@@ -16,7 +16,6 @@ function clientConnect(name) {
 		shipList = gameState.shipList;
 		if(shipList[myID] != null){
 			myShip = shipList[myID];
-			console.log(myShip);
 		}
 	});
 
@@ -29,8 +28,13 @@ function clientConnect(name) {
 	server.on("playerLeft", function(id){
 		var name = playerList[id];
 		console.log(name + " disconnected");
+		console.log(playerList);
 		delete playerList[id];
 		delete shipList[id];
+	});
+
+	server.on("movementUpdates",function(movementPacket){
+		shipList = movementPacket;
 	});
 
    	return server;

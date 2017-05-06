@@ -23,6 +23,11 @@ canvas = document.getElementById('gameCanvas'),
 myShip = null,
 mousex,
 mousey,
+
+moveForward = false,
+moveBackward = false,
+turnLeft = false,
+turnRight = false,
 canvasContext;
 
 function auth(name){
@@ -39,7 +44,8 @@ function init(){
     animloop();
     canvas.addEventListener("mousemove", calcMousePos, false);
     canvas.addEventListener("click", handleClick, false);
-    canvas.addEventListener("keydown", handleKeys, false);
+    window.addEventListener("keydown", keyDown, false);
+    window.addEventListener("keyup", keyUp, false);
 }
 
 function animloop(){
@@ -66,30 +72,26 @@ function handleClick(evt){
     console.log('click');
 }
 
-function handleKeys(evt){
-	var moveFoward = false;
-	var moveBackward = false;
-	var turnLeft = false;
-	var turnRight = false;
-	switch(evt.keyCode) {
-	    case 65: {turnLeft = true; break;} //Left key
-        case 87: {moveFoward = true; break;} //Up key
+function keyDown(evt){
+    switch(evt.keyCode) {
+        case 65: {turnLeft = true; break;} //Left key
+        case 87: {moveForward = true; break;} //Up key
         case 68: {turnRight = true; break;}//Right key
         case 83: {moveBackward = true; break;} //Down key
-	}
-    if(moveFoward){
-    	//server.emit("moveFoward",null);
     }
-    if(moveBackward){
-    	
-    }
-    if(turnLeft){
-    	
-    }
-    if(turnRight){
-    	
-    }
+    server.emit('movement',{turnLeft:turnLeft,moveForward:moveForward,turnRight:turnRight,moveBackward:moveBackward});
 }
+
+function keyUp(evt){
+    switch(evt.keyCode) {
+        case 65: {turnLeft = false; break;} //Left key
+        case 87: {moveForward = false; break;} //Up key
+        case 68: {turnRight = false; break;}//Right key
+        case 83: {moveBackward = false; break;} //Down key
+    }
+    server.emit('movement',{turnLeft:turnLeft,moveForward:moveForward,turnRight:turnRight,moveBackward:moveBackward});
+}
+
 </script>
 
 <script>
