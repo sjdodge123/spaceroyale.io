@@ -20,6 +20,7 @@ window.requestAnimFrame = (function(){
 var server = null,
 skipAuth = false,
 canvas = document.getElementById('gameCanvas'),
+myShip = null,
 mousex,
 mousey,
 canvasContext;
@@ -49,6 +50,7 @@ function animloop(){
 function gameLoop(){
     drawBackground();
     drawAliveCounter();
+    drawShips();
 }
 
 function calcMousePos(evt){

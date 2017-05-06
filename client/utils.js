@@ -13,3 +13,11 @@ function getPlayerListCount(){
 	}
 	return count;
 }
+
+function getShipListCount(){
+	var count = 0;
+	for(var player in shipList){
+		count++;
+	}
+	return count;
+}

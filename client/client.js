@@ -1,26 +1,36 @@
-var playerList = {};
+var myID = null,
+	playerList = {},
+	shipList = {};
 function clientConnect(name) {
 	var server = io();
 
 	server.on('welcome', function(id){
 		console.log("Connected to server");
+		myID = id;
 		playerList[id] = name;
 		server.emit("gotit",name);
 	});
 
 	server.on("gameState", function(gameState){
 		playerList = gameState.playerList;
+		shipList = gameState.shipList;
+		if(shipList[myID] != null){
+			myShip = shipList[myID];
+			console.log(myShip);
+		}
 	});
 
 	server.on("playerJoin", function(appendPlayerList){
 		console.log(appendPlayerList.name + " has joined the battle");
 		playerList[appendPlayerList.id] = appendPlayerList.name;
+		shipList[appendPlayerList.id] = appendPlayerList.ship;
 	});
 
 	server.on("playerLeft", function(id){
 		var name = playerList[id];
 		console.log(name + " disconnected");
 		delete playerList[id];
+		delete shipList[id];
 	});
 
    	return server;

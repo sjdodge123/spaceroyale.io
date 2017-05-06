@@ -10,5 +10,18 @@ function drawText(text,x,y){
 }
 
 function drawAliveCounter(){
-	drawText(getPlayerListCount() + " alive",canvas.width-60,20);
+	drawText(getShipListCount() + " alive",canvas.width-60,20);
+}
+
+function drawShip(ship) {
+	canvasContext.fillStyle = 'white';
+	canvasContext.fillRect(ship.x,ship.y,ship.width,ship.height);
+}
+
+function drawShips(){
+	for(var ship in shipList){
+		if(ship != null){
+			drawShip(shipList[ship]);
+		}
+	}
 }
