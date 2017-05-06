@@ -37,5 +37,11 @@ function clientConnect(name) {
 		shipList = movementPacket;
 	});
 
+	server.on('serverShutdown', function(reason){
+    	serverRunning = false;
+    	serverShutdownReason = reason;
+    	server.disconnect();
+  	});
+
    	return server;
 }

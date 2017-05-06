@@ -19,6 +19,8 @@ window.requestAnimFrame = (function(){
 
 var server = null,
 skipAuth = false,
+serverRunning = false,
+serverShutdownReason = "Error",
 canvas = document.getElementById('gameCanvas'),
 myShip = null,
 mousex,
@@ -35,6 +37,7 @@ function auth(name){
         console.log("Could not connect to server");
     }
     if(server){
+        serverRunning = true;
         init();
     }
 }
@@ -49,8 +52,13 @@ function init(){
 }
 
 function animloop(){
-  requestAnimFrame(animloop);
-  gameLoop();
+    if(serverRunning){
+        requestAnimFrame(animloop);
+        gameLoop();
+    } else {
+        drawBackground();
+        drawText("The server has shutdown: " + serverShutdownReason,10,50);
+    }
 }
 
 function gameLoop(){

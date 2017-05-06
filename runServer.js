@@ -13,6 +13,11 @@ server.listen(3000, function(){
   console.log('listening on *:3000');
 });
 
+process.on( 'SIGINT', function() {
+	  console.log( "\nServer shutting down from (Ctrl-C)" );
+	  io.sockets.emit("serverShutdown","Server terminated");
+	  process.exit();
+});
 
 
 function update(){
