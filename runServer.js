@@ -5,7 +5,8 @@ var path = require('path');
 app.use(express.static(path.join(__dirname, './client')));
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
-var serverSleeping = true;
+var serverSleeping = true,
+	serverTickSpeed = 1000/30;
 var clientList = {},
 	shipList = {};
 
@@ -27,10 +28,7 @@ function update(){
 
 io.on('connection', function(client){
 	client.emit("welcome",client.id);
-	if(serverSleeping){
-		setInterval(update,1000/60);
-		serverSleeping = false;
-	}
+
 	client.on('gotit', function(name){
 
 		console.log(name + " connected");
@@ -69,11 +67,18 @@ io.on('connection', function(client){
 
 	
 	client.on('movement',function(packet){
-		shipList[client.id].moveForward = packet.moveForward;
-		shipList[client.id].moveBackward = packet.moveBackward;
-		shipList[client.id].turnLeft = packet.turnLeft;
-		shipList[client.id].turnRight = packet.turnRight;
+		if(shipList[client.id] != null){
+			shipList[client.id].moveForward = packet.moveForward;
+			shipList[client.id].moveBackward = packet.moveBackward;
+			shipList[client.id].turnLeft = packet.turnLeft;
+			shipList[client.id].turnRight = packet.turnRight;
+		}
 	});
+
+	if(serverSleeping){
+		setInterval(update,serverTickSpeed);
+		serverSleeping = false;
+	}
 });
 
 function updateShips(){

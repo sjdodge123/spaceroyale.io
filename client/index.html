@@ -13,7 +13,7 @@ window.requestAnimFrame = (function(){
           window.webkitRequestAnimationFrame ||
           window.mozRequestAnimationFrame    ||
           function( callback ){
-            window.setTimeout(callback, 1000 / 60);
+            window.setTimeout(callback, 1000 / 30);
           };
 })();
 
@@ -83,9 +83,13 @@ function handleClick(evt){
 function keyDown(evt){
     switch(evt.keyCode) {
         case 65: {turnLeft = true; break;} //Left key
+        case 37: {turnLeft = true; break;} //Left key
         case 87: {moveForward = true; break;} //Up key
+        case 38: {moveForward = true; break;} //Up key
         case 68: {turnRight = true; break;}//Right key
+        case 39: {turnRight = true; break;}//Right key
         case 83: {moveBackward = true; break;} //Down key
+        case 40: {moveBackward = true; break;} //Down key
     }
     server.emit('movement',{turnLeft:turnLeft,moveForward:moveForward,turnRight:turnRight,moveBackward:moveBackward});
 }
@@ -93,9 +97,13 @@ function keyDown(evt){
 function keyUp(evt){
     switch(evt.keyCode) {
         case 65: {turnLeft = false; break;} //Left key
+        case 37: {turnLeft = false; break;} //Left key
         case 87: {moveForward = false; break;} //Up key
+        case 38: {moveForward = false; break;} //Up key
         case 68: {turnRight = false; break;}//Right key
+        case 39: {turnRight = false; break;}//Right key
         case 83: {moveBackward = false; break;} //Down key
+        case 40: {moveBackward = false; break;} //Down key
     }
     server.emit('movement',{turnLeft:turnLeft,moveForward:moveForward,turnRight:turnRight,moveBackward:moveBackward});
 }
