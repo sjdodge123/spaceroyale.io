@@ -6,7 +6,7 @@ app.use(express.static(path.join(__dirname, './client')));
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 var serverSleeping = true,
-	serverTickSpeed = 1000/30;
+	serverTickSpeed = 1000/60;
 var clientList = {},
 	shipList = {};
 
@@ -93,16 +93,16 @@ function sendUpdates(){
 
 function moveShip(ship){
 	if(ship.moveForward){
-		ship.y -= 10;
+		ship.y -= 1;
 	}
 	if(ship.moveBackward){
-		ship.y += 10;
+		ship.y += 1;
 	}
 	if(ship.turnLeft){
-		ship.x -= 10;
+		ship.x -= 1;
 	}
 	if(ship.turnRight){
-		ship.x += 10;
+		ship.x += 1;
 	}
 }
 
