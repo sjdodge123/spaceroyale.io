@@ -1,0 +1,46 @@
+<html>
+<script src='socket.io/socket.io.js'></script>
+<script src='client.js'></script>
+<script type="text/javascript">
+
+window.onload = function() {
+	try{socket = clientConnect();} catch (e) {
+		console.log("Could not connect to server");
+   		//window.addEventListener("keydown", handleKeys, false);
+	}
+
+}
+
+function handleKeys(evt){
+	var moveFoward = false;
+	var moveBackward = false;
+	var turnLeft = false;
+	var turnRight = false;
+	switch(evt.keyCode) {
+	    case 65: {turnLeft = true; break;} //Left key
+        case 87: {moveFoward = true; break;} //Up key
+        case 68: {turnRight = true; break;}//Right key
+        case 83: {moveBackward = true; break;} //Down key
+	}
+    if(moveFoward){
+    	myShip.y -= 5;
+    }
+    if(moveBackward){
+    	myShip.y += 5; 
+    }
+    if(turnLeft){
+    	myShip.x -=5;
+    }
+    if(turnRight){
+    	myShip.x += 5;
+    }
+    if(socket){
+    	//socket.emit('movement', myShip);
+    }
+}
+
+
+
+</script>
+
+</html>
