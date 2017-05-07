@@ -40,7 +40,6 @@ io.on('connection', function(client){
 		shipList[client.id] = spawnNewShip();
 
 		//Send the current gamestate to the new player
-
 		var gameState = {
 			playerList:clientList,
 			shipList:shipList
@@ -73,6 +72,20 @@ io.on('connection', function(client){
 			shipList[client.id].turnLeft = packet.turnLeft;
 			shipList[client.id].turnRight = packet.turnRight;
 		}
+	});
+
+	client.on('mousemove',function(loc){
+		var ship = shipList[client.id];
+		if(ship != null && ship != undefined){
+			ship.angle = (180/Math.PI)*Math.atan2(loc.y-ship.y,loc.x-ship.x)-90;
+			client.emit('rotateShip',{ship:ship,id:client.id});
+			client.broadcast.emit('rotateShip',{ship:ship,id:client.id});
+		}
+	});
+	
+
+	client.on('click',function(loc){
+
 	});
 
 	if(serverSleeping){
@@ -113,6 +126,8 @@ function spawnNewShip(){
 		y: loc.y,
 		width:10,
 		height:10,
+		color: "white",
+		angle: 90,
 		moveForward: false,
 		moveBackward: false,
 		turnLeft: false,

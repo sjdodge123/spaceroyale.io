@@ -16,7 +16,8 @@ function getPlayerListCount(){
 
 function getShipListCount(){
 	var count = 0;
-	for(var player in shipList){
+	for(var ship in shipList){
+
 		count++;
 	}
 	return count;

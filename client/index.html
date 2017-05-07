@@ -73,11 +73,12 @@ function calcMousePos(evt){
         root = document.documentElement;
     mouseX = evt.pageX - rect.left - root.scrollLeft;
     mouseY = evt.pageY - rect.top - root.scrollTop;
+    server.emit('mousemove',{x:mouseX,y:mouseY});
 }
 
 function handleClick(evt){
     evt.preventDefault();
-    console.log('click');
+    server.emit("click",{x:mouseX,y:mouseY});
 }
 
 function keyDown(evt){

@@ -14,8 +14,12 @@ function drawAliveCounter(){
 }
 
 function drawShip(ship) {
-	canvasContext.fillStyle = 'white';
-	canvasContext.fillRect(ship.x,ship.y,ship.width,ship.height);
+	canvasContext.save();
+	canvasContext.translate(ship.x,ship.y);
+	canvasContext.rotate(ship.angle*Math.PI/180);
+	canvasContext.fillStyle = ship.color;
+	canvasContext.fillRect(-ship.width/2,-ship.height/2,ship.width,ship.height);
+	canvasContext.restore();
 }
 
 function drawShips(){

@@ -28,13 +28,8 @@ function clientConnect(name) {
 	server.on("playerLeft", function(id){
 		var name = playerList[id];
 		console.log(name + " disconnected");
-		console.log(playerList);
 		delete playerList[id];
 		delete shipList[id];
-	});
-
-	server.on("movementUpdates",function(movementPacket){
-		shipList = movementPacket;
 	});
 
 	server.on('serverShutdown', function(reason){
@@ -42,6 +37,14 @@ function clientConnect(name) {
     	serverShutdownReason = reason;
     	server.disconnect();
   	});
+
+	server.on("movementUpdates",function(movementPacket){
+		shipList = movementPacket;
+	});
+
+	server.on("rotateShip",function(movementPacket){
+		shipList[movementPacket.id] = movementPacket.ship;
+	});
 
    	return server;
 }
