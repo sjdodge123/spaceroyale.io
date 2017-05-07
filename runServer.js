@@ -27,6 +27,7 @@ process.on( 'SIGINT', function() {
 function update(){
 	if(!serverSleeping){
 		updateShips();
+		updateBullets();
 		sendUpdates();
 	}
 }
@@ -93,8 +94,6 @@ io.on('connection', function(client){
 		var ship = shipList[client.id];
 		if(ship != null && ship != undefined){
 			ship.angle = (180/Math.PI)*Math.atan2(loc.y-ship.y,loc.x-ship.x)-90;
-			client.emit('rotateShip',{ship:ship,id:client.id});
-			client.broadcast.emit('rotateShip',{ship:ship,id:client.id});
 		}
 	});
 	
@@ -102,8 +101,6 @@ io.on('connection', function(client){
 	client.on('click',function(loc){
 		//if bullet should be spawned (could be clicking something else)
 		var bullet = spawnNewBullet(client.id);
-		client.emit('shotsFired',bullet);
-		client.broadcast.emit('shotsFired',bullet);
 	});
 
 	if(serverSleeping){
@@ -114,12 +111,21 @@ io.on('connection', function(client){
 
 function updateShips(){
 	for(var ship in shipList){
+		//Check for hit first!!
 		moveShip(shipList[ship]);
 	}
 }
 
+function updateBullets(){
+	for(var sig in bulletList){
+		//Check for hit first!!
+		updatePhysics(bulletList[sig]);
+		moveBullet(bulletList[sig]);
+	}
+}
+
 function sendUpdates(){
-	io.sockets.emit("movementUpdates",shipList);
+	io.sockets.emit("movementUpdates",{shipList:shipList,bulletList:bulletList});
 }
 
 function moveShip(ship){
@@ -135,6 +141,17 @@ function moveShip(ship){
 	if(ship.turnRight){
 		ship.x += 1;
 	}
+}
+
+function updatePhysics(object){
+	//I'm fucking dumb and can't figure this shit out
+	object.velX = Math.sin(object.angle)*object.speed;
+	object.velY = Math.cos(object.angle)*object.speed;
+}
+
+function moveBullet(bullet){
+	bullet.x += bullet.velX;
+	bullet.y += bullet.velY;
 }
 
 function spawnNewShip(){
@@ -159,15 +176,24 @@ function spawnNewBullet(id){
 	var bullet = {
 		x:ship.x,
 		y:ship.y,
+		speed:1,
+		velX:0,
+		velY:0,
 		angle:ship.angle,
 		width:2,
 		height:6,
 		color:ship.color,
 		owner:id,
+		lifetime:5,
 		sig:generateBulletSig()
 	}
+	setTimeout(terminateBullet,bullet.lifetime*1000,bullet.sig);
 	bulletList[bullet.sig] = bullet;
 	return bullet;
+}
+
+function terminateBullet(sig){
+	delete bulletList[sig];
 }
 
 function generateBulletSig(){

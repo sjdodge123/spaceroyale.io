@@ -40,11 +40,8 @@ function clientConnect(name) {
   	});
 
 	server.on("movementUpdates",function(movementPacket){
-		shipList = movementPacket;
-	});
-
-	server.on("rotateShip",function(movementPacket){
-		shipList[movementPacket.id] = movementPacket.ship;
+		shipList = movementPacket.shipList;
+		bulletList = movementPacket.bulletList;
 	});
 
 	server.on("shotsFired",function(bullet){
