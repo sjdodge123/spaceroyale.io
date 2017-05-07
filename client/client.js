@@ -1,5 +1,6 @@
 var myID = null,
 	playerList = {},
+	bulletList = {},
 	shipList = {};
 function clientConnect(name) {
 	var server = io();
@@ -44,6 +45,10 @@ function clientConnect(name) {
 
 	server.on("rotateShip",function(movementPacket){
 		shipList[movementPacket.id] = movementPacket.ship;
+	});
+
+	server.on("shotsFired",function(bullet){
+		bulletList[bullet.sig] = bullet;
 	});
 
    	return server;

@@ -6,8 +6,11 @@ app.use(express.static(path.join(__dirname, './client')));
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 var serverSleeping = true,
-	serverTickSpeed = 1000/60;
+	serverTickSpeed = 1000/60,
+	clientCount;
+
 var clientList = {},
+	bulletList = {},
 	shipList = {};
 
 server.listen(3000, function(){
@@ -22,8 +25,10 @@ process.on( 'SIGINT', function() {
 
 
 function update(){
-	updateShips();
-	sendUpdates();
+	if(!serverSleeping){
+		updateShips();
+		sendUpdates();
+	}
 }
 
 io.on('connection', function(client){
@@ -62,6 +67,16 @@ io.on('connection', function(client){
 		console.log(name + ' disconnected');
 		delete clientList[id];
 		delete shipList[id];
+
+		clientCount = 0; 
+		for(var user in clientList){
+			clientCount++;
+		}
+		if(clientCount == 0){
+			serverSleeping = true;
+			console.log("Server sleeping..");
+		}
+		
   	});
 
 	
@@ -85,12 +100,15 @@ io.on('connection', function(client){
 	
 
 	client.on('click',function(loc){
-
+		//if bullet should be spawned (could be clicking something else)
+		var bullet = spawnNewBullet(client.id);
+		client.emit('shotsFired',bullet);
+		client.broadcast.emit('shotsFired',bullet);
 	});
 
 	if(serverSleeping){
-		setInterval(update,serverTickSpeed);
 		serverSleeping = false;
+		setInterval(update,serverTickSpeed);
 	}
 });
 
@@ -134,6 +152,30 @@ function spawnNewShip(){
 		turnRight: false
 	}
 	return ship;
+}
+
+function spawnNewBullet(id){
+	var ship = shipList[id];
+	var bullet = {
+		x:ship.x,
+		y:ship.y,
+		angle:ship.angle,
+		width:2,
+		height:6,
+		color:ship.color,
+		owner:id,
+		sig:generateBulletSig()
+	}
+	bulletList[bullet.sig] = bullet;
+	return bullet;
+}
+
+function generateBulletSig(){
+	var sig = getRandomInt(0,99999);
+	if(bulletList[sig] == null || bulletList[sig] == undefined){
+		return sig;
+	}
+	sig = generateBulletSig();
 }
 
 function findRandomSpawnLoc(){

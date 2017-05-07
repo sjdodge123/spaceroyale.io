@@ -22,10 +22,27 @@ function drawShip(ship) {
 	canvasContext.restore();
 }
 
+function drawBullet(bullet){
+	canvasContext.save();
+	canvasContext.translate(bullet.x,bullet.y);
+	canvasContext.rotate(bullet.angle*Math.PI/180);
+	canvasContext.fillStyle = bullet.color;
+	canvasContext.fillRect(-bullet.width/2,-bullet.height/2,bullet.width,bullet.height);
+	canvasContext.restore();
+}
+
 function drawShips(){
 	for(var ship in shipList){
 		if(ship != null){
 			drawShip(shipList[ship]);
+		}
+	}
+}
+
+function drawBullets(){
+	for(var sig in bulletList){
+		if(sig != null){
+			drawBullet(bulletList[sig]);
 		}
 	}
 }
