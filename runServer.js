@@ -5,13 +5,26 @@ var path = require('path');
 app.use(express.static(path.join(__dirname, './client')));
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
+
+//Base Server Settings
 var serverSleeping = true,
 	serverTickSpeed = 1000/60,
 	clientCount;
 
+//Gameobject lists
 var clientList = {},
 	bulletList = {},
 	shipList = {};
+
+
+
+
+
+
+
+//Base Server Functions
+
+
 
 server.listen(3000, function(){
   console.log('listening on *:3000');
@@ -22,15 +35,6 @@ process.on( 'SIGINT', function() {
 	  io.sockets.emit("serverShutdown","Server terminated");
 	  process.exit();
 });
-
-
-function update(){
-	if(!serverSleeping){
-		updateShips();
-		updateBullets();
-		sendUpdates();
-	}
-}
 
 io.on('connection', function(client){
 	client.emit("welcome",client.id);
@@ -109,6 +113,32 @@ io.on('connection', function(client){
 	}
 });
 
+
+
+
+//Gamestate updates
+
+
+function update(){
+	if(!serverSleeping){
+		checkCollisions();
+		updateShips();
+		updateBullets();
+		sendUpdates();
+	}
+}
+
+function checkCollisions(){
+	var objectArray = [];
+	for(var ship in shipList){
+		objectArray.push(shipList[ship]);
+	}
+	for(var sig in bulletList){
+		objectArray.push(bulletList[sig]);
+	}
+	broadBase(objectArray);
+}
+
 function updateShips(){
 	for(var ship in shipList){
 		//Check for hit first!!
@@ -163,6 +193,7 @@ function spawnNewShip(){
 		height:10,
 		color: "white",
 		angle: 90,
+		isHit: false,
 		moveForward: false,
 		moveBackward: false,
 		turnLeft: false,
@@ -180,6 +211,7 @@ function spawnNewBullet(id){
 		velX:0,
 		velY:0,
 		angle:ship.angle,
+		isHit: false,
 		width:2,
 		height:6,
 		color:ship.color,
@@ -196,6 +228,9 @@ function terminateBullet(sig){
 	delete bulletList[sig];
 }
 
+
+
+//Utils
 function generateBulletSig(){
 	var sig = getRandomInt(0,99999);
 	if(bulletList[sig] == null || bulletList[sig] == undefined){
@@ -212,4 +247,46 @@ function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min)) + min;
+}
+
+
+
+
+
+
+
+
+//Collision
+function broadBase(objectArray){
+	//Shitty Collision detection for first run through
+	checkBoxBroad(objectArray);
+}
+
+function checkBoxBroad(objectArray){
+	for (var i = 0; i < objectArray.length-1; i++) {
+    	for (var j = i + 1; j < objectArray.length; j++) {
+    		if(checkBoxNarrow(objectArray[i],objectArray[j])){
+    			objectArray[i].isHit = true;
+    			objectArray[i].color = 'red';
+    			objectArray[j].isHit = true;
+    			objectArray[j].color = 'red';
+    		} else{
+    			objectArray[i].isHit = false;
+    			objectArray[i].color = 'white';
+    			objectArray[j].isHit = false;
+    			objectArray[j].color = 'white';
+    		}
+    	}
+    }
+}
+
+
+function checkBoxNarrow(box1,box2) {
+	if (box1.x < box2.x + box2.width &&
+	    box1.x + box1.width > box2.x &&
+	    box1.y < box2.y + box2.height &&
+	    box1.height + box1.y > box2.y){
+		return true;
+	}
+	return false;
 }
