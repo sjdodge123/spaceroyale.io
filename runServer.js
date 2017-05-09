@@ -9,7 +9,7 @@ var io = require('socket.io').listen(server);
 //Base Server Settings
 var serverSleeping = true,
 	serverTickSpeed = 1000/60,
-	clientCount;
+	clientCount = 0;
 
 //Gameobject lists
 var clientList = {},
@@ -20,8 +20,6 @@ var clientList = {},
 
 
 //Base Server Functions
-
-
 
 server.listen(3000, function(){
   console.log('listening on *:3000');
@@ -39,7 +37,7 @@ io.on('connection', function(client){
 	client.on('gotit', function(name){
 
 		console.log(name + " connected");
-
+		clientCount++;
 		//Add this player to the list of current clients
 		clientList[client.id] = name; 
 
@@ -181,13 +179,23 @@ function moveBullet(bullet){
 }
 
 function spawnNewShip(){
-	var loc = findRandomSpawnLoc();
+	var loc;// = findRandomSpawnLoc();
+	var shipColor;
+	if(clientCount == 1){
+		shipColor = "white";
+		loc = {x:10,y:10};
+	} else {
+		shipColor = "green";
+		loc = {x:40,y:40};
+	}
 	var ship = {
 		x: loc.x,
 		y: loc.y,
 		width:10,
 		height:10,
-		color: "white",
+		color: shipColor,
+		baseColor: shipColor,
+		hitColor: "red",
 		angle: 90,
 		isHit: false,
 		moveForward: false,
@@ -224,8 +232,6 @@ function terminateBullet(sig){
 	delete bulletList[sig];
 }
 
-
-
 //Utils
 function generateBulletSig(){
 	var sig = getRandomInt(0,99999);
@@ -247,11 +253,6 @@ function getRandomInt(min, max) {
 
 
 
-
-
-
-
-
 //Collision
 function broadBase(objectArray){
 	//Shitty Collision detection for first run through
@@ -259,18 +260,27 @@ function broadBase(objectArray){
 }
 
 function checkBoxBroad(objectArray){
-	for (var i = 0; i < objectArray.length-1; i++) {
-    	for (var j = i + 1; j < objectArray.length; j++) {
-    		if(checkBoxNarrow(objectArray[i],objectArray[j])){
-    			objectArray[i].isHit = true;
-    			objectArray[i].color = 'red';
-    			objectArray[j].isHit = true;
-    			objectArray[j].color = 'red';
+	for (var i = 0; i < objectArray.length; i++) {
+    	for (var j = 0; j < objectArray.length; j++) {
+
+    		if(objectArray[i] == objectArray[j]){
+    			continue;
+    		}
+    		var obj1 = objectArray[i],
+    			obj2 = objectArray[j];
+
+    		if(checkDistance(obj1,obj2)){
+    			obj1.isHit = true;
+    			obj1.color = obj1.hitColor;
+
+    			obj2.isHit = true;
+    			obj2.color = obj2.hitColor;
     		} else{
-    			objectArray[i].isHit = false;
-    			objectArray[i].color = 'white';
-    			objectArray[j].isHit = false;
-    			objectArray[j].color = 'white';
+    			obj1.isHit = false;
+    			obj1.color = obj1.baseColor;
+
+    			obj2.isHit = false;
+    			obj2.color = obj2.baseColor;;
     		}
     	}
     }
@@ -282,6 +292,14 @@ function checkBoxNarrow(box1,box2) {
 	    box1.x + box1.width > box2.x &&
 	    box1.y < box2.y + box2.height &&
 	    box1.height + box1.y > box2.y){
+		return true;
+	}
+	return false;
+}
+
+function checkDistance(obj1,obj2){
+	var distance = Math.sqrt(Math.pow((obj2.x - obj1.x),2) + Math.pow((obj2.y - obj1.y),2));
+	if(distance < 10){
 		return true;
 	}
 	return false;

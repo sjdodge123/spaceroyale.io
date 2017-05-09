@@ -26,6 +26,20 @@ myShip = null,
 mousex,
 mousey,
 
+camera = {
+    xOffset: canvas.width/2,
+    yOffset: canvas.height/2,
+
+    centerOnObject : function(object){
+       xOffset =  object.x - (canvas.width/2);
+       yOffset =  object.y - (canvas.height/2);
+    },
+    move : function(x,y){
+        this.xOffset += x;
+        this.yOffset += y;
+    }   
+},
+
 moveForward = false,
 moveBackward = false,
 turnLeft = false,
@@ -64,16 +78,17 @@ function animloop(){
 function gameLoop(){
     drawBackground();
     drawAliveCounter();
-    drawShips();
-    drawBullets();
+    drawRelativeObjects();
+    //drawShips();
+    //drawBullets();
 }
 
 function calcMousePos(evt){
     evt.preventDefault();
     var rect = canvas.getBoundingClientRect(),
         root = document.documentElement;
-    mouseX = evt.pageX - rect.left - root.scrollLeft;
-    mouseY = evt.pageY - rect.top - root.scrollTop;
+    mouseX = evt.pageX - rect.left - root.scrollLeft - camera.xOffset;
+    mouseY = evt.pageY - rect.top - root.scrollTop - camera.yOffset;
     server.emit('mousemove',{x:mouseX,y:mouseY});
 }
 
