@@ -18,7 +18,7 @@ window.requestAnimFrame = (function(){
 })();
 
 var server = null,
-skipAuth = true,
+skipAuth = false,
 serverRunning = false,
 serverShutdownReason = "Error",
 canvas = document.getElementById('gameCanvas'),
@@ -32,7 +32,7 @@ camera = {
     width : canvas.width,
     height : canvas.height,
     color : 'yellow',
-    padding: 150,
+    padding: -50,
     left: 0,
     right:0,
     top:0,
@@ -75,8 +75,8 @@ turnLeft = false,
 turnRight = false,
 canvasContext;
 
-function auth(name){
-    try{server = clientConnect(name);} catch (e) {
+function auth(name,color){
+    try{server = clientConnect({name:name,color:color});} catch (e) {
         console.log("Could not connect to server");
     }
     if(server){
@@ -169,12 +169,20 @@ window.onload = function() {
 <form id="authForm" hidden>
     Enter your username:<br>
     <input type="text" id="nameBox"></input>
-    <input type="submit"></submit>
+    <input type="submit" value="Play!"></input>
+    <br>
+    <input type="radio" name="color" value = "white">White</input>
+    <input type="radio" name="color" value = "red">Red</input>
+    <input type="radio" name="color" value = "green">Green</input>
+    <input type="radio" name="color" value = "blue">Blue</input>
 </form>
 
 <script type="text/javascript">
+var array = $('input[name=color]');
+array[getRandomInt(0,array.length)].checked = true;
+
 $('#authForm').submit(function () {
- auth($('#nameBox').val());
+ auth($('#nameBox').val(),$('input[name=color]:checked').val());
  $('#authForm').hide();
  return false;
 });

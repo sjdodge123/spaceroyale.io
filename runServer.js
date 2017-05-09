@@ -19,6 +19,13 @@ var clientList = {},
 
 
 
+var world ={
+	x:0,
+	y:0,
+	width:300,
+	height:300
+}
+
 //Base Server Functions
 
 server.listen(3000, function(){
@@ -34,15 +41,14 @@ process.on( 'SIGINT', function() {
 io.on('connection', function(client){
 	client.emit("welcome",client.id);
 
-	client.on('gotit', function(name){
-
-		console.log(name + " connected");
+	client.on('gotit', function(message){
+		console.log(message.name + " connected");
 		clientCount++;
 		//Add this player to the list of current clients
-		clientList[client.id] = name; 
+		clientList[client.id] = message.name; 
 
 		//Spawn a ship for the new player
-		shipList[client.id] = spawnNewShip();
+		shipList[client.id] = spawnNewShip(message.color);
 
 		//Send the current gamestate to the new player
 		var gameState = {
@@ -53,7 +59,7 @@ io.on('connection', function(client){
 
 		//Update all existing players with the new player's info
 		var appendPlayerList = {
-			name:name,
+			name:message.name,
 			id:client.id,
 			ship:shipList[client.id]
 		};
@@ -178,23 +184,15 @@ function moveBullet(bullet){
 	bullet.y += bullet.velY;
 }
 
-function spawnNewShip(){
-	var loc;// = findRandomSpawnLoc();
-	var shipColor;
-	if(clientCount == 1){
-		shipColor = "white";
-		loc = {x:10,y:10};
-	} else {
-		shipColor = "green";
-		loc = {x:40,y:40};
-	}
+function spawnNewShip(color){
+	var loc = findRandomSpawnLoc();
 	var ship = {
 		x: loc.x,
 		y: loc.y,
 		width:10,
 		height:10,
-		color: shipColor,
-		baseColor: shipColor,
+		color: color,
+		baseColor: color,
 		hitColor: "red",
 		angle: 90,
 		isHit: false,
@@ -218,7 +216,7 @@ function spawnNewBullet(id){
 		isHit: false,
 		width:2,
 		height:6,
-		color:ship.color,
+		color:ship.baseColor,
 		owner:id,
 		lifetime:5,
 		sig:generateBulletSig()
@@ -242,7 +240,7 @@ function generateBulletSig(){
 }
 
 function findRandomSpawnLoc(){
-	return {x:getRandomInt(10,790),y:getRandomInt(10,590)};
+	return {x:getRandomInt(world.x,world.width),y:getRandomInt(world.y,world.height)};
 }
 
 function getRandomInt(min, max) {
