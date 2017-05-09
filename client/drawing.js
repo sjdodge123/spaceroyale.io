@@ -13,17 +13,6 @@ function drawAliveCounter(){
 	drawText(getShipListCount() + " alive",canvas.width-60,20);
 }
 
-/*
-function drawShip(ship) {
-	canvasContext.save();
-	canvasContext.translate(ship.x,ship.y);
-	canvasContext.rotate(ship.angle*Math.PI/180);
-	canvasContext.fillStyle = ship.color;
-	canvasContext.fillRect(-ship.width/2,-ship.height/2,ship.width,ship.height);
-	canvasContext.restore();
-}
-*/
-
 function drawShip(ship){
 	canvasContext.save();
 	canvasContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
@@ -46,6 +35,7 @@ function drawRelativeObjects(){
 	if(myID != null && shipList != null && shipList[myID] != null){
         myShip = shipList[myID];
         camera.centerOnObject(myShip);
+		camera.draw();
         drawShips();
 		drawBullets();
     }
@@ -56,7 +46,9 @@ function drawShips(cameraX,cameraY){
 		if(shipList[shipKey] == null){
 			continue;
 		}
-		drawShip(shipList[shipKey]);
+		if(camera.inBounds(shipList[shipKey])){
+			drawShip(shipList[shipKey]);
+		}
 	}
 }
 
@@ -65,6 +57,8 @@ function drawBullets(cameraX,cameraY){
 		if(sig == null){
 			continue;
 		}
-		drawBullet(bulletList[sig]);
+		if(camera.inBounds(bulletList[sig])){
+			drawBullet(bulletList[sig]);
+		}
 	}
 }

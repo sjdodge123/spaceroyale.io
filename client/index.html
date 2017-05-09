@@ -27,6 +27,16 @@ mousex,
 mousey,
 
 camera = {
+    x : canvas.width/2,
+    y : canvas.height/2,
+    width : canvas.width,
+    height : canvas.height,
+    color : 'yellow',
+    padding: 150,
+    left: 0,
+    right:0,
+    top:0,
+    bottom:0,
     xOffset: canvas.width/2,
     yOffset: canvas.height/2,
 
@@ -34,10 +44,29 @@ camera = {
        xOffset =  object.x - (canvas.width/2);
        yOffset =  object.y - (canvas.height/2);
     },
+
+    draw : function() {
+        canvasContext.beginPath();
+        canvasContext.strokeStyle = this.color;
+        canvasContext.rect(this.padding,this.padding,this.width-this.padding*2,this.height-this.padding*2);
+        canvasContext.stroke();
+    },
+
+    inBounds: function(object){
+        if(this.padding <= object.x - myShip.x  + this.xOffset &&
+           this.width-this.padding >= object.x - myShip.x + this.xOffset &&
+           this.padding <= object.y - myShip.y  + this.yOffset &&
+           this.height-this.padding >= object.y - myShip.y + this.yOffset
+           ){
+           return true;
+        }
+        return false;
+    },
+
     move : function(x,y){
         this.xOffset += x;
         this.yOffset += y;
-    }   
+    }  
 },
 
 moveForward = false,
@@ -87,8 +116,8 @@ function calcMousePos(evt){
     evt.preventDefault();
     var rect = canvas.getBoundingClientRect(),
         root = document.documentElement;
-    mouseX = evt.pageX - rect.left - root.scrollLeft - camera.xOffset;
-    mouseY = evt.pageY - rect.top - root.scrollTop - camera.yOffset;
+    mouseX = evt.pageX - rect.left - root.scrollLeft + myShip.x - camera.xOffset;
+    mouseY = evt.pageY - rect.top - root.scrollTop + myShip.y - camera.yOffset;
     server.emit('mousemove',{x:mouseX,y:mouseY});
 }
 
