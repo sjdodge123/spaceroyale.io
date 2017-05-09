@@ -19,9 +19,6 @@ var clientList = {},
 
 
 
-
-
-
 //Base Server Functions
 
 
@@ -174,9 +171,8 @@ function moveShip(ship){
 }
 
 function updatePhysics(object){
-	//I'm fucking dumb and can't figure this shit out
-	object.velX = Math.sin(object.angle)*object.speed;
-	object.velY = Math.cos(object.angle)*object.speed;
+	object.velX = Math.cos((object.angle+90)*(Math.PI/180))*object.speed;
+	object.velY = Math.sin((object.angle+90)*(Math.PI/180))*object.speed;
 }
 
 function moveBullet(bullet){
@@ -207,7 +203,7 @@ function spawnNewBullet(id){
 	var bullet = {
 		x:ship.x,
 		y:ship.y,
-		speed:1,
+		speed:5,
 		velX:0,
 		velY:0,
 		angle:ship.angle,
