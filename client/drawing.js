@@ -3,6 +3,11 @@ function drawBackground() {
 	canvasContext.fillRect(0,0,canvas.width,canvas.height);
 }
 
+function drawFlashScreen(){
+	canvasContext.fillStyle = 'red';
+	canvasContext.fillRect(0,0,canvas.width,canvas.height);
+}
+
 function drawText(text,x,y){
 	canvasContext.fillStyle = 'white';
 	canvasContext.font="20px Georgia";
@@ -11,6 +16,18 @@ function drawText(text,x,y){
 
 function drawAliveCounter(){
 	drawText(getShipListCount() + " alive",canvas.width-60,20);
+}
+
+function drawDeathText(){
+	drawText("You died!",camera.x-60,camera.y);
+}
+
+function drawHPCounter(){
+	if(!iAmAlive){
+		drawText("HP:" + 0,10,20);
+		return;
+	}
+	drawText("HP:" + shipList[myID].health,10,20);
 }
 
 function drawShip(ship){
@@ -31,6 +48,15 @@ function drawBullet(bullet){
 	canvasContext.restore();
 }
 
+function drawWorld(){
+	if(world != null){
+		canvasContext.beginPath();
+        canvasContext.strokeStyle = 'orange';
+        canvasContext.rect(world.x-myShip.x+camera.xOffset,world.y-myShip.y+camera.yOffset,world.width,world.height);
+        canvasContext.stroke();
+	}
+}
+
 function drawRelativeObjects(){
 	if(myID != null && shipList != null && shipList[myID] != null){
         myShip = shipList[myID];
@@ -38,6 +64,7 @@ function drawRelativeObjects(){
 		camera.draw();
         drawShips();
 		drawBullets();
+		drawWorld();
     }
 	
 }

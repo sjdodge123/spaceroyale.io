@@ -1,4 +1,5 @@
 var myID = null,
+	world,
 	playerList = {},
 	bulletList = {},
 	shipList = {};
@@ -15,6 +16,7 @@ function clientConnect(name) {
 	server.on("gameState", function(gameState){
 		playerList = gameState.playerList;
 		shipList = gameState.shipList;
+		world = gameState.world;
 		if(shipList[myID] != null){
 			myShip = shipList[myID];
 		}
@@ -31,6 +33,13 @@ function clientConnect(name) {
 		console.log(name + " disconnected");
 		delete playerList[id];
 		delete shipList[id];
+	});
+
+	server.on("shipDeath",function(id){
+		if(id == myID){
+			iAmAlive = false;
+			delete shipList[id];
+		}
 	});
 
 	server.on('serverShutdown', function(reason){

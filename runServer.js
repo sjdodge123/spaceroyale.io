@@ -17,14 +17,27 @@ var clientList = {},
 	shipList = {};
 
 
-
-
 var world ={
 	x:0,
 	y:0,
 	width:300,
-	height:300
+	height:300,
+
+	inBounds:function(object){
+		if(this.x < object.x &&
+           this.x + this.width > object.x &&
+           this.y < object.y &&
+           this.y + this.height > object.y
+           ){
+           return true;
+        }
+        return false;
+	}
 }
+
+//Gamerules
+var damageRate = 2,
+	damagePerTick = 15;
 
 //Base Server Functions
 
@@ -53,7 +66,8 @@ io.on('connection', function(client){
 		//Send the current gamestate to the new player
 		var gameState = {
 			playerList:clientList,
-			shipList:shipList
+			shipList:shipList,
+			world:world
 		};
 		client.emit("gameState" , gameState);
 
@@ -115,8 +129,6 @@ io.on('connection', function(client){
 });
 
 
-
-
 //Gamestate updates
 
 
@@ -141,10 +153,52 @@ function checkCollisions(){
 }
 
 function updateShips(){
-	for(var ship in shipList){
+	for(var shipID in shipList){
 		//Check for hit first!!
-		moveShip(shipList[ship]);
+		checkForMapDamage(shipID);
+		if(checkHP(shipID)){
+			continue;
+		}
+		moveShip(shipID);
+
 	}
+}
+
+function checkHP(shipID){
+	var ship = shipList[shipID];
+	if(ship == null){
+		return;
+	}
+	if(ship.health < 1){
+		io.sockets.emit('shipDeath',shipID);
+		delete shipList[shipID];
+		return true;
+	}
+	return false;
+}
+
+function checkForMapDamage(shipID){
+	var ship = shipList[shipID];
+	if(!world.inBounds(ship)){
+		if(ship.damageTimer == false){
+			ship.damageTimer = true;
+			setTimeout(dealMapDamage,damageRate*1000,shipID);
+		}
+	}
+}
+
+function dealMapDamage(shipID){
+	var ship = shipList[shipID];
+	if(ship == undefined){
+		return;
+	}
+	if(world.inBounds(ship)){
+		ship.damageTimer = false;
+	} else{
+		ship.health -= damagePerTick;
+		setTimeout(dealMapDamage,damageRate*1000,shipID);
+	}
+	
 }
 
 function updateBullets(){
@@ -159,7 +213,8 @@ function sendUpdates(){
 	io.sockets.emit("movementUpdates",{shipList:shipList,bulletList:bulletList});
 }
 
-function moveShip(ship){
+function moveShip(shipID){
+	var ship = shipList[shipID];
 	if(ship.moveForward){
 		ship.y -= 1;
 	}
@@ -191,8 +246,10 @@ function spawnNewShip(color){
 		y: loc.y,
 		width:10,
 		height:10,
+		health:100,
 		color: color,
 		baseColor: color,
+		damageTimer:false,
 		hitColor: "red",
 		angle: 90,
 		isHit: false,
@@ -212,6 +269,7 @@ function spawnNewBullet(id){
 		speed:5,
 		velX:0,
 		velY:0,
+		damage:30,
 		angle:ship.angle,
 		isHit: false,
 		width:2,
@@ -249,8 +307,6 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-
-
 //Collision
 function broadBase(objectArray){
 	//Shitty Collision detection for first run through
@@ -283,7 +339,6 @@ function checkBoxBroad(objectArray){
     	}
     }
 }
-
 
 function checkBoxNarrow(box1,box2) {
 	if (box1.x < box2.x + box2.width &&

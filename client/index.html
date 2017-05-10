@@ -20,9 +20,11 @@ window.requestAnimFrame = (function(){
 var server = null,
 skipAuth = false,
 serverRunning = false,
+iAmAlive = true,
 serverShutdownReason = "Error",
 canvas = document.getElementById('gameCanvas'),
 myShip = null,
+healthLastFrame = 100,
 mousex,
 mousey,
 
@@ -32,7 +34,7 @@ camera = {
     width : canvas.width,
     height : canvas.height,
     color : 'yellow',
-    padding: -50,
+    padding: -10,
     left: 0,
     right:0,
     top:0,
@@ -105,11 +107,26 @@ function animloop(){
 }
 
 function gameLoop(){
+    if(myID == null || myShip == null){
+        return;
+    }
     drawBackground();
     drawAliveCounter();
+    drawHPCounter();
     drawRelativeObjects();
-    //drawShips();
-    //drawBullets();
+    if(iAmAlive){
+        checkForDamage();
+    } else{
+        drawDeathText();
+    }
+   
+}
+
+function checkForDamage(){
+    if(shipList[myID].health < healthLastFrame){
+        drawFlashScreen();
+    }
+    healthLastFrame = shipList[myID].health;
 }
 
 function calcMousePos(evt){
@@ -123,7 +140,9 @@ function calcMousePos(evt){
 
 function handleClick(evt){
     evt.preventDefault();
-    server.emit("click",{x:mouseX,y:mouseY});
+    if(iAmAlive){
+       server.emit("click",{x:mouseX,y:mouseY}); 
+    }
 }
 
 function keyDown(evt){
