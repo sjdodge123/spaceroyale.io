@@ -51,6 +51,8 @@ function clientConnect(name) {
 	server.on("movementUpdates",function(movementPacket){
 		shipList = movementPacket.shipList;
 		bulletList = movementPacket.bulletList;
+		world = movementPacket.world;
+		shrinkTimeLeft = movementPacket.shrinkTimeLeft;
 	});
 
 	server.on("shotsFired",function(bullet){

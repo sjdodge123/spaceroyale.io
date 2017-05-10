@@ -14,6 +14,15 @@ function drawText(text,x,y){
 	canvasContext.fillText(text,x,y);
 }
 
+
+
+//DRAWING HUD UI
+function drawHUD(){
+	drawAliveCounter();
+    drawHPCounter();
+    drawShrinkTimer();
+}
+
 function drawAliveCounter(){
 	drawText(getShipListCount() + " alive",canvas.width-60,20);
 }
@@ -30,6 +39,30 @@ function drawHPCounter(){
 	drawText("HP:" + shipList[myID].health,10,20);
 }
 
+
+function drawShrinkTimer(){
+	if(shrinkTimeLeft > 0){
+		drawText(shrinkTimeLeft + " until shrink",canvas.width/2,20);
+	} else{
+		drawText("Shrinking world..",canvas.width/2,20);
+	}
+}
+
+
+
+//DRAWING OBJECTS RELATIVE TO CAMERA
+function drawRelativeObjects(){
+	if(myID != null && shipList != null && shipList[myID] != null){
+        myShip = shipList[myID];
+        camera.centerOnObject(myShip);
+		camera.draw();
+        drawShips();
+		drawBullets();
+		drawWorld();
+		drawBounds();
+    }
+	
+}
 function drawShip(ship){
 	canvasContext.save();
 	canvasContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
@@ -57,17 +90,22 @@ function drawWorld(){
 	}
 }
 
-function drawRelativeObjects(){
-	if(myID != null && shipList != null && shipList[myID] != null){
-        myShip = shipList[myID];
-        camera.centerOnObject(myShip);
-		camera.draw();
-        drawShips();
-		drawBullets();
-		drawWorld();
-    }
-	
+function drawBounds(){
+	if(world.whiteBound != null){
+		canvasContext.beginPath();
+		canvasContext.strokeStyle = world.whiteBound.color;
+		canvasContext.arc(world.whiteBound.x-myShip.x+camera.xOffset,world.whiteBound.y-myShip.y+camera.yOffset,world.whiteBound.radius,0,Math.PI*2,true);
+		canvasContext.stroke();
+	}
+	if(world.blueBound != null){
+		canvasContext.beginPath();
+		canvasContext.strokeStyle = world.blueBound.color;
+		canvasContext.arc(world.blueBound.x-myShip.x+camera.xOffset,world.blueBound.y-myShip.y+camera.yOffset,world.blueBound.radius,0,Math.PI*2,true);
+		canvasContext.stroke();
+	}
 }
+
+
 function drawShips(cameraX,cameraY){
 	for(var shipKey in shipList){
 		if(shipList[shipKey] == null){

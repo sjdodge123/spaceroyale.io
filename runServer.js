@@ -5,10 +5,12 @@ var path = require('path');
 app.use(express.static(path.join(__dirname, './client')));
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
-
+var factory = require('./server/factory.js');
+var util = require('./server/util.js');
 //Base Server Settings
 var serverSleeping = true,
 	serverTickSpeed = 1000/60,
+	gameActive = false,
 	clientCount = 0;
 
 //Gameobject lists
@@ -16,28 +18,16 @@ var clientList = {},
 	bulletList = {},
 	shipList = {};
 
-
-var world ={
-	x:0,
-	y:0,
-	width:300,
-	height:300,
-
-	inBounds:function(object){
-		if(this.x < object.x &&
-           this.x + this.width > object.x &&
-           this.y < object.y &&
-           this.y + this.height > object.y
-           ){
-           return true;
-        }
-        return false;
-	}
-}
+var world = factory.getWorld();
 
 //Gamerules
-var damageRate = 2,
-	damagePerTick = 15;
+var minPlayersToStart = 2,
+	damageRate = 2,
+	damagePerTick = 15,
+	shrinkTime = 60,
+	shrinkerTimer = null,
+	shrinkTimeLeft = 60,
+	shrinkRate = .3;
 
 //Base Server Functions
 
@@ -78,6 +68,12 @@ io.on('connection', function(client){
 			ship:shipList[client.id]
 		};
 		client.broadcast.emit("playerJoin",appendPlayerList);
+
+		if(clientCount == minPlayersToStart){
+			gameActive = true;
+			world.drawNextBound();
+			shrinkerTimer = factory.getTimer(world.shrinkBound,shrinkTime*1000); 
+		}
 	});
 
 	client.on('disconnect', function() {
@@ -139,6 +135,9 @@ function update(){
 		updateBullets();
 		sendUpdates();
 	}
+	if(gameActive){
+		shrinkTimeLeft = shrinkerTimer.getTimeLeft().toFixed(1);
+	}
 }
 
 function checkCollisions(){
@@ -179,7 +178,8 @@ function checkHP(shipID){
 
 function checkForMapDamage(shipID){
 	var ship = shipList[shipID];
-	if(!world.inBounds(ship)){
+
+	if(!world.inBounds(ship) || !world.blueBound.inBounds(ship)){
 		if(ship.damageTimer == false){
 			ship.damageTimer = true;
 			setTimeout(dealMapDamage,damageRate*1000,shipID);
@@ -192,7 +192,7 @@ function dealMapDamage(shipID){
 	if(ship == undefined){
 		return;
 	}
-	if(world.inBounds(ship)){
+	if(world.inBounds(ship) && world.blueBound.inBounds(ship)){
 		ship.damageTimer = false;
 	} else{
 		ship.health -= damagePerTick;
@@ -210,7 +210,7 @@ function updateBullets(){
 }
 
 function sendUpdates(){
-	io.sockets.emit("movementUpdates",{shipList:shipList,bulletList:bulletList});
+	io.sockets.emit("movementUpdates",{shipList:shipList,bulletList:bulletList,world:world,shrinkTimeLeft:shrinkTimeLeft});
 }
 
 function moveShip(shipID){
@@ -240,7 +240,7 @@ function moveBullet(bullet){
 }
 
 function spawnNewShip(color){
-	var loc = findRandomSpawnLoc();
+	var loc = world.getRandomLoc();
 	var ship = {
 		x: loc.x,
 		y: loc.y,
@@ -295,10 +295,6 @@ function generateBulletSig(){
 		return sig;
 	}
 	sig = generateBulletSig();
-}
-
-function findRandomSpawnLoc(){
-	return {x:getRandomInt(world.x,world.width),y:getRandomInt(world.y,world.height)};
 }
 
 function getRandomInt(min, max) {

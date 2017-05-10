@@ -22,6 +22,7 @@ skipAuth = false,
 serverRunning = false,
 iAmAlive = true,
 serverShutdownReason = "Error",
+shrinkTimeLeft = 60,
 canvas = document.getElementById('gameCanvas'),
 myShip = null,
 healthLastFrame = 100,
@@ -111,8 +112,7 @@ function gameLoop(){
         return;
     }
     drawBackground();
-    drawAliveCounter();
-    drawHPCounter();
+    drawHUD();
     drawRelativeObjects();
     if(iAmAlive){
         checkForDamage();
