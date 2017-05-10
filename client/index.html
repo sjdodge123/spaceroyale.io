@@ -21,6 +21,7 @@ var server = null,
 skipAuth = false,
 serverRunning = false,
 iAmAlive = true,
+victory = false,
 serverShutdownReason = "Error",
 shrinkTimeLeft = 60,
 canvas = document.getElementById('gameCanvas'),
@@ -115,11 +116,23 @@ function gameLoop(){
     drawHUD();
     drawRelativeObjects();
     if(iAmAlive){
+        if(victory){
+            gameOver();
+            return;
+        }
         checkForDamage();
     } else{
         drawDeathText();
     }
-   
+
+}
+
+function gameOver(){
+    drawVictoryScreen();
+    canvas.removeEventListener("mousemove", calcMousePos, false);
+    canvas.removeEventListener("click", handleClick, false);
+    window.removeEventListener("keydown", keyDown, false);
+    window.removeEventListener("keyup", keyUp, false);
 }
 
 function checkForDamage(){

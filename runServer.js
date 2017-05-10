@@ -68,12 +68,7 @@ io.on('connection', function(client){
 			ship:shipList[client.id]
 		};
 		client.broadcast.emit("playerJoin",appendPlayerList);
-
-		if(clientCount == minPlayersToStart){
-			gameActive = true;
-			world.drawNextBound();
-			shrinkerTimer = factory.getTimer(world.shrinkBound,shrinkTime*1000); 
-		}
+		checkForGameStart();
 	});
 
 	client.on('disconnect', function() {
@@ -95,7 +90,6 @@ io.on('connection', function(client){
 		
   	});
 
-	
 	client.on('movement',function(packet){
 		if(shipList[client.id] != null){
 			shipList[client.id].moveForward = packet.moveForward;
@@ -124,20 +118,71 @@ io.on('connection', function(client){
 	}
 });
 
+function checkForGameStart(){
+	if(getShipCount() == minPlayersToStart){
+		gameStart();
+	}
+}
+
+function gameStart(){
+	randomLocShips();
+	gameActive = true;
+	world.drawNextBound();
+	shrinkerTimer = factory.getTimer(world.shrinkBound,shrinkTime*1000);
+}
+
+function randomLocShips(){
+	for(var shipID in shipList){
+		var ship = shipList[shipID];
+		var loc = world.getRandomLoc();
+		ship.x = loc.x;
+		ship.y = loc.y;
+	}
+}
+
 
 //Gamestate updates
-
-
 function update(){
+	if(gameActive){
+		checkForWin();
+		shrinkTimeLeft = shrinkerTimer.getTimeLeft().toFixed(1);
+	}
 	if(!serverSleeping){
 		checkCollisions();
 		updateShips();
 		updateBullets();
 		sendUpdates();
 	}
-	if(gameActive){
-		shrinkTimeLeft = shrinkerTimer.getTimeLeft().toFixed(1);
+}
+
+function checkForWin(){
+	if(getShipCount() == 1){
+		gameOver();
 	}
+}
+
+function getShipCount(){
+	var shipCount = 0;
+	for(var shipID in shipList){
+		shipCount++;
+	}
+	return shipCount;
+}
+
+function gameOver(){
+	gameActive = false;
+	for(var shipID in shipList){
+		console.log(clientList[shipID]+" wins!");
+		io.sockets.emit("gameOver",shipID);
+		//TODO: instead of immediately closing and booting all active players , a timer should start and wait to kick them out of the room
+		io.sockets.emit("serverShutdown","Server has closed your session");
+		resetGame();
+	}
+}
+
+function resetGame(){
+	world.reset();
+	shrinkerTimer.reset();
 }
 
 function checkCollisions(){
@@ -154,10 +199,11 @@ function checkCollisions(){
 function updateShips(){
 	for(var shipID in shipList){
 		//Check for hit first!!
-		checkForMapDamage(shipID);
-		if(checkHP(shipID)){
-			continue;
+		if(gameActive){
+			checkForMapDamage(shipID);
+			if(checkHP(shipID)){continue;}
 		}
+		
 		moveShip(shipID);
 
 	}
@@ -178,8 +224,7 @@ function checkHP(shipID){
 
 function checkForMapDamage(shipID){
 	var ship = shipList[shipID];
-
-	if(!world.inBounds(ship) || !world.blueBound.inBounds(ship)){
+	if(world.inBounds(ship) == false || world.blueBound.inBounds(ship) == false){
 		if(ship.damageTimer == false){
 			ship.damageTimer = true;
 			setTimeout(dealMapDamage,damageRate*1000,shipID);
@@ -241,24 +286,7 @@ function moveBullet(bullet){
 
 function spawnNewShip(color){
 	var loc = world.getRandomLoc();
-	var ship = {
-		x: loc.x,
-		y: loc.y,
-		width:10,
-		height:10,
-		health:100,
-		color: color,
-		baseColor: color,
-		damageTimer:false,
-		hitColor: "red",
-		angle: 90,
-		isHit: false,
-		moveForward: false,
-		moveBackward: false,
-		turnLeft: false,
-		turnRight: false
-	}
-	return ship;
+	return factory.getShip(loc.x,loc.y,10,10,color);
 }
 
 function spawnNewBullet(id){

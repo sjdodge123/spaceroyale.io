@@ -42,6 +42,12 @@ function clientConnect(name) {
 		}
 	});
 
+	server.on("gameOver",function(id){
+		if(id == myID){
+			victory = true;
+		}
+	});
+
 	server.on('serverShutdown', function(reason){
     	serverRunning = false;
     	serverShutdownReason = reason;

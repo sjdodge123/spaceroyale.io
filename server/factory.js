@@ -8,33 +8,95 @@ exports.getTimer = function(callback,delay){
 	return new Timer(callback,delay);
 };
 
-class World {
-	constructor(x,y,width,height){
+exports.getRect = function(x,y,width,height){
+	return new Rect(x,y,width,height);
+}
+exports.getCircle = function(x,y,radius){
+	return new Circle(x,y,radius);
+}
+exports.getShip = function(x,y,width,height,color){
+	return new Ship(x,y,width,height,color);
+}
+
+class Shape {
+	constructor(x,y,color){
 		this.x = x;
 		this.y = y;
+		this.color = color;
+	}
+	inBounds(shape){
+		if(shape instanceof Rect){
+			return this.testRect(shape);
+		}
+		if(shape instanceof Circle){
+			return this.testCircle(shape);
+		}
+		return false;
+	}
+}
+
+class Rect extends Shape{
+	constructor(x,y,width,height,color){
+		super(x,y,color);
 		this.width = width;
 		this.height = height;
-		this.color = "blue";
-		this.whiteBound = new WhiteBound(width/2,height/2,width*1.2);
-		this.blueBound = new BlueBound(width/2,height/2,width*1.2);
-		this.center = {x:width/2,y:height/2};		
 	}
-	inBounds(object){
-		if(this.x < object.x + object.width &&
-           this.x + this.width > object.x &&
-           this.y < object.y + object.height &&
-           this.y + this.height > object.y
+	testRect(rect){
+		if(this.x < rect.x &&
+           this.x + this.width > rect.x &&
+           this.y < rect.y &&
+           this.y + this.height > rect.y
            ){
            return true;
         }
         return false;
+	}
+	testCircle(circle){
+		var distX = Math.abs(circle.x - this.x-this.width/2);
+		var distY = Math.abs(circle.y - this.y-this.height/2);
+		if(distX > (this.width/2 + circle.radius)){return false;}
+		if(distY > (this.height/2 + circle.radius)){return false;}
+		if(distX <= (this.width/2)){return true;}
+		if(distY <= (this.height/2)){return true;}
+		var dx = distX-this.width/2;
+		var dy = distY-this.height/2;
+		return (dx*dx+dy*dy<=(circle.radius*circle.radius));
+	}
+}
+
+class Circle extends Shape{
+	constructor(x,y,radius,color){
+		super(x,y,color);
+		this.radius = radius;
+	}
+	testRect(rect){
+		return true;
+	}
+
+	testCircle(circle){
+		var distance = Math.sqrt(Math.pow(circle.x-this.x,2) + Math.pow(circle.y-this.y,2));
+		if(distance+circle.radius <= this.radius){
+			return true;
+		}
+		return false;
+	}
+
+}
+
+class World extends Rect{
+	constructor(x,y,width,height){
+		super(x,y,width,height,"orange");
+		this.baseBoundRadius = width;
+		this.whiteBound = new WhiteBound(width/2,height/2,this.baseBoundRadius);
+		this.blueBound = new BlueBound(width/2,height/2,this.baseBoundRadius);
+		this.center = {x:width/2,y:height/2};		
 	}
 	drawNextBound(){
 		this.whiteBound = this._drawWhiteBound();
 	}
 	_drawWhiteBound(){
 		var loc = this.getRandomLoc();
-		var whiteBound = new WhiteBound(loc.x,loc.y,this.whiteBound.radius/6);
+		var whiteBound = new WhiteBound(loc.x,loc.y,this.whiteBound.radius/2);
 		if(!this.inBounds(whiteBound)){
 			whiteBound = this._drawWhiteBound();
 		}
@@ -49,37 +111,43 @@ class World {
 	getWhiteBound(){
 
 	}
-
+	reset(){
+		this.whiteBound = new WhiteBound(this.width/2,this.height/2,this.baseBoundRadius);
+		this.blueBound = new BlueBound(this.width/2,this.height/2,this.baseBoundRadius);
+	}
 }
 
-class Bound{
-	constructor(x,y,radius){
-		this.x = x;
-		this.y = y;
-		this.height = radius*2;
-		this.width = radius*2;
-		this.radius = radius;
-	}
-	inBounds(object){
-		var distance = Math.sqrt(Math.pow((object.x - this.x),2) + Math.pow((object.y - this.y),2));
-		if(distance < this.radius){
-			return true;
-		}
-		return false;
+class Bound extends Circle{
+	constructor(x,y,radius,color){
+		super(x,y,radius,color);
 	}
 }
 
 class WhiteBound extends Bound{
 	constructor(x,y,radius){
-		super(x,y,radius);
-		this.color = "white";
+		super(x,y,radius,'white');
 	}
 }
 
 class BlueBound extends Bound{
 	constructor(x,y,radius){
-		super(x,y,radius);
-		this.color = "blue";
+		super(x,y,radius,'blue');
+	}
+}
+
+class Ship extends Rect{
+	constructor(x,y,width,height,color){
+		super(x,y,width,height,color);
+		this.health = 100;
+		this.baseColor = color;
+		this.hitColor = "red";
+		this.angle = 90;
+		this.isHit = false;
+		this.damageTimer = false;
+		this.moveForward = false;
+		this.moveBackward = false;
+		this.turnLeft = false;
+		this.turnRight = false;
 	}
 }
 
@@ -111,7 +179,12 @@ class Timer {
     	}
     	return this.remaining/1000;
     }
-
+    reset(){
+    	this.running = false;
+    	clearTimeout(this.id);
+    	this.remaining = this.delay;
+    	this.started = null;
+    }
     isRunning(){
     	return this.running;
     }

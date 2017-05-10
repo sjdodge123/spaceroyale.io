@@ -31,6 +31,10 @@ function drawDeathText(){
 	drawText("You died!",camera.x-60,camera.y);
 }
 
+function drawVictoryScreen(){
+	drawText("Winner winner chicken dinner!",camera.x-120,camera.y-20);
+}
+
 function drawHPCounter(){
 	if(!iAmAlive){
 		drawText("HP:" + 0,10,20);
@@ -84,7 +88,7 @@ function drawBullet(bullet){
 function drawWorld(){
 	if(world != null){
 		canvasContext.beginPath();
-        canvasContext.strokeStyle = 'orange';
+        canvasContext.strokeStyle = world.color;
         canvasContext.rect(world.x-myShip.x+camera.xOffset,world.y-myShip.y+camera.yOffset,world.width,world.height);
         canvasContext.stroke();
 	}
