@@ -6,7 +6,7 @@ app.use(express.static(path.join(__dirname, './client')));
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 var factory = require('./server/factory.js');
-var util = require('./server/util.js');
+//var util = require('./server/util.js');
 //Base Server Settings
 var serverSleeping = true,
 	serverTickSpeed = 1000/60,
