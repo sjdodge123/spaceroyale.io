@@ -6,7 +6,7 @@ app.use(express.static(path.join(__dirname, './client')));
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 var factory = require('./server/factory.js');
-//var util = require('./server/util.js');
+
 //Base Server Settings
 var serverSleeping = true,
 	serverTickSpeed = 1000/60,
@@ -156,6 +156,11 @@ function getRoomCount(){
 	return count;
 }
 
+function reclaimRoom(sig){
+	io.to(sig).emit("serverShutdown","Server has closed your session");
+	delete roomList[sig];
+}
+
 //Gamestate updates
 function update(){
 	if(!serverSleeping){
@@ -174,9 +179,7 @@ function update(){
 			//if game is over send messages
 			if(room.game.gameEnded){
 				io.to(sig).emit("gameOver",room.game.winner);
-				//TODO: instead of immediately closing and booting all active players , a timer should start and wait to kick them out of the room
-				io.to(sig).emit("serverShutdown","Server has closed your session");
-				room.game.reset();
+				setTimeout(reclaimRoom,roomKickTimeout*1000,sig);	
 			}
 			io.to(sig).emit("movementUpdates",{
 				shipList:room.shipList,
