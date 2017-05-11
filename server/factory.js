@@ -1,5 +1,7 @@
 'use strict';
 
+var c = require('./config.json');
+
 exports.getWorld = function() {
     return new World(0,0,300,300);
 };
@@ -26,7 +28,7 @@ class Room {
 	constructor(sig,size){
 		this.sig = sig;
 		this.size = size;
-		this.world = new World(0,0,300,300);
+		this.world = new World(0,0,c.worldWidth,c.worldHeight);
 		this.clientList = {};
 		this.asteroidList = {};
 		this.bulletList = {};
@@ -74,17 +76,17 @@ class Game {
 		this.asteroidList = asteroidList;
 
 		//Gamerules
-		this.minPlayers = 2;
-		this.density = 10;
-		this.active = false;
-		this.shrinkTime = 60,
+		this.minPlayers = c.minPlayers;
+		this.density = c.asteroidDensity;
+		this.lobbyWaitTime = c.lobbyWaitTime;
+		this.shrinkTime = c.startingShrinkTimer,
+
 		this.shrinkTimer = null;
 		this.shrinkTimeLeft = 60;
 		this.gameEnded = false;
 		this.winner = null;
-
+		this.active = false;
 		this.lobbyTimer = null;
-		this.lobbyWaitTime = 5;
 		this.lobbyTimeLeft = this.lobbyWaitTime;
 
 		this.gameBoard = new GameBoard(world,clientList,bulletList,shipList,asteroidList);
@@ -258,10 +260,12 @@ class GameBoard {
 		return Math.floor(Math.random() * (max - min)) + min;
 	}
 	populateWorld(density){
-		for(var i = 0; i<this.world.width/density;i++){
-			var loc = this.world.getRandomLoc();
-			var sig = this.generateAsteroidSig();
-			this.asteroidList[sig] = new Asteroid(loc.x,loc.y,this.getRandomInt(0,10),sig);
+		if(c.generateAsteroids){
+			for(var i = 0; i<this.world.width/density;i++){
+				var loc = this.world.getRandomLoc();
+				var sig = this.generateAsteroidSig();
+				this.asteroidList[sig] = new Asteroid(loc.x,loc.y,this.getRandomInt(0,10),sig);
+			}
 		}
 	}
 }

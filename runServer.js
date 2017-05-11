@@ -6,22 +6,23 @@ app.use(express.static(path.join(__dirname, './client')));
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 var factory = require('./server/factory.js');
+var c = require('./server/config.json');
 
 //Base Server Settings
 var serverSleeping = true,
-	serverTickSpeed = 1000/60,
+	serverTickSpeed = c.serverTickSpeed,
 	gameActive = false,
 	clientCount = 0;
 
 //Room settings
 
 var roomList = {},
-	maxRoomSize = 10,
-	roomKickTimeout = 30;
+	maxPlayersInRoom = c.maxPlayersInRoom,
+	roomKickTimeout = c.roomKickTimeout;
 
 //Base Server Functions
-server.listen(3000, function(){
-  console.log('listening on *:3000');
+server.listen(c.port,c.host, function(){
+  console.log('listening on '+c.host+':'+c.port);
 });
 
 process.on( 'SIGINT', function() {
@@ -135,7 +136,7 @@ function getActiveRoomCount(){
 function findARoom(clientID){
 	if(getRoomCount() == 0){
 		var sig = generateRoomSig();
-		roomList[sig] = factory.getRoom(sig,maxRoomSize);
+		roomList[sig] = factory.getRoom(sig,maxPlayersInRoom);
 		return sig;
 	}
 	for(var sig2 in roomList){
@@ -144,7 +145,7 @@ function findARoom(clientID){
 		}
 	}
 	var sig3 = generateRoomSig();
-	roomList[sig3] = factory.getRoom(sig3,maxRoomSize);
+	roomList[sig3] = factory.getRoom(sig3,maxPlayersInRoom);
 	return sig3;
 }
 

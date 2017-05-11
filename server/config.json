@@ -1,0 +1,28 @@
+{
+    "host": "0.0.0.0",
+    "port": 3000,
+    "serverTickSpeed": 16.666,
+
+    "minPlayers":2,
+    "maxPlayersInRoom":10,
+    "roomKickTimeout":30,
+    "lobbyWaitTime":5,
+    "startingShrinkTimer":60,
+
+    "worldWidth": 500,
+    "worldHeight": 500,
+
+    "damageTickRate":2,
+    "damagePerTick":15,
+    "generateAsteroids":false,
+    "asteroidDensity":10,
+
+    "sqlinfo":{
+      "connectionLimit": 100,
+      "host": "localhost",
+      "user": "root",
+      "password": "DEFAULT",
+      "database": "DEFAULT",
+      "debug": false
+    }
+}
