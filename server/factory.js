@@ -166,11 +166,13 @@ class GameBoard {
 		this.bulletList = bulletList;
 		this.shipList = shipList;
 		this.asteroidList = asteroidList;
+		this.collisionEngine = new CollisionEngine();
 	}
 	update(active){
-		this.checkCollisions();
+		this.checkCollisions(active);
 		this.updateShips(active);
 		this.updateBullets();
+		this.updateAsteroids();
 	}
 	updateShips(active){
 		for(var shipID in this.shipList){
@@ -184,51 +186,41 @@ class GameBoard {
 	}
 	updateBullets(){
 		for(var sig in this.bulletList){
-			this.bulletList[sig].update();
+			var bullet = this.bulletList[sig];
+			if(bullet.alive == false){
+				delete this.bulletList[sig];
+				continue;
+			}
+			bullet.update();
 		}
 	}
-	checkCollisions(){
-		var objectArray = [];
-		for(var ship in this.shipList){
-			objectArray.push(this.shipList[ship]);
+	updateAsteroids(){
+		for(var asteroidSig in this.asteroidList){
+			var asteroid = this.asteroidList[asteroidSig];
+			if(asteroid.alive == false){
+				delete this.asteroidList[asteroidSig];
+				continue;
+			}
+			asteroid.update();
+			
 		}
-		for(var sig in this.bulletList){
-			objectArray.push(this.bulletList[sig]);
+	}
+	checkCollisions(active){
+		if(active){
+			var objectArray = [];
+			for(var ship in this.shipList){
+				objectArray.push(this.shipList[ship]);
+			}
+			for(var asteroidSig in this.asteroidList){
+				objectArray.push(this.asteroidList[asteroidSig]);
+			}
+			for(var sig in this.bulletList){
+				objectArray.push(this.bulletList[sig]);
+			}
+			this.collisionEngine.broadBase(objectArray);
 		}
-		this.broadBase(objectArray);
 	}
-	broadBase(objectArray){
-		for (var i = 0; i < objectArray.length; i++) {
-    		for (var j = 0; j < objectArray.length; j++) {
-	    		if(objectArray[i] == objectArray[j]){
-	    			continue;
-	    		}
-	    		var obj1 = objectArray[i],
-	    			obj2 = objectArray[j];
-
-	    		if(this.checkDistance(obj1,obj2)){
-	    			obj1.isHit = true;
-	    			obj1.color = obj1.hitColor;
-
-	    			obj2.isHit = true;
-	    			obj2.color = obj2.hitColor;
-	    		} else{
-	    			obj1.isHit = false;
-	    			obj1.color = obj1.baseColor;
-
-	    			obj2.isHit = false;
-	    			obj2.color = obj2.baseColor;;
-	    		}
-    		}
-    	}
-	}
-	checkDistance(obj1,obj2){
-		var distance = Math.sqrt(Math.pow((obj2.x - obj1.x),2) + Math.pow((obj2.y - obj1.y),2));
-		if(distance < 10){
-			return true;
-		}
-		return false;
-	}
+	
 	spawnNewBullet(ship){
 		var sig = this.generateBulletSig();
 		var bullet = ship.fire(sig);
@@ -456,6 +448,11 @@ class Ship extends Rect{
 			this.x += 1;
 		}
 	}
+	handleHit(object){
+		if(object.owner != this.id && object.alive){
+			this.health -= object.damage;
+		}
+	}
 	checkHP(){
 		if(this.health < 1){
 			this.alive = false;
@@ -467,6 +464,7 @@ class Bullet extends Rect{
 	constructor(x,y,width,height,color,angle,owner,sig){
 		super(x,y,width,height,color);
 		this.angle = angle;
+		this.alive = true;
 		this.owner = owner;
 		this.sig = sig;
 
@@ -485,12 +483,62 @@ class Bullet extends Rect{
 		this.x += this.velX;
 		this.y += this.velY;
 	}
+	handleHit(object){
+		if(object.id != this.owner){
+			this.alive = false;
+		}
+	}
 }
 
 class Asteroid extends Circle{
 	constructor(x,y,radius,sig){
 		super(x,y,radius,"orange");
 		this.sig = sig;
+		this.damage = 0;
+		this.health = 40;
+		this.alive = true;
+	}
+
+	update(){
+
+	}
+	handleHit(object){
+		if(object.alive){
+			this.health -= object.damage;
+		}
+		if(this.health < 1){
+			this.alive = false;
+		}
+	}
+}
+
+class CollisionEngine {
+	constructor(){
+
+	}
+	broadBase(objectArray){
+		for (var i = 0; i < objectArray.length; i++) {
+    		for (var j = 0; j < objectArray.length; j++) {
+	    		if(objectArray[i] == objectArray[j]){
+	    			continue;
+	    		}
+	    		var obj1 = objectArray[i],
+	    			obj2 = objectArray[j];
+
+	    		if(this.checkDistance(obj1,obj2)){
+	    			obj1.handleHit(obj2);
+	    			obj2.handleHit(obj1);
+	    		}
+    		}
+    	}
+	}
+
+	checkDistance(obj1,obj2){
+		var distance = Math.sqrt(Math.pow((obj2.x - obj1.x),2) + Math.pow((obj2.y - obj1.y),2));
+		if(distance < 10){
+			return true;
+		}
+		return false;
 	}
 }
 

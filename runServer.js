@@ -177,6 +177,16 @@ function update(){
 					delete room.shipList[shipID];
 				}
 			}
+
+			//If asteroid is detroyed send message
+			for(var asteroidSig in room.asteroidList){
+				var asteroid = room.asteroidList[asteroidSig];
+				if(asteroid.alive == false){
+					//io.to(sig).emit('asteroidDeath',asteroidSig);
+					delete room.asteroidList[asteroidSig];
+				}
+			}
+
 			//if game is over send messages
 			if(room.game.gameEnded){
 				io.to(sig).emit("gameOver",room.game.winner);
@@ -197,28 +207,6 @@ function spawnNewBullet(id){
 	var room = locateMyRoom(id);
 	var ship = room.shipList[id];
 	room.game.gameBoard.spawnNewBullet(ship);
-	/*
-	var bullet = {
-		x:ship.x,
-		y:ship.y,
-		speed:5,
-		velX:0,
-		velY:0,
-		damage:30,
-		angle:ship.angle,
-		isHit: false,
-		width:2,
-		height:6,
-		color:ship.baseColor,
-		owner:id,
-		lifetime:5,
-		sig:generateBulletSig()
-	}
-
-	setTimeout(terminateBullet,bullet.lifetime*1000,bullet.sig);
-	room.bulletList[bullet.sig] = bullet;
-	return bullet;
-	*/
 }
 function generateRoomSig(){
 	var sig = getRandomInt(0,99999);

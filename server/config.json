@@ -14,7 +14,7 @@
 
     "damageTickRate":2,
     "damagePerTick":15,
-    "generateAsteroids":false,
+    "generateAsteroids":true,
     "asteroidDensity":10,
 
     "sqlinfo":{
