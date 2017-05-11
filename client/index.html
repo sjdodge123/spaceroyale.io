@@ -93,6 +93,7 @@ function auth(name,color){
 
 function init(){
     canvasContext = canvas.getContext('2d');
+    setInterval(checkForTimeout,1000);
     animloop();
     canvas.addEventListener("mousemove", calcMousePos, false);
     canvas.addEventListener("click", handleClick, false);
@@ -126,7 +127,6 @@ function gameLoop(){
     } else{
         drawDeathText();
     }
-
 }
 
 function gameOver(){

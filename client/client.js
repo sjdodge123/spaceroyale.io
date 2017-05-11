@@ -1,4 +1,7 @@
 var myID = null,
+	
+	timeSinceLastCom = 0,
+	serverTimeoutWait = 5,
 	world,
 	asteroidList = {},
 	playerList = {},
@@ -63,6 +66,7 @@ function clientConnect(name) {
 		gameStarted = movementPacket.state;
 		lobbyTimeLeft = movementPacket.lobbyTimeLeft;
 		shrinkTimeLeft = movementPacket.shrinkTimeLeft;
+		timeSinceLastCom = 0;
 	});
 
 	server.on("shotsFired",function(bullet){
@@ -70,4 +74,13 @@ function clientConnect(name) {
 	});
 
    	return server;
+}
+
+function checkForTimeout(){
+	timeSinceLastCom++;
+	if(timeSinceLastCom > serverTimeoutWait){
+		serverRunning = false;
+    	serverShutdownReason = "Server timed out";
+		server.disconnect();
+	}
 }
