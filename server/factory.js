@@ -79,6 +79,11 @@ class Game {
 		this.shrinkTimeLeft = 60;
 		this.gameEnded = false;
 		this.winner = null;
+
+		this.lobbyTimer = null;
+		this.lobbyWaitTime = 30;
+		this.lobbyTimeLeft = this.lobbyWaitTime;
+
 		this.gameBoard = new GameBoard(world,clientList,bulletList,shipList);
 	}
 
@@ -86,7 +91,8 @@ class Game {
 		this.active = true;
 		this.randomLocShips();
 		this.world.drawNextBound();
-		this.shrinkTimer = new Timer(this.world.shrinkBound,this.shrinkTime*1000);
+		var gamew = this;
+		this.shrinkTimer = new Timer(function(){gamew.world.shrinkBound();},this.shrinkTime*1000);
 	}
 
 	reset(){
@@ -120,11 +126,16 @@ class Game {
 	}
 
 	checkForGameStart(){
-		if(this.getShipCount() == this.minPlayers){
-			//TODO: Start a countdown time for X seconds first
-			this.start();
+		if(this.getShipCount() >= this.minPlayers){
+			if(this.lobbyTimer == null){
+				var game = this;
+				this.lobbyTimer = new Timer(function(){game.start();},this.lobbyWaitTime*1000);
+			} else{
+				this.lobbyTimeLeft = this.lobbyTimer.getTimeLeft().toFixed(1);
+			}
 		}
 	}
+
 	getShipCount(){
 		var shipCount = 0;
 		for(var shipID in this.shipList){

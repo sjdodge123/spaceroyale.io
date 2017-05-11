@@ -20,7 +20,12 @@ function drawText(text,x,y){
 function drawHUD(){
 	drawAliveCounter();
     drawHPCounter();
-    drawShrinkTimer();
+    if(gameStarted){
+    	drawShrinkTimer();
+    } else{
+    	drawLobbyTimer();
+    }
+    
 }
 
 function drawAliveCounter(){
@@ -43,13 +48,16 @@ function drawHPCounter(){
 	drawText("HP:" + shipList[myID].health,10,20);
 }
 
-
 function drawShrinkTimer(){
 	if(shrinkTimeLeft > 0){
 		drawText(shrinkTimeLeft + " until shrink",canvas.width/2,20);
 	} else{
 		drawText("Shrinking world..",canvas.width/2,20);
 	}
+}
+
+function drawLobbyTimer(){
+	drawText(lobbyTimeLeft + " until start",canvas.width/2,20);
 }
 
 

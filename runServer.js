@@ -16,8 +16,8 @@ var serverSleeping = true,
 //Room settings
 
 var roomList = {},
-	maxRoomSize = 3,
-	roomTimeout = 30;
+	maxRoomSize = 10,
+	roomKickTimeout = 30;
 
 //Base Server Functions
 server.listen(3000, function(){
@@ -178,7 +178,13 @@ function update(){
 				io.to(sig).emit("serverShutdown","Server has closed your session");
 				room.game.reset();
 			}
-			io.to(sig).emit("movementUpdates",{shipList:room.shipList,bulletList:room.bulletList,world:room.world,shrinkTimeLeft:room.game.shrinkTimeLeft});
+			io.to(sig).emit("movementUpdates",{
+				shipList:room.shipList,
+				bulletList:room.bulletList,
+				world:room.world,
+				state:room.game.active,
+				lobbyTimeLeft:room.game.lobbyTimeLeft,
+				shrinkTimeLeft:room.game.shrinkTimeLeft});
 		}
 	}
 }

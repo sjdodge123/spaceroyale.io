@@ -58,6 +58,8 @@ function clientConnect(name) {
 		shipList = movementPacket.shipList;
 		bulletList = movementPacket.bulletList;
 		world = movementPacket.world;
+		gameStarted = movementPacket.state;
+		lobbyTimeLeft = movementPacket.lobbyTimeLeft;
 		shrinkTimeLeft = movementPacket.shrinkTimeLeft;
 	});
 
