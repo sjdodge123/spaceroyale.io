@@ -18,6 +18,225 @@ exports.getShip = function(x,y,width,height,color){
 	return new Ship(x,y,width,height,color);
 }
 
+exports.getRoom = function(sig,size){
+	return new Room(sig,size);
+}
+
+class Room {
+	constructor(sig,size){
+		this.sig = sig;
+		this.size = size;
+		this.world = new World(0,0,300,300);
+		this.clientList = {};
+		this.bulletList = {};
+		this.shipList = {};
+		this.clientCount = 0;
+		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList);
+	}
+	join(client){
+		client.join(this.sig);
+		this.clientCount++;
+	}
+	leave(client){
+		client.leave(this.sig)
+		this.clientCount--;
+	}
+	update(){
+		this.game.update();
+	}
+	
+	checkRoom(clientID){
+		for(var id in this.clientList){
+			if(id == clientID){
+				return true;
+			}
+		}
+		return false;
+	}
+	hasSpace(){
+		if(this.clientCount < this.size){
+			if(!this.game.active){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+}
+
+class Game {
+	constructor(world,clientList,bulletList,shipList){
+		this.world = world;
+		this.clientList = clientList;
+		this.bulletList = bulletList;
+		this.shipList = shipList;
+
+		//Gamerules
+		this.minPlayers = 2;
+		this.active = false;
+		this.shrinkTime = 60,
+		this.shrinkTimer = null;
+		this.shrinkTimeLeft = 60;
+		this.gameEnded = false;
+		this.winner = null;
+		this.gameBoard = new GameBoard(world,clientList,bulletList,shipList);
+	}
+
+	start(){
+		this.active = true;
+		this.randomLocShips();
+		this.world.drawNextBound();
+		this.shrinkTimer = new Timer(this.world.shrinkBound,this.shrinkTime*1000);
+	}
+
+	reset(){
+		this.world.reset();
+		this.shrinkTimer.reset();
+	}
+
+	gameover(){
+		this.active = false;
+		for(var shipID in this.shipList){
+			console.log(this.clientList[shipID]+" wins!");
+			this.winner = shipID;
+			this.gameEnded = true;
+		}
+	}
+
+	update(){
+		if(this.active){
+			this.checkForWin()
+			this.shrinkTimeLeft = this.shrinkTimer.getTimeLeft().toFixed(1);
+		} else{
+			this.checkForGameStart()
+		}
+		this.gameBoard.update(this.active);
+	}
+
+	checkForWin(){
+		if(this.getShipCount() == 1){
+			this.gameover();
+		}
+	}
+
+	checkForGameStart(){
+		if(this.getShipCount() == this.minPlayers){
+			//TODO: Start a countdown time for X seconds first
+			this.start();
+		}
+	}
+	getShipCount(){
+		var shipCount = 0;
+		for(var shipID in this.shipList){
+			shipCount++;
+		}
+		return shipCount;
+	}
+	randomLocShips(){
+		for(var shipID in this.shipList){
+			var ship = this.shipList[shipID];
+			var loc = this.world.getRandomLoc();
+			ship.x = loc.x;
+			ship.y = loc.y;
+		}
+	}
+}
+
+class GameBoard {
+	constructor(world,clientList,bulletList,shipList){
+		this.world = world;
+		this.clientList = clientList;
+		this.bulletList = bulletList;
+		this.shipList = shipList;
+	}
+	update(active){
+		this.checkCollisions();
+		this.updateShips(active);
+		this.updateBullets();
+	}
+	updateShips(active){
+		for(var shipID in this.shipList){
+			var ship = this.shipList[shipID];
+			//TODO: Check for hit first!!
+			if(active){
+				this.world.checkForMapDamage(ship);
+			}
+			ship.update();
+		}
+	}
+	updateBullets(){
+		for(var sig in this.bulletList){
+			this.bulletList[sig].update();
+		}
+	}
+	checkCollisions(){
+		var objectArray = [];
+		for(var ship in this.shipList){
+			objectArray.push(this.shipList[ship]);
+		}
+		for(var sig in this.bulletList){
+			objectArray.push(this.bulletList[sig]);
+		}
+		this.broadBase(objectArray);
+	}
+	broadBase(objectArray){
+		for (var i = 0; i < objectArray.length; i++) {
+    		for (var j = 0; j < objectArray.length; j++) {
+	    		if(objectArray[i] == objectArray[j]){
+	    			continue;
+	    		}
+	    		var obj1 = objectArray[i],
+	    			obj2 = objectArray[j];
+
+	    		if(this.checkDistance(obj1,obj2)){
+	    			obj1.isHit = true;
+	    			obj1.color = obj1.hitColor;
+
+	    			obj2.isHit = true;
+	    			obj2.color = obj2.hitColor;
+	    		} else{
+	    			obj1.isHit = false;
+	    			obj1.color = obj1.baseColor;
+
+	    			obj2.isHit = false;
+	    			obj2.color = obj2.baseColor;;
+	    		}
+    		}
+    	}
+	}
+	checkDistance(obj1,obj2){
+		var distance = Math.sqrt(Math.pow((obj2.x - obj1.x),2) + Math.pow((obj2.y - obj1.y),2));
+		if(distance < 10){
+			return true;
+		}
+		return false;
+	}
+	spawnNewBullet(ship){
+		var sig = this.generateBulletSig();
+		var bullet = ship.fire(sig);
+		this.bulletList[sig] = bullet;
+		setTimeout(this.terminateBullet,bullet.lifetime*1000,{sig:sig,bulletList:this.bulletList});
+	}
+	terminateBullet(packet){
+		if(packet.bulletList[packet.sig] != undefined){
+			delete packet.bulletList[packet.sig];
+		}
+	}
+	generateBulletSig(){
+		var sig = this.getRandomInt(0,99999);
+		if(this.bulletList[sig] == null || this.bulletList[sig] == undefined){
+			return sig;
+		}
+		return this.generateBulletSig();
+	}
+	getRandomInt(min,max){
+		min = Math.ceil(min);
+		max = Math.floor(max);
+		return Math.floor(Math.random() * (max - min)) + min;
+	}
+}
+
+
 class Shape {
 	constructor(x,y,color){
 		this.x = x;
@@ -70,7 +289,11 @@ class Circle extends Shape{
 		this.radius = radius;
 	}
 	testRect(rect){
-		return true;
+		var distance = Math.sqrt(Math.pow(rect.x-this.x,2) + Math.pow(rect.y-this.y,2));
+		if(distance+rect.width <= this.radius){
+			return true;
+		}
+		return false;
 	}
 
 	testCircle(circle){
@@ -87,9 +310,11 @@ class World extends Rect{
 	constructor(x,y,width,height){
 		super(x,y,width,height,"orange");
 		this.baseBoundRadius = width;
+		this.damageRate = 2;
+		this.damagePerTick = 15;
 		this.whiteBound = new WhiteBound(width/2,height/2,this.baseBoundRadius);
 		this.blueBound = new BlueBound(width/2,height/2,this.baseBoundRadius);
-		this.center = {x:width/2,y:height/2};		
+		this.center = {x:width/2,y:height/2};	
 	}
 	drawNextBound(){
 		this.whiteBound = this._drawWhiteBound();
@@ -115,6 +340,31 @@ class World extends Rect{
 		this.whiteBound = new WhiteBound(this.width/2,this.height/2,this.baseBoundRadius);
 		this.blueBound = new BlueBound(this.width/2,this.height/2,this.baseBoundRadius);
 	}
+	checkForMapDamage(object){
+		if(this.blueBound.inBounds(object) == false){
+			if(object.damageTimer == false){
+				object.damageTimer = true;
+				setTimeout(this.dealDamage,this.damageRate*1000,{object:object,
+					bounds:this.blueBound,
+					rate:this.damageRate,
+					damage:this.damagePerTick,
+					callback:this.dealDamage});
+			}
+		}
+	}
+	dealDamage(packet){
+		if(packet.bounds.inBounds(packet.object)){
+			packet.object.damageTimer = false;
+		} else {
+			packet.object.health -= packet.damage;
+			setTimeout(packet.callback,packet.rate*1000,packet);
+		}
+	}
+
+	spawnNewShip(id,color){
+		var loc = this.getRandomLoc();
+		return new Ship(loc.x,loc.y,10,10,color,id)
+	}
 }
 
 class Bound extends Circle{
@@ -136,7 +386,7 @@ class BlueBound extends Bound{
 }
 
 class Ship extends Rect{
-	constructor(x,y,width,height,color){
+	constructor(x,y,width,height,color,id){
 		super(x,y,width,height,color);
 		this.health = 100;
 		this.baseColor = color;
@@ -148,6 +398,58 @@ class Ship extends Rect{
 		this.moveBackward = false;
 		this.turnLeft = false;
 		this.turnRight = false;
+		this.alive = true;
+		this.id = id;
+	}
+	update(){
+		this.checkHP();
+		this.move();
+	}
+	fire(sig){
+		return new Bullet(this.x,this.y,2,6,this.baseColor,this.angle,this.id,sig);
+	}
+	move(){
+		if(this.moveForward){
+			this.y -= 1;
+		}
+		if(this.moveBackward){
+			this.y += 1;
+		}
+		if(this.turnLeft){
+			this.x -= 1;
+		}
+		if(this.turnRight){
+			this.x += 1;
+		}
+	}
+	checkHP(){
+		if(this.health < 1){
+			this.alive = false;
+		}
+	}
+}
+
+class Bullet extends Rect{
+	constructor(x,y,width,height,color,angle,owner,sig){
+		super(x,y,width,height,color);
+		this.angle = angle;
+		this.owner = owner;
+		this.sig = sig;
+
+		this.lifetime = 5;
+		this.speed = 5;
+		this.velX = 0;
+		this.velY = 0;
+		this.damage = 30;	
+	}
+	update(){
+		this.velX = Math.cos((this.angle+90)*(Math.PI/180))*this.speed;
+		this.velY = Math.sin((this.angle+90)*(Math.PI/180))*this.speed;
+		this.move();
+	}
+	move(){
+		this.x += this.velX;
+		this.y += this.velY;
 	}
 }
 
