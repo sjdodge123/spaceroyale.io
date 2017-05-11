@@ -28,10 +28,11 @@ class Room {
 		this.size = size;
 		this.world = new World(0,0,300,300);
 		this.clientList = {};
+		this.asteroidList = {};
 		this.bulletList = {};
 		this.shipList = {};
 		this.clientCount = 0;
-		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList);
+		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList);
 	}
 	join(client){
 		client.join(this.sig);
@@ -65,14 +66,16 @@ class Room {
 }
 
 class Game {
-	constructor(world,clientList,bulletList,shipList){
+	constructor(world,clientList,bulletList,shipList,asteroidList){
 		this.world = world;
 		this.clientList = clientList;
 		this.bulletList = bulletList;
 		this.shipList = shipList;
+		this.asteroidList = asteroidList;
 
 		//Gamerules
 		this.minPlayers = 2;
+		this.density = 10;
 		this.active = false;
 		this.shrinkTime = 60,
 		this.shrinkTimer = null;
@@ -81,14 +84,15 @@ class Game {
 		this.winner = null;
 
 		this.lobbyTimer = null;
-		this.lobbyWaitTime = 30;
+		this.lobbyWaitTime = 5;
 		this.lobbyTimeLeft = this.lobbyWaitTime;
 
-		this.gameBoard = new GameBoard(world,clientList,bulletList,shipList);
+		this.gameBoard = new GameBoard(world,clientList,bulletList,shipList,asteroidList);
 	}
 
 	start(){
 		this.active = true;
+		this.gameBoard.populateWorld(this.density);
 		this.randomLocShips();
 		this.world.drawNextBound();
 		var gamew = this;
@@ -154,11 +158,12 @@ class Game {
 }
 
 class GameBoard {
-	constructor(world,clientList,bulletList,shipList){
+	constructor(world,clientList,bulletList,shipList,asteroidList){
 		this.world = world;
 		this.clientList = clientList;
 		this.bulletList = bulletList;
 		this.shipList = shipList;
+		this.asteroidList = asteroidList;
 	}
 	update(active){
 		this.checkCollisions();
@@ -240,10 +245,24 @@ class GameBoard {
 		}
 		return this.generateBulletSig();
 	}
+	generateAsteroidSig(){
+		var sig = this.getRandomInt(0,99999);
+		if(this.asteroidList[sig] == null || this.asteroidList[sig] == undefined){
+			return sig;
+		}
+		return this.generateAsteroidSig();
+	}
 	getRandomInt(min,max){
 		min = Math.ceil(min);
 		max = Math.floor(max);
 		return Math.floor(Math.random() * (max - min)) + min;
+	}
+	populateWorld(density){
+		for(var i = 0; i<this.world.width/density;i++){
+			var loc = this.world.getRandomLoc();
+			var sig = this.generateAsteroidSig();
+			this.asteroidList[sig] = new Asteroid(loc.x,loc.y,this.getRandomInt(0,10),sig);
+		}
 	}
 }
 
@@ -461,6 +480,13 @@ class Bullet extends Rect{
 	move(){
 		this.x += this.velX;
 		this.y += this.velY;
+	}
+}
+
+class Asteroid extends Circle{
+	constructor(x,y,radius,sig){
+		super(x,y,radius,"orange");
+		this.sig = sig;
 	}
 }
 

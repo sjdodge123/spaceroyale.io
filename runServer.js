@@ -184,6 +184,7 @@ function update(){
 			io.to(sig).emit("movementUpdates",{
 				shipList:room.shipList,
 				bulletList:room.bulletList,
+				asteroidList:room.asteroidList,
 				world:room.world,
 				state:room.game.active,
 				lobbyTimeLeft:room.game.lobbyTimeLeft,

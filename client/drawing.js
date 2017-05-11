@@ -69,6 +69,7 @@ function drawRelativeObjects(){
         camera.centerOnObject(myShip);
 		camera.draw();
         drawShips();
+        drawAsteroids();
 		drawBullets();
 		drawWorld();
 		drawBounds();
@@ -82,6 +83,13 @@ function drawShip(ship){
 	canvasContext.fillStyle = ship.color;
 	canvasContext.fillRect(-ship.width/2,-ship.height/2,ship.width,ship.height);
 	canvasContext.restore();
+}
+
+function drawAsteroid(asteroid){
+	canvasContext.beginPath();
+	canvasContext.fillStyle = asteroid.color;
+	canvasContext.arc(asteroid.x-myShip.x+camera.xOffset,asteroid.y-myShip.y+camera.yOffset,asteroid.radius,0,Math.PI*2,true);
+	canvasContext.fill();
 }
 
 function drawBullet(bullet){
@@ -118,7 +126,7 @@ function drawBounds(){
 }
 
 
-function drawShips(cameraX,cameraY){
+function drawShips(){
 	for(var shipKey in shipList){
 		if(shipList[shipKey] == null){
 			continue;
@@ -129,9 +137,21 @@ function drawShips(cameraX,cameraY){
 	}
 }
 
-function drawBullets(cameraX,cameraY){
+function drawAsteroids(){
+	for(var sig in asteroidList){
+		if(asteroidList[sig] == null){
+			continue;
+		}
+		if(camera.inBounds(asteroidList[sig])){
+			drawAsteroid(asteroidList[sig]);
+		}
+
+	}
+}
+
+function drawBullets(){
 	for(var sig in bulletList){
-		if(sig == null){
+		if(bulletList[sig] == null){
 			continue;
 		}
 		if(camera.inBounds(bulletList[sig])){

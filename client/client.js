@@ -1,5 +1,6 @@
 var myID = null,
 	world,
+	asteroidList = {},
 	playerList = {},
 	bulletList = {},
 	shipList = {};
@@ -57,6 +58,7 @@ function clientConnect(name) {
 	server.on("movementUpdates",function(movementPacket){
 		shipList = movementPacket.shipList;
 		bulletList = movementPacket.bulletList;
+		asteroidList = movementPacket.asteroidList;
 		world = movementPacket.world;
 		gameStarted = movementPacket.state;
 		lobbyTimeLeft = movementPacket.lobbyTimeLeft;
