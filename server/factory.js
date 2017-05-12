@@ -82,6 +82,7 @@ class Game {
 		this.shrinkTime = c.startingShrinkTimer;
 
 		this.shrinkTimer = null;
+		this.boundTimer = null;
 		this.shrinkTimeLeft = 60;
 		this.gameEnded = false;
 		this.winner = null;
@@ -97,13 +98,22 @@ class Game {
 		this.gameBoard.populateWorld(this.density);
 		this.randomLocShips();
 		this.world.drawFirstBound();
+
 		var gamew = this;
-		this.shrinkTimer = new Timer(function(){gamew.world.shrinkBound();},this.shrinkTime*1000);
+		this.boundTimer = setInterval(function(){gamew.world.shrinkBound();},this.shrinkTime*1000);
+		this.resetShrinkTimer();
+	}
+
+	resetShrinkTimer(){
+		var gameW = this;
+		delete this.shrinkTimer;
+		this.shrinkTimer = new Timer(function(){gameW.resetShrinkTimer();},this.shrinkTime*1000);
 	}
 
 	reset(){
 		this.world.reset();
 		this.shrinkTimer.reset();
+		clearInterval(this.boundTimer);
 	}
 
 	gameover(){
@@ -117,8 +127,8 @@ class Game {
 
 	update(){
 		if(this.active){
-			this.checkForWin()
 			this.shrinkTimeLeft = this.shrinkTimer.getTimeLeft().toFixed(1);
+			this.checkForWin();
 		} else{
 			this.checkForGameStart()
 		}
@@ -346,11 +356,11 @@ class World extends Rect{
 		this.blueBound = new BlueBound(width/2,height/2,this.baseBoundRadius);
 		this.center = {x:width/2,y:height/2};	
 	}
+
 	drawNextBound(){
 		this.whiteBound = this._drawWhiteBound();
 	}
 	drawFirstBound(){
-		var worldCopy = this;
 		var newRadius = this.blueBound.radius/3;
 		var x = this.getRandomInt(this.x+newRadius,this.x+this.width-newRadius);
 		var y = this.getRandomInt(this.y+newRadius,this.y+this.height-newRadius);
@@ -372,13 +382,11 @@ class World extends Rect{
 		return Math.floor(Math.random() * (max - min)) + min;
 	}
 	shrinkBound(){
-		console.log("Shrink");
-		//Dont do this until shrinking has elapsed
+		//TODO: This should occur over many frames
 		this.blueBound = new BlueBound(this.whiteBound.x,this.whiteBound.y,this.whiteBound.radius);
-		this.drawNextBound();
-	}
-	shrinkBound(){
-		console.log("Shrinking bounds");
+		if(this.blueBound.radius == this.whiteBound.radius){
+			this.drawNextBound();
+		}
 	}
 	reset(){
 		this.whiteBound = new WhiteBound(this.width/2,this.height/2,this.baseBoundRadius);
@@ -467,7 +475,7 @@ class Ship extends Rect{
 		}
 	}
 	handleHit(object){
-		if(object.owner != this.id && object.alive){
+		if(object.owner != this.id && object.alive && object.damage != null){
 			this.health -= object.damage;
 		}
 	}
@@ -521,7 +529,7 @@ class Asteroid extends Circle{
 
 	}
 	handleHit(object){
-		if(object.alive){
+		if(object.alive && object.damage != null){
 			this.health -= object.damage;
 		}
 		if(this.health < 1){
@@ -544,8 +552,8 @@ class CollisionEngine {
 	    			obj2 = objectArray[j];
 
 	    		if(this.checkDistance(obj1,obj2)){
-	    			obj1.handleHit(obj2);
-	    			obj2.handleHit(obj1);
+    				obj1.handleHit(obj2);
+    				obj2.handleHit(obj1);
 	    		}
     		}
     	}
