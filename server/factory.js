@@ -1,6 +1,7 @@
 'use strict';
 
 var c = require('./config.json');
+var utils = require('./utils.js');
 
 exports.getWorld = function() {
     return new World(0,0,300,300);
@@ -33,9 +34,10 @@ class Room {
 		this.planetList = {};
 		this.asteroidList = {};
 		this.bulletList = {};
+		this.itemList = {};
 		this.shipList = {};
 		this.clientCount = 0;
-		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList,this.planetList);
+		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList,this.planetList,this.itemList);
 	}
 	join(client){
 		client.join(this.sig);
@@ -69,13 +71,14 @@ class Room {
 }
 
 class Game {
-	constructor(world,clientList,bulletList,shipList,asteroidList,planetList){
+	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList){
 		this.world = world;
 		this.clientList = clientList;
 		this.bulletList = bulletList;
 		this.shipList = shipList;
 		this.planetList = planetList;
 		this.asteroidList = asteroidList;
+		this.itemList = itemList;
 
 		//Gamerules
 		this.minPlayers = c.minPlayers;
@@ -91,7 +94,7 @@ class Game {
 		this.lobbyTimer = null;
 		this.lobbyTimeLeft = this.lobbyWaitTime;
 
-		this.gameBoard = new GameBoard(world,clientList,bulletList,shipList,asteroidList,planetList);
+		this.gameBoard = new GameBoard(world,clientList,bulletList,shipList,asteroidList,planetList,itemList);
 	}
 
 	start(){
@@ -173,13 +176,14 @@ class Game {
 }
 
 class GameBoard {
-	constructor(world,clientList,bulletList,shipList,asteroidList,planetList){
+	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList){
 		this.world = world;
 		this.clientList = clientList;
 		this.bulletList = bulletList;
 		this.shipList = shipList;
 		this.asteroidList = asteroidList;
 		this.planetList = planetList;
+		this.itemList = itemList;
 		this.collisionEngine = new CollisionEngine();
 	}
 	update(active){
@@ -187,6 +191,7 @@ class GameBoard {
 		this.updateShips(active);
 		this.updateBullets();
 		this.updateAsteroids();
+		this.updateItems();
 	}
 	updateShips(active){
 		for(var shipID in this.shipList){
@@ -212,11 +217,20 @@ class GameBoard {
 		for(var asteroidSig in this.asteroidList){
 			var asteroid = this.asteroidList[asteroidSig];
 			if(asteroid.alive == false){
-				delete this.asteroidList[asteroidSig];
+				this.terminateAsteroid(asteroid);
+				
 				continue;
 			}
 			asteroid.update();
 			
+		}
+	}
+	updateItems(){
+		for(var itemSig in this.itemList){
+			var item = this.itemList[itemSig];
+			if(item.alive == false){
+				this.terminateItem(itemSig);
+			}
 		}
 	}
 	checkCollisions(active){
@@ -230,6 +244,9 @@ class GameBoard {
 			}
 			for(var planetSig in this.planetList){
 				objectArray.push(this.planetList[planetSig]);
+			}
+			for(var itemSig in this.itemList){
+				objectArray.push(this.itemList[itemSig]);
 			}
 			for(var sig in this.bulletList){
 				objectArray.push(this.bulletList[sig]);
@@ -249,50 +266,64 @@ class GameBoard {
 			delete packet.bulletList[packet.sig];
 		}
 	}
+	terminateAsteroid(asteroid){
+		if(asteroid.item != null){
+			var sig = this.generateItemSig();
+			asteroid.item.sig = sig;
+			this.itemList[sig] = asteroid.item;
+		}
+		delete this.asteroidList[asteroid.sig];
+	}
+	terminateItem(itemSig){
+		delete this.itemList[itemSig];
+	}
 	clean(){
 		for(var sig in this.bulletList){
 			this.bulletList[sig].alive = false;
 		}
 	}
 	generateBulletSig(){
-		var sig = this.getRandomInt(0,99999);
+		var sig = utils.getRandomInt(0,99999);
 		if(this.bulletList[sig] == null || this.bulletList[sig] == undefined){
 			return sig;
 		}
 		return this.generateBulletSig();
 	}
 	generateAsteroidSig(){
-		var sig = this.getRandomInt(0,99999);
+		var sig = utils.getRandomInt(0,99999);
 		if(this.asteroidList[sig] == null || this.asteroidList[sig] == undefined){
 			return sig;
 		}
 		return this.generateAsteroidSig();
 	}
+	generateItemSig(){
+		var sig = utils.getRandomInt(0,99999);
+		if(this.itemList[sig] == null || this.itemList[sig] == undefined){
+			return sig;
+		}
+		return this.generateItemSig();
+	}
+
 	generatePlanetSig(){
-		var sig = this.getRandomInt(0,99999);
+		var sig = utils.getRandomInt(0,99999);
 		if(this.planetList[sig] == null || this.planetList[sig] == undefined){
 			return sig;
 		}
 		return this.generatePlanetSig();
-	}
-	getRandomInt(min,max){
-		min = Math.ceil(min);
-		max = Math.floor(max);
-		return Math.floor(Math.random() * (max - min)) + min;
 	}
 	populateWorld(){
 		if(c.generateAsteroids){
 			for(var i = 0; i<c.asteroidAmt;i++){
 				var loc = this.world.getRandomLoc();
 				var sig = this.generateAsteroidSig();
-				this.asteroidList[sig] = new Asteroid(loc.x,loc.y,this.getRandomInt(c.asteroidMinSize,c.asteroidMaxSize),sig);
+				this.asteroidList[sig] = new Asteroid(loc.x,loc.y,utils.getRandomInt(c.asteroidMinSize,c.asteroidMaxSize),sig);
 			}
 		}
 		if(c.generatePlanets){
 			for(var i = 0; i<c.planetAmt;i++){
 				var loc = this.world.getRandomLoc();
 				var sig = this.generatePlanetSig();
-				this.planetList[sig] = new Planet(loc.x,loc.y,this.getRandomInt(c.planetMinSize,c.planetMaxSize),sig);
+				this.planetList[sig] = new Planet(loc.x,loc.y,utils.getRandomInt(c.planetMinSize,c.planetMaxSize),sig);
 			}
 		}
 	}
@@ -396,8 +427,8 @@ class World extends Rect{
 	}
 	drawFirstBound(){
 		var newRadius = this.blueBound.radius/3;
-		var x = this.getRandomInt(this.x+newRadius,this.x+this.width-newRadius);
-		var y = this.getRandomInt(this.y+newRadius,this.y+this.height-newRadius);
+		var x = utils.getRandomInt(this.x+newRadius,this.x+this.width-newRadius);
+		var y = utils.getRandomInt(this.y+newRadius,this.y+this.height-newRadius);
 		this.whiteBound = new WhiteBound(x,y,newRadius);
 	}
 	_drawWhiteBound(){
@@ -409,11 +440,6 @@ class World extends Rect{
 	}
 	getRandomLoc(){
 		 return {x:Math.floor(Math.random()*(this.width - this.x)) + this.x,y:Math.floor(Math.random()*(this.height - this.y)) + this.y};
-	}
-	getRandomInt(min,max){
-		min = Math.ceil(min);
-		max = Math.floor(max);
-		return Math.floor(Math.random() * (max - min)) + min;
 	}
 	shrinkBound(){
 		//TODO: This should occur over many frames
@@ -474,9 +500,9 @@ class BlueBound extends Bound{
 class Ship extends Rect{
 	constructor(x,y,width,height,color,id){
 		super(x,y,width,height,color);
-		this.health = 100;
+		this.baseHealth = 100;
+		this.health = this.baseHealth;
 		this.baseColor = color;
-		this.hitColor = "red";
 		this.angle = 90;
 		this.isHit = false;
 		this.damageTimer = false;
@@ -491,6 +517,15 @@ class Ship extends Rect{
 	update(){
 		this.checkHP();
 		this.move();
+	}
+	heal(amt){
+		if(this.health < this.baseHealth){
+			if(this.health+amt > this.baseHealth){
+				this.health = this.baseHealth;
+			} else{
+				this.health += amt;	
+			}	
+		}
 	}
 	fire(sig){
 		return new Bullet(this.x,this.y,2,6,this.baseColor,this.angle,this.id,sig);
@@ -555,6 +590,9 @@ class Asteroid extends Circle{
 	constructor(x,y,radius,sig){
 		super(x,y,radius,"orange");
 		this.sig = sig;
+		this.item = null;
+		this.dropRate = c.asteroidDropRate;
+		this.lootTable = {HPItem:85,Shotgun:15};
 		this.damage = 0;
 		this.health = 40;
 		this.alive = true;
@@ -564,12 +602,41 @@ class Asteroid extends Circle{
 
 	}
 	handleHit(object){
+		if(!this.alive){
+			return;
+		}
 		if(object.alive && object.damage != null){
 			this.health -= object.damage;
 		}
 		if(this.health < 1){
+			this.checkForDrop();
 			this.alive = false;
 		}
+	}
+	checkForDrop(){
+		if(utils.getRandomInt(0,10000) <= this.dropRate * 100){
+			var rand =  utils.getRandomInt(0,100);
+			for(var item in this.lootTable){
+				if(rand <= this.lootTable[item]){
+					this.dropItem(item);
+					return;
+				}
+			}		
+		}
+	}
+	dropItem(itemName){
+		var item;
+		switch(itemName){
+			case "HPItem":{
+				item = new HPItem(this.x,this.y);
+				break;
+			}
+			case "Shotgun": {
+				item = new Shotgun(this.x,this.y);
+				break;
+			}
+		}
+		this.item = item;
 	}
 }
 
@@ -582,6 +649,46 @@ class Planet extends Circle {
 		return;
 	}
 }
+
+class RectItem extends Rect{
+	constructor(x,y,color){
+		super(x,y,5,5,color);
+		this.sig = null;
+	}
+}
+
+class HPItem extends RectItem {
+	constructor(x,y){
+		super(x,y,"DarkOliveGreen");
+		this.healAmt = 15;
+		this.alive = true;
+	}
+	handleHit(object){
+		if(!this.alive){
+			return;
+		}
+		if(object instanceof Ship){
+			object.heal(this.healAmt);
+			this.alive = false;
+		}
+	}
+}
+class Shotgun extends RectItem {
+	constructor(x,y){
+		super(x,y,"Yellow");
+	}
+	handleHit(object){
+		return;
+	}
+}
+
+/*
+class CircleItem extends Circle{
+	constructor(x,y,radius,color){
+		super(x,y,radius,color);
+	}
+}
+*/
 
 class CollisionEngine {
 	constructor(){

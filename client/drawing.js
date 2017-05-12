@@ -70,6 +70,7 @@ function drawRelativeObjects(){
 		camera.draw();
         drawShips();
         drawAsteroids();
+        drawItems();
 		drawBullets();
 		drawPlanets();
 		drawWorld();
@@ -91,6 +92,11 @@ function drawAsteroid(asteroid){
 	canvasContext.fillStyle = asteroid.color;
 	canvasContext.arc(asteroid.x-myShip.x+camera.xOffset,asteroid.y-myShip.y+camera.yOffset,asteroid.radius,0,Math.PI*2,true);
 	canvasContext.fill();
+}
+
+function drawItem(item){
+	canvasContext.fillStyle = item.color;
+	canvasContext.fillRect(item.x-myShip.x+camera.xOffset,item.y-myShip.y+camera.yOffset,item.width,item.height);
 }
 
 function drawPlanet(planet){
@@ -156,6 +162,20 @@ function drawAsteroids(){
 
 	}
 }
+
+function drawItems(){
+	for(var sig in itemList){
+		if(itemList[sig] == null){
+			continue;
+		}
+		if(camera.inBounds(itemList[sig])){
+			drawItem(itemList[sig]);
+		}
+
+	}
+}
+
+
 
 function drawPlanets(){
 	for(var sig in planetList){

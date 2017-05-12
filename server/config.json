@@ -14,6 +14,7 @@
 
     "generateAsteroids":true,
     "asteroidAmt":100,
+    "asteroidDropRate":30,
     "asteroidMinSize":15,
     "asteroidMaxSize":25,
 

@@ -4,6 +4,7 @@ var myID = null,
 	serverTimeoutWait = 5,
 	world,
 	asteroidList = {},
+	itemList = {},
 	planetList = {},
 	playerList = {},
 	bulletList = {},
@@ -66,6 +67,7 @@ function clientConnect(name) {
 		bulletList = movementPacket.bulletList;
 		asteroidList = movementPacket.asteroidList;
 		planetList = movementPacket.planetList;
+		itemList = movementPacket.itemList;
 		world = movementPacket.world;
 		gameStarted = movementPacket.state;
 		lobbyTimeLeft = movementPacket.lobbyTimeLeft;

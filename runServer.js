@@ -193,6 +193,7 @@ function updateRoom(room){
 		bulletList:room.bulletList,
 		asteroidList:room.asteroidList,
 		planetList:room.planetList,
+		itemList:room.itemList,
 		world:room.world,
 		state:room.game.active,
 		lobbyTimeLeft:room.game.lobbyTimeLeft,
