@@ -58,7 +58,7 @@ class Room {
 	}
 	hasSpace(){
 		if(this.clientCount < this.size){
-			if(!this.game.active){
+			if(!this.game.active && !this.game.gameEnded){
 				return true;
 			}
 		}
