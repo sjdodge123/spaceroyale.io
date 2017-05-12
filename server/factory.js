@@ -28,7 +28,7 @@ class Room {
 	constructor(sig,size){
 		this.sig = sig;
 		this.size = size;
-		this.world = new World(0,0,c.worldWidth,c.worldHeight);
+		this.world = new World(0,0,500,500);
 		this.clientList = {};
 		this.planetList = {};
 		this.asteroidList = {};
@@ -79,8 +79,7 @@ class Game {
 
 		//Gamerules
 		this.minPlayers = c.minPlayers;
-		this.density = c.asteroidDensity;
-		this.lobbyWaitTime = c.lobbyWaitTime;1
+		this.lobbyWaitTime = c.lobbyWaitTime;
 		this.shrinkTime = c.startingShrinkTimer;
 
 		this.shrinkTimer = null;
@@ -96,8 +95,10 @@ class Game {
 	}
 
 	start(){
+		this.gameBoard.clean();
 		this.active = true;
-		this.gameBoard.populateWorld(this.density);
+		this.world.resize();
+		this.gameBoard.populateWorld();
 		this.randomLocShips();
 		this.world.drawFirstBound();
 
@@ -248,6 +249,11 @@ class GameBoard {
 			delete packet.bulletList[packet.sig];
 		}
 	}
+	clean(){
+		for(var sig in this.bulletList){
+			this.bulletList[sig].alive = false;
+		}
+	}
 	generateBulletSig(){
 		var sig = this.getRandomInt(0,99999);
 		if(this.bulletList[sig] == null || this.bulletList[sig] == undefined){
@@ -274,16 +280,16 @@ class GameBoard {
 		max = Math.floor(max);
 		return Math.floor(Math.random() * (max - min)) + min;
 	}
-	populateWorld(density){
+	populateWorld(){
 		if(c.generateAsteroids){
-			for(var i = 0; i<density;i++){
+			for(var i = 0; i<c.asteroidAmt;i++){
 				var loc = this.world.getRandomLoc();
 				var sig = this.generateAsteroidSig();
 				this.asteroidList[sig] = new Asteroid(loc.x,loc.y,this.getRandomInt(c.asteroidMinSize,c.asteroidMaxSize),sig);
 			}
 		}
 		if(c.generatePlanets){
-			for(var i = 0; i<density;i++){
+			for(var i = 0; i<c.planetAmt;i++){
 				var loc = this.world.getRandomLoc();
 				var sig = this.generatePlanetSig();
 				this.planetList[sig] = new Planet(loc.x,loc.y,this.getRandomInt(c.planetMinSize,c.planetMaxSize),sig);
@@ -370,11 +376,19 @@ class World extends Rect{
 	constructor(x,y,width,height){
 		super(x,y,width,height,"orange");
 		this.baseBoundRadius = width;
-		this.damageRate = 2;
-		this.damagePerTick = 15;
+		this.damageRate = c.damageTickRate;
+		this.damagePerTick = c.damagePerTick;
 		this.whiteBound = new WhiteBound(width/2,height/2,this.baseBoundRadius);
 		this.blueBound = new BlueBound(width/2,height/2,this.baseBoundRadius);
 		this.center = {x:width/2,y:height/2};	
+	}
+	resize(){
+		this.width = c.worldWidth;
+		this.height = c.worldHeight;
+		this.baseBoundRadius = this.width;
+		this.center = {x:this.width/2,y:this.height/2};
+		this.whiteBound = new WhiteBound(this.width/2,this.height/2,this.baseBoundRadius);
+		this.blueBound = new BlueBound(this.width/2,this.height/2,this.baseBoundRadius);
 	}
 
 	drawNextBound(){
@@ -471,6 +485,7 @@ class Ship extends Rect{
 		this.turnLeft = false;
 		this.turnRight = false;
 		this.alive = true;
+		this.speed = c.playerBaseSpeed;
 		this.id = id;
 	}
 	update(){
@@ -482,16 +497,16 @@ class Ship extends Rect{
 	}
 	move(){
 		if(this.moveForward){
-			this.y -= 1;
+			this.y -= this.speed;
 		}
 		if(this.moveBackward){
-			this.y += 1;
+			this.y += this.speed;
 		}
 		if(this.turnLeft){
-			this.x -= 1;
+			this.x -= this.speed;
 		}
 		if(this.turnRight){
-			this.x += 1;
+			this.x += this.speed;
 		}
 	}
 	handleHit(object){
