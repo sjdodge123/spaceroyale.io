@@ -177,16 +177,7 @@ function update(){
 					delete room.shipList[shipID];
 				}
 			}
-
-			//If asteroid is detroyed send message
-			for(var asteroidSig in room.asteroidList){
-				var asteroid = room.asteroidList[asteroidSig];
-				if(asteroid.alive == false){
-					//io.to(sig).emit('asteroidDeath',asteroidSig);
-					delete room.asteroidList[asteroidSig];
-				}
-			}
-
+			
 			//if game is over send messages
 			if(room.game.gameEnded){
 				io.to(sig).emit("gameOver",room.game.winner);
@@ -196,6 +187,7 @@ function update(){
 				shipList:room.shipList,
 				bulletList:room.bulletList,
 				asteroidList:room.asteroidList,
+				planetList:room.planetList,
 				world:room.world,
 				state:room.game.active,
 				lobbyTimeLeft:room.game.lobbyTimeLeft,

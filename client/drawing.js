@@ -71,6 +71,7 @@ function drawRelativeObjects(){
         drawShips();
         drawAsteroids();
 		drawBullets();
+		drawPlanets();
 		drawWorld();
 		drawBounds();
     }
@@ -89,6 +90,13 @@ function drawAsteroid(asteroid){
 	canvasContext.beginPath();
 	canvasContext.fillStyle = asteroid.color;
 	canvasContext.arc(asteroid.x-myShip.x+camera.xOffset,asteroid.y-myShip.y+camera.yOffset,asteroid.radius,0,Math.PI*2,true);
+	canvasContext.fill();
+}
+
+function drawPlanet(planet){
+	canvasContext.beginPath();
+	canvasContext.fillStyle = planet.color;
+	canvasContext.arc(planet.x-myShip.x+camera.xOffset,planet.y-myShip.y+camera.yOffset,planet.radius,0,Math.PI*2,true);
 	canvasContext.fill();
 }
 
@@ -144,6 +152,18 @@ function drawAsteroids(){
 		}
 		if(camera.inBounds(asteroidList[sig])){
 			drawAsteroid(asteroidList[sig]);
+		}
+
+	}
+}
+
+function drawPlanets(){
+	for(var sig in planetList){
+		if(planetList[sig] == null){
+			continue;
+		}
+		if(camera.inBounds(planetList[sig])){
+			drawPlanet(planetList[sig]);
 		}
 
 	}

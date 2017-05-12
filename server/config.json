@@ -11,10 +11,15 @@
 
     "worldWidth": 500,
     "worldHeight": 500,
+    "asteroidMinSize":3,
+    "asteroidMaxSize":10,
+    "planetMinSize":20,
+    "planetMaxSize":30,
 
     "damageTickRate":2,
     "damagePerTick":15,
     "generateAsteroids":true,
+    "generatePlanets":true,
     "asteroidDensity":10,
 
     "sqlinfo":{
