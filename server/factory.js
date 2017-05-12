@@ -79,7 +79,7 @@ class Game {
 		this.minPlayers = c.minPlayers;
 		this.density = c.asteroidDensity;
 		this.lobbyWaitTime = c.lobbyWaitTime;
-		this.shrinkTime = c.startingShrinkTimer,
+		this.shrinkTime = c.startingShrinkTimer;
 
 		this.shrinkTimer = null;
 		this.shrinkTimeLeft = 60;
@@ -96,7 +96,7 @@ class Game {
 		this.active = true;
 		this.gameBoard.populateWorld(this.density);
 		this.randomLocShips();
-		this.world.drawNextBound();
+		this.world.drawFirstBound();
 		var gamew = this;
 		this.shrinkTimer = new Timer(function(){gamew.world.shrinkBound();},this.shrinkTime*1000);
 	}
@@ -329,7 +329,11 @@ class Circle extends Shape{
 		}
 		return false;
 	}
-
+	getRandomCircleLoc(minR,maxR){
+		var r = Math.floor(Math.random()*(maxR - minR));
+		var angle = Math.floor(Math.random()*(Math.PI*2 - 0));
+		return {x:r*Math.cos(angle)+this.x,y:r*Math.sin(angle)+this.y};
+	}
 }
 
 class World extends Rect{
@@ -345,22 +349,36 @@ class World extends Rect{
 	drawNextBound(){
 		this.whiteBound = this._drawWhiteBound();
 	}
+	drawFirstBound(){
+		var worldCopy = this;
+		var newRadius = this.blueBound.radius/3;
+		var x = this.getRandomInt(this.x+newRadius,this.x+this.width-newRadius);
+		var y = this.getRandomInt(this.y+newRadius,this.y+this.height-newRadius);
+		this.whiteBound = new WhiteBound(x,y,newRadius);
+	}
 	_drawWhiteBound(){
-		var loc = this.getRandomLoc();
-		var whiteBound = new WhiteBound(loc.x,loc.y,this.whiteBound.radius/2);
-		if(!this.inBounds(whiteBound)){
-			whiteBound = this._drawWhiteBound();
-		}
+		var newRadius = this.blueBound.radius/2;
+		var distR = this.blueBound.radius-newRadius;
+		var loc = this.blueBound.getRandomCircleLoc(0,distR);
+		var whiteBound = new WhiteBound(loc.x,loc.y,newRadius);
 		return whiteBound;
 	}
 	getRandomLoc(){
 		 return {x:Math.floor(Math.random()*(this.width - this.x)) + this.x,y:Math.floor(Math.random()*(this.height - this.y)) + this.y};
 	}
+	getRandomInt(min,max){
+		min = Math.ceil(min);
+		max = Math.floor(max);
+		return Math.floor(Math.random() * (max - min)) + min;
+	}
+	shrinkBound(){
+		console.log("Shrink");
+		//Dont do this until shrinking has elapsed
+		this.blueBound = new BlueBound(this.whiteBound.x,this.whiteBound.y,this.whiteBound.radius);
+		this.drawNextBound();
+	}
 	shrinkBound(){
 		console.log("Shrinking bounds");
-	}
-	getWhiteBound(){
-
 	}
 	reset(){
 		this.whiteBound = new WhiteBound(this.width/2,this.height/2,this.baseBoundRadius);
@@ -567,6 +585,9 @@ class Timer {
     	if(this.running){
     		this.pause();
     		this.start();
+    	}
+    	if(this.remaining <= 0){
+    		clearTimeout(this.id);
     	}
     	return this.remaining/1000;
     }

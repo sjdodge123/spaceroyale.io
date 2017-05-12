@@ -7,7 +7,7 @@
     "maxPlayersInRoom":10,
     "roomKickTimeout":30,
     "lobbyWaitTime":5,
-    "startingShrinkTimer":60,
+    "startingShrinkTimer":20,
 
     "worldWidth": 500,
     "worldHeight": 500,
