@@ -159,41 +159,44 @@ function getRoomCount(){
 
 function reclaimRoom(sig){
 	io.to(sig).emit("serverShutdown","Server has closed your session");
-	delete roomList[sig];
 }
 
 //Gamestate updates
 function update(){
 	if(!serverSleeping){
 		for(var sig in roomList){
-			var room =  roomList[sig];
-			var status = room.update();
-
-			//Send messages about ships death
-			for(var shipID in room.shipList){
-				var ship = room.shipList[shipID];
-				if(ship.alive == false){
-					io.to(sig).emit('shipDeath',shipID);
-					delete room.shipList[shipID];
-				}
+			var room = roomList[sig];
+			if(!room.game.gameEnded){
+				updateRoom(room);
+			} else{
+				io.to(room.sig).emit("gameOver",room.game.winner);
+				setTimeout(reclaimRoom,roomKickTimeout*1000,room.sig);	
 			}
-			
-			//if game is over send messages
-			if(room.game.gameEnded){
-				io.to(sig).emit("gameOver",room.game.winner);
-				setTimeout(reclaimRoom,roomKickTimeout*1000,sig);	
-			}
-			io.to(sig).emit("movementUpdates",{
-				shipList:room.shipList,
-				bulletList:room.bulletList,
-				asteroidList:room.asteroidList,
-				planetList:room.planetList,
-				world:room.world,
-				state:room.game.active,
-				lobbyTimeLeft:room.game.lobbyTimeLeft,
-				shrinkTimeLeft:room.game.shrinkTimeLeft});
 		}
 	}
+}
+
+function updateRoom(room){
+	room.update();
+
+	//Send messages about ships death
+	for(var shipID in room.shipList){
+		var ship = room.shipList[shipID];
+		if(ship.alive == false){
+			io.to(room.sig).emit('shipDeath',shipID);
+			delete room.shipList[shipID];
+		}
+	}
+	
+	io.to(room.sig).emit("movementUpdates",{
+		shipList:room.shipList,
+		bulletList:room.bulletList,
+		asteroidList:room.asteroidList,
+		planetList:room.planetList,
+		world:room.world,
+		state:room.game.active,
+		lobbyTimeLeft:room.game.lobbyTimeLeft,
+		shrinkTimeLeft:room.game.shrinkTimeLeft});
 }
 function spawnNewBullet(id){
 	var room = locateMyRoom(id);

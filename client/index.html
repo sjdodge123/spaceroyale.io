@@ -21,6 +21,7 @@ var server = null,
 skipAuth = false,
 serverRunning = false,
 iAmAlive = true,
+timeOutChecker = null,
 gameStarted = false,
 victory = false,
 serverShutdownReason = "Error",
@@ -93,7 +94,7 @@ function auth(name,color){
 
 function init(){
     canvasContext = canvas.getContext('2d');
-    setInterval(checkForTimeout,1000);
+    timeOutChecker = setInterval(checkForTimeout,1000);
     animloop();
     canvas.addEventListener("mousemove", calcMousePos, false);
     canvas.addEventListener("click", handleClick, false);
@@ -116,8 +117,8 @@ function gameLoop(){
         return;
     }
     drawBackground();
-    drawHUD();
     drawRelativeObjects();
+    drawHUD();
     if(iAmAlive){
         if(victory){
             gameOver();
@@ -131,6 +132,7 @@ function gameLoop(){
 
 function gameOver(){
     drawVictoryScreen();
+    server.emit('movement',{turnLeft:false,moveForward:false,turnRight:false,moveBackward:false});
     canvas.removeEventListener("mousemove", calcMousePos, false);
     canvas.removeEventListener("click", handleClick, false);
     window.removeEventListener("keydown", keyDown, false);

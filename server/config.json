@@ -9,19 +9,24 @@
     "lobbyWaitTime":5,
     "startingShrinkTimer":20,
 
-    "worldWidth": 500,
-    "worldHeight": 500,
-    "asteroidMinSize":3,
-    "asteroidMaxSize":10,
-    "planetMinSize":20,
-    "planetMaxSize":30,
+    "worldWidth": 2500,
+    "worldHeight": 2500,
+
+    "generateAsteroids":true,
+    "asteroidAmt":100,
+    "asteroidMinSize":15,
+    "asteroidMaxSize":25,
+
+    "generatePlanets":true,
+    "planetAmt":30,
+    "planetMinSize":40,
+    "planetMaxSize":80,
 
     "damageTickRate":2,
     "damagePerTick":15,
-    "generateAsteroids":true,
-    "generatePlanets":true,
-    "asteroidDensity":10,
-
+    
+    "playerBaseSpeed":2,
+  
     "sqlinfo":{
       "connectionLimit": 100,
       "host": "localhost",

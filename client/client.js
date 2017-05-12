@@ -51,6 +51,8 @@ function clientConnect(name) {
 		if(id == myID){
 			victory = true;
 		}
+		timeSinceLastCom = 0;
+		serverTimeoutWait = 60;
 	});
 
 	server.on('serverShutdown', function(reason){
