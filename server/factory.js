@@ -50,7 +50,7 @@ class Room {
 	update(){
 		this.game.update();
 	}
-	
+
 	checkRoom(clientID){
 		for(var id in this.clientList){
 			if(id == clientID){
@@ -67,7 +67,7 @@ class Room {
 		}
 		return false;
 	}
-	
+
 }
 
 class Game {
@@ -226,11 +226,11 @@ class GameBoard {
 			var asteroid = this.asteroidList[asteroidSig];
 			if(asteroid.alive == false){
 				this.terminateAsteroid(asteroid);
-				
+
 				continue;
 			}
 			asteroid.update();
-			
+
 		}
 	}
 	updateItems(){
@@ -262,7 +262,7 @@ class GameBoard {
 			this.collisionEngine.broadBase(objectArray);
 		}
 	}
-	
+
 	fireWeapon(ship){
 		var bullets = ship.fire();
 		if(bullets == null){
@@ -426,7 +426,7 @@ class World extends Rect{
 		this.shrinking = false;
 		this.whiteBound = new WhiteBound(width/2,height/2,this.baseBoundRadius);
 		this.blueBound = new BlueBound(width/2,height/2,this.baseBoundRadius);
-		this.center = {x:width/2,y:height/2};	
+		this.center = {x:width/2,y:height/2};
 	}
 	update(timeLeft){
 		this.updateBounds(timeLeft);
@@ -561,8 +561,8 @@ class Ship extends Rect{
 			if(this.health+amt > this.baseHealth){
 				this.health = this.baseHealth;
 			} else{
-				this.health += amt;	
-			}	
+				this.health += amt;
+			}
 		}
 	}
 	fire(){
@@ -606,7 +606,7 @@ class Bullet extends Rect{
 		this.speed = 5;
 		this.velX = 0;
 		this.velY = 0;
-		this.damage = 30;	
+		this.damage = 30;
 	}
 	update(){
 		this.velX = Math.cos((this.angle+90)*(Math.PI/180))*this.speed;
@@ -665,18 +665,22 @@ class Asteroid extends Circle{
 		}
 	}
 	checkForDrop(){
+    var totalSum = 0;
+    var keys = Object.keys(this.lootTable);
+    for(var item in this.lootTable){
+      totalSum += this.lootTable[item];
+    }
 		if(utils.getRandomInt(0,10000) <= this.dropRate * 100){
+      var itemToDrop = null;
 
-			var rand =  utils.getRandomInt(0,100);
-			var itemToDrop = null;
-			for(var item in this.lootTable){
-				
-				if(rand <= this.lootTable[item]){
-					itemToDrop = item;
-					break;
-				}
-
-			}
+			var rand =  utils.getRandomInt(0,totalSum);
+      var sum = 0;
+      var i=0;
+      while(sum < rand){
+        i += 1;
+        sum += this.lootTable[keys[i]];
+      }
+      itemToDrop = keys[Math.max(0,i-1)];
 			this.dropItem(itemToDrop);
 		}
 	}
@@ -746,7 +750,7 @@ class ShotgunItem extends RectItem {
 
 class Weapon {
 	constructor(){
-		
+
 	}
 }
 

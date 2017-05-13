@@ -17,10 +17,10 @@
     "asteroidDropRate":100,
     "asteroidMinSize":15,
     "asteroidMaxSize":25,
-    
+
     "asteroidLootTable":{
-      "HPItem":60,
-      "Shotgun":40
+      "HPItem":3,
+      "ShotgunItem":2
     },
 
     "generatePlanets":true,
@@ -30,9 +30,9 @@
 
     "damageTickRate":2,
     "damagePerTick":5,
-    
+
     "playerBaseSpeed":2,
-  
+
     "sqlinfo":{
       "connectionLimit": 100,
       "host": "localhost",
