@@ -102,7 +102,7 @@ io.on('connection', function(client){
 
 	client.on('click',function(loc){
 		//if bullet should be spawned (could be clicking something else)
-		var bullet = spawnNewBullet(client.id);
+		fireWeapon(client.id);
 	});
 
 	if(serverSleeping){
@@ -199,10 +199,10 @@ function updateRoom(room){
 		lobbyTimeLeft:room.game.lobbyTimeLeft,
 		shrinkTimeLeft:room.game.shrinkTimeLeft});
 }
-function spawnNewBullet(id){
+function fireWeapon(id){
 	var room = locateMyRoom(id);
 	var ship = room.shipList[id];
-	room.game.gameBoard.spawnNewBullet(ship);
+	room.game.gameBoard.fireWeapon(ship);
 }
 function generateRoomSig(){
 	var sig = getRandomInt(0,99999);

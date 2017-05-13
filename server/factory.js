@@ -255,11 +255,17 @@ class GameBoard {
 		}
 	}
 	
-	spawnNewBullet(ship){
-		var sig = this.generateBulletSig();
-		var bullet = ship.fire(sig);
-		this.bulletList[sig] = bullet;
-		setTimeout(this.terminateBullet,bullet.lifetime*1000,{sig:sig,bulletList:this.bulletList});
+	fireWeapon(ship){
+		var bullets = ship.fire();
+		if(bullets == null){
+			return;
+		}
+		for(var i=0;i<bullets.length;i++){
+			var bullet = bullets[i];
+			bullet.sig = this.generateBulletSig();
+			this.bulletList[bullet.sig] = bullet;
+			setTimeout(this.terminateBullet,bullet.lifetime*1000,{sig:bullet.sig,bulletList:this.bulletList});
+		}
 	}
 	terminateBullet(packet){
 		if(packet.bulletList[packet.sig] != undefined){
@@ -513,10 +519,16 @@ class Ship extends Rect{
 		this.alive = true;
 		this.speed = c.playerBaseSpeed;
 		this.id = id;
+		this.weapon = new Gun();
 	}
 	update(){
 		this.checkHP();
 		this.move();
+	}
+	equip(item){
+		if(item instanceof ShotgunItem){
+			this.weapon = new Shotgun();
+		}
 	}
 	heal(amt){
 		if(this.health < this.baseHealth){
@@ -527,8 +539,8 @@ class Ship extends Rect{
 			}	
 		}
 	}
-	fire(sig){
-		return new Bullet(this.x,this.y,2,6,this.baseColor,this.angle,this.id,sig);
+	fire(){
+		return this.weapon.fire(this.x,this.y,this.angle,this.baseColor,this.id);
 	}
 	move(){
 		if(this.moveForward){
@@ -557,12 +569,12 @@ class Ship extends Rect{
 }
 
 class Bullet extends Rect{
-	constructor(x,y,width,height,color,angle,owner,sig){
+	constructor(x,y,width,height,color,angle,owner){
 		super(x,y,width,height,color);
 		this.angle = angle;
 		this.alive = true;
 		this.owner = owner;
-		this.sig = sig;
+		this.sig = null;
 
 		this.lifetime = 5;
 		this.speed = 5;
@@ -580,11 +592,24 @@ class Bullet extends Rect{
 		this.y += this.velY;
 	}
 	handleHit(object){
-		if(object.id != this.owner){
-			this.alive = false;
+		if(object.owner == this.owner){
+			return;
 		}
+		if(object.id == this.owner){
+			return;
+		}
+		this.alive = false;
 	}
 }
+
+class Birdshot extends Bullet{
+	constructor(x,y,width,height,color,angle,owner){
+		super(x,y,width,height,color,angle,owner);
+		this.damage = 10;
+	}
+
+}
+
 
 class Asteroid extends Circle{
 	constructor(x,y,radius,sig){
@@ -631,8 +656,8 @@ class Asteroid extends Circle{
 				item = new HPItem(this.x,this.y);
 				break;
 			}
-			case "Shotgun": {
-				item = new Shotgun(this.x,this.y);
+			case "ShotgunItem": {
+				item = new ShotgunItem(this.x,this.y);
 				break;
 			}
 		}
@@ -654,6 +679,7 @@ class RectItem extends Rect{
 	constructor(x,y,color){
 		super(x,y,5,5,color);
 		this.sig = null;
+		this.alive = true;
 	}
 }
 
@@ -661,7 +687,6 @@ class HPItem extends RectItem {
 	constructor(x,y){
 		super(x,y,"Red");
 		this.healAmt = 15;
-		this.alive = true;
 	}
 	handleHit(object){
 		if(!this.alive){
@@ -673,12 +698,52 @@ class HPItem extends RectItem {
 		}
 	}
 }
-class Shotgun extends RectItem {
+class ShotgunItem extends RectItem {
 	constructor(x,y){
 		super(x,y,"Yellow");
 	}
 	handleHit(object){
-		return;
+		if(!this.alive){
+			return;
+		}
+		if(object instanceof Ship){
+			object.equip(this);
+			this.alive = false;
+		}
+	}
+}
+
+class Weapon {
+	constructor(){
+		
+	}
+}
+
+class Gun extends Weapon{
+	constructor(){
+		super();
+	}
+
+	fire(x,y,angle,color,id){
+		var bullets = [];
+		bullets.push(new Bullet(x,y,2,6,color,angle,id));
+		return bullets;
+	}
+}
+
+class Shotgun extends Weapon{
+	constructor(){
+		super();
+	}
+
+	fire(x,y,angle,color,id){
+		var bullets = [];
+		bullets.push(new Birdshot(x,y,2,6,color,angle-10,id));
+		bullets.push(new Birdshot(x,y,2,6,color,angle-5,id));
+		bullets.push(new Birdshot(x,y,2,6,color,angle,id));
+		bullets.push(new Birdshot(x,y,2,6,color,angle+5,id));
+		bullets.push(new Birdshot(x,y,2,6,color,angle+10,id));
+		return bullets;
 	}
 }
 
