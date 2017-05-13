@@ -61,7 +61,6 @@ function drawLobbyTimer(){
 }
 
 
-
 //DRAWING OBJECTS RELATIVE TO CAMERA
 function drawRelativeObjects(){
 	if(myID != null && shipList != null && shipList[myID] != null){
@@ -97,6 +96,10 @@ function drawAsteroid(asteroid){
 function drawItem(item){
 	canvasContext.fillStyle = item.color;
 	canvasContext.fillRect(item.x-myShip.x+camera.xOffset,item.y-myShip.y+camera.yOffset,item.width,item.height);
+	canvasContext.strokeStyle = "white";
+	canvasContext.lineWidth=0.5;
+    canvasContext.rect(item.x-myShip.x+camera.xOffset,item.y-myShip.y+camera.yOffset,item.width,item.height);
+    canvasContext.stroke();
 }
 
 function drawPlanet(planet){

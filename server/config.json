@@ -17,6 +17,11 @@
     "asteroidDropRate":30,
     "asteroidMinSize":15,
     "asteroidMaxSize":25,
+    
+    "asteroidLootTable":{
+      "HPItem":80,
+      "Shotgun":20
+    },
 
     "generatePlanets":true,
     "planetAmt":30,

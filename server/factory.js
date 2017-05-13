@@ -592,7 +592,7 @@ class Asteroid extends Circle{
 		this.sig = sig;
 		this.item = null;
 		this.dropRate = c.asteroidDropRate;
-		this.lootTable = {HPItem:85,Shotgun:15};
+		this.lootTable = c.asteroidLootTable;
 		this.damage = 0;
 		this.health = 40;
 		this.alive = true;
@@ -659,7 +659,7 @@ class RectItem extends Rect{
 
 class HPItem extends RectItem {
 	constructor(x,y){
-		super(x,y,"DarkOliveGreen");
+		super(x,y,"Red");
 		this.healAmt = 15;
 		this.alive = true;
 	}
@@ -681,14 +681,6 @@ class Shotgun extends RectItem {
 		return;
 	}
 }
-
-/*
-class CircleItem extends Circle{
-	constructor(x,y,radius,color){
-		super(x,y,radius,color);
-	}
-}
-*/
 
 class CollisionEngine {
 	constructor(){
