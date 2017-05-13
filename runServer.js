@@ -197,7 +197,7 @@ function updateRoom(room){
 		world:room.world,
 		state:room.game.active,
 		lobbyTimeLeft:room.game.lobbyTimeLeft,
-		shrinkTimeLeft:room.game.shrinkTimeLeft});
+		shrinkTimeLeft:room.game.timeLeftUntilShrink});
 }
 function fireWeapon(id){
 	var room = locateMyRoom(id);

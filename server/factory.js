@@ -85,9 +85,11 @@ class Game {
 		this.lobbyWaitTime = c.lobbyWaitTime;
 		this.shrinkTime = c.startingShrinkTimer;
 
-		this.shrinkTimer = null;
-		this.boundTimer = null;
-		this.shrinkTimeLeft = 60;
+		this.timerUntilShrink = null;
+		this.shrinkingTimer = null;
+		this.timeLeftUntilShrink = 60;
+		this.shrinkTimeLeft = 0;
+
 		this.gameEnded = false;
 		this.winner = null;
 		this.active = false;
@@ -104,22 +106,22 @@ class Game {
 		this.gameBoard.populateWorld();
 		this.randomLocShips();
 		this.world.drawFirstBound();
-
-		var gamew = this;
-		this.boundTimer = setInterval(function(){gamew.world.shrinkBound();},this.shrinkTime*1000);
-		this.resetShrinkTimer();
+		this.resetTimeUntilShrink();
 	}
+	resetTimeUntilShrink(){
+		var game = this;
+		this.timerUntilShrink = new Timer(function(){game.currentlyShrinking();},this.shrinkTime*1000);
 
-	resetShrinkTimer(){
-		var gameW = this;
-		delete this.shrinkTimer;
-		this.shrinkTimer = new Timer(function(){gameW.resetShrinkTimer();},this.shrinkTime*1000);
+	}
+	currentlyShrinking(){
+		var game = this;
+	    this.shrinkingTimer = new Timer(function(){game.resetTimeUntilShrink();},5000);
+	    this.world.shrinkBound();
 	}
 
 	reset(){
 		this.world.reset();
-		this.shrinkTimer.reset();
-		clearInterval(this.boundTimer);
+		this.timerUntilShrink.reset();
 	}
 
 	gameover(){
@@ -133,12 +135,18 @@ class Game {
 
 	update(){
 		if(this.active){
-			this.shrinkTimeLeft = this.shrinkTimer.getTimeLeft().toFixed(1);
+			if(this.timerUntilShrink != null){
+        		this.timeLeftUntilShrink = this.timerUntilShrink.getTimeLeft().toFixed(1);
+      		}
+		    if(this.shrinkingTimer != null){
+		        this.shrinkTimeLeft = this.shrinkingTimer.getTimeLeft().toFixed(1);
+		    }
 			this.checkForWin();
 		} else{
 			this.checkForGameStart()
 		}
 		this.gameBoard.update(this.active);
+		this.world.update(this.shrinkTimeLeft);
 	}
 
 	checkForWin(){
@@ -415,9 +423,29 @@ class World extends Rect{
 		this.baseBoundRadius = width;
 		this.damageRate = c.damageTickRate;
 		this.damagePerTick = c.damagePerTick;
+		this.shrinking = false;
 		this.whiteBound = new WhiteBound(width/2,height/2,this.baseBoundRadius);
 		this.blueBound = new BlueBound(width/2,height/2,this.baseBoundRadius);
 		this.center = {x:width/2,y:height/2};	
+	}
+	update(timeLeft){
+		this.updateBounds(timeLeft);
+	}
+	updateBounds(timeLeft){
+		if(this.shrinking){
+	      this.blueBound.velX = (this.whiteBound.x - this.blueBound.x)/(60*timeLeft);
+	      this.blueBound.velY = (this.whiteBound.y - this.blueBound.y)/(60*timeLeft);
+	      this.blueBound.x += this.blueBound.velX;
+	      this.blueBound.y += this.blueBound.velY;
+      	  this.blueBound.radius -= (this.blueBound.radius - this.whiteBound.radius)/(60*timeLeft);
+	      if(this.blueBound.radius <= this.whiteBound.radius){
+          	this.blueBound.radius = this.whiteBound.radius;
+          	this.blueBound.x = this.whiteBound.x;
+          	this.blueBound.y = this.whiteBound.y;
+          	this.shrinking = false;
+          	this.drawNextBound();
+	      }
+    	}
 	}
 	resize(){
 		this.width = c.worldWidth;
@@ -448,11 +476,7 @@ class World extends Rect{
 		 return {x:Math.floor(Math.random()*(this.width - this.x)) + this.x,y:Math.floor(Math.random()*(this.height - this.y)) + this.y};
 	}
 	shrinkBound(){
-		//TODO: This should occur over many frames
-		this.blueBound = new BlueBound(this.whiteBound.x,this.whiteBound.y,this.whiteBound.radius);
-		if(this.blueBound.radius == this.whiteBound.radius){
-			this.drawNextBound();
-		}
+		this.shrinking = true;
 	}
 	reset(){
 		this.whiteBound = new WhiteBound(this.width/2,this.height/2,this.baseBoundRadius);
@@ -488,6 +512,8 @@ class World extends Rect{
 class Bound extends Circle{
 	constructor(x,y,radius,color){
 		super(x,y,radius,color);
+		this.velX = 0;
+		this.velY = 0;
 	}
 }
 
@@ -640,13 +666,18 @@ class Asteroid extends Circle{
 	}
 	checkForDrop(){
 		if(utils.getRandomInt(0,10000) <= this.dropRate * 100){
+
 			var rand =  utils.getRandomInt(0,100);
+			var itemToDrop = null;
 			for(var item in this.lootTable){
+				
 				if(rand <= this.lootTable[item]){
-					this.dropItem(item);
-					return;
+					itemToDrop = item;
+					break;
 				}
-			}		
+
+			}
+			this.dropItem(itemToDrop);
 		}
 	}
 	dropItem(itemName){
@@ -801,11 +832,12 @@ class Timer {
     getTimeLeft(){
     	if(this.running){
     		this.pause();
+        if(this.remaining <= 0){
+      		return 0;
+      	}
     		this.start();
     	}
-    	if(this.remaining <= 0){
-    		clearTimeout(this.id);
-    	}
+
     	return this.remaining/1000;
     }
     reset(){

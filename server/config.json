@@ -7,20 +7,20 @@
     "maxPlayersInRoom":10,
     "roomKickTimeout":30,
     "lobbyWaitTime":5,
-    "startingShrinkTimer":20,
+    "startingShrinkTimer":60,
 
     "worldWidth": 2500,
     "worldHeight": 2500,
 
     "generateAsteroids":true,
-    "asteroidAmt":100,
-    "asteroidDropRate":30,
+    "asteroidAmt":200,
+    "asteroidDropRate":100,
     "asteroidMinSize":15,
     "asteroidMaxSize":25,
     
     "asteroidLootTable":{
-      "HPItem":80,
-      "Shotgun":20
+      "HPItem":60,
+      "Shotgun":40
     },
 
     "generatePlanets":true,
@@ -29,7 +29,7 @@
     "planetMaxSize":80,
 
     "damageTickRate":2,
-    "damagePerTick":15,
+    "damagePerTick":5,
     
     "playerBaseSpeed":2,
   
