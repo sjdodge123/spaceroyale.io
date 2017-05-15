@@ -90,6 +90,12 @@ function drawShip(ship){
 	canvasContext.fillRect(-ship.width/2,-ship.height/2,ship.width,ship.height);
 	canvasContext.restore();
 }
+function drawShield(ship){
+	canvasContext.beginPath();
+	canvasContext.strokeStyle = ship.shield.color;
+	canvasContext.arc(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset,ship.shield.radius,0,Math.PI*2,true);
+	canvasContext.stroke();
+}
 
 function drawAsteroid(asteroid){
 	canvasContext.beginPath();
@@ -159,8 +165,12 @@ function drawShips(){
 		if(shipList[shipKey] == null){
 			continue;
 		}
-		if(camera.inBounds(shipList[shipKey])){
-			drawShip(shipList[shipKey]);
+		var ship = shipList[shipKey];
+		if(camera.inBounds(ship)){
+			drawShip(ship);
+			if(ship.shield != null && ship.shield.alive){
+				drawShield(ship);
+			}
 		}
 	}
 }

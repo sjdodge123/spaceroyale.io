@@ -564,6 +564,7 @@ class Ship extends Rect{
 		this.killList = [];
 		this.killedBy = null;
 		this.weapon = new Gun();
+		this.shield = null;
 	}
 	update(){
 		this.checkHP();
@@ -575,6 +576,9 @@ class Ship extends Rect{
 		}
 		if(item instanceof RifleItem){
 			this.weapon = new Rifle();
+		}
+		if(item instanceof ShieldItem){
+			this.shield = new Shield(this.id);
 		}
 	}
 	heal(amt){
@@ -605,7 +609,17 @@ class Ship extends Rect{
 	}
 	handleHit(object){
 		if(object.owner != this.id && object.alive && object.damage != null){
-			this.health -= object.damage;
+			if(this.shield != null && this.shield.alive){
+				this.shield.handleHit(object);
+				if(this.shield.alive){
+					return;
+				}
+				this.health -= Math.abs(this.shield.leftOverDamage);
+				this.shield = null;
+			} else{
+				this.health -= object.damage;
+			}
+
 			if(this.health < 1){
 				this.killedBy = object.owner;
 				this.alive = false;
@@ -643,6 +657,9 @@ class Bullet extends Rect{
 		this.y += this.velY;
 	}
 	handleHit(object){
+		if(!this.alive){
+			return
+		}
 		if(object.owner == this.owner){
 			return;
 		}
@@ -673,7 +690,6 @@ class RifleBullet extends Bullet{
 	}
 }
 
-
 class Asteroid extends Circle{
 	constructor(x,y,radius,sig){
 		super(x,y,radius,"orange");
@@ -681,8 +697,9 @@ class Asteroid extends Circle{
 		this.item = null;
 		this.dropRate = c.asteroidDropRate;
 		this.lootTable = c.asteroidLootTable;
+		this.baseHealth = 40;
 		this.damage = 0;
-		this.health = 40;
+		this.health = this.baseHealth;
 		this.alive = true;
 	}
 
@@ -731,6 +748,10 @@ class Asteroid extends Circle{
 			}
 			case "RifleItem": {
 				item = new RifleItem(this.x,this.y);
+				break;
+			}
+			case "ShieldItem": {
+				item = new ShieldItem(this.x,this.y);
 				break;
 			}
 		}
@@ -789,6 +810,20 @@ class ShotgunItem extends RectItem {
 class RifleItem extends RectItem {
 	constructor(x,y){
 		super(x,y,"Green");
+	}
+	handleHit(object){
+		if(!this.alive){
+			return;
+		}
+		if(object instanceof Ship){
+			object.equip(this);
+			this.alive = false;
+		}
+	}
+}
+class ShieldItem extends RectItem {
+	constructor(x,y){
+		super(x,y,"Aqua");
 	}
 	handleHit(object){
 		if(!this.alive){
@@ -872,6 +907,24 @@ class Rifle extends Weapon{
 	}
 }
 
+
+class Shield extends Circle{
+	constructor(owner){
+		super(0,0,c.shieldRadius,"Aqua");
+		this.health = c.shieldProection;
+		this.owner = owner;
+		this.alive = true;
+	}
+	handleHit(object){
+		//console.log("Shield(" +this.health +") taking " + object.damage +" damage");
+		this.health -= object.damage;
+		if(this.health < 1){
+			this.leftOverDamage = this.health;
+			this.alive = false;
+		}
+	}
+}
+
 class CollisionEngine {
 	constructor(){
 
@@ -926,7 +979,7 @@ class Timer {
     getTimeLeft(){
     	if(this.running){
     		this.pause();
-	        if(this.remaining <= 0){
+	        if(this.remaining < 0){
 	      		return 0;
 	      	}
     		this.start();

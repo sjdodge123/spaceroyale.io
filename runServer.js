@@ -66,6 +66,9 @@ io.on('connection', function(client){
 
 	client.on('disconnect', function() {
 		var room = locateMyRoom(client.id);
+		if(room == undefined){
+			return;
+		}
 		var name = room.clientList[client.id];
 		var id = client.id;
 		client.broadcast.to(room.sig).emit('playerLeft',client.id);
@@ -82,6 +85,9 @@ io.on('connection', function(client){
 
 	client.on('movement',function(packet){
 		var room = locateMyRoom(client.id);
+		if(room == undefined){
+			return;
+		}
 		var ship = room.shipList[client.id];
 		if(ship != null){
 			ship.moveForward = packet.moveForward;
@@ -93,6 +99,9 @@ io.on('connection', function(client){
 
 	client.on('mousemove',function(loc){
 		var room = locateMyRoom(client.id);
+		if(room == undefined){
+			return;
+		}
 		var ship = room.shipList[client.id];
 		if(ship != null && ship != undefined){
 			ship.angle = (180/Math.PI)*Math.atan2(loc.y-ship.y,loc.x-ship.x)-90;
@@ -205,6 +214,9 @@ function updateRoom(room){
 }
 function fireWeapon(id){
 	var room = locateMyRoom(id);
+	if(room == undefined){
+		return;
+	}
 	var ship = room.shipList[id];
 	room.game.gameBoard.fireWeapon(ship);
 }
