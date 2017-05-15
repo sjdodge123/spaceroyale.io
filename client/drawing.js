@@ -19,6 +19,7 @@ function drawText(text,x,y){
 //DRAWING HUD UI
 function drawHUD(){
 	drawAliveCounter();
+	drawKillCounter();
     drawHPCounter();
     if(gameStarted){
     	drawShrinkTimer();
@@ -30,6 +31,10 @@ function drawHUD(){
 
 function drawAliveCounter(){
 	drawText(getShipListCount() + " alive",canvas.width-60,20);
+}
+
+function drawKillCounter(){
+	drawText("Killed " + myShip.killList.length,canvas.width-190,20);
 }
 
 function drawDeathText(){
@@ -97,7 +102,9 @@ function drawItem(item){
 	canvasContext.fillStyle = item.color;
 	canvasContext.fillRect(item.x-myShip.x+camera.xOffset,item.y-myShip.y+camera.yOffset,item.width,item.height);
 	canvasContext.strokeStyle = "white";
+	var temp = canvasContext.lineWidth;
 	canvasContext.lineWidth=0.5;
+	canvasContext.lineWidth = temp;
     canvasContext.rect(item.x-myShip.x+camera.xOffset,item.y-myShip.y+camera.yOffset,item.width,item.height);
     canvasContext.stroke();
 }
@@ -128,18 +135,22 @@ function drawWorld(){
 }
 
 function drawBounds(){
+	var temp = canvasContext.lineWidth;
 	if(world.whiteBound != null){
 		canvasContext.beginPath();
+		canvasContext.lineWidth = 3;
 		canvasContext.strokeStyle = world.whiteBound.color;
 		canvasContext.arc(world.whiteBound.x-myShip.x+camera.xOffset,world.whiteBound.y-myShip.y+camera.yOffset,world.whiteBound.radius,0,Math.PI*2,true);
 		canvasContext.stroke();
 	}
 	if(world.blueBound != null){
 		canvasContext.beginPath();
+		canvasContext.lineWidth = 3;
 		canvasContext.strokeStyle = world.blueBound.color;
 		canvasContext.arc(world.blueBound.x-myShip.x+camera.xOffset,world.blueBound.y-myShip.y+camera.yOffset,world.blueBound.radius,0,Math.PI*2,true);
 		canvasContext.stroke();
 	}
+	canvasContext.lineWidth = temp;
 }
 
 
