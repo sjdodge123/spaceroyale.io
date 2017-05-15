@@ -173,6 +173,15 @@ class Game {
 			} else{
 				this.lobbyTimeLeft = this.lobbyTimer.getTimeLeft().toFixed(1);
 			}
+		} else{
+			this.cancelGameStart();
+		}
+	}
+	cancelGameStart(){
+		if(this.lobbyTimer != null){
+			this.lobbyTimer.reset();
+			this.lobbyTimer = null;
+			this.lobbyTimeLeft = this.lobbyWaitTime;
 		}
 	}
 
