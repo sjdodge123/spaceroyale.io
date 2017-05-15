@@ -139,6 +139,7 @@ function gameOver(){
     canvas.removeEventListener("click", handleClick, false);
     window.removeEventListener("keydown", keyDown, false);
     window.removeEventListener("keyup", keyUp, false);
+    server.disconnect();
 }
 
 function checkForDamage(){

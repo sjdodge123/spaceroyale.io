@@ -45,6 +45,9 @@ function clientConnect(name) {
 		if(id == myID){
 			iAmAlive = false;
 			delete shipList[id];
+			server.disconnect();
+			timeSinceLastCom = 0;
+			serverTimeoutWait = 10;
 		}
 	});
 
@@ -53,7 +56,7 @@ function clientConnect(name) {
 			victory = true;
 		}
 		timeSinceLastCom = 0;
-		serverTimeoutWait = 60;
+		serverTimeoutWait = 10;
 	});
 
 	server.on('serverShutdown', function(reason){
@@ -93,6 +96,7 @@ function checkForTimeout(){
 		serverRunning = false;
     	serverShutdownReason = "Server timed out";
 		server.disconnect();
+		window.parent.location.reload();
 	}
 }
 
