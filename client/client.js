@@ -79,6 +79,11 @@ function clientConnect(name) {
 		bulletList[bullet.sig] = bullet;
 	});
 
+	server.on("toast",function(message){
+		toastMessage = message;
+		toastTimer = setTimeout(clearToast,1700);
+	});
+
    	return server;
 }
 
@@ -89,4 +94,9 @@ function checkForTimeout(){
     	serverShutdownReason = "Server timed out";
 		server.disconnect();
 	}
+}
+
+function clearToast(){
+	clearTimeout(toastTimer);
+	toastMessage = null;
 }

@@ -6,6 +6,7 @@ app.use(express.static(path.join(__dirname, './client')));
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 var factory = require('./server/factory.js');
+var utils = require('./server/utils.js');
 var c = require('./server/config.json');
 
 //Base Server Settings
@@ -38,6 +39,8 @@ io.on('connection', function(client){
 		//Find a room with space
 		var roomSig = findARoom(client.id);
 		var room = roomList[roomSig];
+		utils.addMailBox(client.id,client);
+
 		room.join(client);
 		console.log(message.name + " connected to Room"+roomSig);
 
@@ -71,6 +74,7 @@ io.on('connection', function(client){
 		}
 		var name = room.clientList[client.id];
 		var id = client.id;
+		utils.removeMailBox(id);
 		client.broadcast.to(room.sig).emit('playerLeft',client.id);
 		console.log(name + ' disconnected from Room' + room.sig);
 		room.leave(client);
@@ -194,7 +198,9 @@ function updateRoom(room){
 		if(ship.alive == false){
 			if(ship.killedBy != null){
 				var murderer = room.shipList[ship.killedBy];
-				murderer.killList.push(room.clientList[shipID]);
+				var deadPlayerName = room.clientList[shipID];
+				murderer.killList.push(deadPlayerName);
+				utils.toastPlayer(murderer.id,"You killed " + deadPlayerName);
 			}
 			io.to(room.sig).emit('shipDeath',shipID);
 			delete room.shipList[shipID];

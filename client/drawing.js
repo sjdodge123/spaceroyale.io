@@ -14,13 +14,12 @@ function drawText(text,x,y){
 	canvasContext.fillText(text,x,y);
 }
 
-
-
 //DRAWING HUD UI
 function drawHUD(){
 	drawAliveCounter();
 	drawKillCounter();
     drawHPCounter();
+    drawToast();
     if(gameStarted){
     	drawShrinkTimer();
     } else{
@@ -51,6 +50,12 @@ function drawHPCounter(){
 		return;
 	}
 	drawText("HP:" + shipList[myID].health,10,20);
+}
+
+function drawToast(){
+	if(toastMessage != null){
+		drawText(toastMessage,canvas.width/2-(toastMessage.length*5),canvas.height/2+50);
+	}
 }
 
 function drawShrinkTimer(){

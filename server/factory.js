@@ -580,6 +580,7 @@ class Ship extends Rect{
 		if(item instanceof ShieldItem){
 			this.shield = new Shield(this.id);
 		}
+		utils.toastPlayer(this.id,item.equipMessage);
 	}
 	heal(amt){
 		if(this.health < this.baseHealth){
@@ -588,7 +589,9 @@ class Ship extends Rect{
 			} else{
 				this.health += amt;
 			}
+			utils.toastPlayer(this.id,"Healed " + amt);
 		}
+		utils.toastPlayer(this.id,"Full health");
 	}
 	fire(){
 		return this.weapon.fire(this.x,this.y,this.angle,this.baseColor,this.id);
@@ -782,6 +785,7 @@ class HPItem extends RectItem {
 	constructor(x,y){
 		super(x,y,"Red");
 		this.healAmt = 15;
+		this.equipMessage = "Applied health pack +" + this.healAmt;
 	}
 	handleHit(object){
 		if(!this.alive){
@@ -796,6 +800,7 @@ class HPItem extends RectItem {
 class ShotgunItem extends RectItem {
 	constructor(x,y){
 		super(x,y,"Yellow");
+		this.equipMessage = "Equiped Shotgun";
 	}
 	handleHit(object){
 		if(!this.alive){
@@ -810,6 +815,7 @@ class ShotgunItem extends RectItem {
 class RifleItem extends RectItem {
 	constructor(x,y){
 		super(x,y,"Green");
+		this.equipMessage = "Equiped Rifle";
 	}
 	handleHit(object){
 		if(!this.alive){
@@ -824,6 +830,7 @@ class RifleItem extends RectItem {
 class ShieldItem extends RectItem {
 	constructor(x,y){
 		super(x,y,"Aqua");
+		this.equipMessage = "Equiped Shield";
 	}
 	handleHit(object){
 		if(!this.alive){
