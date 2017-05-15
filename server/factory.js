@@ -83,7 +83,13 @@ class Game {
 		//Gamerules
 		this.minPlayers = c.minPlayers;
 		this.lobbyWaitTime = c.lobbyWaitTime;
-		this.shrinkTime = c.startingShrinkTimer;
+		this.timeUntilShrink = c.baseTimeUntilShrink;
+		
+		this.shrinkingDurationSpeedup = c.shrinkingDurationSpeedup;
+		this.timeUntilShrinkSpeedup = c.timeUntilShrinkSpeedup;
+
+		this.timeUntilShrink = c.baseTimeUntilShrink;
+		this.shrinkingDuration = c.baseShrinkingDuration;
 
 		this.timerUntilShrink = null;
 		this.shrinkingTimer = null;
@@ -91,6 +97,7 @@ class Game {
 		this.shrinkTimeLeft = 0;
 
 		this.gameEnded = false;
+		this.firstPass = true;
 		this.winner = null;
 		this.active = false;
 		this.lobbyTimer = null;
@@ -110,13 +117,16 @@ class Game {
 	}
 	resetTimeUntilShrink(){
 		var game = this;
-		this.timerUntilShrink = new Timer(function(){game.currentlyShrinking();},this.shrinkTime*1000);
+		if(!this.firstPass){this.timeUntilShrink *= this.timeUntilShrinkSpeedup;};
+		this.timerUntilShrink = new Timer(function(){game.currentlyShrinking();},this.timeUntilShrink*1000);
 
 	}
 	currentlyShrinking(){
 		var game = this;
-	    this.shrinkingTimer = new Timer(function(){game.resetTimeUntilShrink();},5000);
+		if(!this.firstPass){this.shrinkingDuration *= this.shrinkingDurationSpeedup;};
+	    this.shrinkingTimer = new Timer(function(){game.resetTimeUntilShrink();},this.shrinkingDuration*1000);
 	    this.world.shrinkBound();
+	    this.firstPass = false;
 	}
 
 	reset(){
@@ -292,8 +302,14 @@ class GameBoard {
 		delete this.itemList[itemSig];
 	}
 	clean(){
+		//Remove all active bullets from the scene
 		for(var sig in this.bulletList){
 			this.bulletList[sig].alive = false;
+		}
+		//Reset all weapon cooldowns
+		for(var id in this.shipList){
+			var ship = this.shipList[id];
+			ship.weapon.resetCoolDown();
 		}
 	}
 	generateBulletSig(){
@@ -545,6 +561,8 @@ class Ship extends Rect{
 		this.alive = true;
 		this.speed = c.playerBaseSpeed;
 		this.id = id;
+		this.killList = [];
+		this.killedBy = null;
 		this.weapon = new Gun();
 	}
 	update(){
@@ -554,6 +572,9 @@ class Ship extends Rect{
 	equip(item){
 		if(item instanceof ShotgunItem){
 			this.weapon = new Shotgun();
+		}
+		if(item instanceof RifleItem){
+			this.weapon = new Rifle();
 		}
 	}
 	heal(amt){
@@ -585,6 +606,10 @@ class Ship extends Rect{
 	handleHit(object){
 		if(object.owner != this.id && object.alive && object.damage != null){
 			this.health -= object.damage;
+			if(this.health < 1){
+				this.killedBy = object.owner;
+				this.alive = false;
+			}
 		}
 	}
 	checkHP(){
@@ -602,11 +627,11 @@ class Bullet extends Rect{
 		this.owner = owner;
 		this.sig = null;
 
-		this.lifetime = 5;
-		this.speed = 5;
+		this.lifetime = c.bulletLifetime;
+		this.speed = c.bulletSpeed;
+		this.damage = c.bulletDamage;
 		this.velX = 0;
 		this.velY = 0;
-		this.damage = 30;
 	}
 	update(){
 		this.velX = Math.cos((this.angle+90)*(Math.PI/180))*this.speed;
@@ -624,6 +649,9 @@ class Bullet extends Rect{
 		if(object.id == this.owner){
 			return;
 		}
+		if(object.isItem){
+			return;
+		}
 		this.alive = false;
 	}
 }
@@ -631,9 +659,18 @@ class Bullet extends Rect{
 class Birdshot extends Bullet{
 	constructor(x,y,width,height,color,angle,owner){
 		super(x,y,width,height,color,angle,owner);
-		this.damage = 10;
+		this.damage = c.birdshotDamage;
+		this.speed = c.birdshotSpeed;
 	}
 
+}
+
+class RifleBullet extends Bullet{
+	constructor(x,y,width,height,color,angle,owner){
+		super(x,y,width,height,color,angle,owner);
+		this.damage = c.rifleBulletDamage;
+		this.speed = c.rifleBulletSpeed;
+	}
 }
 
 
@@ -665,23 +702,20 @@ class Asteroid extends Circle{
 		}
 	}
 	checkForDrop(){
-    var totalSum = 0;
-    var keys = Object.keys(this.lootTable);
-    for(var item in this.lootTable){
-      totalSum += this.lootTable[item];
-    }
 		if(utils.getRandomInt(0,10000) <= this.dropRate * 100){
-      var itemToDrop = null;
-
+		    var totalSum = 0;
+		    var keys = Object.keys(this.lootTable);
+	    	for(var item in this.lootTable){
+	      		totalSum += this.lootTable[item];
+	    	}
 			var rand =  utils.getRandomInt(0,totalSum);
-      var sum = 0;
-      var i=0;
-      while(sum < rand){
-        i += 1;
-        sum += this.lootTable[keys[i]];
-      }
-      itemToDrop = keys[Math.max(0,i-1)];
-			this.dropItem(itemToDrop);
+      		var sum = 0;
+      		var i = 0;
+      		while(sum < rand){
+        		i += 1;
+        		sum += this.lootTable[keys[i]];
+      		}
+			this.dropItem(keys[Math.max(0,i-1)]);
 		}
 	}
 	dropItem(itemName){
@@ -693,6 +727,10 @@ class Asteroid extends Circle{
 			}
 			case "ShotgunItem": {
 				item = new ShotgunItem(this.x,this.y);
+				break;
+			}
+			case "RifleItem": {
+				item = new RifleItem(this.x,this.y);
 				break;
 			}
 		}
@@ -713,6 +751,7 @@ class Planet extends Circle {
 class RectItem extends Rect{
 	constructor(x,y,color){
 		super(x,y,5,5,color);
+		this.isItem = true;
 		this.sig = null;
 		this.alive = true;
 	}
@@ -747,19 +786,50 @@ class ShotgunItem extends RectItem {
 		}
 	}
 }
+class RifleItem extends RectItem {
+	constructor(x,y){
+		super(x,y,"Green");
+	}
+	handleHit(object){
+		if(!this.alive){
+			return;
+		}
+		if(object instanceof Ship){
+			object.equip(this);
+			this.alive = false;
+		}
+	}
+}
 
 class Weapon {
 	constructor(){
-
+		this.cooldown = 10;
+		this.nextFire = 0;
+	}
+	resetCoolDown(){
+		this.nextFire = 0;
+	}
+	onCoolDown(){
+		this.currentTime = new Date();
+		if(this.currentTime > this.nextFire){
+			this.nextFire = new Date(this.currentTime);
+			this.nextFire.setTime(this.nextFire.getTime() + this.cooldown*1000);
+			return false;
+		}
+		return true;
 	}
 }
 
 class Gun extends Weapon{
 	constructor(){
 		super();
+		this.cooldown = c.basegunCoolDown;
 	}
 
 	fire(x,y,angle,color,id){
+		if(this.onCoolDown()){
+			return;
+		}
 		var bullets = [];
 		bullets.push(new Bullet(x,y,2,6,color,angle,id));
 		return bullets;
@@ -769,15 +839,35 @@ class Gun extends Weapon{
 class Shotgun extends Weapon{
 	constructor(){
 		super();
+		this.cooldown = c.shotgunCoolDown;
 	}
 
 	fire(x,y,angle,color,id){
+		if(this.onCoolDown()){
+			return;
+		}
 		var bullets = [];
-		bullets.push(new Birdshot(x,y,2,6,color,angle-10,id));
-		bullets.push(new Birdshot(x,y,2,6,color,angle-5,id));
+		bullets.push(new Birdshot(x,y,2,6,color,angle-2.5,id));
+		bullets.push(new Birdshot(x,y,2,6,color,angle-1,id));
 		bullets.push(new Birdshot(x,y,2,6,color,angle,id));
-		bullets.push(new Birdshot(x,y,2,6,color,angle+5,id));
-		bullets.push(new Birdshot(x,y,2,6,color,angle+10,id));
+		bullets.push(new Birdshot(x,y,2,6,color,angle+1,id));
+		bullets.push(new Birdshot(x,y,2,6,color,angle+2.5,id));
+		return bullets;
+	}
+}
+
+class Rifle extends Weapon{
+	constructor(){
+		super();
+		this.cooldown = c.rifleCoolDown;
+	}
+
+	fire(x,y,angle,color,id){
+		if(this.onCoolDown()){
+			return;
+		}
+		var bullets = [];
+		bullets.push(new RifleBullet(x,y,4,10,color,angle,id));
 		return bullets;
 	}
 }
@@ -824,7 +914,7 @@ class Timer {
 	}
 	start() {
         this.running = true;
-        this.started = new Date()
+        this.started = new Date();
         this.id = setTimeout(this.callback, this.remaining);
     }
 
@@ -836,9 +926,9 @@ class Timer {
     getTimeLeft(){
     	if(this.running){
     		this.pause();
-        if(this.remaining <= 0){
-      		return 0;
-      	}
+	        if(this.remaining <= 0){
+	      		return 0;
+	      	}
     		this.start();
     	}
 

@@ -7,20 +7,28 @@
     "maxPlayersInRoom":10,
     "roomKickTimeout":30,
     "lobbyWaitTime":5,
-    "startingShrinkTimer":60,
+
+    "baseTimeUntilShrink":30,
+    "timeUntilShrinkSpeedup":0.75,
+    "baseShrinkingDuration": 20,
+    "shrinkingDurationSpeedup":0.75,
+
+    "damageTickRate":2,
+    "damagePerTick":5,
 
     "worldWidth": 2500,
     "worldHeight": 2500,
 
     "generateAsteroids":true,
     "asteroidAmt":200,
-    "asteroidDropRate":100,
+    "asteroidDropRate":20,
     "asteroidMinSize":15,
     "asteroidMaxSize":25,
 
     "asteroidLootTable":{
-      "HPItem":3,
-      "ShotgunItem":2
+      "HPItem":4,
+      "RifleItem":1,
+      "ShotgunItem":3
     },
 
     "generatePlanets":true,
@@ -28,10 +36,20 @@
     "planetMinSize":40,
     "planetMaxSize":80,
 
-    "damageTickRate":2,
-    "damagePerTick":5,
-
     "playerBaseSpeed":2,
+
+    "basegunCoolDown":0.2,
+    "bulletLifetime":5,
+    "bulletSpeed":5,
+    "bulletDamage":10,
+
+    "shotgunCoolDown":1.2,
+    "birdshotDamage":10,
+    "birdshotSpeed":8,
+
+    "rifleCoolDown":1.7,
+    "rifleBulletDamage":50,
+    "rifleBulletSpeed":15,
 
     "sqlinfo":{
       "connectionLimit": 100,

@@ -183,6 +183,10 @@ function updateRoom(room){
 	for(var shipID in room.shipList){
 		var ship = room.shipList[shipID];
 		if(ship.alive == false){
+			if(ship.killedBy != null){
+				var murderer = room.shipList[ship.killedBy];
+				murderer.killList.push(room.clientList[shipID]);
+			}
 			io.to(room.sig).emit('shipDeath',shipID);
 			delete room.shipList[shipID];
 		}
