@@ -1,0 +1,8 @@
+option confirm off
+open sftp://ubuntu@54.145.214.4
+option include "client/"
+option include "server/"
+option include "runServer.js"
+
+synchronize -filemask=|".git/;node_modules/" remote %curpath% /home/ubuntu/spacepirates.io/
+exit

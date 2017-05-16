@@ -6,11 +6,11 @@
     "minPlayers":2,
     "maxPlayersInRoom":10,
     "roomKickTimeout":30,
-    "lobbyWaitTime":20,
+    "lobbyWaitTime":15,
 
-    "baseTimeUntilShrink":30,
+    "baseTimeUntilShrink":20,
     "timeUntilShrinkSpeedup":0.75,
-    "baseShrinkingDuration": 20,
+    "baseShrinkingDuration": 10,
     "shrinkingDurationSpeedup":0.75,
 
     "damageTickRate":2,
