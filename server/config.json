@@ -4,7 +4,7 @@
     "serverTickSpeed": 16.666,
 
     "minPlayers":2,
-    "maxPlayersInRoom":10,
+    "maxPlayersInRoom":15,
     "roomKickTimeout":30,
     "lobbyWaitTime":15,
 
@@ -14,7 +14,7 @@
     "shrinkingDurationSpeedup":0.75,
 
     "damageTickRate":2,
-    "damagePerTick":5,
+    "damagePerTick":15,
 
     "worldWidth": 2500,
     "worldHeight": 2500,
@@ -27,9 +27,9 @@
 
     "asteroidLootTable":{
       "HPItem":3,
-      "ShieldItem":1,
+      "ShieldItem":2,
       "RifleItem":4,
-      "ShotgunItem":2
+      "ShotgunItem":1
     },
 
     "generatePlanets":true,
@@ -45,7 +45,7 @@
     "bulletDamage":10,
 
     "shotgunCoolDown":1.2,
-    "birdshotDamage":10,
+    "birdshotDamage":11,
     "birdshotSpeed":8,
 
     "rifleCoolDown":1.2,

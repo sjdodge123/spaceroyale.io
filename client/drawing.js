@@ -91,6 +91,10 @@ function drawShip(ship){
 	canvasContext.save();
 	canvasContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
 	canvasContext.rotate(ship.angle*Math.PI/180);
+	canvasContext.shadowColor = ship.glowColor;
+	canvasContext.shadowOffsetX = 1;
+	canvasContext.shadowOffsetY = 1;
+	canvasContext.shadowBlur = 16;
 	canvasContext.fillStyle = ship.color;
 	canvasContext.fillRect(-ship.width/2,-ship.height/2,ship.width,ship.height);
 	canvasContext.restore();

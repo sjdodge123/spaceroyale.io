@@ -560,6 +560,7 @@ class Ship extends Rect{
 		this.baseHealth = 100;
 		this.health = this.baseHealth;
 		this.baseColor = color;
+		this.glowColor = color;
 		this.angle = 90;
 		this.isHit = false;
 		this.damageTimer = false;
@@ -572,24 +573,32 @@ class Ship extends Rect{
 		this.id = id;
 		this.killList = [];
 		this.killedBy = null;
-		this.weapon = new Gun();
+		this.weapon = new Gun(this.id);
 		this.shield = null;
 	}
 	update(){
 		this.checkHP();
+		this.checkKills();
 		this.move();
 	}
 	equip(item){
 		if(item instanceof ShotgunItem){
-			this.weapon = new Shotgun();
+			if(this.weapon instanceof Shotgun){
+				this.weapon.upgrade();
+				return;
+			}	
+			this.weapon = new Shotgun(this.id);
+			this.weapon.equip();
 		}
 		if(item instanceof RifleItem){
-			this.weapon = new Rifle();
+			this.weapon = new Rifle(this.id);
+			this.weapon.equip();
 		}
 		if(item instanceof ShieldItem){
 			this.shield = new Shield(this.id);
+			this.shield.equip();
 		}
-		utils.toastPlayer(this.id,item.equipMessage);
+		
 	}
 	heal(amt){
 		if(this.health < this.baseHealth){
@@ -599,8 +608,9 @@ class Ship extends Rect{
 				this.health += amt;
 			}
 			utils.toastPlayer(this.id,"Healed " + amt);
+		} else{
+			utils.toastPlayer(this.id,"Full health");
 		}
-		utils.toastPlayer(this.id,"Full health");
 	}
 	fire(){
 		return this.weapon.fire(this.x,this.y,this.angle,this.baseColor,this.id);
@@ -641,6 +651,20 @@ class Ship extends Rect{
 	checkHP(){
 		if(this.health < 1){
 			this.alive = false;
+		}
+	}
+	checkKills(){
+		if(this.killList.length >= 1){
+			this.color = "#ffb84d";
+		}
+		if(this.killList.length >= 3){
+			this.color = "#bfbfbf";
+		}
+		if(this.killList.length >= 5){
+			this.color = "#806c00";
+		}
+		if(this.killList.length >= 10){
+			this.color = "#ffffff";
 		}
 	}
 }
@@ -809,7 +833,6 @@ class HPItem extends RectItem {
 class ShotgunItem extends RectItem {
 	constructor(x,y){
 		super(x,y,"Yellow");
-		this.equipMessage = "Equiped Shotgun";
 	}
 	handleHit(object){
 		if(!this.alive){
@@ -824,7 +847,6 @@ class ShotgunItem extends RectItem {
 class RifleItem extends RectItem {
 	constructor(x,y){
 		super(x,y,"Green");
-		this.equipMessage = "Equiped Rifle";
 	}
 	handleHit(object){
 		if(!this.alive){
@@ -839,7 +861,7 @@ class RifleItem extends RectItem {
 class ShieldItem extends RectItem {
 	constructor(x,y){
 		super(x,y,"Aqua");
-		this.equipMessage = "Equiped Shield";
+		
 	}
 	handleHit(object){
 		if(!this.alive){
@@ -853,9 +875,18 @@ class ShieldItem extends RectItem {
 }
 
 class Weapon {
-	constructor(){
+	constructor(owner){
+		this.owner = owner;
 		this.cooldown = 10;
+		this.level = 1;
+		this.maxLevel = 3;
 		this.nextFire = 0;
+		this.maxLevelMessage = "Weapon already at max";
+		this.upgradeMessage = "No upgrade message set";
+		this.equipMessage = "No equip message set";
+	}
+	equip(){
+		utils.toastPlayer(this.owner,this.equipMessage);
 	}
 	resetCoolDown(){
 		this.nextFire = 0;
@@ -869,12 +900,22 @@ class Weapon {
 		}
 		return true;
 	}
+	upgrade(){
+		if(this.level < this.maxLevel){
+			utils.toastPlayer(this.owner,this.upgradeMessage);
+			this.level++;
+			return;
+		} 
+		utils.toastPlayer(this.owner,this.maxLevelMessage);
+	}
 }
 
 class Gun extends Weapon{
-	constructor(){
-		super();
+	constructor(owner){
+		super(owner);
 		this.cooldown = c.basegunCoolDown;
+		this.equipMessage = "Equiped pistol";
+		this.maxLevel = 1;
 	}
 
 	fire(x,y,angle,color,id){
@@ -888,9 +929,11 @@ class Gun extends Weapon{
 }
 
 class Shotgun extends Weapon{
-	constructor(){
-		super();
+	constructor(owner){
+		super(owner);
 		this.cooldown = c.shotgunCoolDown;
+		this.equipMessage = "Equiped Shotgun";
+		this.upgradeMessage ="Upgraded Shotgun";
 	}
 
 	fire(x,y,angle,color,id){
@@ -898,19 +941,45 @@ class Shotgun extends Weapon{
 			return;
 		}
 		var bullets = [];
-		bullets.push(new Birdshot(x,y,2,6,color,angle-2.5,id));
-		bullets.push(new Birdshot(x,y,2,6,color,angle-1,id));
-		bullets.push(new Birdshot(x,y,2,6,color,angle,id));
-		bullets.push(new Birdshot(x,y,2,6,color,angle+1,id));
-		bullets.push(new Birdshot(x,y,2,6,color,angle+2.5,id));
+		if(this.level > 1){
+			var shot1 = new Birdshot(x,y,1,2,color,angle-5,id);
+			shot1.speed -= 2;
+			var shot2 = new Birdshot(x,y,1,2,color,angle,id);
+			shot2.speed -= 2;
+			var shot3 = new Birdshot(x,y,1,2,color,angle+5,id);
+			shot3.speed -= 2;
+			bullets.push(shot1,shot2,shot3);
+		}
+		if(this.level > 2){
+			var shot1 = new Birdshot(x,y,1,2,color,angle-15,id);
+			shot1.speed -= 4;
+			var shot2 = new Birdshot(x,y,1,2,color,angle,id);
+			shot2.speed -= 4;
+			var shot3 = new Birdshot(x,y,1,2,color,angle+15,id);
+			shot3.speed -= 4;
+			bullets.push(shot1,shot2,shot3);
+		}
+		bullets.push(new Birdshot(x,y,2,4,color,angle-2.5,id));
+		bullets.push(new Birdshot(x,y,2,4,color,angle-1,id));
+		bullets.push(new Birdshot(x,y,2,4,color,angle,id));
+		bullets.push(new Birdshot(x,y,2,4,color,angle+1,id));
+		bullets.push(new Birdshot(x,y,2,4,color,angle+2.5,id));
 		return bullets;
+	}
+	upgrade(){
+		super.upgrade();
+		if(this.level == 3){
+			this.cooldown -= .3;
+		}
 	}
 }
 
 class Rifle extends Weapon{
-	constructor(){
-		super();
+	constructor(owner){
+		super(owner);
 		this.cooldown = c.rifleCoolDown;
+		this.equipMessage = "Equiped Rifle";
+		this.maxLevel = 1;
 	}
 
 	fire(x,y,angle,color,id){
@@ -923,21 +992,23 @@ class Rifle extends Weapon{
 	}
 }
 
-
 class Shield extends Circle{
 	constructor(owner){
 		super(0,0,c.shieldRadius,"Aqua");
+		this.equipMessage = "Equiped Shield";
 		this.health = c.shieldProection;
 		this.owner = owner;
 		this.alive = true;
 	}
 	handleHit(object){
-		//console.log("Shield(" +this.health +") taking " + object.damage +" damage");
 		this.health -= object.damage;
 		if(this.health < 1){
 			this.leftOverDamage = this.health;
 			this.alive = false;
 		}
+	}
+	equip(){
+		utils.toastPlayer(this.owner,this.equipMessage);
 	}
 }
 
