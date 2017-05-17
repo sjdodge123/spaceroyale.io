@@ -12,6 +12,7 @@ var c = require('./server/config.json');
 //Base Server Settings
 var serverSleeping = true,
 	serverTickSpeed = c.serverTickSpeed,
+	serverUpdates = null,
 	gameActive = false,
 	clientCount = 0;
 
@@ -83,6 +84,7 @@ io.on('connection', function(client){
 
 		if(getActiveRoomCount() == 0){
 			serverSleeping = true;
+			clearInterval(serverUpdates);
 			console.log("Server sleeping..");
 		}
   	});
@@ -120,7 +122,8 @@ io.on('connection', function(client){
 
 	if(serverSleeping){
 		serverSleeping = false;
-		setInterval(update,serverTickSpeed);
+		console.log("Server wakeup");
+		serverUpdates = setInterval(update,serverTickSpeed);
 	}
 });
 
