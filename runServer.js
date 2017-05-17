@@ -199,6 +199,7 @@ function updateRoom(room){
 	for(var shipID in room.shipList){
 		var ship = room.shipList[shipID];
 		if(ship.alive == false){
+			room.game.gameBoard.spawnItem(ship.weapon.drop(ship.x,ship.y));
 			if(ship.killedBy != null){
 				var murderer = room.shipList[ship.killedBy];
 				var deadPlayerName = room.clientList[shipID];

@@ -245,7 +245,6 @@ class GameBoard {
 			var asteroid = this.asteroidList[asteroidSig];
 			if(asteroid.alive == false){
 				this.terminateAsteroid(asteroid);
-
 				continue;
 			}
 			asteroid.update();
@@ -259,6 +258,11 @@ class GameBoard {
 				this.terminateItem(itemSig);
 			}
 		}
+	}
+	spawnItem(item){
+		var sig = this.generateItemSig();
+		item.sig = sig;
+		this.itemList[sig] = item;
 	}
 	checkCollisions(active){
 		if(active){
@@ -301,9 +305,7 @@ class GameBoard {
 	}
 	terminateAsteroid(asteroid){
 		if(asteroid.item != null){
-			var sig = this.generateItemSig();
-			asteroid.item.sig = sig;
-			this.itemList[sig] = asteroid.item;
+			this.spawnItem(asteroid.item);
 		}
 		delete this.asteroidList[asteroid.sig];
 	}
@@ -573,7 +575,7 @@ class Ship extends Rect{
 		this.id = id;
 		this.killList = [];
 		this.killedBy = null;
-		this.weapon = new Gun(this.id);
+		this.weapon = new Pistol(this.id);
 		this.shield = null;
 	}
 	update(){
@@ -582,6 +584,14 @@ class Ship extends Rect{
 		this.move();
 	}
 	equip(item){
+		if(item instanceof PistolItem){
+			if(this.weapon instanceof Pistol){
+				this.weapon.upgrade();
+				return;
+			}	
+			this.weapon = new Pistol(this.id);
+			this.weapon.equip();
+		}
 		if(item instanceof ShotgunItem){
 			if(this.weapon instanceof Shotgun){
 				this.weapon.upgrade();
@@ -591,12 +601,23 @@ class Ship extends Rect{
 			this.weapon.equip();
 		}
 		if(item instanceof RifleItem){
+			if(this.weapon instanceof Rifle){
+				this.weapon.upgrade();
+				return;
+			}
 			this.weapon = new Rifle(this.id);
 			this.weapon.equip();
 		}
 		if(item instanceof ShieldItem){
-			this.shield = new Shield(this.id);
-			this.shield.equip();
+			if(this.shield == null){
+				this.shield = new Shield(this.id);
+				this.shield.equip();
+				return;
+			}
+			if(this.shield instanceof Shield){
+				this.shield.upgrade();
+			}
+			
 		}
 		
 	}
@@ -643,10 +664,15 @@ class Ship extends Rect{
 			}
 
 			if(this.health < 1){
-				this.killedBy = object.owner;
-				this.alive = false;
+				this.iDied(object.owner);
 			}
 		}
+	}
+	iDied(killerID){
+		if(killerID){
+			this.killedBy = killerID;
+		}
+		this.alive = false;
 	}
 	checkHP(){
 		if(this.health < 1){
@@ -778,6 +804,10 @@ class Asteroid extends Circle{
 				item = new HPItem(this.x,this.y);
 				break;
 			}
+			case "PistolItem": {
+				item = new PistolItem(this.x,this.y);
+				break;
+			}
 			case "ShotgunItem": {
 				item = new ShotgunItem(this.x,this.y);
 				break;
@@ -830,47 +860,41 @@ class HPItem extends RectItem {
 		}
 	}
 }
-class ShotgunItem extends RectItem {
+
+class EquipableItem extends RectItem{
+	constructor(x,y,color){
+		super(x,y,color);
+	}
+	handleHit(object){
+		if(!this.alive){
+			return;
+		}
+		if(object instanceof Ship){
+			object.equip(this);
+			this.alive = false;
+		}
+	}
+}
+
+class PistolItem extends EquipableItem {
+	constructor(x,y){
+		super(x,y,"Magenta");
+	}
+}
+
+class ShotgunItem extends EquipableItem {
 	constructor(x,y){
 		super(x,y,"Yellow");
 	}
-	handleHit(object){
-		if(!this.alive){
-			return;
-		}
-		if(object instanceof Ship){
-			object.equip(this);
-			this.alive = false;
-		}
-	}
 }
-class RifleItem extends RectItem {
+class RifleItem extends EquipableItem {
 	constructor(x,y){
 		super(x,y,"Green");
 	}
-	handleHit(object){
-		if(!this.alive){
-			return;
-		}
-		if(object instanceof Ship){
-			object.equip(this);
-			this.alive = false;
-		}
-	}
 }
-class ShieldItem extends RectItem {
+class ShieldItem extends EquipableItem {
 	constructor(x,y){
 		super(x,y,"Aqua");
-		
-	}
-	handleHit(object){
-		if(!this.alive){
-			return;
-		}
-		if(object instanceof Ship){
-			object.equip(this);
-			this.alive = false;
-		}
 	}
 }
 
@@ -908,14 +932,19 @@ class Weapon {
 		} 
 		utils.toastPlayer(this.owner,this.maxLevelMessage);
 	}
+	drop(x,y){
+		return new this.item(x,y);
+	}
 }
 
-class Gun extends Weapon{
+class Pistol extends Weapon{
 	constructor(owner){
 		super(owner);
 		this.cooldown = c.basegunCoolDown;
-		this.equipMessage = "Equiped pistol";
 		this.maxLevel = 1;
+		this.equipMessage = "Equiped Pistol";
+		this.upgradeMessage ="Upgraded Pistol";
+		this.item = PistolItem;
 	}
 
 	fire(x,y,angle,color,id){
@@ -934,6 +963,7 @@ class Shotgun extends Weapon{
 		this.cooldown = c.shotgunCoolDown;
 		this.equipMessage = "Equiped Shotgun";
 		this.upgradeMessage ="Upgraded Shotgun";
+		this.item = ShotgunItem;
 	}
 
 	fire(x,y,angle,color,id){
@@ -972,16 +1002,20 @@ class Shotgun extends Weapon{
 			this.cooldown -= .3;
 		}
 	}
+	drop(x,y){
+		return new ShotgunItem(x,y);
+	}
 }
 
 class Rifle extends Weapon{
 	constructor(owner){
 		super(owner);
 		this.cooldown = c.rifleCoolDown;
-		this.equipMessage = "Equiped Rifle";
 		this.maxLevel = 1;
+		this.equipMessage = "Equiped Rifle";
+		this.upgradeMessage = "Upgraded Rifle";
+		this.item = RifleItem;
 	}
-
 	fire(x,y,angle,color,id){
 		if(this.onCoolDown()){
 			return;
@@ -990,21 +1024,70 @@ class Rifle extends Weapon{
 		bullets.push(new RifleBullet(x,y,4,10,color,angle,id));
 		return bullets;
 	}
+	drop(x,y){
+		return new RifleItem(x,y);
+	}
 }
 
 class Shield extends Circle{
 	constructor(owner){
 		super(0,0,c.shieldRadius,"Aqua");
+		this.level = 1;
+		this.maxLevel = 3;
 		this.equipMessage = "Equiped Shield";
-		this.health = c.shieldProection;
+		this.upgradeMessage = "Upgraded Shield";
+		this.maxLevelMessage = "Shield restored 10 points";
+		this.health = c.shield1Protection;
+		this.maxHealth = c.shield3Protection;
+		this.restoreAmount = c.shieldRestoreAmount;
 		this.owner = owner;
 		this.alive = true;
 	}
 	handleHit(object){
+		if(!this.alive){
+			return;
+		}
 		this.health -= object.damage;
 		if(this.health < 1){
 			this.leftOverDamage = this.health;
 			this.alive = false;
+			return;
+		}
+		this.checkLevel();
+	}
+	upgrade(){
+		if(!this.alive){
+			return;
+		}
+		if(this.level < this.maxLevel){
+			this.health += this.restoreAmount;
+			this.checkLevel();
+			utils.toastPlayer(this.owner,this.upgradeMessage);
+			return;
+		}
+		if(this.health < this.maxHealth){
+			if(this.health + this.restoreAmount < this.maxHealth){
+				this.health + this.restoreAmount;
+			} else{
+				this.health = this.maxHealth;
+			}
+		}
+		utils.toastPlayer(this.owner,this.maxLevelMessage);
+	}
+	checkLevel(){
+		if(this.health >= 1 && this.health <= c.shield1Protection){
+			this.level = 1;
+			this.color = "Aqua";
+			return;
+		}
+		if(this.health > c.shield1Protection && this.health <= c.shield2Protection){
+			this.level = 2;
+			this.color = "#FFFF00";
+			return;
+		}
+		if(this.health > c.shield2Protection && this.health <= c.shield3Protection){
+			this.level = 3;
+			this.color = "#FF6347";
 		}
 	}
 	equip(){

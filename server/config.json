@@ -21,15 +21,16 @@
 
     "generateAsteroids":true,
     "asteroidAmt":200,
-    "asteroidDropRate":20,
+    "asteroidDropRate":40,
     "asteroidMinSize":15,
     "asteroidMaxSize":25,
 
     "asteroidLootTable":{
-      "HPItem":3,
+      "HPItem":4,
       "ShieldItem":2,
-      "RifleItem":4,
-      "ShotgunItem":1
+      "RifleItem":5,
+      "ShotgunItem":3,
+      "PistolItem":1
     },
 
     "generatePlanets":true,
@@ -53,7 +54,10 @@
     "rifleBulletSpeed":20,
 
     "shieldRadius":9,
-    "shieldProection":11,
+    "shield1Protection":10,
+    "shield2Protection":20,
+    "shield3Protection":30,
+    "shieldRestoreAmount":10,
 
     "sqlinfo":{
       "connectionLimit": 100,
