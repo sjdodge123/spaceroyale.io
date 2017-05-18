@@ -26,6 +26,7 @@ function drawHUD(){
     drawHPCounter();
     drawToast();
     drawTotalPlayers();
+    drawEventLog();
     if(gameStarted){
     	drawShrinkTimer();
     } else{
@@ -68,6 +69,26 @@ function drawTotalPlayers(){
 		var message = "Players on Server: " + totalPlayers;
 		drawTextF(message,canvas.width-(message.length*5),canvas.height - 15,"#e0e0eb","10px Georgia");
 	}
+}
+
+function drawEventLog(){
+	canvasContext.save();
+	canvasContext.globalAlpha = 0.25;
+	canvasContext.fillStyle = eventLog.backgroundColor;
+	canvasContext.fillRect(eventLog.x,eventLog.y,eventLog.width,eventLog.height);
+	canvasContext.fillStyle = eventLog.textColor;
+	canvasContext.font=	eventLog.textStyle;
+	var len = eventLog.printList.length-1;
+	if(len == eventLog.listMax){
+		eventLog.printList.shift();
+	}
+	if(len != -1){
+
+		for(var i=len;i>=0;i--){
+			canvasContext.fillText(eventLog.printList[i],eventLog.textX(),eventLog.textY()+(i*eventLog.textSize));
+		}
+	}
+	canvasContext.restore();
 }
 
 function drawShrinkTimer(){

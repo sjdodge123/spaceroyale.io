@@ -24,7 +24,8 @@ var roomList = {},
 
 //Base Server Functions
 server.listen(c.port,c.host, function(){
-  console.log('listening on '+c.host+':'+c.port);
+	utils.build(io);
+    console.log('listening on '+c.host+':'+c.port);
 });
 
 process.on( 'SIGINT', function() {
@@ -40,7 +41,7 @@ io.on('connection', function(client){
 		//Find a room with space
 		var roomSig = findARoom(client.id);
 		var room = roomList[roomSig];
-		utils.addMailBox(client.id,client);
+		utils.addMailBox(client.id,client,roomSig);
 
 		room.join(client);
 		console.log(message.name + " connected to Room"+roomSig);
@@ -202,8 +203,10 @@ function updateRoom(room){
 			room.game.gameBoard.spawnItem(ship.weapon.drop(ship.x,ship.y));
 			if(ship.killedBy != null){
 				var murderer = room.shipList[ship.killedBy];
+				var murdererName = room.clientList[ship.killedBy];
 				var deadPlayerName = room.clientList[shipID];
 				murderer.killList.push(deadPlayerName);
+				utils.sendEventMessageToRoom(murderer.id,murdererName + " killed " + deadPlayerName);
 				utils.toastPlayer(murderer.id,"You killed " + deadPlayerName);
 			}
 			io.to(room.sig).emit('shipDeath',shipID);

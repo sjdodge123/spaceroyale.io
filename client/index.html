@@ -40,7 +40,12 @@ var canvasContext = canvas.getContext('2d');
 canvasContext.canvas.width  = window.innerWidth;
 canvasContext.canvas.height = window.innerHeight;
 
+
+
+
+
 var server = null,
+eventLog,
 camera,
 skipAuth = false,
 serverRunning = false,
@@ -131,6 +136,31 @@ function resize(){
             this.yOffset += y;
         }
     }
+    eventLog = {
+        backgroundColor:'#2a2a2a',
+        width:300,
+        height:300,
+        x: 10,
+        y: canvas.height-300-10,
+        textColor:"#d3d3d3",
+        textStyle:"15px Verdana",
+        textSize:15,
+        printList:[],
+        listMax:20,
+        textX: function(){
+            return this.x+10;
+        },
+        textY:function(){
+            return this.y+15;
+        },
+        addEvent:function(eventmsg){
+            if(this.printList.length == this.listMax){
+                this.printList.shift();
+            }
+            this.printList.push(eventmsg);
+        }
+       
+    }
 }
 
 function animloop(){
@@ -182,9 +212,11 @@ function calcMousePos(evt){
     evt.preventDefault();
     var rect = canvas.getBoundingClientRect(),
         root = document.documentElement;
-    mouseX = evt.pageX - rect.left - root.scrollLeft + myShip.x - camera.xOffset;
-    mouseY = evt.pageY - rect.top - root.scrollTop + myShip.y - camera.yOffset;
-    server.emit('mousemove',{x:mouseX,y:mouseY});
+    if(myShip != null){
+        mouseX = evt.pageX - rect.left - root.scrollLeft + myShip.x - camera.xOffset;
+        mouseY = evt.pageY - rect.top - root.scrollTop + myShip.y - camera.yOffset;
+        server.emit('mousemove',{x:mouseX,y:mouseY});
+    }
 }
 
 function handleClick(evt){

@@ -85,7 +85,12 @@ function clientConnect(name) {
 
 	server.on("toast",function(message){
 		toastMessage = message;
+		eventLog.addEvent(message);
 		toastTimer = setTimeout(clearToast,1700);
+	});
+
+	server.on("eventMessage",function(message){
+		eventLog.addEvent(message);
 	});
 
    	return server;
