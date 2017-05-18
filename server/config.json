@@ -8,9 +8,9 @@
     "roomKickTimeout":30,
     "lobbyWaitTime":15,
 
-    "baseTimeUntilShrink":20,
+    "baseTimeUntilShrink":30,
     "timeUntilShrinkSpeedup":0.75,
-    "baseShrinkingDuration": 10,
+    "baseShrinkingDuration": 40,
     "shrinkingDurationSpeedup":0.75,
 
     "damageTickRate":2,
@@ -20,7 +20,7 @@
     "worldHeight": 2500,
 
     "generateAsteroids":true,
-    "asteroidAmt":200,
+    "asteroidAmt":100,
     "asteroidDropRate":40,
     "asteroidMinSize":15,
     "asteroidMaxSize":25,
@@ -34,24 +34,24 @@
     },
 
     "generatePlanets":true,
-    "planetAmt":30,
+    "planetAmt":40,
     "planetMinSize":40,
     "planetMaxSize":80,
 
-    "playerBaseSpeed":2,
+    "playerBaseSpeed":5,
 
     "basegunCoolDown":0.2,
     "bulletLifetime":5,
-    "bulletSpeed":5,
+    "bulletSpeed":10,
     "bulletDamage":10,
 
     "shotgunCoolDown":1.2,
     "birdshotDamage":11,
-    "birdshotSpeed":8,
+    "birdshotSpeed":16,
 
     "rifleCoolDown":1.2,
     "rifleBulletDamage":50,
-    "rifleBulletSpeed":20,
+    "rifleBulletSpeed":25,
 
     "shieldRadius":9,
     "shield1Protection":10,

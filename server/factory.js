@@ -1021,7 +1021,7 @@ class Rifle extends Weapon{
 			return;
 		}
 		var bullets = [];
-		bullets.push(new RifleBullet(x,y,4,10,color,angle,id));
+		bullets.push(new RifleBullet(x,y,4,15,color,angle,id));
 		return bullets;
 	}
 	drop(x,y){
