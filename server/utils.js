@@ -13,6 +13,14 @@ exports.removeMailBox = function(id){
 	delete mailBoxList[id];
 }
 
+exports.getTotalPlayers = function(){
+	var count = 0;
+	for(var box in mailBoxList){
+		count++;
+	}
+	return count;
+}
+
 exports.toastPlayer = function(id,message){
 	mailBoxList[id].emit("toast",message);
 }

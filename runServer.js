@@ -220,6 +220,7 @@ function updateRoom(room){
 		world:room.world,
 		state:room.game.active,
 		lobbyTimeLeft:room.game.lobbyTimeLeft,
+		totalPlayers:utils.getTotalPlayers(),
 		shrinkTimeLeft:room.game.timeLeftUntilShrink});
 }
 function fireWeapon(id){

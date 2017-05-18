@@ -75,6 +75,7 @@ function clientConnect(name) {
 		gameStarted = movementPacket.state;
 		lobbyTimeLeft = movementPacket.lobbyTimeLeft;
 		shrinkTimeLeft = movementPacket.shrinkTimeLeft;
+		totalPlayers = movementPacket.totalPlayers;
 		timeSinceLastCom = 0;
 	});
 

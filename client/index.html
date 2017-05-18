@@ -1,11 +1,27 @@
 <html>
 <script src='socket.io/socket.io.js'></script>
-<canvas id ="gameCanvas" width = "800" height = "600"></canvas>
+<div id="main">
+    <div id="centerContainer">
+        <div id="bannerBox">SpacePirates.io</div>
+        <form id="authForm">
+            <input type="text" id="nameBox"></input>
+            <input type="submit" value="Play!"></input>
+            <br>
+            <input type="radio" name="color" value = "#ff00bf">Magenta</input>
+            <input type="radio" name="color" value = "red">Red</input>
+            <input type="radio" name="color" value = "green">Green</input>
+            <input type="radio" name="color" value = "#66b3ff">Blue</input>
+        </form>
+    </div>
+    <canvas id ="gameCanvas" width="800" height="600"></canvas>
+</div>
+
+
 <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<link rel="stylesheet" type="text/css" href="styles.css">
 <script src='client.js'></script>
 <script src='drawing.js'></script>
 <script src='utils.js'></script>
-
 <script type="text/javascript">
 
 window.requestAnimFrame = (function(){
@@ -16,6 +32,10 @@ window.requestAnimFrame = (function(){
             window.setTimeout(callback, 1000 / 60);
           };
 })();
+var canvas = document.getElementById('gameCanvas');
+var canvasContext = canvas.getContext('2d');
+canvasContext.canvas.width  = window.innerWidth;
+canvasContext.canvas.height = window.innerHeight;
 
 var server = null,
 skipAuth = false,
@@ -29,7 +49,7 @@ shrinkTimeLeft = 60,
 lobbyTimeLeft = 0,
 toastTimer = null,
 toastMessage = null,
-canvas = document.getElementById('gameCanvas'),
+totalPlayers = null,
 myShip = null,
 healthLastFrame = 100,
 mousex,
@@ -90,12 +110,13 @@ function auth(name,color){
     }
     if(server){
         serverRunning = true;
+        $('#centerContainer').hide();
         init();
     }
 }
 
 function init(){
-    canvasContext = canvas.getContext('2d');
+    
     timeOutChecker = setInterval(checkForTimeout,1000);
     animloop();
     canvas.addEventListener("mousemove", calcMousePos, false);
@@ -197,24 +218,11 @@ function keyUp(evt){
 
 <script>
 window.onload = function() {
-    if(skipAuth){
-       auth("Player" + getRandomInt(0,999999));
-    } else{
-        $('#authForm').show();
-    }
+    $('#nameBox').attr("placeholder","Guest"+getRandomInt(0,999999));
 }
 </script>
 
-<form id="authForm" hidden>
-    Enter your username:<br>
-    <input type="text" id="nameBox"></input>
-    <input type="submit" value="Play!"></input>
-    <br>
-    <input type="radio" name="color" value = "#ff00bf">Magenta</input>
-    <input type="radio" name="color" value = "red">Red</input>
-    <input type="radio" name="color" value = "green">Green</input>
-    <input type="radio" name="color" value = "#66b3ff">Blue</input>
-</form>
+
 
 <script type="text/javascript">
 var array = $('input[name=color]');

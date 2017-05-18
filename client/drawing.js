@@ -13,6 +13,11 @@ function drawText(text,x,y){
 	canvasContext.font="20px Georgia";
 	canvasContext.fillText(text,x,y);
 }
+function drawTextF(text,x,y,color,font){
+	canvasContext.fillStyle = color;
+	canvasContext.font=font;
+	canvasContext.fillText(text,x,y);
+}
 
 //DRAWING HUD UI
 function drawHUD(){
@@ -20,6 +25,7 @@ function drawHUD(){
 	drawKillCounter();
     drawHPCounter();
     drawToast();
+    drawTotalPlayers();
     if(gameStarted){
     	drawShrinkTimer();
     } else{
@@ -55,6 +61,12 @@ function drawHPCounter(){
 function drawToast(){
 	if(toastMessage != null){
 		drawText(toastMessage,canvas.width/2-(toastMessage.length*5),canvas.height/2+50);
+	}
+}
+function drawTotalPlayers(){
+	if(totalPlayers !=null){
+		var message = "Players on Server: " + totalPlayers;
+		drawTextF(message,canvas.width-(message.length*5),canvas.height - 15,"#e0e0eb","10px Georgia");
 	}
 }
 
