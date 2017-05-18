@@ -41,6 +41,7 @@ canvasContext.canvas.width  = window.innerWidth;
 canvasContext.canvas.height = window.innerHeight;
 
 var server = null,
+camera,
 skipAuth = false,
 serverRunning = false,
 iAmAlive = true,
@@ -57,50 +58,6 @@ myShip = null,
 healthLastFrame = 100,
 mousex,
 mousey,
-
-camera = {
-    x : canvas.width/2,
-    y : canvas.height/2,
-    width : canvas.width,
-    height : canvas.height,
-    color : 'yellow',
-    padding: -150,
-    left: 0,
-    right:0,
-    top:0,
-    bottom:0,
-    xOffset: canvas.width/2,
-    yOffset: canvas.height/2,
-
-    centerOnObject : function(object){
-       xOffset =  object.x - (canvas.width/2);
-       yOffset =  object.y - (canvas.height/2);
-    },
-
-    draw : function() {
-        canvasContext.beginPath();
-        canvasContext.strokeStyle = this.color;
-        canvasContext.rect(this.padding,this.padding,this.width-this.padding*2,this.height-this.padding*2);
-        canvasContext.stroke();
-    },
-
-    inBounds: function(object){
-        if(this.padding <= object.x - myShip.x  + this.xOffset &&
-           this.width-this.padding >= object.x - myShip.x + this.xOffset &&
-           this.padding <= object.y - myShip.y  + this.yOffset &&
-           this.height-this.padding >= object.y - myShip.y + this.yOffset
-           ){
-           return true;
-        }
-        return false;
-    },
-
-    move : function(x,y){
-        this.xOffset += x;
-        this.yOffset += y;
-    }  
-},
-
 moveForward = false,
 moveBackward = false,
 turnLeft = false,
@@ -119,13 +76,61 @@ function auth(name,color){
 }
 
 function init(){
-    
     timeOutChecker = setInterval(checkForTimeout,1000);
     animloop();
     canvas.addEventListener("mousemove", calcMousePos, false);
     canvas.addEventListener("click", handleClick, false);
     window.addEventListener("keydown", keyDown, false);
     window.addEventListener("keyup", keyUp, false);
+    resize();
+}
+
+function resize(){
+    canvasContext.canvas.width  = window.innerWidth;
+    canvasContext.canvas.height = window.innerHeight;
+
+    camera = {
+        x : canvas.width/2,
+        y : canvas.height/2,
+        width : canvas.width,
+        height : canvas.height,
+        color : 'yellow',
+        padding: -150,
+        left: 0,
+        right:0,
+        top:0,
+        bottom:0,
+        xOffset: canvas.width/2,
+        yOffset: canvas.height/2,
+
+        centerOnObject : function(object){
+           xOffset =  object.x - (canvas.width/2);
+           yOffset =  object.y - (canvas.height/2);
+        },
+
+        draw : function() {
+            canvasContext.beginPath();
+            canvasContext.strokeStyle = this.color;
+            canvasContext.rect(this.padding,this.padding,this.width-this.padding*2,this.height-this.padding*2);
+            canvasContext.stroke();
+        },
+
+        inBounds: function(object){
+            if(this.padding <= object.x - myShip.x  + this.xOffset &&
+               this.width-this.padding >= object.x - myShip.x + this.xOffset &&
+               this.padding <= object.y - myShip.y  + this.yOffset &&
+               this.height-this.padding >= object.y - myShip.y + this.yOffset
+               ){
+               return true;
+            }
+            return false;
+        },
+
+        move : function(x,y){
+            this.xOffset += x;
+            this.yOffset += y;
+        }
+    }
 }
 
 function animloop(){
@@ -222,6 +227,9 @@ function keyUp(evt){
 <script>
 window.onload = function() {
     $('#nameBox').attr("placeholder","Guest"+getRandomInt(0,999999));
+    $(window).resize(function(){
+        resize();
+    });
 }
 </script>
 
