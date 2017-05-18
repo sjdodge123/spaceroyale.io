@@ -5,12 +5,15 @@
         <div id="bannerBox">SpacePirates.io</div>
         <form id="authForm">
             <input type="text" id="nameBox"></input>
-            <input type="submit" value="Play!"></input>
+            <input type="submit" id="playButton" value="Play!"></input>
+            <br><br>
+            <input type="radio" id="magentaRadio" name="color" value ="#ff00bf">Magenta</input>
             <br>
-            <input type="radio" name="color" value = "#ff00bf">Magenta</input>
-            <input type="radio" name="color" value = "red">Red</input>
-            <input type="radio" name="color" value = "green">Green</input>
-            <input type="radio" name="color" value = "#66b3ff">Blue</input>
+            <input type="radio" id="redRadio" name="color" value = "red">Red</input>
+            <br>
+            <input type="radio" id="greenRadio" name="color" value = "green">Green</input>
+            <br>
+            <input type="radio" id="blueRadio" name="color" value = "#66b3ff">Blue</input>
         </form>
     </div>
     <canvas id ="gameCanvas" width="800" height="600"></canvas>
@@ -222,16 +225,17 @@ window.onload = function() {
 }
 </script>
 
-
-
 <script type="text/javascript">
 var array = $('input[name=color]');
 array[getRandomInt(0,array.length)].checked = true;
 
 $('#authForm').submit(function () {
- auth($('#nameBox').val(),$('input[name=color]:checked').val());
- $('#authForm').hide();
- return false;
+    var name = $('#nameBox').val();
+    if(name == ""){
+        name = $('#nameBox').attr("placeholder");
+    }
+    auth(name,$('input[name=color]:checked').val());
+    return false;
 });
 </script>
 
