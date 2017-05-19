@@ -9,28 +9,34 @@ var myID = null,
 	playerList = {},
 	bulletList = {},
 	shipList = {};
-function clientConnect(user,pass) {
+function clientConnect() {
 	var server = io();
 
 	server.on('welcome', function(id){
 		myID = id;
-		if(user!=null || pass != null){
-			server.emit("auth",{username:user,password:pass});
-		}
 	});
-
-	//playerList[id] = name;
 
 	server.on("successfulAuth", function(playerInfo){
 		changeToSignout();
 		$('.collapse').collapse("hide");
 		$('#signInUser').val('');
 		$('#signInPass').val('');
-		$('#nameBox').val(playerInfo.playerName).prop('disabled',true);
 	});
 
-	server.on("unsuccessfulAuth", function(){
+	server.on("successfulReg",function(playerInfo){
+		changeToSignout();
+		$('#signUp').hide();
+	    $("#centerContainer").removeClass("disabled");
+	    $("#centerContainer").addClass("enabled");
+	});
+
+	server.on("unsuccessfulAuth", function(payload){
+		console.log(payload.reason);
 		failedToAuth();
+	});
+
+	server.on("unsuccessfulReg",function(payload){
+		failedToRegister(payload.reason);
 	});
 
 	server.on("successfulSignout",function(){
@@ -128,6 +134,14 @@ function checkForTimeout(){
 function clearToast(){
 	clearTimeout(toastTimer);
 	toastMessage = null;
+}
+
+function clientSendAuth(user,pass){
+	server.emit("auth",{username:user,password:pass});
+}
+
+function clientSendReg(user,pass,gameName){
+	server.emit("register",{username:user,password:pass,gamename:gameName});
 }
 
 function clientSendStart(myname,mycolor){

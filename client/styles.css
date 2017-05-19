@@ -1,6 +1,12 @@
+html *{
+	overflow: none;
+}
+
 #gameCanvas{
 	cursor: crosshair;
 	overflow: none;
+	width: 100%;
+	height: 100%;
 }
 #main{
 	background: black;
@@ -11,6 +17,8 @@
 	right: 0;
 	bottom: 0;
 	top: 0;
+	width: 100%;
+	height: 100%;
 }
 
 #centerContainer{
@@ -55,6 +63,13 @@ form {
 	text-align: center;
 	vertical-align: middle;
 }
+form label {
+	margin-bottom:4px;
+	color: white;
+}
+#signUpGameName{
+	margin-bottom:30px;
+}
 #nameBox{
 	color:black;
 	width: 40%;
@@ -68,10 +83,32 @@ form {
 	color:black;
 	float: right;
 }
+#signUpButton{
+	margin-right: 3px;
+	color:black;
+	float: right;
+}
 #signIn{
 	color:black;
+	overflow: none;
 }
-
+#signUp{
+	width: 30%;
+   	height: 50%;
+   	left: 50%;
+   	top: 50%;
+   	margin-left: -15%;
+   	margin-top: -20%; 
+   	position: absolute;
+   	background-color: #1a1a1a;
+	color:black;
+	overflow: none;
+	border: 1px solid #333333;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    border-top-left-radius:30px;
+    border-top-right-radius: 30px;
+}
 #magentaRadio label{
 	color:#ff00bf;
 }
@@ -84,3 +121,12 @@ form {
 #blueRadio label{
 	color:#66b3ff;
 }
+.disabled {
+    pointer-events: none;
+    opacity: 0.3;
+}
+.enabled {
+    pointer-events: all;
+    opacity: 1;
+}
+

@@ -11,15 +11,10 @@ var factory = require('./server/factory.js');
 var utils = require('./server/utils.js');
 var c = require('./server/config.json');
 
-var database = mysql.createConnection({
-	host: c.sqlinfo.host,
-	user: c.sqlinfo.user,
-	password : c.sqlinfo.password,
-	database : c.sqlinfo.database,
-	debug : c.sqlinfo.debug
-});
+var database = null;
 var userRegex = new RegExp('^[a-zA-Z0-9_-]{3,15}$');
 var passRegex = new RegExp('^[a-zA-Z0-9_-]{6,20}$');
+var gameNameRegex = new RegExp('^[a-zA-Z0-9_-]{3,10}$');
 
 //Base Server Settings
 var serverSleeping = true,
@@ -36,8 +31,7 @@ var roomList = {},
 //Base Server Functions
 server.listen(c.port,c.host, function(){
 	utils.build(io);
-	connectToDB();
-	//addNewUser({user_name:'sdodge',password:'password',total_exp:'0'});
+	
     console.log('listening on '+c.host+':'+c.port);
 });
 
@@ -67,15 +61,18 @@ process.on('uncaughtException',function(e){
 
 io.on('connection', function(client){
 	client.emit("welcome",client.id);
-
 	utils.addMailBox(client.id,client);
+
+	client.on('register',function(creds){
+		//TODO log all reg attempts into a log file for security
+		creds.id = client.id;
+		checkReg(creds);
+	});
 
 	client.on('auth',function(creds){
 		//TODO log all auth attempts into a log file for security
 		creds.id = client.id;
-		if(invalidAuth(creds)){
-			client.emit("unsuccessfulAuth");
-		}
+		checkAuth(creds);
 	});
 
 	client.on('enterLobby', function(message){
@@ -289,12 +286,12 @@ function generateRoomSig(){
 	sig = generateRoomSig();
 }
 
-function invalidAuth(creds){
+function checkAuth(creds){
 	if(invalid(creds.username,creds.password)){
-		return true;
+		utils.messageUser(creds.id,"unsuccessfulAuth",{reason:"Invalid attempt"});
+		return;
 	}
 	lookupUser(checkPassword,creds);
-	return false;
 }
 
 function invalid(user,pass){
@@ -312,14 +309,55 @@ function invalid(user,pass){
     }
 }
 
-function connectToDB(){
-	database.connect(function(e){
-		if(e){
-			throw e;
-		}
-		console.log("Connected to database");
-	})
+function simpleChecks(creds){
+	var user = creds.username;
+	var pass = creds.password;
+	var gameName = creds.gamename;
+
+	if(user == null || user == ""){
+		utils.messageUser(creds.id,'unsuccessfulReg',{reason:"User is empty"});
+        return true;
+    }
+    if(userRegex.test(user) == false){
+        utils.messageUser(creds.id,'unsuccessfulReg',{reason:"User is invalid"});
+        return true;
+    }
+    if(pass == null || pass == ""){
+        utils.messageUser(creds.id,'unsuccessfulReg',{reason:"Password is empty"});
+        return true;
+    }
+    if(passRegex.test(pass) == false){
+        utils.messageUser(creds.id,'unsuccessfulReg',{reason:"Password is invalid"});
+        return true;
+    }
+    if(gameName == null || gameName == ""){
+        utils.messageUser(creds.id,'unsuccessfulReg',{reason:"Callsign is empty"});
+        return true;
+    }
+    if(gameNameRegex.test(gameName) == false){
+        utils.messageUser(creds.id,'unsuccessfulReg',{reason:"Callsign is invalid"});
+        return true;
+    }
+    return false;
 }
+
+function checkReg(creds){
+	if(simpleChecks(creds)){
+		return;
+	}
+	createUser(respondToClient,creds);
+}
+
+function createConnection(){
+	database = mysql.createConnection({
+		host: c.sqlinfo.host,
+		user: c.sqlinfo.user,
+		password : c.sqlinfo.password,
+		database : c.sqlinfo.database,
+		debug : c.sqlinfo.debug
+	});
+}
+
 function sendQuery(value){
 	database.query(value,function(e,result){
 		if(e){
@@ -329,35 +367,69 @@ function sendQuery(value){
 	});
 }
 
-function addNewUser(user){
-	database.query("INSERT INTO queenanne.user SET ?",mysql.escape(user),function(e,result){
+function createUser(callback,params){
+	var user = {user_name:params.username,password:params.password,total_exp:'0'};
+	createConnection();
+	database.connect(function(e){
 		if(e){
 			throw e;
 		}
-		console.log(result);
+		database.query("SELECT * FROM queenanne.user WHERE user_name LIKE ?",params.username,function(e,result){
+			if(e){
+				throw e;
+			}
+			if(result.length != 0){
+				utils.messageUser(params.id,'unsuccessfulReg',{reason:"Username is taken"});
+				return;
+			}
+			database.query("INSERT INTO queenanne.user SET ?",user,function(e,result){
+				if(e){
+					throw e;
+				}
+				callback(result,params);
+				database.end();
+			});
+		});
+		
 	});
 }
 
 function lookupUser(callback,params){
-	database.query("SELECT * FROM queenanne.user WHERE user_name LIKE ?",params.username,function(e,result){
+	createConnection();
+	database.connect(function(e){
 		if(e){
 			throw e;
 		}
-		callback(result,params);
+		database.query("SELECT * FROM queenanne.user WHERE user_name LIKE ?",params.username,function(e,result){
+			if(e){
+				throw e;
+			}
+			callback(result,params);
+			database.end();
+		});
 	});
 }
 
 function checkPassword(result,params){
 	if(result.length == 0){
-		utils.messageUser(params.id,'unsuccessfulAuth');
+		utils.messageUser(params.id,'unsuccessfulAuth',{reason:"User not found"});
 		return;
 	}
 	if(result[0].password === params.password){
 		authedUserList[params.id] = result[0].user_id;
-		utils.messageUser(params.id,'successfulAuth',{playerName:'D3s7iny'});
+		utils.messageUser(params.id,'successfulAuth',{playerName:'MyName'});
 		return;
 	}
-	utils.messageUser(params.id,'unsuccessfulAuth');
+	utils.messageUser(params.id,'unsuccessfulAuth',{reason:"Password incorrect"});
+}
+
+function respondToClient(result,params){
+	if(result.insertId == undefined){
+		utils.messageUser(params.id,'unsuccessfulReg',{reason:"Failed to register"});
+		return;
+	}
+	authedUserList[params.id] = result.insertId;
+	utils.messageUser(params.id,'successfulReg',{playerName:params.gameName});
 }
 
 function getRandomInt(min, max) {

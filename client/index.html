@@ -4,6 +4,7 @@
 <div id="main">
     <div id="centerContainer">
         <button class="btn btn-info" data-toggle="collapse" id="signInButton" data-target="#signIn">Sign in</button>
+        <button class="btn btn-warning" id="signUpButton">Sign up</button>
         <div id="bannerBox">SpacePirates.io</div>
          
         <form id="nameForm">
@@ -19,11 +20,22 @@
             <input type="radio" id="blueRadio" name="color" value = "#66b3ff">Blue</input>
         </form>
     </div>
-    
         <form id="signIn" class="collapse">
             <input type="text" id="signInUser" placeholder="Username"></input>
             <input type="password" id="signInPass" placeholder="Password"></input>
             <input type="button" class="btn btn-success" id="signInSubmit" value="Submit"></input>
+        </form>
+        <form id="signUp" hidden>
+            <label>Create an account</label>
+            <input type="text" id="signUpUser" placeholder="Username"></input>
+            <input type="password" id="signUpPass1" placeholder="Password"></input>
+            <input type="password" id="signUpPass2" placeholder="Retype Password"></input>
+            <input type="text" id="signUpGameName" placeholder="Callsign">          </input>          
+            <div ="signUpButtons">
+                <input type="button" class="btn btn-success" id="signUpSubmit" value="Submit"></input>
+                <input type="button" class="btn btn-danger" id="signUpCancel" value="Cancel"></input>
+            </div>
+            <label id="signUpError" style="color:tomato" hidden></label>
         </form>
   </div>
     <canvas id ="gameCanvas" width="800" height="600"></canvas>
@@ -80,17 +92,16 @@ canvasContext;
 
 var userRegex = new RegExp('^[a-zA-Z0-9_-]{3,15}$');
 var passRegex = new RegExp('^[a-zA-Z0-9_-]{6,20}$');
+var gameNameRegex = new RegExp('^[a-zA-Z0-9_-]{3,10}$');
 
 function auth(user,pass){
-    if(invalid(user,pass)){
+    if(invalidAuth(user,pass)){
         failedToAuth();
         return;
     }
-    try{server = clientConnect(user,pass);} catch (e) {
-        console.log("Could not connect to server");
-    }
+    clientSendAuth(user,pass);
 }
-function invalid(user,pass){
+function invalidAuth(user,pass){
     if(user == null || user == ""){
         return true;
     }
@@ -103,6 +114,55 @@ function invalid(user,pass){
     if(passRegex.test(pass) == false){
         return true;
     }
+    return false;
+}
+
+function invalidRegister(user,pass1,pass2,gameName){
+    if(user == null || user == ""){
+        failedToRegister("User is empty");
+        return true;
+    }
+    if(userRegex.test(user) == false){
+        failedToRegister("Username is invalid");
+        return true;
+    }
+    if(pass1 == null || pass1 == ""){
+        failedToRegister("Password is empty");
+        return true;
+    }
+    if(passRegex.test(pass1) == false){
+        failedToRegister("Password is invalid");
+        return true;
+    }
+    if(pass2 == null || pass2 == ""){
+        failedToRegister("Please retype password");
+        return true;
+    }
+    if(pass1 !== pass2){
+        failedToRegister("Passwords don't match");
+        return true;
+    }
+    if(gameName == null || gameName == ""){
+        failedToRegister("Callsign empty");
+        return true;
+    }
+    if(gameNameRegex.test(gameName) == false){
+        failedToRegister("Callsign is invalid");
+        return true;
+    }
+    return false;
+}
+
+function register(user,pass1,pass2,gameName){
+    if(invalidRegister(user,pass1,pass2,gameName)){
+        return;
+    }
+    clientSendReg(user,pass1,gameName);
+}
+
+function failedToRegister(error){
+    $('#signUpError').show().html(error);
+    $("#signUp").effect("shake");
 }
 
 function failedToAuth(){
@@ -110,11 +170,15 @@ function failedToAuth(){
 }
 
 function changeToSignout(){
+    $('#nameBox').hide();
+    $('#signUpButton').hide();
     $('#signInButton').click(function(){
         signOutUser();
     }).attr('data-toggle','').attr('class','btn btn-danger').html('Sign out');
 }
 function changeToSignIn(){
+    $('#nameBox').show();
+    $('#signUpButton').show();
     $('#signInButton').attr('data-toggle','collapse').attr('class','btn btn-info').html('Sign in');
 }
 
@@ -123,18 +187,10 @@ function signOutUser(){
 }
 
 function startGame(name,color){
-    if(server == null){
-        try{server = clientConnect(null);} catch (e) {
-            console.log("Could not connect to server");
-            return;
-        }
-    }
     clientSendStart(name,color);
-    if(server != null){
-        gameRunning = true;
-        $('#main').hide();
-        init();
-    }
+    gameRunning = true;
+    $('#main').hide();
+    init();
 }
 
 function init(){
@@ -315,6 +371,7 @@ function keyUp(evt){
 
 <script>
 window.onload = function() {
+    server = clientConnect();
     $('#nameBox').attr("placeholder","Guest"+getRandomInt(0,999999));
     $(window).resize(function(){
         resize();
@@ -339,6 +396,29 @@ $('#signInSubmit').click(function(e){
     auth($('#signInUser').val(),$('#signInPass').val());
 });
 
+$('#signUpSubmit').click(function(e){
+    $('#signUpError').hide()
+    register($('#signUpUser').val(),
+             $('#signUpPass1').val(),
+             $('#signUpPass2').val(),
+             $('#signUpGameName').val()
+        );
+});
+
+//***************************Toggle for Signup screen*************************************
+$('#signUpButton').click(function(e){
+    $('.collapse').collapse("hide");
+    $('#signUp').show();
+    $("#centerContainer").removeClass("enabled");
+    $("#centerContainer").addClass("disabled");
+});
+
+$('#signUpCancel').click(function(e){
+    $('#signUp').hide();
+    $("#centerContainer").removeClass("disabled");
+    $("#centerContainer").addClass("enabled");
+});
+//*******************************************************************************************
 $('#signInUser').keypress(function(e) {
     if(e.which == 13) {
         auth($('#signInUser').val(),$('#signInPass').val());
@@ -351,8 +431,16 @@ $('#signInPass').keypress(function(e) {
     }
 });
 
-
+$('#signUpGameName').keypress(function(e) {
+    if(e.which == 13) {
+        $('#signUpError').hide()
+    register($('#signUpUser').val(),
+             $('#signUpPass1').val(),
+             $('#signUpPass2').val(),
+             $('#signUpGameName').val()
+        );
+    }
+});
 
 </script>
-
 </html>
