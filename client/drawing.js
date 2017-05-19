@@ -27,6 +27,11 @@ function drawHUD(){
     drawToast();
     drawTotalPlayers();
     drawEventLog();
+    /*
+    if(!camera.inBounds(world.whiteBound)){
+		drawBoundArrow();
+	}
+	*/
     if(gameStarted){
     	drawShrinkTimer();
     } else{
@@ -71,6 +76,23 @@ function drawTotalPlayers(){
 	}
 }
 
+function drawBoundArrow(){
+	var x = canvas.width/2;
+	var y = 40;
+	var angle = (180/Math.PI)*Math.atan2(world.whiteBound.y-myShip.x+camera.xOffset,world.whiteBound.x-myShip.y+camera.yOffset)-90;
+	canvasContext.save();
+	canvasContext.translate(x,y);
+	canvasContext.rotate(angle);
+	canvasContext.strokeStyle = myShip.color;
+	canvasContext.beginPath();
+	canvasContext.lineWidth = 5;
+	canvasContext.moveTo(0,23);
+	canvasContext.lineTo(20,3);
+	canvasContext.lineTo(40,23);
+	canvasContext.stroke();
+	canvasContext.restore();
+}
+
 function drawEventLog(){
 	canvasContext.save();
 	canvasContext.globalAlpha = 0.25;
@@ -79,11 +101,7 @@ function drawEventLog(){
 	canvasContext.fillStyle = eventLog.textColor;
 	canvasContext.font=	eventLog.textStyle;
 	var len = eventLog.printList.length-1;
-	if(len == eventLog.listMax){
-		eventLog.printList.shift();
-	}
 	if(len != -1){
-
 		for(var i=len;i>=0;i--){
 			canvasContext.fillText(eventLog.printList[i],eventLog.textX(),eventLog.textY()+(i*eventLog.textSize));
 		}

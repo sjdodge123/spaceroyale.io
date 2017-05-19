@@ -2,22 +2,33 @@ var express = require('express')
   , http = require('http');
 var app = express();
 var path = require('path');
+
 app.use(express.static(path.join(__dirname, './client')));
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
+var mysql = require('mysql');
 var factory = require('./server/factory.js');
 var utils = require('./server/utils.js');
 var c = require('./server/config.json');
+
+var database = mysql.createConnection({
+	host: c.sqlinfo.host,
+	user: c.sqlinfo.user,
+	password : c.sqlinfo.password,
+	database : c.sqlinfo.database,
+	debug : c.sqlinfo.debug
+});
+var userRegex = new RegExp('^[a-zA-Z0-9_-]{3,15}$');
+var passRegex = new RegExp('^[a-zA-Z0-9_-]{6,20}$');
 
 //Base Server Settings
 var serverSleeping = true,
 	serverTickSpeed = c.serverTickSpeed,
 	serverUpdates = null,
-	gameActive = false,
-	clientCount = 0;
+	result = [],
+	authedUserList = {};
 
 //Room settings
-
 var roomList = {},
 	maxPlayersInRoom = c.maxPlayersInRoom,
 	roomKickTimeout = c.roomKickTimeout;
@@ -25,6 +36,8 @@ var roomList = {},
 //Base Server Functions
 server.listen(c.port,c.host, function(){
 	utils.build(io);
+	connectToDB();
+	//addNewUser({user_name:'sdodge',password:'password',total_exp:'0'});
     console.log('listening on '+c.host+':'+c.port);
 });
 
@@ -34,14 +47,43 @@ process.on( 'SIGINT', function() {
 	  process.exit();
 });
 
+process.on('SIGUSR2', function () {
+  	console.log( "\nServer restarting" );
+	io.sockets.emit("serverShutdown","Server restarted");
+	process.exit();
+});
+
+process.on('exit', function(){
+	console.log( "\nServer shutting down from terminate" );
+	io.sockets.emit("serverShutdown","Server terminated");
+	process.exit();
+});
+
+process.on('uncaughtException',function(e){
+	console.log( "\nServer shutting down from unhandled exception:\n\n"+ e);
+	io.sockets.emit("serverShutdown","Server terminated");
+	process.exit();
+});
+
 io.on('connection', function(client){
 	client.emit("welcome",client.id);
-	client.on('gotit', function(message){
+
+	utils.addMailBox(client.id,client);
+
+	client.on('auth',function(creds){
+		//TODO log all auth attempts into a log file for security
+		creds.id = client.id;
+		if(invalidAuth(creds)){
+			client.emit("unsuccessfulAuth");
+		}
+	});
+
+	client.on('enterLobby', function(message){
 
 		//Find a room with space
 		var roomSig = findARoom(client.id);
 		var room = roomList[roomSig];
-		utils.addMailBox(client.id,client,roomSig);
+		utils.addRoomToMailBox(client.id,roomSig);
 
 		room.join(client);
 		console.log(message.name + " connected to Room"+roomSig);
@@ -88,6 +130,11 @@ io.on('connection', function(client){
 			clearInterval(serverUpdates);
 			console.log("Server sleeping..");
 		}
+  	});
+
+  	client.on('signout',function(){
+  		client.emit('successfulSignout');
+  		delete authedUserList[client.id];
   	});
 
 	client.on('movement',function(packet){
@@ -240,6 +287,77 @@ function generateRoomSig(){
 		return sig;
 	}
 	sig = generateRoomSig();
+}
+
+function invalidAuth(creds){
+	if(invalid(creds.username,creds.password)){
+		return true;
+	}
+	lookupUser(checkPassword,creds);
+	return false;
+}
+
+function invalid(user,pass){
+    if(user == null || user == ""){
+        return true;
+    }
+    if(pass == null || pass == ""){
+        return true;
+    }
+    if(userRegex.test(user) == false){
+        return true;
+    }
+    if(passRegex.test(pass) == false){
+        return true;
+    }
+}
+
+function connectToDB(){
+	database.connect(function(e){
+		if(e){
+			throw e;
+		}
+		console.log("Connected to database");
+	})
+}
+function sendQuery(value){
+	database.query(value,function(e,result){
+		if(e){
+			throw e;
+		}
+		return result;
+	});
+}
+
+function addNewUser(user){
+	database.query("INSERT INTO queenanne.user SET ?",mysql.escape(user),function(e,result){
+		if(e){
+			throw e;
+		}
+		console.log(result);
+	});
+}
+
+function lookupUser(callback,params){
+	database.query("SELECT * FROM queenanne.user WHERE user_name LIKE ?",params.username,function(e,result){
+		if(e){
+			throw e;
+		}
+		callback(result,params);
+	});
+}
+
+function checkPassword(result,params){
+	if(result.length == 0){
+		utils.messageUser(params.id,'unsuccessfulAuth');
+		return;
+	}
+	if(result[0].password === params.password){
+		authedUserList[params.id] = result[0].user_id;
+		utils.messageUser(params.id,'successfulAuth',{playerName:'D3s7iny'});
+		return;
+	}
+	utils.messageUser(params.id,'unsuccessfulAuth');
 }
 
 function getRandomInt(min, max) {

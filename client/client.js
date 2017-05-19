@@ -9,14 +9,33 @@ var myID = null,
 	playerList = {},
 	bulletList = {},
 	shipList = {};
-function clientConnect(name) {
+function clientConnect(user,pass) {
 	var server = io();
 
 	server.on('welcome', function(id){
-		console.log("Connected to server");
 		myID = id;
-		playerList[id] = name;
-		server.emit("gotit",name);
+		if(user!=null || pass != null){
+			server.emit("auth",{username:user,password:pass});
+		}
+	});
+
+	//playerList[id] = name;
+
+	server.on("successfulAuth", function(playerInfo){
+		changeToSignout();
+		$('.collapse').collapse("hide");
+		$('#signInUser').val('');
+		$('#signInPass').val('');
+		$('#nameBox').val(playerInfo.playerName).prop('disabled',true);
+	});
+
+	server.on("unsuccessfulAuth", function(){
+		failedToAuth();
+	});
+
+	server.on("successfulSignout",function(){
+		changeToSignIn();
+    	$('#nameBox').val('').prop('disabled',false);
 	});
 
 	server.on("gameState", function(gameState){
@@ -109,4 +128,8 @@ function checkForTimeout(){
 function clearToast(){
 	clearTimeout(toastTimer);
 	toastMessage = null;
+}
+
+function clientSendStart(myname,mycolor){
+	server.emit('enterLobby',{name:myname,color:mycolor});
 }

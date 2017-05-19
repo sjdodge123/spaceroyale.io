@@ -1,9 +1,11 @@
 #gameCanvas{
 	cursor: crosshair;
+	overflow: none;
 }
 #main{
 	background: black;
 	position: absolute;
+	overflow: none;
 	z-index: 200;
 	left: 0;
 	right: 0;
@@ -15,9 +17,9 @@
 	background: black;
 	position: absolute;
 	left: 15%;
-	top:20%;
+	top:15%;
     width:65%;
-    bottom: 25%;
+    bottom: 20%;
     padding-top :15px;
     padding-left:15px;
     padding-right: 15px;
@@ -45,9 +47,7 @@
 	color:white;
 	top: 10%;
 	height: 50%;
-	width: 100%;
 	display: inline-block;
-	position: relative;
 }
 form {
 	color:white;
@@ -56,12 +56,20 @@ form {
 	vertical-align: middle;
 }
 #nameBox{
-	width: 13vw;
+	color:black;
+	width: 40%;
 	height: 2vw;
 	font-size: 2vw;
 }
 #playButton{
 	font-size: 1.7vw;
+}
+#signInButton{
+	color:black;
+	float: right;
+}
+#signIn{
+	color:black;
 }
 
 #magentaRadio label{

@@ -12,10 +12,13 @@ exports.getRandomInt = function(min,max){
 		return Math.floor(Math.random() * (max - min)) + min;
 };
 
-exports.addMailBox = function(id,client,roomSig){
+exports.addMailBox = function(id,client){
 	mailBoxList[id] = client;
+}
+exports.addRoomToMailBox = function(id,roomSig){
 	roomMailList[id] = roomSig;
 }
+
 exports.removeMailBox = function(id){
 	delete mailBoxList[id];
 }
@@ -30,6 +33,9 @@ exports.getTotalPlayers = function(){
 
 exports.toastPlayer = function(id,message){
 	mailBoxList[id].emit("toast",message);
+}
+exports.messageUser = function(id,header,payload){
+	mailBoxList[id].emit(header,payload);
 }
 
 exports.sendEventMessageToPlayer = function(id,message){
