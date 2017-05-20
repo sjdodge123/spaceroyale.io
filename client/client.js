@@ -17,7 +17,7 @@ function clientConnect() {
 	});
 
 	server.on("successfulAuth", function(player){
-		console.log(player);
+		displayPlayerProfile(player[0]);
 		changeToSignout();
 		$('.collapse').collapse("hide");
 		$('#signInUser').val('');
@@ -25,7 +25,7 @@ function clientConnect() {
 	});
 
 	server.on("successfulReg",function(player){
-		console.log(player);
+		displayPlayerProfile(player[0]);
 		changeToSignout();
 		$('#signUp').hide();
 	    $("#centerContainer").removeClass("disabled");

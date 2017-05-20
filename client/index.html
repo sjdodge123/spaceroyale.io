@@ -6,7 +6,6 @@
         <button class="btn btn-info" data-toggle="collapse" id="signInButton" data-target="#signIn">Sign in</button>
         <button class="btn btn-warning" id="signUpButton">Sign up</button>
         <div id="bannerBox">SpacePirates.io</div>
-         
         <form id="nameForm">
             <input type="text" id="nameBox"></input>
             <input type="submit"  class="btn btn-primary" id="playButton" value="Play!"></input>
@@ -19,6 +18,21 @@
             <br>
             <input type="radio" id="blueRadio" name="color" value = "#66b3ff">Blue</input>
         </form>
+        <div id="playerProfile" hidden>
+            <table id="playerTable">
+                <tr>
+                    <th id="playerName"></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                <tr class="blankRow"><td colspan="3"></td></tr>
+                <tr>
+                    <td id="playerExp"></td>
+                    <td id="playerKills"></td>
+                    <td id="playerWins"></td>
+                </tr>
+            </table>
+        </div>
     </div>
         <form id="signIn" class="collapse">
             <input type="text" id="signInUser" placeholder="Username"></input>
@@ -151,6 +165,14 @@ function invalidRegister(user,pass1,pass2,gameName){
         return true;
     }
     return false;
+}
+
+function displayPlayerProfile(player){
+    $('#playerProfile').show();
+    $('#playerName').html(player.game_name.trim());
+    $('#playerExp').html("Exp:" + player.total_exp.toString().trim());
+    $('#playerKills').html("Total Kills:" + player.total_kills.toString().trim());
+    $('#playerWins').html("Total Wins:" + player.total_wins.toString().trim());
 }
 
 function register(user,pass1,pass2,gameName){

@@ -109,6 +109,37 @@ form label {
     border-top-left-radius:30px;
     border-top-right-radius: 30px;
 }
+#playerProfile{
+	width: 50%;
+   	height: 20%;
+   	left: 50%;
+   	top: 30%;
+   	margin-left: -25%;
+   	position: absolute;
+   	background-color: #1a1a1a;
+   	overflow: none;
+	border: 1px solid #333333;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    border-top-left-radius:30px;
+    border-top-right-radius: 30px;
+}
+
+.blankRow {
+	 height: 30px !important;
+}
+
+#playerTable {
+	width: 100%;
+	color: white;
+	font-size:32px;
+	margin-left:15px;
+}
+#playerTable *{
+	text-align: center;
+	vertical-align: middle;
+}
+
 #magentaRadio label{
 	color:#ff00bf;
 }
