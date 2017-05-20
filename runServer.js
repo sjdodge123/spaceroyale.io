@@ -115,6 +115,9 @@ io.on('connection', function(client){
 		}
 		var name = room.clientList[client.id];
 		var id = client.id;
+		if(authedUserList[id] != null){
+			delete authedUserList[id];
+		}
 		utils.removeMailBox(id);
 		client.broadcast.to(room.sig).emit('playerLeft',client.id);
 		console.log(name + ' disconnected from Room' + room.sig);
@@ -291,7 +294,7 @@ function checkAuth(creds){
 		utils.messageUser(creds.id,"unsuccessfulAuth",{reason:"Invalid attempt"});
 		return;
 	}
-	lookupUser(checkPassword,creds);
+	lookupUser(authCallback,creds);
 }
 
 function invalid(user,pass){
@@ -368,7 +371,8 @@ function sendQuery(value){
 }
 
 function createUser(callback,params){
-	var user = {user_name:params.username,password:params.password,total_exp:'0'};
+	var user = {user_name:params.username,password:params.password};
+	var player = {user_id:null,total_exp:0,total_kills:0,total_wins:0,game_name:params.gamename,skin_id:0};
 	createConnection();
 	database.connect(function(e){
 		if(e){
@@ -386,8 +390,16 @@ function createUser(callback,params){
 				if(e){
 					throw e;
 				}
-				callback(result,params);
-				database.end();
+				player.user_id = result.insertId;
+				database.query("INSERT INTO queenanne.player SET ?",player,function(e,result){
+					if(e){
+						throw e;
+					}
+					params.player = player;
+					result.insertId = player.user_id;
+					callback(result,params);
+					database.end();
+				});
 			});
 		});
 		
@@ -404,23 +416,51 @@ function lookupUser(callback,params){
 			if(e){
 				throw e;
 			}
+			if(result.length == 0){
+				utils.messageUser(params.id,'unsuccessfulAuth',{reason:"User not found"});
+				return;
+			}
+			if(result[0].password !== params.password){
+				utils.messageUser(params.id,'unsuccessfulAuth',{reason:"Password incorrect"});
+				return;
+			}
+
+			authedUserList[params.id] = result[0].user_id;
+			params.user_id = result[0].user_id;
+			
+			database.query("SELECT * FROM queenanne.player WHERE user_id LIKE ?",params.user_id,function(e,result){
+				if(e){
+					throw e;
+				}
+				callback(result,params);
+				database.end();
+			});
+		});
+	});
+}
+
+function lookupPlayer(callback,params){
+	createConnection();
+	database.connect(function(e){
+		if(e){
+			throw e;
+		}
+		database.query("SELECT * FROM queenanne.player WHERE user_id LIKE ?",params.user_id,function(e,result){
+			if(e){
+				throw e;
+			}
 			callback(result,params);
 			database.end();
 		});
 	});
 }
 
-function checkPassword(result,params){
-	if(result.length == 0){
-		utils.messageUser(params.id,'unsuccessfulAuth',{reason:"User not found"});
+function authCallback(result,params){
+	if(result == undefined){
+		utils.messageUser(params.id,'unsuccessfulAuth',{reason:"Player not found"});
 		return;
 	}
-	if(result[0].password === params.password){
-		authedUserList[params.id] = result[0].user_id;
-		utils.messageUser(params.id,'successfulAuth',{playerName:'MyName'});
-		return;
-	}
-	utils.messageUser(params.id,'unsuccessfulAuth',{reason:"Password incorrect"});
+	utils.messageUser(params.id,'successfulAuth',result);
 }
 
 function respondToClient(result,params){
@@ -429,7 +469,7 @@ function respondToClient(result,params){
 		return;
 	}
 	authedUserList[params.id] = result.insertId;
-	utils.messageUser(params.id,'successfulReg',{playerName:params.gameName});
+	utils.messageUser(params.id,'successfulReg',params.player);
 }
 
 function getRandomInt(min, max) {

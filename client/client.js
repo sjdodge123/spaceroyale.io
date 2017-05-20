@@ -16,14 +16,16 @@ function clientConnect() {
 		myID = id;
 	});
 
-	server.on("successfulAuth", function(playerInfo){
+	server.on("successfulAuth", function(player){
+		console.log(player);
 		changeToSignout();
 		$('.collapse').collapse("hide");
 		$('#signInUser').val('');
 		$('#signInPass').val('');
 	});
 
-	server.on("successfulReg",function(playerInfo){
+	server.on("successfulReg",function(player){
+		console.log(player);
 		changeToSignout();
 		$('#signUp').hide();
 	    $("#centerContainer").removeClass("disabled");
