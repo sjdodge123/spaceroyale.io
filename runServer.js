@@ -2,7 +2,8 @@ var express = require('express')
   , http = require('http');
 var app = express();
 var path = require('path');
-
+var util = require('util');
+var fs = require('fs');
 app.use(express.static(path.join(__dirname, './client')));
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
@@ -62,7 +63,7 @@ process.on('uncaughtException',function(e){
 io.on('connection', function(client){
 	client.emit("welcome",client.id);
 	utils.addMailBox(client.id,client);
-
+	console.log();
 	client.on('register',function(creds){
 		//TODO log all reg attempts into a log file for security
 		creds.id = client.id;
@@ -70,7 +71,7 @@ io.on('connection', function(client){
 	});
 
 	client.on('auth',function(creds){
-		//TODO log all auth attempts into a log file for security
+		logToFile('/logs/auth_attempts.txt',creds.username + " : " + client.handshake.address + '\n');
 		creds.id = client.id;
 		checkAuth(creds);
 	});
@@ -470,6 +471,10 @@ function respondToClient(result,params){
 	}
 	authedUserList[params.id] = result.insertId;
 	utils.messageUser(params.id,'successfulReg',params.player);
+}
+
+function logToFile(fileLoc,content){
+	fs.appendFile(__dirname + fileLoc, content);
 }
 
 function getRandomInt(min, max) {
