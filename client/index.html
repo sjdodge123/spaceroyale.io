@@ -73,6 +73,7 @@
 <script src='client.js'></script>
 <script src='drawing.js'></script>
 <script src='utils.js'></script>
+<script src='audio.js'></script>
 <script type="text/javascript">
 
 window.requestAnimFrame = (function(){
@@ -393,6 +394,7 @@ function gameOver(){
 
 function checkForDamage(){
     if(shipList[myID].health < healthLastFrame){
+        playSound(takeDamage);
         drawFlashScreen();
     }
     healthLastFrame = shipList[myID].health;
@@ -414,6 +416,11 @@ function handleClick(evt){
     if(iAmAlive){
        server.emit("click",{x:mouseX,y:mouseY}); 
     }
+    if(myShip != null){
+        if(myShip.weapon.name == "Pistol"){
+            playSound(pistolShot);
+        }
+    }
 }
 
 function keyDown(evt){
@@ -427,6 +434,7 @@ function keyDown(evt){
         case 83: {moveBackward = true; break;} //Down key
         case 40: {moveBackward = true; break;} //Down key
     }
+    playThrust();
     server.emit('movement',{turnLeft:turnLeft,moveForward:moveForward,turnRight:turnRight,moveBackward:moveBackward});
 }
 
@@ -441,6 +449,7 @@ function keyUp(evt){
         case 83: {moveBackward = false; break;} //Down key
         case 40: {moveBackward = false; break;} //Down key
     }
+    stopThrust();
     server.emit('movement',{turnLeft:turnLeft,moveForward:moveForward,turnRight:turnRight,moveBackward:moveBackward});
 }
 

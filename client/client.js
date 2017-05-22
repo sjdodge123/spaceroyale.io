@@ -64,6 +64,7 @@ function clientConnect() {
 
 	server.on("playerJoin", function(appendPlayerList){
 		eventLog.addEvent(appendPlayerList.name + " has joined the battle");
+		playSound(playerJoinSound);
 		playerList[appendPlayerList.id] = appendPlayerList.name;
 		shipList[appendPlayerList.id] = appendPlayerList.ship;
 	});

@@ -968,6 +968,7 @@ class Weapon {
 class Pistol extends Weapon{
 	constructor(owner){
 		super(owner);
+		this.name = "Pistol";
 		this.cooldown = c.basegunCoolDown;
 		this.maxLevel = 1;
 		this.equipMessage = "Equiped Pistol";
