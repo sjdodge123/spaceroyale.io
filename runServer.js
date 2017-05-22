@@ -41,32 +41,13 @@ process.on( 'SIGINT', function() {
 	  io.sockets.emit("serverShutdown","Server terminated");
 	  process.exit();
 });
-/*
-process.on('SIGUSR2', function () {
-  	console.log( "\nServer restarting" );
-	io.sockets.emit("serverShutdown","Server restarted");
-	process.exit();
-});
-
-process.on('exit', function(){
-	console.log( "\nServer shutting down from terminate" );
-	io.sockets.emit("serverShutdown","Server terminated");
-	process.exit();
-});
-
-process.on('uncaughtException',function(e){
-	console.log(e);
-	io.sockets.emit("serverShutdown","Server terminated");
-	process.exit();
-});
-*/
 
 io.on('connection', function(client){
 	client.emit("welcome",client.id);
 	utils.addMailBox(client.id,client);
 
 	client.on('register',function(creds){
-		//TODO log all reg attempts into a log file for security
+		logToFile('/logs/reg_attempts.txt',creds.username + " : " + client.handshake.address + '\n');
 		creds.id = client.id;
 		checkReg(creds);
 	});
@@ -183,11 +164,7 @@ function locateMyRoom(id){
 function getActiveRoomCount(){
 	var activeRooms = 0;
 	for(var sig2 in roomList){
-		if(roomList[sig2].clientCount == 0){
-			delete roomList[sig2];
-		} else{
-			activeRooms++;
-		}
+		activeRooms++;
 	}
 	return activeRooms;
 }
@@ -218,9 +195,19 @@ function kickFromRoom(clientID){
 function getRoomCount(){
 	var count = 0;
 	for(var sig in roomList){
+		if(roomList[sig].clientCount == 0){
+			delete roomList[sig];
+		}
 		count++;
 	}
 	return count;
+}
+
+function reclaimRoom(sig){
+	var room = roomList[sig];
+	for(var clientID in room.clientList){
+		room.leave(clientID);
+	}
 }
 
 //Gamestate updates
@@ -230,9 +217,10 @@ function update(){
 			var room = roomList[sig];
 			if(!room.game.gameEnded){
 				updateRoom(room);
-			} else{
+			} else if(room.alive){
+				room.alive = false;
 				io.to(room.sig).emit("gameOver",room.game.winner);
-				setTimeout(room.reclaim,roomKickTimeout*1000);	
+				setTimeout(reclaimRoom,roomKickTimeout*1000,room.sig);	
 			}
 		}
 	}

@@ -37,6 +37,7 @@ class Room {
 		this.itemList = {};
 		this.shipList = {};
 		this.clientCount = 0;
+		this.alive = true;
 		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList,this.planetList,this.itemList);
 	}
 	join(clientID){
@@ -54,12 +55,7 @@ class Room {
 		delete this.clientList[clientID];
 		delete this.shipList[clientID];
 		this.clientCount--;
-	}
-	reclaim(){
-		for(var clientID in this.clientList){
-			this.leave(this.clientList[clientID]);
-		}
-	}
+	} 
 	update(){
 		this.game.update();
 	}
