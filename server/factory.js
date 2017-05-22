@@ -2,24 +2,7 @@
 
 var c = require('./config.json');
 var utils = require('./utils.js');
-
-exports.getWorld = function() {
-    return new World(0,0,300,300);
-};
-
-exports.getTimer = function(callback,delay){
-	return new Timer(callback,delay);
-};
-
-exports.getRect = function(x,y,width,height){
-	return new Rect(x,y,width,height);
-}
-exports.getCircle = function(x,y,radius){
-	return new Circle(x,y,radius);
-}
-exports.getShip = function(x,y,width,height,color){
-	return new Ship(x,y,width,height,color);
-}
+var database = require('./database.js');
 
 exports.getRoom = function(sig,size){
 	return new Room(sig,size);
@@ -48,6 +31,7 @@ class Room {
 	}
 	leave(clientID){
 		console.log(this.clientList[clientID] + ' left Room' + this.sig);
+		database.recordShip(clientID,this.shipList[clientID]);
 		utils.messageRoomBySig(this.sig,'playerLeft',clientID);
 		var client = utils.getClient(clientID);
 		client.leave(this.sig);
@@ -56,8 +40,43 @@ class Room {
 		delete this.shipList[clientID];
 		this.clientCount--;
 	} 
-	update(){
+	update(){	
 		this.game.update();
+		this.checkForDeaths();
+		this.sendUpdates();
+	}
+	checkForDeaths(){
+		for(var shipID in this.shipList){
+			var ship = this.shipList[shipID];
+			if(ship.alive == false){
+				this.game.gameBoard.spawnItem(ship.weapon.drop(ship.x,ship.y));
+				if(ship.killedBy != null){
+					var murderer = this.shipList[ship.killedBy];
+					var murdererName = this.clientList[ship.killedBy];
+					var deadPlayerName = this.clientList[shipID];
+					murderer.killList.push(deadPlayerName);
+					utils.sendEventMessageToRoom(murderer.id,murdererName + " killed " + deadPlayerName);
+					utils.toastPlayer(murderer.id,"You killed " + deadPlayerName);
+				}
+				delete this.shipList[shipID];
+				utils.messageRoomBySig(this.sig,'shipDeath',shipID);
+			}
+		}
+	}
+
+	sendUpdates(){
+		utils.messageRoomBySig(this.sig,"gameUpdates",{
+			shipList:this.shipList,
+			bulletList:this.bulletList,
+			asteroidList:this.asteroidList,
+			planetList:this.planetList,
+			itemList:this.itemList,
+			world:this.world,
+			state:this.game.active,
+			lobbyTimeLeft:this.game.lobbyTimeLeft,
+			totalPlayers:utils.getTotalPlayers(),
+			shrinkTimeLeft:this.game.timeLeftUntilShrink
+		});
 	}
 
 	checkRoom(clientID){

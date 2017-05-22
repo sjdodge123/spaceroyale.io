@@ -136,7 +136,6 @@ io.on('connection', function(client){
 			ship.angle = (180/Math.PI)*Math.atan2(loc.y-ship.y,loc.x-ship.x)-90;
 		}
 	});
-	
 
 	client.on('click',function(loc){
 		//if bullet should be spawned (could be clicking something else)
@@ -194,9 +193,6 @@ function kickFromRoom(clientID){
 function getRoomCount(){
 	var count = 0;
 	for(var sig in roomList){
-		if(roomList[sig].clientCount == 0){
-			delete roomList[sig];
-		}
 		count++;
 	}
 	return count;
@@ -207,6 +203,9 @@ function reclaimRoom(sig){
 	for(var clientID in room.clientList){
 		room.leave(clientID);
 	}
+	if(room.clientCount == 0){
+		delete roomList[sig];
+	}
 }
 
 //Gamestate updates
@@ -215,7 +214,7 @@ function update(){
 		for(var sig in roomList){
 			var room = roomList[sig];
 			if(!room.game.gameEnded){
-				updateRoom(room);
+				room.update();
 			} else if(room.alive){
 				room.alive = false;
 				io.to(room.sig).emit("gameOver",room.game.winner);
@@ -225,40 +224,6 @@ function update(){
 	}
 }
 
-function updateRoom(room){
-	room.update();
-
-	//Send messages about ships death
-	for(var shipID in room.shipList){
-		var ship = room.shipList[shipID];
-		if(ship.alive == false){
-			room.game.gameBoard.spawnItem(ship.weapon.drop(ship.x,ship.y));
-			if(ship.killedBy != null){
-				var murderer = room.shipList[ship.killedBy];
-				var murdererName = room.clientList[ship.killedBy];
-				var deadPlayerName = room.clientList[shipID];
-				murderer.killList.push(deadPlayerName);
-				utils.sendEventMessageToRoom(murderer.id,murdererName + " killed " + deadPlayerName);
-				utils.toastPlayer(murderer.id,"You killed " + deadPlayerName);
-			}
-			delete room.shipList[shipID];
-			io.to(room.sig).emit('shipDeath',shipID);
-		}
-	}
-	
-	io.to(room.sig).emit("movementUpdates",{
-		shipList:room.shipList,
-		bulletList:room.bulletList,
-		asteroidList:room.asteroidList,
-		planetList:room.planetList,
-		itemList:room.itemList,
-		world:room.world,
-		state:room.game.active,
-		lobbyTimeLeft:room.game.lobbyTimeLeft,
-		totalPlayers:utils.getTotalPlayers(),
-		shrinkTimeLeft:room.game.timeLeftUntilShrink
-	});
-}
 function fireWeapon(id){
 	var room = locateMyRoom(id);
 	if(room == undefined){

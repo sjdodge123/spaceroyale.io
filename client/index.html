@@ -182,7 +182,10 @@ function invalidRegister(user,pass1,pass2,gameName){
 }
 
 function displayPlayerProfile(player){
+    updateProfile(player);
     $('#playerProfile').show();
+}
+function updateProfile(player){
     $('#playerName').html(player.game_name.trim());
     $('#playerExp').html("Exp:" + player.total_exp.toString().trim());
     $('#playerKills').html("Total Kills:" + player.total_kills.toString().trim());

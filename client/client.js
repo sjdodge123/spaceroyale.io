@@ -104,17 +104,17 @@ function clientConnect() {
     	server.disconnect();
   	});
 
-	server.on("movementUpdates",function(movementPacket){
-		shipList = movementPacket.shipList;
-		bulletList = movementPacket.bulletList;
-		asteroidList = movementPacket.asteroidList;
-		planetList = movementPacket.planetList;
-		itemList = movementPacket.itemList;
-		world = movementPacket.world;
-		gameStarted = movementPacket.state;
-		lobbyTimeLeft = movementPacket.lobbyTimeLeft;
-		shrinkTimeLeft = movementPacket.shrinkTimeLeft;
-		totalPlayers = movementPacket.totalPlayers;
+	server.on("gameUpdates",function(updatePacket){
+		shipList = updatePacket.shipList;
+		bulletList = updatePacket.bulletList;
+		asteroidList = updatePacket.asteroidList;
+		planetList = updatePacket.planetList;
+		itemList = updatePacket.itemList;
+		world = updatePacket.world;
+		gameStarted = updatePacket.state;
+		lobbyTimeLeft = updatePacket.lobbyTimeLeft;
+		shrinkTimeLeft = updatePacket.shrinkTimeLeft;
+		totalPlayers = updatePacket.totalPlayers;
 		timeSinceLastCom = 0;
 	});
 
@@ -130,6 +130,11 @@ function clientConnect() {
 
 	server.on("eventMessage",function(message){
 		eventLog.addEvent(message);
+	});
+
+	server.on("profileUpdate",function(player){
+		profile = player;
+		updateProfile(player);
 	});
 
    	return server;
