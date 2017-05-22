@@ -7,12 +7,12 @@ var fs = require('fs');
 app.use(express.static(path.join(__dirname, './client')));
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
-var mysql = require('mysql');
+
 var factory = require('./server/factory.js');
 var utils = require('./server/utils.js');
+var database = require('./server/database.js');
 var c = require('./server/config.json');
 
-var database = null;
 var userRegex = new RegExp('^[a-zA-Z0-9_-]{3,15}$');
 var passRegex = new RegExp('^[a-zA-Z0-9_-]{6,20}$');
 var gameNameRegex = new RegExp('^[a-zA-Z0-9_-]{3,10}$');
@@ -21,8 +21,7 @@ var gameNameRegex = new RegExp('^[a-zA-Z0-9_-]{3,10}$');
 var serverSleeping = true,
 	serverTickSpeed = c.serverTickSpeed,
 	serverUpdates = null,
-	result = [],
-	authedUserList = {};
+	result = [];
 
 //Room settings
 var roomList = {},
@@ -94,8 +93,8 @@ io.on('connection', function(client){
 	});
 
 	client.on('disconnect', function() {
-		if(authedUserList[client.id] != null){
-			delete authedUserList[client.id];
+		if(database.findAuthedUser(client.id) != null){
+			database.removeAuthedUser(client.id);
 		}
 		kickFromRoom(client.id);
 		//This is removing connection to the client, make sure this is the final thing we do for that client
@@ -109,8 +108,8 @@ io.on('connection', function(client){
   	});
 
   	client.on('signout',function(){
+  		database.removeAuthedUser(client.id);
   		client.emit('successfulSignout');
-  		delete authedUserList[client.id];
   	});
 
 	client.on('movement',function(packet){
@@ -281,7 +280,14 @@ function checkAuth(creds){
 		utils.messageUser(creds.id,"unsuccessfulAuth",{reason:"Invalid attempt"});
 		return;
 	}
-	lookupUser(authCallback,creds);
+	database.lookupUser(authCallback,creds);
+}
+function authCallback(result,params){
+	if(result == undefined){
+		utils.messageUser(params.id,'unsuccessfulAuth',{reason:"Player not found"});
+		return;
+	}
+	utils.messageUser(params.id,'successfulAuth',result[0]);
 }
 
 function invalid(user,pass){
@@ -335,119 +341,7 @@ function checkReg(creds){
 	if(simpleChecks(creds)){
 		return;
 	}
-	createUser(regCallback,creds);
-}
-
-function createConnection(){
-	database = mysql.createConnection({
-		host: c.sqlinfo.host,
-		user: c.sqlinfo.user,
-		password : c.sqlinfo.password,
-		database : c.sqlinfo.database,
-		debug : c.sqlinfo.debug
-	});
-}
-
-function sendQuery(value){
-	database.query(value,function(e,result){
-		if(e){
-			throw e;
-		}
-		return result;
-	});
-}
-
-function createUser(callback,params){
-	var user = {user_name:params.username,password:params.password};
-	var player = {user_id:null,total_exp:0,total_kills:0,total_wins:0,game_name:params.gamename,skin_id:0};
-	createConnection();
-	database.connect(function(e){
-		if(e){
-			throw e;
-		}
-		database.query("SELECT * FROM queenanne.user WHERE user_name LIKE ?",params.username,function(e,result){
-			if(e){
-				throw e;
-			}
-			if(result.length != 0){
-				utils.messageUser(params.id,'unsuccessfulReg',{reason:"Username is taken"});
-				return;
-			}
-			database.query("INSERT INTO queenanne.user SET ?",user,function(e,result){
-				if(e){
-					throw e;
-				}
-				player.user_id = result.insertId;
-				database.query("INSERT INTO queenanne.player SET ?",player,function(e,result){
-					if(e){
-						throw e;
-					}
-					params.player = player;
-					result.insertId = player.user_id;
-					callback(result,params);
-					database.end();
-				});
-			});
-		});
-		
-	});
-}
-
-function lookupUser(callback,params){
-	createConnection();
-	database.connect(function(e){
-		if(e){
-			throw e;
-		}
-		database.query("SELECT * FROM queenanne.user WHERE user_name LIKE ?",params.username,function(e,result){
-			if(e){
-				throw e;
-			}
-			if(result.length == 0){
-				utils.messageUser(params.id,'unsuccessfulAuth',{reason:"User not found"});
-				return;
-			}
-			if(result[0].password !== params.password){
-				utils.messageUser(params.id,'unsuccessfulAuth',{reason:"Password incorrect"});
-				return;
-			}
-
-			authedUserList[params.id] = result[0].user_id;
-			params.user_id = result[0].user_id;
-			
-			database.query("SELECT * FROM queenanne.player WHERE user_id LIKE ?",params.user_id,function(e,result){
-				if(e){
-					throw e;
-				}
-				callback(result,params);
-				database.end();
-			});
-		});
-	});
-}
-
-function lookupPlayer(callback,params){
-	createConnection();
-	database.connect(function(e){
-		if(e){
-			throw e;
-		}
-		database.query("SELECT * FROM queenanne.player WHERE user_id LIKE ?",params.user_id,function(e,result){
-			if(e){
-				throw e;
-			}
-			callback(result,params);
-			database.end();
-		});
-	});
-}
-
-function authCallback(result,params){
-	if(result == undefined){
-		utils.messageUser(params.id,'unsuccessfulAuth',{reason:"Player not found"});
-		return;
-	}
-	utils.messageUser(params.id,'successfulAuth',result[0]);
+	database.createUser(regCallback,creds);
 }
 
 function regCallback(result,params){
@@ -455,7 +349,7 @@ function regCallback(result,params){
 		utils.messageUser(params.id,'unsuccessfulReg',{reason:"Failed to register"});
 		return;
 	}
-	authedUserList[params.id] = result.insertId;
+	database.addAuthedUser(params.id,result.insertId);
 	utils.messageUser(params.id,'successfulReg',params.player);
 }
 
