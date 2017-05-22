@@ -52,13 +52,18 @@ function clientConnect() {
 		playerList = gameState.playerList;
 		shipList = gameState.shipList;
 		world = gameState.world;
+
+		for(var id in playerList){
+			eventLog.addEvent(playerList[id] + " has joined the battle");
+		}
+
 		if(shipList[myID] != null){
 			myShip = shipList[myID];
 		}
 	});
 
 	server.on("playerJoin", function(appendPlayerList){
-		console.log(appendPlayerList.name + " has joined the battle");
+		eventLog.addEvent(appendPlayerList.name + " has joined the battle");
 		playerList[appendPlayerList.id] = appendPlayerList.name;
 		shipList[appendPlayerList.id] = appendPlayerList.ship;
 	});

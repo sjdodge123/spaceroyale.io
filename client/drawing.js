@@ -87,7 +87,7 @@ function drawBoundArrow(){
 
 function drawEventLog(){
 	canvasContext.save();
-	canvasContext.globalAlpha = 0.25;
+	canvasContext.globalAlpha = 0.5;
 	canvasContext.fillStyle = eventLog.backgroundColor;
 	canvasContext.fillRect(eventLog.x,eventLog.y,eventLog.width,eventLog.height);
 	canvasContext.fillStyle = eventLog.textColor;
