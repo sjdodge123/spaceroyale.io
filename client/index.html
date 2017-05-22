@@ -227,6 +227,7 @@ function signOutUser(){
 }
 
 function showGameOverScreen(cause){
+    $('#gameCanvas').off("blur");
     $('#gameCanvas').fadeTo("slow",0.5,function(){
         $('#gameOverCause').html(cause);
         $('#gameOverMenu').show();
@@ -274,6 +275,11 @@ function resetGameVariables(){
     canvas.removeEventListener("click", handleClick, false);
     window.removeEventListener("keydown", keyDown, false);
     window.removeEventListener("keyup", keyUp, false);
+    window.removeEventListener('contextmenu', function(ev) {
+        ev.preventDefault();
+        return false;
+    }, false);
+    $(window).off("blur");
     canvas = document.getElementById('gameCanvas');
     canvasContext = canvas.getContext('2d');
 }
@@ -293,6 +299,15 @@ function init(){
     canvas.addEventListener("click", handleClick, false);
     window.addEventListener("keydown", keyDown, false);
     window.addEventListener("keyup", keyUp, false);
+    window.addEventListener('contextmenu', function(ev) {
+        ev.preventDefault();
+        return false;
+    }, false);
+
+    $(window).blur(function(){
+        cancelMovement();
+    });
+
     resize();
 }
 
@@ -386,6 +401,14 @@ function gameLoop(){
     if(iAmAlive){
         checkForDamage();
     }
+}
+
+function cancelMovement(){
+    turnLeft = false;
+    turnRight = false;
+    moveForward = false;
+    moveBackward = false;
+    server.emit('movement',{turnLeft:false,moveForward:false,turnRight:false,moveBackward:false});
 }
 
 function gameOver(){

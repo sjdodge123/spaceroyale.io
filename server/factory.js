@@ -12,7 +12,7 @@ class Room {
 	constructor(sig,size){
 		this.sig = sig;
 		this.size = size;
-		this.world = new World(0,0,500,500);
+		this.world = new World(0,0,c.lobbyWidth,c.lobbyHeight);
 		this.clientList = {};
 		this.planetList = {};
 		this.asteroidList = {};
@@ -560,7 +560,7 @@ class World extends Rect{
 
 	spawnNewShip(id,color){
 		var loc = this.getRandomLoc();
-		return new Ship(loc.x,loc.y,10,10,color,id)
+		return new Ship(loc.x,loc.y,color,id)
 	}
 }
 
@@ -585,8 +585,8 @@ class BlueBound extends Bound{
 }
 
 class Ship extends Rect{
-	constructor(x,y,width,height,color,id){
-		super(x,y,width,height,color);
+	constructor(x,y,color,id){
+		super(x,y,25,25,color);
 		this.baseHealth = 100;
 		this.health = this.baseHealth;
 		this.baseColor = color;
@@ -604,6 +604,7 @@ class Ship extends Rect{
 		this.killList = [];
 		this.killedBy = null;
 		this.weapon = new Pistol(this.id);
+		this.weapon.level = 3;
 		this.shield = null;
 	}
 	update(){
@@ -723,62 +724,6 @@ class Ship extends Rect{
 	}
 }
 
-class Bullet extends Rect{
-	constructor(x,y,width,height,color,angle,owner){
-		super(x,y,width,height,color);
-		this.angle = angle;
-		this.alive = true;
-		this.owner = owner;
-		this.sig = null;
-
-		this.lifetime = c.bulletLifetime;
-		this.speed = c.bulletSpeed;
-		this.damage = c.bulletDamage;
-		this.velX = 0;
-		this.velY = 0;
-	}
-	update(){
-		this.velX = Math.cos((this.angle+90)*(Math.PI/180))*this.speed;
-		this.velY = Math.sin((this.angle+90)*(Math.PI/180))*this.speed;
-		this.move();
-	}
-	move(){
-		this.x += this.velX;
-		this.y += this.velY;
-	}
-	handleHit(object){
-		if(!this.alive){
-			return
-		}
-		if(object.owner == this.owner){
-			return;
-		}
-		if(object.id == this.owner){
-			return;
-		}
-		if(object.isItem){
-			return;
-		}
-		this.alive = false;
-	}
-}
-
-class Birdshot extends Bullet{
-	constructor(x,y,width,height,color,angle,owner){
-		super(x,y,width,height,color,angle,owner);
-		this.damage = c.birdshotDamage;
-		this.speed = c.birdshotSpeed;
-	}
-
-}
-
-class RifleBullet extends Bullet{
-	constructor(x,y,width,height,color,angle,owner){
-		super(x,y,width,height,color,angle,owner);
-		this.damage = c.rifleBulletDamage;
-		this.speed = c.rifleBulletSpeed;
-	}
-}
 
 class Asteroid extends Circle{
 	constructor(x,y,radius,sig){
@@ -865,7 +810,7 @@ class Planet extends Circle {
 
 class RectItem extends Rect{
 	constructor(x,y,color){
-		super(x,y,5,5,color);
+		super(x,y,15,15,color);
 		this.isItem = true;
 		this.sig = null;
 		this.alive = true;
@@ -981,7 +926,7 @@ class Pistol extends Weapon{
 			return;
 		}
 		var bullets = [];
-		bullets.push(new Bullet(x,y,2,6,color,angle,id));
+		bullets.push(new Bullet(x,y,5,12,color,angle,id));
 		return bullets;
 	}
 }
@@ -1001,28 +946,24 @@ class Shotgun extends Weapon{
 		}
 		var bullets = [];
 		if(this.level > 1){
-			var shot1 = new Birdshot(x,y,1,2,color,angle-5,id);
-			shot1.speed -= 2;
-			var shot2 = new Birdshot(x,y,1,2,color,angle,id);
-			shot2.speed -= 2;
-			var shot3 = new Birdshot(x,y,1,2,color,angle+5,id);
-			shot3.speed -= 2;
-			bullets.push(shot1,shot2,shot3);
+			var shot1 = new Birdshot(x,y,4,10,color,angle-7.5,id);
+			var shot3 = new Birdshot(x,y,4,10,color,angle+7.5,id);
+			bullets.push(shot1,shot3);
 		}
 		if(this.level > 2){
-			var shot1 = new Birdshot(x,y,1,2,color,angle-15,id);
+			var shot1 = new Birdshot(x,y,4,10,color,angle-15,id);
 			shot1.speed -= 4;
-			var shot2 = new Birdshot(x,y,1,2,color,angle,id);
+			var shot2 = new Birdshot(x,y,4,10,color,angle,id);
 			shot2.speed -= 4;
-			var shot3 = new Birdshot(x,y,1,2,color,angle+15,id);
+			var shot3 = new Birdshot(x,y,4,10,color,angle+15,id);
 			shot3.speed -= 4;
 			bullets.push(shot1,shot2,shot3);
 		}
-		bullets.push(new Birdshot(x,y,2,4,color,angle-2.5,id));
-		bullets.push(new Birdshot(x,y,2,4,color,angle-1,id));
-		bullets.push(new Birdshot(x,y,2,4,color,angle,id));
-		bullets.push(new Birdshot(x,y,2,4,color,angle+1,id));
-		bullets.push(new Birdshot(x,y,2,4,color,angle+2.5,id));
+		bullets.push(new Birdshot(x,y,4,10,color,angle-5,id));
+		bullets.push(new Birdshot(x,y,4,10,color,angle-2.5,id));
+		bullets.push(new Birdshot(x,y,4,10,color,angle,id));
+		bullets.push(new Birdshot(x,y,4,10,color,angle+2.5,id));
+		bullets.push(new Birdshot(x,y,4,10,color,angle+5,id));
 		return bullets;
 	}
 	upgrade(){
@@ -1050,7 +991,7 @@ class Rifle extends Weapon{
 			return;
 		}
 		var bullets = [];
-		bullets.push(new RifleBullet(x,y,4,15,color,angle,id));
+		bullets.push(new RifleBullet(x,y,8,20,color,angle,id));
 		return bullets;
 	}
 	drop(x,y){
@@ -1123,6 +1064,64 @@ class Shield extends Circle{
 		utils.toastPlayer(this.owner,this.equipMessage);
 	}
 }
+
+class Bullet extends Rect{
+	constructor(x,y,width,height,color,angle,owner){
+		super(x,y,width,height,color);
+		this.angle = angle;
+		this.alive = true;
+		this.owner = owner;
+		this.sig = null;
+
+		this.lifetime = c.bulletLifetime;
+		this.speed = c.bulletSpeed;
+		this.damage = c.bulletDamage;
+		this.velX = 0;
+		this.velY = 0;
+	}
+	update(){
+		this.velX = Math.cos((this.angle+90)*(Math.PI/180))*this.speed;
+		this.velY = Math.sin((this.angle+90)*(Math.PI/180))*this.speed;
+		this.move();
+	}
+	move(){
+		this.x += this.velX;
+		this.y += this.velY;
+	}
+	handleHit(object){
+		if(!this.alive){
+			return
+		}
+		if(object.owner == this.owner){
+			return;
+		}
+		if(object.id == this.owner){
+			return;
+		}
+		if(object.isItem){
+			return;
+		}
+		this.alive = false;
+	}
+}
+
+class Birdshot extends Bullet{
+	constructor(x,y,width,height,color,angle,owner){
+		super(x,y,width,height,color,angle,owner);
+		this.damage = c.birdshotDamage;
+		this.speed = c.birdshotSpeed;
+	}
+
+}
+
+class RifleBullet extends Bullet{
+	constructor(x,y,width,height,color,angle,owner){
+		super(x,y,width,height,color,angle,owner);
+		this.damage = c.rifleBulletDamage;
+		this.speed = c.rifleBulletSpeed;
+	}
+}
+
 
 class CollisionEngine {
 	constructor(){

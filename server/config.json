@@ -16,14 +16,17 @@
     "damageTickRate":2,
     "damagePerTick":15,
 
-    "worldWidth": 2500,
-    "worldHeight": 2500,
+    "lobbyWidth": 750,
+    "lobbyHeight": 750,
+
+    "worldWidth": 5000,
+    "worldHeight": 5000,
 
     "generateAsteroids":true,
     "asteroidAmt":100,
     "asteroidDropRate":40,
-    "asteroidMinSize":15,
-    "asteroidMaxSize":25,
+    "asteroidMinSize":45,
+    "asteroidMaxSize":65,
 
     "asteroidLootTable":{
       "HPItem":4,
@@ -35,8 +38,8 @@
 
     "generatePlanets":true,
     "planetAmt":40,
-    "planetMinSize":40,
-    "planetMaxSize":80,
+    "planetMinSize":70,
+    "planetMaxSize":150,
 
     "playerBaseSpeed":5,
 
@@ -51,9 +54,9 @@
 
     "rifleCoolDown":1.2,
     "rifleBulletDamage":50,
-    "rifleBulletSpeed":25,
+    "rifleBulletSpeed":35,
 
-    "shieldRadius":9,
+    "shieldRadius":26,
     "shield1Protection":10,
     "shield2Protection":20,
     "shield3Protection":30,
@@ -61,10 +64,10 @@
 
     "sqlinfo":{
       "connectionLimit": 100,
-      "host": "localhost",
-      "user": "root",
-      "password": "DEFAULT",
-      "database": "DEFAULT",
+      "host": "spdbdev.cj1qbrqikxsw.us-east-1.rds.amazonaws.com",
+      "user": "blackbeard",
+      "password": "kLl77d&m",
+      "database": "queenanne",
       "debug": false
     }
 }
