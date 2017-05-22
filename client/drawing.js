@@ -48,14 +48,6 @@ function drawKillCounter(){
 	drawText("Killed " + myShip.killList.length,canvas.width-190,20);
 }
 
-function drawDeathText(){
-	drawText("You died!",camera.x-60,camera.y);
-}
-
-function drawVictoryScreen(){
-	drawText("Winner winner chicken dinner!",camera.x-120,camera.y-20);
-}
-
 function drawHPCounter(){
 	if(!iAmAlive){
 		drawText("HP:" + 0,10,20);
@@ -128,15 +120,14 @@ function drawRelativeObjects(){
         myShip = shipList[myID];
         camera.centerOnObject(myShip);
 		camera.draw();
-        drawShips();
-        drawAsteroids();
-        drawItems();
-		drawBullets();
-		drawPlanets();
-		drawWorld();
-		drawBounds();
-    }
-	
+	}
+    drawShips();
+    drawAsteroids();
+    drawItems();
+	drawBullets();
+	drawPlanets();
+	drawWorld();
+	drawBounds();	
 }
 function drawShip(ship){
 	canvasContext.save();

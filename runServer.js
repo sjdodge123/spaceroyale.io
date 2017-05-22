@@ -41,7 +41,7 @@ process.on( 'SIGINT', function() {
 	  io.sockets.emit("serverShutdown","Server terminated");
 	  process.exit();
 });
-
+/*
 process.on('SIGUSR2', function () {
   	console.log( "\nServer restarting" );
 	io.sockets.emit("serverShutdown","Server restarted");
@@ -55,15 +55,16 @@ process.on('exit', function(){
 });
 
 process.on('uncaughtException',function(e){
-	console.log( "\nServer shutting down from unhandled exception:\n\n"+ e);
+	console.log(e);
 	io.sockets.emit("serverShutdown","Server terminated");
 	process.exit();
 });
+*/
 
 io.on('connection', function(client){
 	client.emit("welcome",client.id);
 	utils.addMailBox(client.id,client);
-	console.log();
+
 	client.on('register',function(creds){
 		//TODO log all reg attempts into a log file for security
 		creds.id = client.id;
@@ -81,10 +82,8 @@ io.on('connection', function(client){
 		//Find a room with space
 		var roomSig = findARoom(client.id);
 		var room = roomList[roomSig];
-		utils.addRoomToMailBox(client.id,roomSig);
-
-		room.join(client);
-		console.log(message.name + " connected to Room"+roomSig);
+		room.join(client.id);
+		console.log(message.name + " joined Room"+roomSig);
 
 		//Add this player to the list of current clients in the room
 		room.clientList[client.id] = message.name; 
@@ -109,22 +108,17 @@ io.on('connection', function(client){
 		client.broadcast.to(roomSig).emit("playerJoin",appendPlayerList);
 	});
 
+	client.on('playerLeaveRoom',function(){
+		kickFromRoom(client.id);
+	});
+
 	client.on('disconnect', function() {
-		var room = locateMyRoom(client.id);
-		if(room == undefined){
-			return;
+		if(authedUserList[client.id] != null){
+			delete authedUserList[client.id];
 		}
-		var name = room.clientList[client.id];
-		var id = client.id;
-		if(authedUserList[id] != null){
-			delete authedUserList[id];
-		}
-		utils.removeMailBox(id);
-		client.broadcast.to(room.sig).emit('playerLeft',client.id);
-		console.log(name + ' disconnected from Room' + room.sig);
-		room.leave(client);
-		delete room.clientList[id];
-		delete room.shipList[id];
+		kickFromRoom(client.id);
+		//This is removing connection to the client, make sure this is the final thing we do for that client
+		utils.removeMailBox(client.id);
 
 		if(getActiveRoomCount() == 0){
 			serverSleeping = true;
@@ -214,16 +208,19 @@ function findARoom(clientID){
 	return sig3;
 }
 
+function kickFromRoom(clientID){
+	var room = locateMyRoom(clientID);
+	if(room != undefined){
+		room.leave(clientID);
+	}
+}
+
 function getRoomCount(){
 	var count = 0;
 	for(var sig in roomList){
 		count++;
 	}
 	return count;
-}
-
-function reclaimRoom(sig){
-	io.to(sig).emit("serverShutdown","Server has closed your session");
 }
 
 //Gamestate updates
@@ -235,7 +232,7 @@ function update(){
 				updateRoom(room);
 			} else{
 				io.to(room.sig).emit("gameOver",room.game.winner);
-				setTimeout(reclaimRoom,roomKickTimeout*1000,room.sig);	
+				setTimeout(room.reclaim,roomKickTimeout*1000);	
 			}
 		}
 	}
@@ -257,8 +254,8 @@ function updateRoom(room){
 				utils.sendEventMessageToRoom(murderer.id,murdererName + " killed " + deadPlayerName);
 				utils.toastPlayer(murderer.id,"You killed " + deadPlayerName);
 			}
-			io.to(room.sig).emit('shipDeath',shipID);
 			delete room.shipList[shipID];
+			io.to(room.sig).emit('shipDeath',shipID);
 		}
 	}
 	
@@ -272,7 +269,8 @@ function updateRoom(room){
 		state:room.game.active,
 		lobbyTimeLeft:room.game.lobbyTimeLeft,
 		totalPlayers:utils.getTotalPlayers(),
-		shrinkTimeLeft:room.game.timeLeftUntilShrink});
+		shrinkTimeLeft:room.game.timeLeftUntilShrink
+	});
 }
 function fireWeapon(id){
 	var room = locateMyRoom(id);
@@ -349,7 +347,7 @@ function checkReg(creds){
 	if(simpleChecks(creds)){
 		return;
 	}
-	createUser(respondToClient,creds);
+	createUser(regCallback,creds);
 }
 
 function createConnection(){
@@ -461,10 +459,10 @@ function authCallback(result,params){
 		utils.messageUser(params.id,'unsuccessfulAuth',{reason:"Player not found"});
 		return;
 	}
-	utils.messageUser(params.id,'successfulAuth',result);
+	utils.messageUser(params.id,'successfulAuth',result[0]);
 }
 
-function respondToClient(result,params){
+function regCallback(result,params){
 	if(result.insertId == undefined){
 		utils.messageUser(params.id,'unsuccessfulReg',{reason:"Failed to register"});
 		return;

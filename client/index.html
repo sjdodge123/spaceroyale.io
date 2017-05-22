@@ -52,7 +52,17 @@
             <label id="signUpError" style="color:tomato" hidden></label>
         </form>
   </div>
-    <canvas id ="gameCanvas" width="800" height="600"></canvas>
+    <canvas id ="gameCanvas" width="800" height="600" hidden></canvas>
+</div>
+
+<div id="gameOverMenu" hidden>
+    <div id ="gameOverTop">
+        <label id="gameOverCause">You died!</label>
+    </div>
+    <div id ="gameOverBottom">
+        <input type="button" class="btn btn-danger" id="gameOverReturn" value="Return to Menu"></input>
+    </div>
+
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -81,13 +91,17 @@ canvasContext.canvas.height = window.innerHeight;
 var server = null,
 eventLog,
 camera,
+canvasContext,
+serverShutdownReason = "Error",
+profile = null,
+
+//Gamevars
 skipAuth = false,
 gameRunning = false,
 iAmAlive = true,
 timeOutChecker = null,
 gameStarted = false,
 victory = false,
-serverShutdownReason = "Error",
 shrinkTimeLeft = 60,
 lobbyTimeLeft = 0,
 toastTimer = null,
@@ -100,8 +114,8 @@ mousey,
 moveForward = false,
 moveBackward = false,
 turnLeft = false,
-turnRight = false,
-canvasContext;
+turnRight = false;
+
 
 
 var userRegex = new RegExp('^[a-zA-Z0-9_-]{3,15}$');
@@ -208,7 +222,60 @@ function signOutUser(){
     server.emit('signout');
 }
 
+function showGameOverScreen(cause){
+    $('#gameCanvas').fadeTo("slow",0.5,function(){
+        $('#gameOverCause').html(cause);
+        $('#gameOverMenu').show();
+        $('#gameOverReturn').click(function(){
+            resetGameVariables();
+            server.emit('playerLeaveRoom');
+            $('#gameOverMenu').hide();
+            $('#gameCanvas').css('opacity', '1');
+            $('#gameCanvas').hide();
+            $('#main').show();
+        });
+    });
+}
+
+function resetGameVariables(){
+    clearInterval(timeOutChecker);
+    skipAuth = false;
+    gameRunning = false;
+    iAmAlive = true;
+    timeOutChecker = null;
+    gameStarted = false;
+    victory = false;
+    gameRunning = true;
+    shrinkTimeLeft = 60;
+    lobbyTimeLeft = 0;
+    toastTimer = null;
+    toastMessage = null;
+    totalPlayers = null;
+    myShip = null;
+    healthLastFrame = 100;
+    moveForward = false;
+    moveBackward = false;
+    turnLeft = false;
+    turnRight = false;
+    timeSinceLastCom = 0;
+    serverTimeoutWait = 5;
+    world = null;
+    asteroidList = {};
+    itemList = {};
+    planetList = {};
+    playerList = {};
+    bulletList = {};
+    shipList = {};
+    canvas.removeEventListener("mousemove", calcMousePos, false);
+    canvas.removeEventListener("click", handleClick, false);
+    window.removeEventListener("keydown", keyDown, false);
+    window.removeEventListener("keyup", keyUp, false);
+    canvas = document.getElementById('gameCanvas');
+    canvasContext = canvas.getContext('2d');
+}
+
 function startGame(name,color){
+    $('#gameCanvas').show();
     clientSendStart(name,color);
     gameRunning = true;
     $('#main').hide();
@@ -302,9 +369,6 @@ function animloop(){
     if(gameRunning){
         requestAnimFrame(animloop);
         gameLoop();
-    } else {
-        drawBackground();
-        drawText("The server has shutdown: " + serverShutdownReason,10,50);
     }
 }
 
@@ -316,24 +380,12 @@ function gameLoop(){
     drawRelativeObjects();
     drawHUD();
     if(iAmAlive){
-        if(victory){
-            gameOver();
-            return;
-        }
         checkForDamage();
-    } else{
-        drawDeathText();
     }
 }
 
 function gameOver(){
-    drawVictoryScreen();
     server.emit('movement',{turnLeft:false,moveForward:false,turnRight:false,moveBackward:false});
-    canvas.removeEventListener("mousemove", calcMousePos, false);
-    canvas.removeEventListener("click", handleClick, false);
-    window.removeEventListener("keydown", keyDown, false);
-    window.removeEventListener("keyup", keyUp, false);
-    server.disconnect();
 }
 
 function checkForDamage(){
@@ -398,72 +450,73 @@ window.onload = function() {
     $(window).resize(function(){
         resize();
     });
-}
-</script>
+    var array = $('input[name=color]');
+    array[getRandomInt(0,array.length)].checked = true;
 
-<script type="text/javascript">
-var array = $('input[name=color]');
-array[getRandomInt(0,array.length)].checked = true;
+    $('#nameForm').submit(function () {
+        var name;
+        if(profile == null){
+            name = $('#nameBox').val();
+            if(name == ""){
+                name = $('#nameBox').attr("placeholder");
+            }
+        } else{
+            name = profile.game_name;
+        }
+        startGame(name,$('input[name=color]:checked').val());
+        return false;
+    });
 
-$('#nameForm').submit(function () {
-    var name = $('#nameBox').val();
-    if(name == ""){
-        name = $('#nameBox').attr("placeholder");
-    }
-    startGame(name,$('input[name=color]:checked').val());
-    return false;
-});
-
-$('#signInSubmit').click(function(e){
-    auth($('#signInUser').val(),$('#signInPass').val());
-});
-
-$('#signUpSubmit').click(function(e){
-    $('#signUpError').hide()
-    register($('#signUpUser').val(),
-             $('#signUpPass1').val(),
-             $('#signUpPass2').val(),
-             $('#signUpGameName').val()
-        );
-});
-
-//***************************Toggle for Signup screen*************************************
-$('#signUpButton').click(function(e){
-    $('.collapse').collapse("hide");
-    $('#signUp').show();
-    $("#centerContainer").removeClass("enabled");
-    $("#centerContainer").addClass("disabled");
-});
-
-$('#signUpCancel').click(function(e){
-    $('#signUp').hide();
-    $('#signUpError').hide();
-    $("#centerContainer").removeClass("disabled");
-    $("#centerContainer").addClass("enabled");
-});
-//*******************************************************************************************
-$('#signInUser').keypress(function(e) {
-    if(e.which == 13) {
+    $('#signInSubmit').click(function(e){
         auth($('#signInUser').val(),$('#signInPass').val());
-    }
-});
+    });
 
-$('#signInPass').keypress(function(e) {
-    if(e.which == 13) {
-        auth($('#signInUser').val(),$('#signInPass').val());
-    }
-});
-
-$('#signUpGameName').keypress(function(e) {
-    if(e.which == 13) {
+    $('#signUpSubmit').click(function(e){
         $('#signUpError').hide()
-    register($('#signUpUser').val(),
-             $('#signUpPass1').val(),
-             $('#signUpPass2').val(),
-             $('#signUpGameName').val()
-        );
-    }
-});
+        register($('#signUpUser').val(),
+                 $('#signUpPass1').val(),
+                 $('#signUpPass2').val(),
+                 $('#signUpGameName').val()
+            );
+    });
 
+    //***************************Toggle for Signup screen*************************************
+    $('#signUpButton').click(function(e){
+        $('.collapse').collapse("hide");
+        $('#signUp').show();
+        $("#centerContainer").removeClass("enabled");
+        $("#centerContainer").addClass("disabled");
+    });
+
+    $('#signUpCancel').click(function(e){
+        $('#signUp').hide();
+        $('#signUpError').hide();
+        $("#centerContainer").removeClass("disabled");
+        $("#centerContainer").addClass("enabled");
+    });
+    //*******************************************************************************************
+    $('#signInUser').keypress(function(e) {
+        if(e.which == 13) {
+            auth($('#signInUser').val(),$('#signInPass').val());
+        }
+    });
+
+    $('#signInPass').keypress(function(e) {
+        if(e.which == 13) {
+            auth($('#signInUser').val(),$('#signInPass').val());
+        }
+    });
+
+    $('#signUpGameName').keypress(function(e) {
+        if(e.which == 13) {
+            $('#signUpError').hide()
+        register($('#signUpUser').val(),
+                 $('#signUpPass1').val(),
+                 $('#signUpPass2').val(),
+                 $('#signUpGameName').val()
+            );
+        }
+    });
+}
 </script>
 </html>

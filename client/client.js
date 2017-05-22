@@ -1,5 +1,4 @@
 var myID = null,
-	
 	timeSinceLastCom = 0,
 	serverTimeoutWait = 5,
 	world,
@@ -17,7 +16,8 @@ function clientConnect() {
 	});
 
 	server.on("successfulAuth", function(player){
-		displayPlayerProfile(player[0]);
+		profile = player;
+		displayPlayerProfile(player);
 		changeToSignout();
 		$('.collapse').collapse("hide");
 		$('#signInUser').val('');
@@ -25,7 +25,8 @@ function clientConnect() {
 	});
 
 	server.on("successfulReg",function(player){
-		displayPlayerProfile(player[0]);
+		profile = player;
+		displayPlayerProfile(player);
 		changeToSignout();
 		$('#signUp').hide();
 	    $("#centerContainer").removeClass("disabled");
@@ -44,6 +45,7 @@ function clientConnect() {
 	server.on("successfulSignout",function(){
 		changeToSignIn();
     	$('#nameBox').val('').prop('disabled',false);
+    	$('#playerProfile').hide();
 	});
 
 	server.on("gameState", function(gameState){
@@ -63,27 +65,32 @@ function clientConnect() {
 
 	server.on("playerLeft", function(id){
 		var name = playerList[id];
-		console.log(name + " disconnected");
-		delete playerList[id];
-		delete shipList[id];
+		if(name != null){
+			console.log(name + " disconnected");
+			delete playerList[id];
+			delete shipList[id];
+			return;
+		}
+		console.log("I disconnected");
 	});
 
 	server.on("shipDeath",function(id){
 		if(id == myID){
 			iAmAlive = false;
 			delete shipList[id];
-			server.disconnect();
-			timeSinceLastCom = 0;
-			serverTimeoutWait = 10;
+			showGameOverScreen("You died!");
 		}
 	});
 
 	server.on("gameOver",function(id){
-		if(id == myID){
-			victory = true;
+		if(id == myID && iAmAlive){
+			iAmAlive = false;
+			delete shipList[id];
+			gameOver();
+			showGameOverScreen("Winner winner chicken dinner!");
 		}
 		timeSinceLastCom = 0;
-		serverTimeoutWait = 10;
+		serverTimeoutWait = 60;
 	});
 
 	server.on('serverShutdown', function(reason){

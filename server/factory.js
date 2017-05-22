@@ -39,13 +39,26 @@ class Room {
 		this.clientCount = 0;
 		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList,this.planetList,this.itemList);
 	}
-	join(client){
+	join(clientID){
+		var client = utils.getClient(clientID);
+		utils.addRoomToMailBox(clientID,this.sig);
 		client.join(this.sig);
 		this.clientCount++;
 	}
-	leave(client){
-		client.leave(this.sig)
+	leave(clientID){
+		console.log(this.clientList[clientID] + ' left Room' + this.sig);
+		utils.messageRoomBySig(this.sig,'playerLeft',clientID);
+		var client = utils.getClient(clientID);
+		client.leave(this.sig);
+		utils.removeRoomMailBox(clientID);
+		delete this.clientList[clientID];
+		delete this.shipList[clientID];
 		this.clientCount--;
+	}
+	reclaim(){
+		for(var clientID in this.clientList){
+			this.leave(this.clientList[clientID]);
+		}
 	}
 	update(){
 		this.game.update();
