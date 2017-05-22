@@ -62,6 +62,7 @@ exports.createUser = function(callback,params){
 						throw e;
 					}
 					params.player = player;
+					authedUsers[params.id] = player.user_id;
 					result.insertId = player.user_id;
 					callback(result,params);
 					database.end();
