@@ -439,11 +439,6 @@ function handleClick(evt){
     if(iAmAlive){
        server.emit("click",{x:mouseX,y:mouseY}); 
     }
-    if(myShip != null){
-        if(myShip.weapon.name == "Pistol"){
-            playSound(pistolShot);
-        }
-    }
 }
 
 function keyDown(evt){
