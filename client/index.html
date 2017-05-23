@@ -6,18 +6,6 @@
         <button class="btn btn-info" data-toggle="collapse" id="signInButton" data-target="#signIn">Sign in</button>
         <button class="btn btn-warning" id="signUpButton">Sign up</button>
         <div id="bannerBox">SpacePirates.io</div>
-        <form id="nameForm">
-            <input type="text" id="nameBox"></input>
-            <input type="submit"  class="btn btn-primary" id="playButton" value="Play!"></input>
-            <br>
-            <input type="radio" id="magentaRadio" name="color" value ="#ff00bf">Magenta</input>
-            <br>
-            <input type="radio" id="redRadio" name="color" value = "red">Red</input>
-            <br>
-            <input type="radio" id="greenRadio" name="color" value = "green">Green</input>
-            <br>
-            <input type="radio" id="blueRadio" name="color" value = "#66b3ff">Blue</input>
-        </form>
         <div id="playerProfile" hidden>
             <table id="playerTable">
                 <tr>
@@ -32,6 +20,32 @@
                     <td id="playerWins"></td>
                 </tr>
             </table>
+        </div>
+        <div id="formBox">
+            <form id="nameForm">
+                <div id="skinSelection">
+                    <div id="leftArrow"><img src="img/landingpage/Color_Selector_Arrow_left.png"></img></div>
+                    <div id="skinSelectionDisplay">
+                        <div id="skins">
+                            <ul>
+                                <li style="left: 50px;">
+                                    <img id="firstSkin" src="img/skins/Ship_Magenta.png" data-selected="#ff00bf"></img>
+                                </li>
+                                <li style="left: 134px;">
+                                    <img id="secondSkin" src="img/skins/Ship_Blue.png" data-selected="#66b3ff"></img>
+                                </li>
+                                <li style="left: 218px;">
+                                    <img id="thirdSkin" src="img/skins/Ship_Red.png" data-selected="red"></img>
+                                </li>
+                            </ul>
+                        </div>
+                        <div id="skinSelector"></div>
+                    </div>
+                    <div id="rightArrow"><img src="img/landingpage/Color_Selector_Arrow_right.png"></img></div>
+                </div>
+                <input type="text" id="nameBox"></input>
+                <input type="submit"  class="btn btn-primary" id="playButton" value="Play!"></input>           
+            </form>
         </div>
     </div>
         <form id="signIn" class="collapse">
@@ -480,8 +494,12 @@ window.onload = function() {
     $(window).resize(function(){
         resize();
     });
-    var array = $('input[name=color]');
-    array[getRandomInt(0,array.length)].checked = true;
+
+    var skinArray = [];
+    skinArray.push({image:'img/skins/Ship_Magenta.png',value:"#ff00bf"});
+    skinArray.push({image:'img/skins/Ship_Blue.png',value:"#66b3ff"});
+    skinArray.push({image:'img/skins/Ship_Red.png',value:"red"});
+    skinArray.push({image:'img/skins/Ship_Green.png',value:"green"});
 
     $('#nameForm').submit(function () {
         var name;
@@ -493,7 +511,7 @@ window.onload = function() {
         } else{
             name = profile.game_name;
         }
-        startGame(name,$('input[name=color]:checked').val());
+        startGame(name,$('#secondSkin').attr('data-selected'));
         return false;
     });
 
@@ -509,6 +527,32 @@ window.onload = function() {
                  $('#signUpGameName').val()
             );
     });
+
+    //***************************Skin Selection Box*************************************
+    $('#leftArrow').hover(function(){
+        $(this).css('filter',"brightness(100%)");
+    },function(){
+        $(this).css('filter',"brightness(80%)");
+    }).click(function(e){
+        var lastElement = skinArray.splice(skinArray.length-1,1)[0];
+        skinArray.unshift(lastElement);
+        $("#firstSkin").attr('src',skinArray[0].image).attr('data-selected',skinArray[0].value);
+        $("#secondSkin").attr('src',skinArray[1].image).attr('data-selected',skinArray[1].value);
+        $("#thirdSkin").attr('src',skinArray[2].image).attr('data-selected',skinArray[2].value);
+    });
+    $('#rightArrow').hover(function(){
+        $(this).css('filter',"brightness(100%)");
+    },function(){
+        $(this).css('filter',"brightness(80%)");
+    }).click(function(){
+        var firstElement = skinArray.shift();
+        skinArray.push(firstElement);
+        $("#firstSkin").attr('src',skinArray[0].image).attr('data-selected',skinArray[0].value);
+        $("#secondSkin").attr('src',skinArray[1].image).attr('data-selected',skinArray[1].value);
+        $("#thirdSkin").attr('src',skinArray[2].image).attr('data-selected',skinArray[2].value);    
+    });
+    //*******************************************************************************************
+
 
     //***************************Toggle for Signup screen*************************************
     $('#signUpButton').click(function(e){
