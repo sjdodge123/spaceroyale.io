@@ -1,5 +1,6 @@
 var mysql = require('mysql');
 var utils = require('./utils.js');
+var messenger = require('./messenger.js');
 var c = require('./config.json');
 var authedUsers = {};
 
@@ -49,7 +50,7 @@ exports.createUser = function(callback,params){
 				throw e;
 			}
 			if(result.length != 0){
-				utils.messageUser(params.id,'unsuccessfulReg',{reason:"Username is taken"});
+				messenger.messageUser(params.id,'unsuccessfulReg',{reason:"Username is taken"});
 				return;
 			}
 			database.query("INSERT INTO queenanne.user SET ?",user,function(e,result){
@@ -84,11 +85,11 @@ exports.lookupUser = function(callback,params){
 				throw e;
 			}
 			if(result.length == 0){
-				utils.messageUser(params.id,'unsuccessfulAuth',{reason:"User not found"});
+				messenger.messageUser(params.id,'unsuccessfulAuth',{reason:"User not found"});
 				return;
 			}
 			if(result[0].password !== params.password){
-				utils.messageUser(params.id,'unsuccessfulAuth',{reason:"Password incorrect"});
+				messenger.messageUser(params.id,'unsuccessfulAuth',{reason:"Password incorrect"});
 				return;
 			}
 
@@ -139,7 +140,7 @@ function updatePlayer(callback,params){
 }
 
 function updatePlayerScreen(result,params){
-	utils.messageUser(params.id,'profileUpdate',params.player);
+	messenger.messageUser(params.id,'profileUpdate',params.player);
 }
 
 function createConnection(){

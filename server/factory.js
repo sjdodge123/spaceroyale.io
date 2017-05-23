@@ -2,6 +2,7 @@
 
 var c = require('./config.json');
 var utils = require('./utils.js');
+var messenger = require('./messenger.js');
 var database = require('./database.js');
 
 exports.getRoom = function(sig,size){
@@ -24,18 +25,18 @@ class Room {
 		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList,this.planetList,this.itemList);
 	}
 	join(clientID){
-		var client = utils.getClient(clientID);
-		utils.addRoomToMailBox(clientID,this.sig);
+		var client = messenger.getClient(clientID);
+		messenger.addRoomToMailBox(clientID,this.sig);
 		client.join(this.sig);
 		this.clientCount++;
 	}
 	leave(clientID){
 		console.log(this.clientList[clientID] + ' left Room' + this.sig);
 		database.recordShip(clientID,this.shipList[clientID]);
-		utils.messageRoomBySig(this.sig,'playerLeft',clientID);
-		var client = utils.getClient(clientID);
+		messenger.messageRoomBySig(this.sig,'playerLeft',clientID);
+		var client = messenger.getClient(clientID);
 		client.leave(this.sig);
-		utils.removeRoomMailBox(clientID);
+		messenger.removeRoomMailBox(clientID);
 		delete this.clientList[clientID];
 		delete this.shipList[clientID];
 		this.clientCount--;
@@ -55,17 +56,17 @@ class Room {
 					var murdererName = this.clientList[ship.killedBy];
 					var deadPlayerName = this.clientList[shipID];
 					murderer.killList.push(deadPlayerName);
-					utils.sendEventMessageToRoom(murderer.id,murdererName + " killed " + deadPlayerName);
-					utils.toastPlayer(murderer.id,"You killed " + deadPlayerName);
+					messenger.sendEventMessageToRoom(murderer.id,murdererName + " killed " + deadPlayerName);
+					messenger.toastPlayer(murderer.id,"You killed " + deadPlayerName);
 				}
 				delete this.shipList[shipID];
-				utils.messageRoomBySig(this.sig,'shipDeath',shipID);
+				messenger.messageRoomBySig(this.sig,'shipDeath',shipID);
 			}
 		}
 	}
 
 	sendUpdates(){
-		utils.messageRoomBySig(this.sig,"gameUpdates",{
+		messenger.messageRoomBySig(this.sig,"gameUpdates",{
 			shipList:this.shipList,
 			bulletList:this.bulletList,
 			asteroidList:this.asteroidList,
@@ -74,7 +75,7 @@ class Room {
 			world:this.world,
 			state:this.game.active,
 			lobbyTimeLeft:this.game.lobbyTimeLeft,
-			totalPlayers:utils.getTotalPlayers(),
+			totalPlayers:messenger.getTotalPlayers(),
 			shrinkTimeLeft:this.game.timeLeftUntilShrink
 		});
 	}
@@ -657,9 +658,9 @@ class Ship extends Rect{
 			} else{
 				this.health += amt;
 			}
-			utils.toastPlayer(this.id,"Healed " + amt);
+			messenger.toastPlayer(this.id,"Healed " + amt);
 		} else{
-			utils.toastPlayer(this.id,"Full health");
+			messenger.toastPlayer(this.id,"Full health");
 		}
 	}
 	fire(){
@@ -883,7 +884,7 @@ class Weapon {
 		this.equipMessage = "No equip message set";
 	}
 	equip(){
-		utils.toastPlayer(this.owner,this.equipMessage);
+		messenger.toastPlayer(this.owner,this.equipMessage);
 	}
 	resetCoolDown(){
 		this.nextFire = 0;
@@ -899,11 +900,11 @@ class Weapon {
 	}
 	upgrade(){
 		if(this.level < this.maxLevel){
-			utils.toastPlayer(this.owner,this.upgradeMessage);
+			messenger.toastPlayer(this.owner,this.upgradeMessage);
 			this.level++;
 			return;
 		} 
-		utils.toastPlayer(this.owner,this.maxLevelMessage);
+		messenger.toastPlayer(this.owner,this.maxLevelMessage);
 	}
 	drop(x,y){
 		return new this.item(x,y);
@@ -1032,7 +1033,7 @@ class Shield extends Circle{
 		if(this.level < this.maxLevel){
 			this.health += this.restoreAmount;
 			this.checkLevel();
-			utils.toastPlayer(this.owner,this.upgradeMessage);
+			messenger.toastPlayer(this.owner,this.upgradeMessage);
 			return;
 		}
 		if(this.health < this.maxHealth){
@@ -1042,7 +1043,7 @@ class Shield extends Circle{
 				this.health = this.maxHealth;
 			}
 		}
-		utils.toastPlayer(this.owner,this.maxLevelMessage);
+		messenger.toastPlayer(this.owner,this.maxLevelMessage);
 	}
 	checkLevel(){
 		if(this.health >= 1 && this.health <= c.shield1Protection){
@@ -1061,7 +1062,7 @@ class Shield extends Circle{
 		}
 	}
 	equip(){
-		utils.toastPlayer(this.owner,this.equipMessage);
+		messenger.toastPlayer(this.owner,this.equipMessage);
 	}
 }
 

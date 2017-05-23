@@ -10,6 +10,8 @@ var io = require('socket.io').listen(server);
 
 var factory = require('./server/factory.js');
 var utils = require('./server/utils.js');
+var messenger = require('./server/messenger.js');
+var hostess = require('./server/hostess.js');
 var database = require('./server/database.js');
 var c = require('./server/config.json');
 
@@ -23,14 +25,9 @@ var serverSleeping = true,
 	serverUpdates = null,
 	result = [];
 
-//Room settings
-var roomList = {},
-	maxPlayersInRoom = c.maxPlayersInRoom,
-	roomKickTimeout = c.roomKickTimeout;
-
 //Base Server Functions
 server.listen(c.port,c.host, function(){
-	utils.build(io);
+	messenger.build(io);
 	
     console.log('listening on '+c.host+':'+c.port);
 });
@@ -43,7 +40,7 @@ process.on( 'SIGINT', function() {
 
 io.on('connection', function(client){
 	client.emit("welcome",client.id);
-	utils.addMailBox(client.id,client);
+	messenger.addMailBox(client.id,client);
 
 	client.on('register',function(creds){
 		logToFile('/logs/reg_attempts.txt',creds.username + " : " + client.handshake.address + '\n');
@@ -57,90 +54,20 @@ io.on('connection', function(client){
 		checkAuth(creds);
 	});
 
-	client.on('enterLobby', function(message){
-
-		//Find a room with space
-		var roomSig = findARoom(client.id);
-		var room = roomList[roomSig];
-		room.join(client.id);
-		console.log(message.name + " joined Room"+roomSig);
-
-		//Add this player to the list of current clients in the room
-		room.clientList[client.id] = message.name; 
-
-		//Spawn a ship for the new player
-		room.shipList[client.id] = room.world.spawnNewShip(client.id,message.color);
-
-		//Send the current gamestate to the new player
-		var gameState = {
-			playerList:room.clientList,
-			shipList:room.shipList,
-			world:room.world
-		};
-		client.emit("gameState" , gameState);
-
-		//Update all existing players with the new player's info
-		var appendPlayerList = {
-			name:message.name,
-			id:client.id,
-			ship:room.shipList[client.id]
-		};
-		client.broadcast.to(roomSig).emit("playerJoin",appendPlayerList);
-	});
-
-	client.on('playerLeaveRoom',function(){
-		kickFromRoom(client.id);
-	});
-
 	client.on('disconnect', function() {
 		if(database.findAuthedUser(client.id) != null){
 			database.removeAuthedUser(client.id);
 		}
-		kickFromRoom(client.id);
+		hostess.kickFromRoom(client.id);
 		//This is removing connection to the client, make sure this is the final thing we do for that client
-		utils.removeMailBox(client.id);
+		messenger.removeMailBox(client.id);
 
-		if(getActiveRoomCount() == 0){
+		if(hostess.getRoomCount() == 0){
 			serverSleeping = true;
 			clearInterval(serverUpdates);
 			console.log("Server sleeping..");
 		}
   	});
-
-  	client.on('signout',function(){
-  		database.removeAuthedUser(client.id);
-  		client.emit('successfulSignout');
-  	});
-
-	client.on('movement',function(packet){
-		var room = locateMyRoom(client.id);
-		if(room == undefined){
-			return;
-		}
-		var ship = room.shipList[client.id];
-		if(ship != null){
-			ship.moveForward = packet.moveForward;
-			ship.moveBackward = packet.moveBackward;
-			ship.turnLeft = packet.turnLeft;
-			ship.turnRight = packet.turnRight;
-		}
-	});
-
-	client.on('mousemove',function(loc){
-		var room = locateMyRoom(client.id);
-		if(room == undefined){
-			return;
-		}
-		var ship = room.shipList[client.id];
-		if(ship != null && ship != undefined){
-			ship.angle = (180/Math.PI)*Math.atan2(loc.y-ship.y,loc.x-ship.x)-90;
-		}
-	});
-
-	client.on('click',function(loc){
-		//if bullet should be spawned (could be clicking something else)
-		fireWeapon(client.id);
-	});
 
 	if(serverSleeping){
 		serverSleeping = false;
@@ -149,110 +76,27 @@ io.on('connection', function(client){
 	}
 });
 
-function locateMyRoom(id){
-	var room;
-	for(var sig in roomList){
-		if(roomList[sig].checkRoom(id)){
-			room = roomList[sig];
-		}
-	}
-	return room;
-}
-
-function getActiveRoomCount(){
-	var activeRooms = 0;
-	for(var sig2 in roomList){
-		activeRooms++;
-	}
-	return activeRooms;
-}
-
-function findARoom(clientID){
-	if(getRoomCount() == 0){
-		var sig = generateRoomSig();
-		roomList[sig] = factory.getRoom(sig,maxPlayersInRoom);
-		return sig;
-	}
-	for(var sig2 in roomList){
-		if(roomList[sig2].hasSpace()){
-			return sig2;
-		}
-	}
-	var sig3 = generateRoomSig();
-	roomList[sig3] = factory.getRoom(sig3,maxPlayersInRoom);
-	return sig3;
-}
-
-function kickFromRoom(clientID){
-	var room = locateMyRoom(clientID);
-	if(room != undefined){
-		room.leave(clientID);
-	}
-}
-
-function getRoomCount(){
-	var count = 0;
-	for(var sig in roomList){
-		count++;
-	}
-	return count;
-}
-
-function reclaimRoom(sig){
-	var room = roomList[sig];
-	for(var clientID in room.clientList){
-		room.leave(clientID);
-	}
-	if(room.clientCount == 0){
-		delete roomList[sig];
-	}
-}
 
 //Gamestate updates
 function update(){
 	if(!serverSleeping){
-		for(var sig in roomList){
-			var room = roomList[sig];
-			if(!room.game.gameEnded){
-				room.update();
-			} else if(room.alive){
-				room.alive = false;
-				io.to(room.sig).emit("gameOver",room.game.winner);
-				setTimeout(reclaimRoom,roomKickTimeout*1000,room.sig);	
-			}
-		}
+		hostess.updateRooms();
 	}
-}
-
-function fireWeapon(id){
-	var room = locateMyRoom(id);
-	if(room == undefined){
-		return;
-	}
-	var ship = room.shipList[id];
-	room.game.gameBoard.fireWeapon(ship);
-}
-function generateRoomSig(){
-	var sig = getRandomInt(0,99999);
-	if(roomList[sig] == null || roomList[sig] == undefined){
-		return sig;
-	}
-	sig = generateRoomSig();
 }
 
 function checkAuth(creds){
 	if(invalid(creds.username,creds.password)){
-		utils.messageUser(creds.id,"unsuccessfulAuth",{reason:"Invalid attempt"});
+		messenger.messageUser(creds.id,"unsuccessfulAuth",{reason:"Invalid attempt"});
 		return;
 	}
 	database.lookupUser(authCallback,creds);
 }
 function authCallback(result,params){
 	if(result == undefined){
-		utils.messageUser(params.id,'unsuccessfulAuth',{reason:"Player not found"});
+		messenger.messageUser(params.id,'unsuccessfulAuth',{reason:"Player not found"});
 		return;
 	}
-	utils.messageUser(params.id,'successfulAuth',result[0]);
+	messenger.messageUser(params.id,'successfulAuth',result[0]);
 }
 
 function invalid(user,pass){
@@ -276,27 +120,27 @@ function simpleChecks(creds){
 	var gameName = creds.gamename;
 
 	if(user == null || user == ""){
-		utils.messageUser(creds.id,'unsuccessfulReg',{reason:"User is empty"});
+		messenger.messageUser(creds.id,'unsuccessfulReg',{reason:"User is empty"});
         return true;
     }
     if(userRegex.test(user) == false){
-        utils.messageUser(creds.id,'unsuccessfulReg',{reason:"User is invalid"});
+        messenger.messageUser(creds.id,'unsuccessfulReg',{reason:"User is invalid"});
         return true;
     }
     if(pass == null || pass == ""){
-        utils.messageUser(creds.id,'unsuccessfulReg',{reason:"Password is empty"});
+        messenger.messageUser(creds.id,'unsuccessfulReg',{reason:"Password is empty"});
         return true;
     }
     if(passRegex.test(pass) == false){
-        utils.messageUser(creds.id,'unsuccessfulReg',{reason:"Password is invalid"});
+        messenger.messageUser(creds.id,'unsuccessfulReg',{reason:"Password is invalid"});
         return true;
     }
     if(gameName == null || gameName == ""){
-        utils.messageUser(creds.id,'unsuccessfulReg',{reason:"Callsign is empty"});
+        messenger.messageUser(creds.id,'unsuccessfulReg',{reason:"Callsign is empty"});
         return true;
     }
     if(gameNameRegex.test(gameName) == false){
-        utils.messageUser(creds.id,'unsuccessfulReg',{reason:"Callsign is invalid"});
+        messenger.messageUser(creds.id,'unsuccessfulReg',{reason:"Callsign is invalid"});
         return true;
     }
     return false;
@@ -311,19 +155,13 @@ function checkReg(creds){
 
 function regCallback(result,params){
 	if(result.insertId == undefined){
-		utils.messageUser(params.id,'unsuccessfulReg',{reason:"Failed to register"});
+		messenger.messageUser(params.id,'unsuccessfulReg',{reason:"Failed to register"});
 		return;
 	}
 	database.addAuthedUser(params.id,result.insertId);
-	utils.messageUser(params.id,'successfulReg',params.player);
+	messenger.messageUser(params.id,'successfulReg',params.player);
 }
 
 function logToFile(fileLoc,content){
 	fs.appendFile(__dirname + fileLoc, content);
-}
-
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min;
 }
