@@ -76,7 +76,6 @@ io.on('connection', function(client){
 	}
 });
 
-
 //Gamestate updates
 function update(){
 	if(!serverSleeping){

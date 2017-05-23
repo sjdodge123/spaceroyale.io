@@ -38,21 +38,13 @@ exports.toastPlayer = function(id,message){
 	mailBoxList[id].emit("toast",message);
 }
 exports.messageUser = function(id,header,payload){
-	mailBoxList[id].emit(header,payload);
+	messageUser(id,header,payload);
 }
-
 exports.messageRoomBySig = function(sig,header,payload){
-	io.to(sig).emit(header,payload);
+	messageRoomBySig(sig,header,payload);
 }
-
 exports.messageRoomByUserID = function(id,header,payload){
-	io.to(roomMailList[id]).emit(header,message);
-}
-exports.sendEventMessageToPlayer = function(id,message){
-	mailBoxList[id].emit("eventMessage",message);
-}
-exports.sendEventMessageToRoom = function(id,message){
-	io.to(roomMailList[id]).emit("eventMessage",message);
+	messageRoomByUserID(id,header,payload);
 }
 
 function checkForMail(client){
@@ -131,6 +123,15 @@ function checkForMail(client){
 	});
 }
 
+function messageUser(id,header,payload){
+	mailBoxList[id].emit(header,payload);
+}
+function messageRoomBySig(sig,header,payload){
+	io.to(sig).emit(header,payload);
+}
+function messageRoomByUserID(id,header,payload){
+	io.to(roomMailList[id]).emit(header,payload);
+}
 function getRoomFromId(clientID){
 	return hostess.getRoomBySig(roomMailList[clientID]);
 }

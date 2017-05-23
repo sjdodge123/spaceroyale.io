@@ -56,7 +56,7 @@ class Room {
 					var murdererName = this.clientList[ship.killedBy];
 					var deadPlayerName = this.clientList[shipID];
 					murderer.killList.push(deadPlayerName);
-					messenger.sendEventMessageToRoom(murderer.id,murdererName + " killed " + deadPlayerName);
+					messenger.messageRoomByUserID(murderer.id,"eventMessage",murdererName + " killed " + deadPlayerName);
 					messenger.toastPlayer(murderer.id,"You killed " + deadPlayerName);
 				}
 				delete this.shipList[shipID];
@@ -664,6 +664,7 @@ class Ship extends Rect{
 		}
 	}
 	fire(){
+		messenger.messageRoomByUserID(this.id,'weaponFired',{ship:this,weapon:this.weapon});
 		return this.weapon.fire(this.x,this.y,this.angle,this.baseColor,this.id);
 	}
 	move(){
@@ -874,6 +875,7 @@ class ShieldItem extends EquipableItem {
 
 class Weapon {
 	constructor(owner){
+		this.name = "Unset";
 		this.owner = owner;
 		this.cooldown = 10;
 		this.level = 1;
@@ -935,6 +937,7 @@ class Pistol extends Weapon{
 class Shotgun extends Weapon{
 	constructor(owner){
 		super(owner);
+		this.name = "Shotgun";
 		this.cooldown = c.shotgunCoolDown;
 		this.equipMessage = "Equiped Shotgun";
 		this.upgradeMessage ="Upgraded Shotgun";
@@ -981,6 +984,7 @@ class Shotgun extends Weapon{
 class Rifle extends Weapon{
 	constructor(owner){
 		super(owner);
+		this.name = "Rifle";
 		this.cooldown = c.rifleCoolDown;
 		this.maxLevel = 1;
 		this.equipMessage = "Equiped Rifle";

@@ -80,6 +80,14 @@ function clientConnect() {
 		console.log("I disconnected");
 	});
 
+	server.on("weaponFired",function(payload){
+		if(camera.inBounds(payload.ship)){
+			if(payload.weapon.name == "Pistol"){
+            	playSound(pistolShot);
+        	}
+		}
+	});
+
 	server.on("shipDeath",function(id){
 		if(id == myID){
 			iAmAlive = false;
