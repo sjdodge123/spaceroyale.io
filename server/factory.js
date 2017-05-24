@@ -20,6 +20,7 @@ class Room {
 		this.bulletList = {};
 		this.itemList = {};
 		this.shipList = {};
+		this.killedShips = {};
 		this.clientCount = 0;
 		this.alive = true;
 		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList,this.planetList,this.itemList);
@@ -32,7 +33,12 @@ class Room {
 	}
 	leave(clientID){
 		console.log(this.clientList[clientID] + ' left Room' + this.sig);
-		database.recordShip(clientID,this.shipList[clientID]);
+		if(this.shipList[clientID] != undefined){
+			database.recordShip(clientID,this.shipList[clientID]);
+		} else{
+			database.recordShip(clientID,this.killedShips[clientID]);
+		}
+		
 		messenger.messageRoomBySig(this.sig,'playerLeft',clientID);
 		var client = messenger.getClient(clientID);
 		client.leave(this.sig);
@@ -59,6 +65,7 @@ class Room {
 					messenger.messageRoomByUserID(murderer.id,"eventMessage",murdererName + " killed " + deadPlayerName);
 					messenger.toastPlayer(murderer.id,"You killed " + deadPlayerName);
 				}
+				this.killedShips[shipID] = this.shipList[shipID];
 				delete this.shipList[shipID];
 				messenger.messageRoomBySig(this.sig,'shipDeath',shipID);
 			}
