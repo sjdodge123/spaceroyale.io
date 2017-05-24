@@ -1,6 +1,7 @@
 var c = require('./config.json');
 var utils = require('./utils.js');
 var hostess = require('./hostess.js');
+var database = require('./database.js');
 
 var mailBoxList = {},
 	roomMailList = {},

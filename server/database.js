@@ -1,6 +1,7 @@
 var mysql = require('mysql');
 var utils = require('./utils.js');
 var messenger = require('./messenger.js');
+var bcrypt = require('bcrypt');
 var c = require('./config.json');
 var authedUsers = {};
 
@@ -38,7 +39,7 @@ exports.recordShip = function(id,ship){
 }
 
 exports.createUser = function(callback,params){
-	var user = {user_name:params.username,password:params.password};
+	var user = {user_name:params.username,password:generateHash(params.password)};
 	var player = {user_id:null,total_exp:0,total_kills:0,total_wins:0,game_name:params.gamename,skin_id:0,total_deaths:0,total_games:0};
 	createConnection();
 	database.connect(function(e){
@@ -88,7 +89,7 @@ exports.lookupUser = function(callback,params){
 				messenger.messageUser(params.id,'unsuccessfulAuth',{reason:"User not found"});
 				return;
 			}
-			if(result[0].password !== params.password){
+			if(!validPassword(params.password,result[0].password)){
 				messenger.messageUser(params.id,'unsuccessfulAuth',{reason:"Password incorrect"});
 				return;
 			}
@@ -137,6 +138,14 @@ function updatePlayer(callback,params){
 			});
 		});
 	});
+}
+
+function generateHash(password){
+	return bcrypt.hashSync(password,bcrypt.genSaltSync(9));
+}
+
+function validPassword(givenPass,dbPass){
+	return bcrypt.compareSync(givenPass,dbPass);
 }
 
 function updatePlayerScreen(result,params){
