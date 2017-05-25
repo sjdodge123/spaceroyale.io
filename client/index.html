@@ -53,6 +53,9 @@
                 <input type="submit"  class="btn btn-primary" id="playButton" value="Play!"></input>           
             </form>
         </div>
+        <a href="#" id="soundControl" class="btn btn-info">
+          <span id="soundIcon" class="glyphicon glyphicon-volume-up"></span>
+        </a>
     </div>
         <form id="signUp" hidden>
             <label>Create an account</label>
@@ -66,6 +69,7 @@
             </div>
             <label id="signUpError" style="color:tomato" hidden></label>
         </form>
+
   </div>
     <canvas id ="gameCanvas" width="800" height="600" hidden></canvas>
 </div>
@@ -76,7 +80,7 @@
     </div>
     <div id ="gameOverBottom">
         <input type="button" class="btn btn-danger" id="gameOverReturn" value="Return to Menu"></input>
-    </div>
+</div>
 
 </div>
 
@@ -528,6 +532,18 @@ window.onload = function() {
                  $('#signUpPass2').val(),
                  $('#signUpGameName').val()
             );
+    });
+
+    $('#soundControl').click(function(){
+        if(gameMuted){ 
+            gameMuted = false;
+            resumeAllSounds();
+            $('#soundIcon').attr('class','glyphicon glyphicon-volume-up');
+            return;
+        }
+        gameMuted = true;
+        stopAllSounds();
+        $('#soundIcon').attr('class','glyphicon glyphicon-volume-off');
     });
 
     //***************************Skin Selection Box*************************************

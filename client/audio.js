@@ -1,4 +1,5 @@
 var gameMuted = false;
+var playingSounds = [];
 var playerJoinSound = new Audio("./sounds/player_join.wav");
 var collision = new Audio("./sounds/collide_with_obj.wav");
 var takeDamage = new Audio("./sounds/take_damage.wav");
@@ -18,10 +19,10 @@ shipInitThrust.volume = .3 * masterVolume;
 shipThrust.volume = .4 * masterVolume;
 backgroundMusic.volume = .1 * masterVolume;
 gameStartMusic.volume = .1 *masterVolume;
-
 shipThrust.loop = true;
 
 function playSound (sound) {
+	playingSounds.push(sound);
 	if(!gameMuted){
 		if(sound.currentTime > 0){
 			sound.currentTime = 0;
@@ -31,11 +32,27 @@ function playSound (sound) {
 }
 
 function stopSound(sound){
+	var index = playingSounds.indexOf(sound);
+	if(index != -1){
+		playingSounds.splice(index,1);
+	}
 	if(!gameMuted){
 		sound.pause();
 		if(sound.currentTime > 0){
 			sound.currentTime = 0;
 		}
+	}
+}
+
+function stopAllSounds(){
+	for(var i=0;i<playingSounds.length;i++){
+		playingSounds[i].pause();
+	}
+}
+
+function resumeAllSounds(){
+	for(var i=0;i<playingSounds.length;i++){
+		playingSounds[i].play();
 	}
 }
 

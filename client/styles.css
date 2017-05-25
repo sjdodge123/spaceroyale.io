@@ -249,4 +249,11 @@ form label {
     pointer-events: all;
     opacity: 1;
 }
+#soundControl{
+	position: absolute;
+	margin-left: -50px;
+	margin-top: -50px;
+	left: 100%;
+	top :100%;
+}
 
