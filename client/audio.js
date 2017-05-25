@@ -20,8 +20,6 @@ backgroundMusic.volume = .1 * masterVolume;
 gameStartMusic.volume = .1 *masterVolume;
 
 shipThrust.loop = true;
-backgroundMusic.loop = true;
-gameStartMusic.loop = true;
 
 function playSound (sound) {
 	if(!gameMuted){
@@ -34,7 +32,7 @@ function playSound (sound) {
 
 function stopSound(sound){
 	if(!gameMuted){
-		sound.pause;
+		sound.pause();
 		if(sound.currentTime > 0){
 			sound.currentTime = 0;
 		}
