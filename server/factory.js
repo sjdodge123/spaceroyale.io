@@ -4,6 +4,7 @@ var c = require('./config.json');
 var utils = require('./utils.js');
 var messenger = require('./messenger.js');
 var database = require('./database.js');
+var engine = require('./engine.js');
 
 exports.getRoom = function(sig,size){
 	return new Room(sig,size);
@@ -38,7 +39,7 @@ class Room {
 		} else{
 			database.recordShip(clientID,this.killedShips[clientID]);
 		}
-		
+
 		messenger.messageRoomBySig(this.sig,'playerLeft',clientID);
 		var client = messenger.getClient(clientID);
 		client.leave(this.sig);
@@ -46,8 +47,8 @@ class Room {
 		delete this.clientList[clientID];
 		delete this.shipList[clientID];
 		this.clientCount--;
-	} 
-	update(){	
+	}
+	update(){
 		this.game.update();
 		this.checkForDeaths();
 		this.sendUpdates();
@@ -121,7 +122,7 @@ class Game {
 		this.minPlayers = c.minPlayers;
 		this.lobbyWaitTime = c.lobbyWaitTime;
 		this.timeUntilShrink = c.baseTimeUntilShrink;
-		
+
 		this.shrinkingDurationSpeedup = c.shrinkingDurationSpeedup;
 		this.timeUntilShrinkSpeedup = c.timeUntilShrinkSpeedup;
 
@@ -249,7 +250,6 @@ class GameBoard {
 		this.asteroidList = asteroidList;
 		this.planetList = planetList;
 		this.itemList = itemList;
-		this.collisionEngine = new CollisionEngine();
 	}
 	update(active){
 		this.checkCollisions(active);
@@ -320,10 +320,9 @@ class GameBoard {
 			for(var sig in this.bulletList){
 				objectArray.push(this.bulletList[sig]);
 			}
-			this.collisionEngine.broadBase(objectArray);
+			engine.broadBase(objectArray);
 		}
 	}
-
 	fireWeapon(ship){
 		var bullets = ship.fire();
 		if(bullets == null){
@@ -627,7 +626,7 @@ class Ship extends Rect{
 			if(this.weapon instanceof Pistol){
 				this.weapon.upgrade();
 				return;
-			}	
+			}
 			this.weapon = new Pistol(this.id);
 			this.weapon.equip();
 		}
@@ -635,7 +634,7 @@ class Ship extends Rect{
 			if(this.weapon instanceof Shotgun){
 				this.weapon.upgrade();
 				return;
-			}	
+			}
 			this.weapon = new Shotgun(this.id);
 			this.weapon.equip();
 		}
@@ -656,9 +655,9 @@ class Ship extends Rect{
 			if(this.shield instanceof Shield){
 				this.shield.upgrade();
 			}
-			
+
 		}
-		
+
 	}
 	heal(amt){
 		if(this.health < this.baseHealth){
@@ -914,7 +913,7 @@ class Weapon {
 			messenger.toastPlayer(this.owner,this.upgradeMessage);
 			this.level++;
 			return;
-		} 
+		}
 		messenger.toastPlayer(this.owner,this.maxLevelMessage);
 	}
 	drop(x,y){
@@ -1137,35 +1136,7 @@ class RifleBullet extends Bullet{
 }
 
 
-class CollisionEngine {
-	constructor(){
 
-	}
-	broadBase(objectArray){
-		for (var i = 0; i < objectArray.length; i++) {
-    		for (var j = 0; j < objectArray.length; j++) {
-	    		if(objectArray[i] == objectArray[j]){
-	    			continue;
-	    		}
-	    		var obj1 = objectArray[i],
-	    			obj2 = objectArray[j];
-
-	    		if(this.checkDistance(obj1,obj2)){
-    				obj1.handleHit(obj2);
-    				obj2.handleHit(obj1);
-	    		}
-    		}
-    	}
-	}
-
-	checkDistance(obj1,obj2){
-		var distance = Math.sqrt(Math.pow((obj2.x - obj1.x),2) + Math.pow((obj2.y - obj1.y),2));
-		if( (distance <= obj1.radius || distance <= obj1.width) || (distance <= obj2.radius || distance <= obj2.width) ){
-			return true;
-		}
-		return false;
-	}
-}
 
 class Timer {
 	constructor(callback,delay){
