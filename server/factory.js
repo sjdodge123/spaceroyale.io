@@ -23,7 +23,7 @@ class Room {
 		this.killedShips = {};
 		this.clientCount = 0;
 		this.alive = true;
-		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList,this.planetList,this.itemList);
+		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList,this.planetList,this.itemList,this.sig);
 	}
 	join(clientID){
 		var client = messenger.getClient(clientID);
@@ -107,7 +107,7 @@ class Room {
 }
 
 class Game {
-	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList){
+	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,roomSig){
 		this.world = world;
 		this.clientList = clientList;
 		this.bulletList = bulletList;
@@ -115,6 +115,7 @@ class Game {
 		this.planetList = planetList;
 		this.asteroidList = asteroidList;
 		this.itemList = itemList;
+		this.roomSig = roomSig;
 
 		//Gamerules
 		this.minPlayers = c.minPlayers;
@@ -143,6 +144,7 @@ class Game {
 	}
 
 	start(){
+		messenger.messageRoomBySig(this.roomSig,'gameStart',null);
 		this.gameBoard.clean();
 		this.active = true;
 		this.world.resize();

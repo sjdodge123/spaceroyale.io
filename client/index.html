@@ -2,6 +2,12 @@
 <script src='socket.io/socket.io.js'></script>
 
 <div id="main">
+    <img id="bgImg" src="img/background.jpg" style="width:100%;height:100%;position:absolute"></img>
+    <form id="signIn" class="collapse">
+            <input type="text" id="signInUser" placeholder="Username"></input>
+            <input type="password" id="signInPass" placeholder="Password"></input>
+            <input type="button" class="btn btn-success" id="signInSubmit" value="Submit"></input>
+    </form>
     <div id="centerContainer">
         <button class="btn btn-info" data-toggle="collapse" id="signInButton" data-target="#signIn">Sign in</button>
         <button class="btn btn-warning" id="signUpButton">Sign up</button>
@@ -48,11 +54,6 @@
             </form>
         </div>
     </div>
-        <form id="signIn" class="collapse">
-            <input type="text" id="signInUser" placeholder="Username"></input>
-            <input type="password" id="signInPass" placeholder="Password"></input>
-            <input type="button" class="btn btn-success" id="signInSubmit" value="Submit"></input>
-        </form>
         <form id="signUp" hidden>
             <label>Create an account</label>
             <input type="text" id="signUpUser" placeholder="Username"></input>
@@ -298,7 +299,7 @@ function resetGameVariables(){
     canvasContext = canvas.getContext('2d');
 }
 
-function startGame(name,color){
+function enterLobby(name,color){
     $('#gameCanvas').show();
     clientSendStart(name,color);
     gameRunning = true;
@@ -328,7 +329,6 @@ function init(){
 function resize(){
     canvasContext.canvas.width  = window.innerWidth;
     canvasContext.canvas.height = window.innerHeight;
-
     camera = {
         x : canvas.width/2,
         y : canvas.height/2,
@@ -511,7 +511,7 @@ window.onload = function() {
         } else{
             name = profile.game_name;
         }
-        startGame(name,$('#secondSkin').attr('data-selected'));
+        enterLobby(name,$('#secondSkin').attr('data-selected'));
         return false;
     });
 
@@ -591,6 +591,7 @@ window.onload = function() {
             );
         }
     });
+    playSound(backgroundMusic);
 }
 </script>
 </html>

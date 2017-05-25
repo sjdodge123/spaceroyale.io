@@ -22,7 +22,6 @@ html *{
 }
 
 #centerContainer{
-	background: black;
 	position: absolute;
 	left: 15%;
 	top:15%;
@@ -72,6 +71,7 @@ html *{
 }
 
 #bannerBox{
+	opacity: 1;
 	color:white;
 	top: 10%;
 	height: 30%;
@@ -189,6 +189,9 @@ form label {
 	float: right;
 }
 #signIn{
+	position: absolute;
+	left: 50%;
+	margin-left: -27.5%;
 	color:black;
 	overflow: none;
 }

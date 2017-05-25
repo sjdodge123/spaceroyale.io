@@ -88,6 +88,11 @@ function clientConnect() {
 		}
 	});
 
+	server.on("gameStart",function(){
+		stopSound(backgroundMusic);
+    	playSound(gameStartMusic);
+	});
+
 	server.on("shipDeath",function(id){
 		if(id == myID){
 			iAmAlive = false;

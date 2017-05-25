@@ -1,6 +1,9 @@
+var background = new Image();
+background.src = 'img/background.jpg';
 function drawBackground() {
-	canvasContext.fillStyle = 'black';
-	canvasContext.fillRect(0,0,canvas.width,canvas.height);
+	canvasContext.drawImage(background,world.x-myShip.x,world.y-myShip.y,world.width+canvas.width,world.height+canvas.height);
+	//canvasContext.fillStyle = 'black';
+	//canvasContext.fillRect(0,0,);
 }
 
 function drawFlashScreen(){
