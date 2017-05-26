@@ -7,5 +7,5 @@ exports.getRandomInt = function(min,max){
 };
 
 exports.logToFile = function(fileLoc,content){
-	fs.appendFile(__dirname + fileLoc, content);
+	fs.appendFile(__dirname + fileLoc,new Date() + " : " + content + "\r\n");
 }

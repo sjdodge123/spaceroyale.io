@@ -7,11 +7,10 @@ var passRegex = new RegExp('^[a-zA-Z0-9_-]{6,20}$');
 var gameNameRegex = new RegExp('^[a-zA-Z0-9_-]{3,10}$');
 
 exports.checkAuth = function(creds){
-	utils.logToFile('logs\\auth_attempts.txt',creds.username + " : " + creds.address + '\n');
 	checkAuth(creds);
 }
 exports.checkReg = function(creds){
-	utils.logToFile('logs\\reg_attempts.txt',creds.username + " : " + creds.address + '\n');
+	utils.logToFile('logs\\reg_attempts.txt',creds.username + "(" + creds.address + ")");
 	checkReg(creds);
 }
 

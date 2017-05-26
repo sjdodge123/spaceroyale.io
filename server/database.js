@@ -86,10 +86,12 @@ exports.lookupUser = function(callback,params){
 				throw e;
 			}
 			if(result.length == 0){
+				utils.logToFile('logs\\auth_attempts.txt',"USERNAME_ERROR (" + params.address + ") " + params.username);
 				messenger.messageUser(params.id,'unsuccessfulAuth',{reason:"User not found"});
 				return;
 			}
 			if(!validPassword(params.password,result[0].password)){
+				utils.logToFile('logs\\auth_attempts.txt',"PASSWORD_ERROR (" + params.address + ") " +params.username);
 				messenger.messageUser(params.id,'unsuccessfulAuth',{reason:"Password incorrect"});
 				return;
 			}

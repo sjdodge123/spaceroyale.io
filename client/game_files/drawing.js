@@ -1,25 +1,31 @@
 var background = new Image();
 background.src = 'img/background.jpg';
 function drawBackground() {
+	canvasContext.save();
 	canvasContext.drawImage(background,world.x-myShip.x,world.y-myShip.y,world.width+canvas.width,world.height+canvas.height);
-	//canvasContext.fillStyle = 'black';
-	//canvasContext.fillRect(0,0,);
+	canvasContext.restore();
 }
 
 function drawFlashScreen(){
+	canvasContext.save();
 	canvasContext.fillStyle = 'red';
 	canvasContext.fillRect(0,0,canvas.width,canvas.height);
+	canvasContext.restore();
 }
 
 function drawText(text,x,y){
+	canvasContext.save();
 	canvasContext.fillStyle = 'white';
 	canvasContext.font="20px Georgia";
 	canvasContext.fillText(text,x,y);
+	canvasContext.restore();
 }
 function drawTextF(text,x,y,color,font){
+	canvasContext.save();
 	canvasContext.fillStyle = color;
 	canvasContext.font=font;
 	canvasContext.fillText(text,x,y);
+	canvasContext.restore();
 }
 
 //DRAWING HUD UI
@@ -72,7 +78,7 @@ function drawTotalPlayers(){
 }
 
 function drawBoundArrow(){
-  var rad = canvas.height/2 * 0.95;
+  	var rad = canvas.height/2 * 0.95;
 	var angle = Math.atan2(world.whiteBound.y-myShip.y,world.whiteBound.x-myShip.x) + Math.PI/2;
 	var x = canvas.width/2 + rad * Math.cos(angle - Math.PI/2);
 	var y = canvas.height/2 + rad * Math.sin(angle - Math.PI/2);
@@ -150,35 +156,41 @@ function drawShip(ship){
 	canvasContext.restore();
 }
 function drawShield(ship){
+	canvasContext.save();
 	canvasContext.beginPath();
 	canvasContext.strokeStyle = ship.shield.color;
 	canvasContext.arc(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset,ship.shield.radius,0,Math.PI*2,true);
 	canvasContext.stroke();
+	canvasContext.restore();
 }
 
 function drawAsteroid(asteroid){
+	canvasContext.save();
 	canvasContext.beginPath();
 	canvasContext.fillStyle = asteroid.color;
 	canvasContext.arc(asteroid.x-myShip.x+camera.xOffset,asteroid.y-myShip.y+camera.yOffset,asteroid.radius,0,Math.PI*2,true);
 	canvasContext.fill();
+	canvasContext.restore();
 }
 
 function drawItem(item){
+	canvasContext.save();
 	canvasContext.fillStyle = item.color;
 	canvasContext.fillRect(item.x-myShip.x+camera.xOffset,item.y-myShip.y+camera.yOffset,item.width,item.height);
 	canvasContext.strokeStyle = "white";
-	var temp = canvasContext.lineWidth;
-	canvasContext.lineWidth=0.5;
-	canvasContext.lineWidth = temp;
+	canvasContext.lineWidth=2;
     canvasContext.rect(item.x-myShip.x+camera.xOffset,item.y-myShip.y+camera.yOffset,item.width,item.height);
     canvasContext.stroke();
+    canvasContext.restore();
 }
 
 function drawPlanet(planet){
+	canvasContext.save();
 	canvasContext.beginPath();
 	canvasContext.fillStyle = planet.color;
 	canvasContext.arc(planet.x-myShip.x+camera.xOffset,planet.y-myShip.y+camera.yOffset,planet.radius,0,Math.PI*2,true);
 	canvasContext.fill();
+	canvasContext.restore();
 }
 
 function drawBullet(bullet){
@@ -192,30 +204,34 @@ function drawBullet(bullet){
 
 function drawWorld(){
 	if(world != null){
+		canvasContext.save();
 		canvasContext.beginPath();
         canvasContext.strokeStyle = world.color;
         canvasContext.rect(world.x-myShip.x+camera.xOffset,world.y-myShip.y+camera.yOffset,world.width,world.height);
         canvasContext.stroke();
+        canvasContext.restore();
 	}
 }
 
 function drawBounds(){
-	var temp = canvasContext.lineWidth;
 	if(world.whiteBound != null){
+		canvasContext.save();
 		canvasContext.beginPath();
 		canvasContext.lineWidth = 3;
 		canvasContext.strokeStyle = world.whiteBound.color;
 		canvasContext.arc(world.whiteBound.x-myShip.x+camera.xOffset,world.whiteBound.y-myShip.y+camera.yOffset,world.whiteBound.radius,0,Math.PI*2,true);
 		canvasContext.stroke();
+		canvasContext.restore();
 	}
 	if(world.blueBound != null){
+		canvasContext.save();
 		canvasContext.beginPath();
 		canvasContext.lineWidth = 3;
 		canvasContext.strokeStyle = world.blueBound.color;
 		canvasContext.arc(world.blueBound.x-myShip.x+camera.xOffset,world.blueBound.y-myShip.y+camera.yOffset,world.blueBound.radius,0,Math.PI*2,true);
 		canvasContext.stroke();
+		canvasContext.restore();
 	}
-	canvasContext.lineWidth = temp;
 }
 
 
