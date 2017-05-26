@@ -50,7 +50,7 @@
                     <div id="rightArrow"><img src="img/landingpage/Color_Selector_Arrow_right.png"></img></div>
                 </div>
                 <input type="text" id="nameBox"></input>
-                <input type="submit"  class="btn btn-primary" id="playButton" value="Play!"></input>           
+                <input type="submit"  class="btn btn-primary" id="playButton" value="Play!"></input>
             </form>
         </div>
         <a href="#" id="soundControl" class="btn btn-info">
@@ -62,7 +62,7 @@
             <input type="text" id="signUpUser" placeholder="Username"></input>
             <input type="password" id="signUpPass1" placeholder="Password"></input>
             <input type="password" id="signUpPass2" placeholder="Retype Password"></input>
-            <input type="text" id="signUpGameName" placeholder="Callsign">          </input>          
+            <input type="text" id="signUpGameName" placeholder="Callsign">          </input>
             <div ="signUpButtons">
                 <input type="button" class="btn btn-success" id="signUpSubmit" value="Submit"></input>
                 <input type="button" class="btn btn-danger" id="signUpCancel" value="Cancel"></input>
@@ -341,7 +341,7 @@ function resize(){
         width : canvas.width,
         height : canvas.height,
         color : 'yellow',
-        padding: -150,
+        padding: -10,
         left: 0,
         right:0,
         top:0,
@@ -400,7 +400,7 @@ function resize(){
             }
             this.printList.push(eventmsg);
         }
-       
+
     }
 }
 
@@ -457,7 +457,7 @@ function calcMousePos(evt){
 function handleClick(evt){
     evt.preventDefault();
     if(iAmAlive){
-       server.emit("click",{x:mouseX,y:mouseY}); 
+       server.emit("click",{x:mouseX,y:mouseY});
     }
 }
 
@@ -535,7 +535,7 @@ window.onload = function() {
     });
 
     $('#soundControl').click(function(){
-        if(gameMuted){ 
+        if(gameMuted){
             gameMuted = false;
             resumeAllSounds();
             $('#soundIcon').attr('class','glyphicon glyphicon-volume-up');
@@ -567,7 +567,7 @@ window.onload = function() {
         skinArray.push(firstElement);
         $("#firstSkin").attr('src',skinArray[0].image).attr('data-selected',skinArray[0].value);
         $("#secondSkin").attr('src',skinArray[1].image).attr('data-selected',skinArray[1].value);
-        $("#thirdSkin").attr('src',skinArray[2].image).attr('data-selected',skinArray[2].value);    
+        $("#thirdSkin").attr('src',skinArray[2].image).attr('data-selected',skinArray[2].value);
     });
     //*******************************************************************************************
 

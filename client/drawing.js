@@ -30,17 +30,17 @@ function drawHUD(){
     drawToast();
     drawTotalPlayers();
     drawEventLog();
-    /*
+
     if(!camera.inBounds(world.whiteBound)){
 		drawBoundArrow();
-	}
-	*/
+		}
+
     if(gameStarted){
     	drawShrinkTimer();
     } else{
     	drawLobbyTimer();
     }
-    
+
 }
 
 function drawAliveCounter(){
@@ -72,18 +72,20 @@ function drawTotalPlayers(){
 }
 
 function drawBoundArrow(){
-	var x = canvas.width/2;
-	var y = 40;
-	var angle = (180/Math.PI)*Math.atan2(world.whiteBound.y-myShip.x+camera.xOffset,world.whiteBound.x-myShip.y+camera.yOffset)-90;
+  var rad = canvas.height/2 * 0.95;
+	var angle = Math.atan2(world.whiteBound.y-myShip.y,world.whiteBound.x-myShip.x) + Math.PI/2;
+	var x = canvas.width/2 + rad * Math.cos(angle - Math.PI/2);
+	var y = canvas.height/2 + rad * Math.sin(angle - Math.PI/2);
+
 	canvasContext.save();
-	canvasContext.translate(x,y);
+	canvasContext.translate(x, y);
 	canvasContext.rotate(angle);
 	canvasContext.strokeStyle = myShip.color;
 	canvasContext.beginPath();
 	canvasContext.lineWidth = 5;
-	canvasContext.moveTo(0,23);
-	canvasContext.lineTo(20,3);
-	canvasContext.lineTo(40,23);
+	canvasContext.moveTo(-20,23);
+	canvasContext.lineTo(0,3);
+	canvasContext.lineTo(20,23);
 	canvasContext.stroke();
 	canvasContext.restore();
 }
@@ -130,7 +132,7 @@ function drawRelativeObjects(){
 	drawBullets();
 	drawPlanets();
 	drawWorld();
-	drawBounds();	
+	drawBounds();
 }
 function drawShip(ship){
 	canvasContext.save();
