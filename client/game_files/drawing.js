@@ -33,7 +33,7 @@ function drawHUD(){
 
     if(!camera.inBounds(world.whiteBound)){
 		drawBoundArrow();
-		}
+	}
 
     if(gameStarted){
     	drawShrinkTimer();
@@ -135,6 +135,9 @@ function drawRelativeObjects(){
 	drawBounds();
 }
 function drawShip(ship){
+	if(ship.shield != null && ship.shield.alive){
+		drawShield(ship);
+	}
 	canvasContext.save();
 	canvasContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
 	canvasContext.rotate(ship.angle*Math.PI/180);
@@ -218,15 +221,16 @@ function drawBounds(){
 
 function drawShips(){
 	for(var shipKey in shipList){
-		if(shipList[shipKey] == null){
+		var ship = shipList[shipKey];
+		if(ship == null){
 			continue;
 		}
-		var ship = shipList[shipKey];
+		if(shipKey == myID){
+			drawShip(ship);
+			continue;
+		}
 		if(camera.inBounds(ship)){
 			drawShip(ship);
-			if(ship.shield != null && ship.shield.alive){
-				drawShield(ship);
-			}
 		}
 	}
 }
