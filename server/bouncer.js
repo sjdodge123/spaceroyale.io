@@ -10,7 +10,7 @@ exports.checkAuth = function(creds){
 	checkAuth(creds);
 }
 exports.checkReg = function(creds){
-	utils.logToFile('logs\\reg_attempts.txt',creds.username + "(" + creds.address + ")");
+	utils.logToFile('logs/reg_attempts.txt',creds.username + "(" + creds.address + ")");
 	checkReg(creds);
 }
 

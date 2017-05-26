@@ -40,7 +40,7 @@ process.on( 'SIGINT', function() {
 
 io.on('connection', function(client){
 	checkForWake();
-	utils.logToFile('logs\\connections.txt',client.handshake.address + ' connected');
+	utils.logToFile('logs/connections.txt',client.handshake.address + ' connected');
 	clientCount++;
 	messenger.addMailBox(client.id,client);
 	client.on('disconnect', function() {
@@ -51,7 +51,7 @@ io.on('connection', function(client){
 		//This is removing connection to the client, make sure this is the final thing we do for that client
 		messenger.removeMailBox(client.id);
 		clientCount--;
-		utils.logToFile('logs\\connections.txt',client.handshake.address + ' disconnected');
+		utils.logToFile('logs/connections.txt',client.handshake.address + ' disconnected');
 		checkForSleep();
   	});
 
@@ -68,7 +68,7 @@ function update(){
 function checkForWake(){
 	if(serverSleeping){
 		serverSleeping = false;
-		utils.logToFile('logs\\connections.txt',"Server wakeup");
+		utils.logToFile('logs/connections.txt',"Server wakeup");
 		serverUpdates = setInterval(update,serverTickSpeed);
 	}
 }
@@ -78,7 +78,7 @@ function checkForSleep(){
 	if(clientCount == 0){
 		serverSleeping = true;
 		clearInterval(serverUpdates);
-		utils.logToFile('logs\\connections.txt',"Server sleep");
+		utils.logToFile('logs/connections.txt',"Server sleep");
 	}
 }
 
