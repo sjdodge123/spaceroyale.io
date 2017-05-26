@@ -615,6 +615,8 @@ class Ship extends Rect{
 		this.weapon = new Pistol(this.id);
 		this.weapon.level = 3;
 		this.shield = null;
+		this.lastX = 0;
+		this.lastY = 0;
 	}
 	update(){
 		this.checkHP();
@@ -677,19 +679,27 @@ class Ship extends Rect{
 	}
 	move(){
 		if(this.moveForward){
+			this.lastY = this.y;
 			this.y -= this.speed;
 		}
 		if(this.moveBackward){
+			this.lastY = this.y;
 			this.y += this.speed;
 		}
 		if(this.turnLeft){
+			this.lastX = this.x;
 			this.x -= this.speed;
 		}
 		if(this.turnRight){
+			this.lastX = this.x;
 			this.x += this.speed;
 		}
 	}
 	handleHit(object){
+		if(object.isWall){
+			this.x = this.lastX;
+			this.y = this.lastY;
+		}
 		if(object.owner != this.id && object.alive && object.damage != null){
 			if(this.shield != null && this.shield.alive){
 				this.shield.handleHit(object);
@@ -739,6 +749,7 @@ class Asteroid extends Circle{
 	constructor(x,y,radius,sig){
 		super(x,y,radius,"orange");
 		this.sig = sig;
+		this.isWall = true;
 		this.item = null;
 		this.dropRate = c.asteroidDropRate;
 		this.lootTable = c.asteroidLootTable;
@@ -811,6 +822,7 @@ class Asteroid extends Circle{
 class Planet extends Circle {
 	constructor(x,y,radius,sig){
 		super(x,y,radius,"SkyBlue");
+		this.isWall = true;
 		this.sig = sig;
 	}
 	handleHit(object){
