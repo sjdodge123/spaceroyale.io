@@ -1,6 +1,7 @@
 var c = require('./config.json');
 var utils = require('./utils.js');
 var hostess = require('./hostess.js');
+var bouncer = require('./bouncer.js');
 var database = require('./database.js');
 
 var mailBoxList = {},
@@ -49,6 +50,19 @@ exports.messageRoomByUserID = function(id,header,payload){
 }
 
 function checkForMail(client){
+	client.emit("welcome",client.id);
+	
+	client.on('register',function(creds){
+		creds.address = client.handshake.address;
+		creds.id = client.id;
+		bouncer.checkReg(creds);
+	});
+
+	client.on('auth',function(creds){
+		creds.address = client.handshake.address;
+		creds.id = client.id;
+		bouncer.checkAuth(creds);
+	});
 
 	client.on('enterLobby', function(message){
 		//Find a room with space

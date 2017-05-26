@@ -4,5 +4,5 @@ option include "client/"
 option include "server/"
 option include "runServer.js"
 
-synchronize -filemask=|".git/;node_modules/;logs/" remote %curpath% /home/ubuntu/spacepirates.io/
+synchronize -filemask=|".git/;node_modules/;serverlogs/" remote %curpath% /home/ubuntu/spacepirates.io/
 exit
