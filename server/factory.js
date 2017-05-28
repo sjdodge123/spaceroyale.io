@@ -263,9 +263,12 @@ class GameBoard {
 	updateShips(active){
 		for(var shipID in this.shipList){
 			var ship = this.shipList[shipID];
-			//TODO: Check for hit first!!
 			if(active){
 				this.world.checkForMapDamage(ship);
+			}
+			if(ship.droppedItem != null){
+				this.spawnItem(ship.droppedItem);
+				ship.droppedItem = null;
 			}
 			ship.update();
 		}
@@ -624,6 +627,7 @@ class Ship extends Rect{
 		this.acel = 10000;
 		this.velX = 0;
 		this.velY = 0;
+		this.droppedItem = null;
 	}
 	update(){
 		this.checkHP();
@@ -631,30 +635,6 @@ class Ship extends Rect{
 		this.move();
 	}
 	equip(item){
-		if(item instanceof PistolItem){
-			if(this.weapon instanceof Pistol){
-				this.weapon.upgrade();
-				return;
-			}
-			this.weapon = new Pistol(this.id);
-			this.weapon.equip();
-		}
-		if(item instanceof ShotgunItem){
-			if(this.weapon instanceof Shotgun){
-				this.weapon.upgrade();
-				return;
-			}
-			this.weapon = new Shotgun(this.id);
-			this.weapon.equip();
-		}
-		if(item instanceof RifleItem){
-			if(this.weapon instanceof Rifle){
-				this.weapon.upgrade();
-				return;
-			}
-			this.weapon = new Rifle(this.id);
-			this.weapon.equip();
-		}
 		if(item instanceof ShieldItem){
 			if(this.shield == null){
 				this.shield = new Shield(this.id);
@@ -663,10 +643,40 @@ class Ship extends Rect{
 			}
 			if(this.shield instanceof Shield){
 				this.shield.upgrade();
+				return;
 			}
-
 		}
-
+		if(item instanceof PistolItem){
+			if(this.weapon instanceof Pistol){
+				this.weapon.upgrade();
+				return;
+			}
+			this.droppedItem = this.weapon.drop(this.x,this.y,this.weapon.level);
+			this.weapon = new Pistol(this.id,item.level);
+			this.weapon.equip();
+			return;
+		}
+		if(item instanceof ShotgunItem){
+			if(this.weapon instanceof Shotgun){
+				this.weapon.upgrade();
+				return;
+			}
+			this.droppedItem = this.weapon.drop(this.x,this.y,this.weapon.level);
+			this.weapon = new Shotgun(this.id,item.level);
+			this.weapon.equip();
+			return;
+		}
+		if(item instanceof RifleItem){
+			if(this.weapon instanceof Rifle){
+				this.weapon.upgrade();
+				return;
+			}
+			this.droppedItem = this.weapon.drop(this.x,this.y,this.weapon.level);
+			this.weapon = new Rifle(this.id,item.level);
+			this.weapon.equip();
+			return;
+		}
+		
 	}
 	heal(amt){
 		if(this.health < this.baseHealth){
@@ -780,7 +790,7 @@ class Asteroid extends Circle{
         		i += 1;
         		sum += this.lootTable[keys[i]];
       		}
-			this.dropItem(keys[Math.max(0,i-1)]);
+			this.dropItem(keys[Math.max(0,i)]);
 		}
 	}
 	dropItem(itemName){
@@ -849,11 +859,17 @@ class HPItem extends RectItem {
 }
 
 class EquipableItem extends RectItem{
-	constructor(x,y,color){
+	constructor(x,y,color,level){
 		super(x,y,color);
+		this.dropDate = null;
+		this.pickUpCooldown = 1;
+		this.level = level || 1;
 	}
 	handleHit(object){
 		if(!this.alive){
+			return;
+		}
+		if(this.dropDate != null && new Date()-this.dropDate < this.pickUpCooldown*1000){
 			return;
 		}
 		if(object instanceof Ship){
@@ -864,19 +880,19 @@ class EquipableItem extends RectItem{
 }
 
 class PistolItem extends EquipableItem {
-	constructor(x,y){
-		super(x,y,"Magenta");
+	constructor(x,y,level){
+		super(x,y,"Magenta",level);
 	}
 }
 
 class ShotgunItem extends EquipableItem {
-	constructor(x,y){
-		super(x,y,"Yellow");
+	constructor(x,y,level){
+		super(x,y,"Yellow",level);
 	}
 }
 class RifleItem extends EquipableItem {
-	constructor(x,y){
-		super(x,y,"Green");
+	constructor(x,y,level){
+		super(x,y,"Green",level);
 	}
 }
 class ShieldItem extends EquipableItem {
@@ -920,14 +936,17 @@ class Weapon {
 		}
 		messenger.toastPlayer(this.owner,this.maxLevelMessage);
 	}
-	drop(x,y){
-		return new this.item(x,y);
+	drop(x,y,level){
+		var item = new this.item(x,y,level);
+		item.dropDate = new Date();
+		return item;
 	}
 }
 
 class Pistol extends Weapon{
-	constructor(owner){
+	constructor(owner,level){
 		super(owner);
+		this.level = level;
 		this.name = "Pistol";
 		this.cooldown = c.basegunCoolDown;
 		this.maxLevel = 1;
@@ -947,9 +966,10 @@ class Pistol extends Weapon{
 }
 
 class Shotgun extends Weapon{
-	constructor(owner){
+	constructor(owner,level){
 		super(owner);
 		this.name = "Shotgun";
+		this.level = level;
 		this.cooldown = c.shotgunCoolDown;
 		this.equipMessage = "Equiped Shotgun";
 		this.upgradeMessage ="Upgraded Shotgun";
@@ -990,15 +1010,13 @@ class Shotgun extends Weapon{
 			this.cooldown -= .3;
 		}
 	}
-	drop(x,y){
-		return new ShotgunItem(x,y);
-	}
 }
 
 class Rifle extends Weapon{
-	constructor(owner){
+	constructor(owner,level){
 		super(owner);
 		this.name = "Rifle";
+		this.level = level;
 		this.cooldown = c.rifleCoolDown;
 		this.maxLevel = 1;
 		this.equipMessage = "Equiped Rifle";
@@ -1012,9 +1030,6 @@ class Rifle extends Weapon{
 		var bullets = [];
 		bullets.push(new RifleBullet(x,y,8,20,color,angle,id));
 		return bullets;
-	}
-	drop(x,y){
-		return new RifleItem(x,y);
 	}
 }
 
