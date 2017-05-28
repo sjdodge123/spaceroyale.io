@@ -44,15 +44,15 @@ exports.getRoomCount = function(){
 	return getRoomCount();
 }
 
-exports.updateRooms = function(){
+exports.updateRooms = function(dt){
 	for(var sig in roomList){
 		var room = roomList[sig];
 		if(!room.game.gameEnded){
-			room.update();
+			room.update(dt);
 		} else if(room.alive){
 			room.alive = false;
 			messenger.messageRoomBySig(room.sig,"gameOver",room.game.winner);
-			setTimeout(reclaimRoom,roomKickTimeout*1000,room.sig);	
+			setTimeout(reclaimRoom,roomKickTimeout*1000,room.sig);
 		}
 	}
 }

@@ -28,7 +28,7 @@ var serverSleeping = true,
 //Base Server Functions
 server.listen(c.port,c.host, function(){
 	messenger.build(io);
-	
+
     console.log('listening on '+c.host+':'+c.port);
 });
 
@@ -55,18 +55,20 @@ io.on('connection', function(client){
 		checkForSleep();
   	});
 
-	
+
 });
 
 //Gamestate updates
 function update(){
 	if(!serverSleeping){
-		hostess.updateRooms();
+    var dt = utils.getDT();
+		hostess.updateRooms(dt);
 	}
 }
 
 function checkForWake(){
 	if(serverSleeping){
+    utils.getDT();
 		serverSleeping = false;
 		utils.logToFile('logs/connections.txt',"Server wakeup");
 		serverUpdates = setInterval(update,serverTickSpeed);
@@ -74,11 +76,10 @@ function checkForWake(){
 }
 
 function checkForSleep(){
-	
+
 	if(clientCount == 0){
 		serverSleeping = true;
 		clearInterval(serverUpdates);
 		utils.logToFile('logs/connections.txt',"Server sleep");
 	}
 }
-

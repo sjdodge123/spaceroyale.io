@@ -48,8 +48,8 @@ class Room {
 		delete this.shipList[clientID];
 		this.clientCount--;
 	}
-	update(){
-		this.game.update();
+	update(dt){
+		this.game.update(dt);
 		this.checkForDeaths();
 		this.sendUpdates();
 	}
@@ -157,13 +157,13 @@ class Game {
 	resetTimeUntilShrink(){
 		var game = this;
 		if(!this.firstPass){this.timeUntilShrink *= this.timeUntilShrinkSpeedup;};
-		this.timerUntilShrink = new Timer(function(){game.currentlyShrinking();},this.timeUntilShrink*1000);
+		this.timerUntilShrink = utils.getTimer(function(){game.currentlyShrinking();},this.timeUntilShrink*1000);
 
 	}
 	currentlyShrinking(){
 		var game = this;
 		if(!this.firstPass){this.shrinkingDuration *= this.shrinkingDurationSpeedup;};
-	    this.shrinkingTimer = new Timer(function(){game.resetTimeUntilShrink();},this.shrinkingDuration*1000);
+	    this.shrinkingTimer = utils.getTimer(function(){game.resetTimeUntilShrink();},this.shrinkingDuration*1000);
 	    this.world.shrinkBound();
 	    this.firstPass = false;
 	}
@@ -182,7 +182,7 @@ class Game {
 		}
 	}
 
-	update(){
+	update(dt){
 		if(this.active){
 			if(this.timerUntilShrink != null){
         		this.timeLeftUntilShrink = this.timerUntilShrink.getTimeLeft().toFixed(1);
@@ -194,7 +194,7 @@ class Game {
 		} else{
 			this.checkForGameStart()
 		}
-		this.gameBoard.update(this.active);
+		this.gameBoard.update(this.active, dt);
 		this.world.update(this.shrinkTimeLeft);
 	}
 
@@ -208,7 +208,7 @@ class Game {
 		if(this.getShipCount() >= this.minPlayers){
 			if(this.lobbyTimer == null){
 				var game = this;
-				this.lobbyTimer = new Timer(function(){game.start();},this.lobbyWaitTime*1000);
+				this.lobbyTimer = utils.getTimer(function(){game.start();},this.lobbyWaitTime*1000);
 			} else{
 				this.lobbyTimeLeft = this.lobbyTimer.getTimeLeft().toFixed(1);
 			}
@@ -235,8 +235,8 @@ class Game {
 		for(var shipID in this.shipList){
 			var ship = this.shipList[shipID];
 			var loc = this.world.getRandomLoc();
-			ship.x = loc.x;
-			ship.y = loc.y;
+			ship.newX = loc.x;
+			ship.newY = loc.y;
 		}
 	}
 }
@@ -250,11 +250,13 @@ class GameBoard {
 		this.asteroidList = asteroidList;
 		this.planetList = planetList;
 		this.itemList = itemList;
+		engine.buildPhysics(this.bulletList, this.shipList);
 	}
-	update(active){
+	update(active, dt){
+		engine.updatePhysics(dt);
 		this.checkCollisions(active);
-		this.updateShips(active);
-		this.updateBullets();
+		this.updateShips(active, dt);
+		this.updateBullets(dt);
 		this.updateAsteroids();
 		this.updateItems();
 	}
@@ -613,10 +615,10 @@ class Ship extends Rect{
 		this.killList = [];
 		this.killedBy = null;
 		this.weapon = new Pistol(this.id);
-		this.weapon.level = 3;
+		this.weapon.level = 1;
 		this.shield = null;
-		this.lastX = 0;
-		this.lastY = 0;
+		this.newX = this.x;
+		this.newY = this.y;
 	}
 	update(){
 		this.checkHP();
@@ -678,27 +680,13 @@ class Ship extends Rect{
 		return this.weapon.fire(this.x,this.y,this.angle,this.baseColor,this.id);
 	}
 	move(){
-		if(this.moveForward){
-			this.lastY = this.y;
-			this.y -= this.speed;
-		}
-		if(this.moveBackward){
-			this.lastY = this.y;
-			this.y += this.speed;
-		}
-		if(this.turnLeft){
-			this.lastX = this.x;
-			this.x -= this.speed;
-		}
-		if(this.turnRight){
-			this.lastX = this.x;
-			this.x += this.speed;
-		}
+		this.x = this.newX;
+		this.y = this.newY;
 	}
 	handleHit(object){
 		if(object.isWall){
-			this.x = this.lastX;
-			this.y = this.lastY;
+			this.newX = this.x;
+			this.newY = this.y;
 		}
 		if(object.owner != this.id && object.alive && object.damage != null){
 			if(this.shield != null && this.shield.alive){
@@ -975,6 +963,7 @@ class Shotgun extends Weapon{
 			bullets.push(shot1,shot3);
 		}
 		if(this.level > 2){
+
 			var shot1 = new Birdshot(x,y,4,10,color,angle-15,id);
 			shot1.speed -= 4;
 			var shot2 = new Birdshot(x,y,4,10,color,angle,id);
@@ -982,6 +971,7 @@ class Shotgun extends Weapon{
 			var shot3 = new Birdshot(x,y,4,10,color,angle+15,id);
 			shot3.speed -= 4;
 			bullets.push(shot1,shot2,shot3);
+
 		}
 		bullets.push(new Birdshot(x,y,4,10,color,angle-5,id));
 		bullets.push(new Birdshot(x,y,4,10,color,angle-2.5,id));
@@ -1103,15 +1093,15 @@ class Bullet extends Rect{
 		this.damage = c.bulletDamage;
 		this.velX = 0;
 		this.velY = 0;
+		this.newX = this.x;
+		this.newY = this.y;
 	}
 	update(){
-		this.velX = Math.cos((this.angle+90)*(Math.PI/180))*this.speed;
-		this.velY = Math.sin((this.angle+90)*(Math.PI/180))*this.speed;
 		this.move();
 	}
 	move(){
-		this.x += this.velX;
-		this.y += this.velY;
+		this.x = this.newX;
+		this.y = this.newY;
 	}
 	handleHit(object){
 		if(!this.alive){
@@ -1145,50 +1135,4 @@ class RifleBullet extends Bullet{
 		this.damage = c.rifleBulletDamage;
 		this.speed = c.rifleBulletSpeed;
 	}
-}
-
-
-
-
-class Timer {
-	constructor(callback,delay){
-		this.callback = callback;
-		this.delay = delay;
-		this.running = false;
-		this.started = null;
-		this.remaining = delay;
-		this.id = null;
-		this.start();
-	}
-	start() {
-        this.running = true;
-        this.started = new Date();
-        this.id = setTimeout(this.callback, this.remaining);
-    }
-
-    pause(){
-    	this.running = false;
-    	clearTimeout(this.id);
-    	this.remaining -= new Date() - this.started;
-    }
-    getTimeLeft(){
-    	if(this.running){
-    		this.pause();
-	        if(this.remaining < 0){
-	      		return 0;
-	      	}
-    		this.start();
-    	}
-
-    	return this.remaining/1000;
-    }
-    reset(){
-    	this.running = false;
-    	clearTimeout(this.id);
-    	this.remaining = this.delay;
-    	this.started = null;
-    }
-    isRunning(){
-    	return this.running;
-    }
 }

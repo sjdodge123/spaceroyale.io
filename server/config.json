@@ -41,20 +41,20 @@
     "planetMinSize":70,
     "planetMaxSize":150,
 
-    "playerBaseSpeed":5,
+    "playerBaseSpeed":294,
 
     "basegunCoolDown":0.2,
     "bulletLifetime":5,
-    "bulletSpeed":10,
+    "bulletSpeed":588,
     "bulletDamage":10,
 
     "shotgunCoolDown":1.2,
     "birdshotDamage":11,
-    "birdshotSpeed":16,
+    "birdshotSpeed":941,
 
     "rifleCoolDown":1.2,
     "rifleBulletDamage":50,
-    "rifleBulletSpeed":35,
+    "rifleBulletSpeed":2058,
 
     "shieldRadius":26,
     "shield1Protection":10,
