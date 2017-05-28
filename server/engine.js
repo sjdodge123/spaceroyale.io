@@ -59,21 +59,50 @@ function updateBullets(dt){
 function updateShips(dt){
 	for (var shipSig in shipList){
 		var ship = shipList[shipSig];
-		if(ship.moveForward){
+		var dirX = 0;
+		var dirY = 0;
 
-			ship.newY -= ship.speed * dt;
+		if(ship.moveForward && ship.moveBackward == false && ship.turnLeft == false && ship.turnRight == false){
+			dirY = -1;
+			dirX = 0;
 		}
-		if(ship.moveBackward){
-
-			ship.newY += ship.speed * dt;
+		else if(ship.moveForward == false && ship.moveBackward && ship.turnLeft == false && ship.turnRight == false){
+			dirY = 1;
+			dirX = 0;
 		}
-		if(ship.turnLeft){
-
-			ship.newX -= ship.speed * dt;
+		else if(ship.moveForward == false && ship.moveBackward == false && ship.turnLeft && ship.turnRight == false){
+			dirY = 0;
+			dirX = -1;
 		}
-		if(ship.turnRight){
-
-			ship.newX += ship.speed * dt;
+		else if(ship.moveForward == false && ship.moveBackward == false && ship.turnLeft == false && ship.turnRight){
+			dirY = 0;
+			dirX = 1;
 		}
+		else if(ship.moveForward && ship.moveBackward == false && ship.turnLeft && ship.turnRight == false){
+			dirY = -Math.sqrt(2)/2;
+			dirX = -Math.sqrt(2)/2;
+		}
+		else if(ship.moveForward && ship.moveBackward == false && ship.turnLeft == false && ship.turnRight){
+			dirY = -Math.sqrt(2)/2;
+			dirX = Math.sqrt(2)/2;
+		}
+		else if(ship.moveForward == false && ship.moveBackward && ship.turnLeft && ship.turnRight == false){
+			dirY = Math.sqrt(2)/2;
+			dirX = -Math.sqrt(2)/2;
+		}
+		else if(ship.moveForward == false && ship.moveBackward && ship.turnLeft == false && ship.turnRight){
+			dirY = Math.sqrt(2)/2;
+			dirX = Math.sqrt(2)/2;
+		}
+		if(ship.velocity < ship.maxVelocity){
+			ship.velX += ship.acel * dirX * dt - .1*ship.velX;
+			ship.velY += ship.acel * dirY * dt - .1*ship.velY;
+		} else{
+			ship.velX += ship.acel * dirX * dt - .5*ship.velX;
+			ship.velY += ship.acel * dirY * dt - .5*ship.velY;
+		}
+		ship.velocity = Math.sqrt(Math.pow(ship.velX, 2) + Math.pow(ship.velY, 2));
+		ship.newX += ship.velX * dt;
+		ship.newY += ship.velY * dt;
 	}
 }

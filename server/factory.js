@@ -619,6 +619,11 @@ class Ship extends Rect{
 		this.shield = null;
 		this.newX = this.x;
 		this.newY = this.y;
+		this.maxVelocity = 294;
+		this.velocity = 0;
+		this.acel = 10000;
+		this.velX = 0;
+		this.velY = 0;
 	}
 	update(){
 		this.checkHP();
