@@ -15,6 +15,10 @@ exports.getTimer = function(callback,delay){
 	return new Timer(callback,delay);
 }
 
+exports.getMag = function(x,y){
+	return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+}
+
 exports.getDT = function(){
 	var currentFrame = new Date();
 	var dt = currentFrame - lastFrame;

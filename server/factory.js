@@ -690,8 +690,7 @@ class Ship extends Rect{
 	}
 	handleHit(object){
 		if(object.isWall){
-			this.newX = this.x;
-			this.newY = this.y;
+			engine.preventMovement(this,object);
 		}
 		if(object.owner != this.id && object.alive && object.damage != null){
 			if(this.shield != null && this.shield.alive){

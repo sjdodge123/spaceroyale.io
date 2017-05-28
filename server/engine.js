@@ -1,7 +1,27 @@
+var utils = require('./utils.js');
 var bulletList;
 var shipList;
+var dt;
+
 
 exports.broadBase = function(objectArray){
+	broadBase(objectArray);
+}
+
+exports.buildPhysics = function(_bulletList, _shipList){
+	bulletList = _bulletList;
+	shipList = _shipList;
+}
+exports.updatePhysics = function(_dt){
+	dt = _dt;
+	updatePhysics();
+}
+
+exports.preventMovement = function(obj,wall){
+	preventMovement(obj,wall);
+}
+
+function broadBase(objectArray){
 	for (var i = 0; i < objectArray.length; i++) {
   		for (var j = 0; j < objectArray.length; j++) {
 
@@ -19,34 +39,41 @@ exports.broadBase = function(objectArray){
   	}
 }
 
-exports.buildPhysics = function(_bulletList, _shipList){
-	bulletList = _bulletList;
-	shipList = _shipList;
-}
-exports.updatePhysics = function(dt){
-	updatePhysics(dt);
-}
 function checkDistance(obj1,obj2){
 	var objX1 = obj1.newX || obj1.x;
 	var objY1 = obj1.newY || obj1.y;
 	var objX2 = obj2.newX || obj2.x;
 	var objY2 = obj2.newY || obj2.y;
-	var distance = Math.sqrt(Math.pow((objX2 - objX1),2) + Math.pow((objY2 - objY1),2));
-  distance -= obj1.radius || obj1.width;
-  distance -= obj2.radius || obj2.width;
-
+	var distance = utils.getMag(objX2 - objX1,objY2 - objY1);
+  	distance -= obj1.radius || obj1.width;
+	distance -= obj2.radius || obj2.width;
 	if(distance <= 0){
 		return true;
 	}
 	return false;
 }
 
-function updatePhysics(dt){
-	updateBullets(dt);
-	updateShips(dt);
+function preventMovement(obj,wall){
+	var bx = wall.x - obj.x;
+	var by = wall.y - obj.y;
+	var bMag = utils.getMag(bx,by);
+	var bxDir = bx/bMag;
+	var byDir = by/bMag;
+	var dot = bxDir*obj.velX+byDir*obj.velY;
+	var ax = dot * bxDir;
+	var ay = dot * byDir;
+	obj.velX -= ax;
+	obj.velY -= ay;
+	obj.newX = obj.x+obj.velX*dt;
+	obj.newY = obj.y+obj.velY*dt;
 }
 
-function updateBullets(dt){
+function updatePhysics(){
+	updateBullets();
+	updateShips();
+}
+
+function updateBullets(){
 	for (var bulletSig in bulletList){
 		var bullet = bulletList[bulletSig];
 		bullet.velX = Math.cos((bullet.angle+90)*(Math.PI/180))*bullet.speed;
@@ -56,7 +83,7 @@ function updateBullets(dt){
 	}
 }
 
-function updateShips(dt){
+function updateShips(){
 	for (var shipSig in shipList){
 		var ship = shipList[shipSig];
 		var dirX = 0;
@@ -101,7 +128,7 @@ function updateShips(dt){
 			ship.velX += ship.acel * dirX * dt - .5*ship.velX;
 			ship.velY += ship.acel * dirY * dt - .5*ship.velY;
 		}
-		ship.velocity = Math.sqrt(Math.pow(ship.velX, 2) + Math.pow(ship.velY, 2));
+		ship.velocity = utils.getMag(ship.velX,ship.velY);
 		ship.newX += ship.velX * dt;
 		ship.newY += ship.velY * dt;
 	}
