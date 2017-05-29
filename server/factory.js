@@ -257,12 +257,12 @@ class GameBoard {
 	update(active, dt){
 		this.engine.update(dt);
 		this.checkCollisions(active);
-		this.updateShips(active, dt);
+		this.updateShips(active,dt);
 		this.updateBullets(dt);
 		this.updateAsteroids();
 		this.updateItems();
 	}
-	updateShips(active){
+	updateShips(active,dt){
 		for(var shipID in this.shipList){
 			var ship = this.shipList[shipID];
 			if(active){
@@ -272,7 +272,7 @@ class GameBoard {
 				this.spawnItem(ship.droppedItem);
 				ship.droppedItem = null;
 			}
-			ship.update();
+			ship.update(dt);
 		}
 	}
 	updateBullets(){

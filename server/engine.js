@@ -8,7 +8,7 @@ exports.preventEscape = function(obj,bound){
 	preventEscape(obj,bound);
 }
 exports.preventMovement = function(obj,wall,dt){
-	preventEscape(obj,wall,dt);
+	preventMovement(obj,wall,dt);
 }
 
 class Engine {
