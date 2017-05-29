@@ -44,11 +44,13 @@ exports.createUser = function(callback,params){
 	createConnection();
 	database.connect(function(e){
 		if(e){
-			throw e;
+			utils.logError(e);
+			return;
 		}
 		database.query("SELECT * FROM queenanne.user WHERE user_name LIKE ?",params.username,function(e,result){
 			if(e){
-				throw e;
+				utils.logError(e);
+				return;
 			}
 			if(result.length != 0){
 				messenger.messageUser(params.id,'unsuccessfulReg',{reason:"Username is taken"});
@@ -56,12 +58,14 @@ exports.createUser = function(callback,params){
 			}
 			database.query("INSERT INTO queenanne.user SET ?",user,function(e,result){
 				if(e){
-					throw e;
+					utils.logError(e);
+					return;
 				}
 				player.user_id = result.insertId;
 				database.query("INSERT INTO queenanne.player SET ?",player,function(e,result){
 					if(e){
-						throw e;
+						utils.logError(e);
+						return;
 					}
 					params.player = player;
 					authedUsers[params.id] = player.user_id;
@@ -79,11 +83,13 @@ exports.lookupUser = function(callback,params){
 	createConnection();
 	database.connect(function(e){
 		if(e){
-			throw e;
+			utils.logError(e);
+			return;
 		}
 		database.query("SELECT * FROM queenanne.user WHERE user_name LIKE ?",params.username,function(e,result){
 			if(e){
-				throw e;
+				utils.logError(e);
+				return;
 			}
 			if(result.length == 0){
 				utils.logToFile('logs/auth_attempts.txt',"USERNAME_ERROR (" + params.address + ") " + params.username);
@@ -101,7 +107,8 @@ exports.lookupUser = function(callback,params){
 			
 			database.query("SELECT * FROM queenanne.player WHERE user_id LIKE ?",params.user_id,function(e,result){
 				if(e){
-					throw e;
+					utils.logError(e);
+					return;
 				}
 				callback(result,params);
 				database.end();
@@ -114,7 +121,8 @@ function updatePlayer(callback,params){
 	createConnection();
 	database.connect(function(e){
 		if(e){
-			throw e;
+			utils.logError(e);
+			return;
 		}
 		database.query("UPDATE `queenanne`.`player` SET" +
 		"`total_kills`=`total_kills`+"+params.kills+"," +
@@ -124,7 +132,8 @@ function updatePlayer(callback,params){
 		"`total_exp`=`total_exp`+"+params.exp+
 		" WHERE `user_id` LIKE ?", params.user_id,function(e,result){
 			if(e){
-				throw e;
+				utils.logError(e);
+				return;
 			}
 			if(result.changedRows != 1){
 				console.log(result);
@@ -132,7 +141,8 @@ function updatePlayer(callback,params){
 			}
 			database.query("SELECT * FROM queenanne.player WHERE user_id LIKE ?",params.user_id,function(e,result){
 				if(e){
-					throw e;
+					utils.logError(e);
+					return;
 				}
 				params.player = result[0];
 				callback(result,params);

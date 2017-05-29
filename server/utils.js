@@ -11,6 +11,10 @@ exports.logToFile = function(fileLoc,content){
 	fs.appendFile(__dirname + fileLoc,new Date() + " : " + content + "\r\n");
 }
 
+exports.logError = function(content){
+    fs.appendFile(__dirname+ "logs/errors.txt",new Date() + " : " + content + "\r\n");
+}
+
 exports.getTimer = function(callback,delay){
 	return new Timer(callback,delay);
 }
