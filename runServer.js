@@ -61,14 +61,14 @@ io.on('connection', function(client){
 //Gamestate updates
 function update(){
 	if(!serverSleeping){
-    var dt = utils.getDT();
+    	var dt = utils.getDT();
 		hostess.updateRooms(dt);
 	}
 }
 
 function checkForWake(){
 	if(serverSleeping){
-    utils.getDT();
+    	utils.getDT();
 		serverSleeping = false;
 		utils.logToFile('logs/connections.txt',"Server wakeup");
 		serverUpdates = setInterval(update,serverTickSpeed);

@@ -320,7 +320,7 @@ function resetGameVariables(){
     bulletList = {};
     shipList = {};
     canvas.removeEventListener("mousemove", calcMousePos, false);
-    canvas.removeEventListener("click", handleClick, false);
+    canvas.removeEventListener("mousedown", handleClick, false);
     window.removeEventListener("keydown", keyDown, false);
     window.removeEventListener("keyup", keyUp, false);
     window.removeEventListener('contextmenu', function(ev) {
@@ -344,7 +344,7 @@ function init(){
     timeOutChecker = setInterval(checkForTimeout,1000);
     animloop();
     canvas.addEventListener("mousemove", calcMousePos, false);
-    canvas.addEventListener("click", handleClick, false);
+    canvas.addEventListener("mousedown", handleClick, false);
     window.addEventListener("keydown", keyDown, false);
     window.addEventListener("keyup", keyUp, false);
     window.addEventListener('contextmenu', function(ev) {
@@ -484,6 +484,7 @@ function calcMousePos(evt){
 }
 
 function handleClick(evt){
+    //Run an interval here until mouseUP or something
     evt.preventDefault();
     if(iAmAlive){
        server.emit("click",{x:mouseX,y:mouseY});

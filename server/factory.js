@@ -4,7 +4,7 @@ var c = require('./config.json');
 var utils = require('./utils.js');
 var messenger = require('./messenger.js');
 var database = require('./database.js');
-var engine = require('./engine.js');
+var _engine = require('./engine.js');
 
 exports.getRoom = function(sig,size){
 	return new Room(sig,size);
@@ -14,7 +14,6 @@ class Room {
 	constructor(sig,size){
 		this.sig = sig;
 		this.size = size;
-		this.world = new World(0,0,c.lobbyWidth,c.lobbyHeight);
 		this.clientList = {};
 		this.planetList = {};
 		this.asteroidList = {};
@@ -24,7 +23,9 @@ class Room {
 		this.killedShips = {};
 		this.clientCount = 0;
 		this.alive = true;
-		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList,this.planetList,this.itemList,this.sig);
+		this.engine = _engine.getEngine(this.bulletList, this.shipList, this.world, this.asteroidList, this.planetList);
+		this.world = new World(0,0,c.lobbyWidth,c.lobbyHeight,this.engine);
+		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList,this.planetList,this.itemList,this.engine,this.sig);
 	}
 	join(clientID){
 		var client = messenger.getClient(clientID);
@@ -108,7 +109,7 @@ class Room {
 }
 
 class Game {
-	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,roomSig){
+	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,engine,roomSig){
 		this.world = world;
 		this.clientList = clientList;
 		this.bulletList = bulletList;
@@ -116,6 +117,7 @@ class Game {
 		this.planetList = planetList;
 		this.asteroidList = asteroidList;
 		this.itemList = itemList;
+		this.engine = engine;
 		this.roomSig = roomSig;
 
 		//Gamerules
@@ -141,7 +143,7 @@ class Game {
 		this.lobbyTimer = null;
 		this.lobbyTimeLeft = this.lobbyWaitTime;
 
-		this.gameBoard = new GameBoard(world,clientList,bulletList,shipList,asteroidList,planetList,itemList);
+		this.gameBoard = new GameBoard(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,engine);
 	}
 
 	start(){
@@ -242,7 +244,7 @@ class Game {
 }
 
 class GameBoard {
-	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList){
+	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,engine){
 		this.world = world;
 		this.clientList = clientList;
 		this.bulletList = bulletList;
@@ -250,10 +252,10 @@ class GameBoard {
 		this.asteroidList = asteroidList;
 		this.planetList = planetList;
 		this.itemList = itemList;
-		engine.buildPhysics(this.bulletList, this.shipList, this.world, this.asteroidList, this.planetList);
+		this.engine = engine;
 	}
 	update(active, dt){
-		engine.updatePhysics(dt);
+		this.engine.update(dt);
 		this.checkCollisions(active);
 		this.updateShips(active, dt);
 		this.updateBullets(dt);
@@ -312,7 +314,7 @@ class GameBoard {
 		if(active){
 			var objectArray = [];
 			for(var ship in this.shipList){
-				engine.preventEscape(this.shipList[ship]);
+				_engine.preventEscape(this.shipList[ship],this.world);
 				objectArray.push(this.shipList[ship]);
 			}
 			for(var asteroidSig in this.asteroidList){
@@ -327,8 +329,7 @@ class GameBoard {
 			for(var sig in this.bulletList){
 				objectArray.push(this.bulletList[sig]);
 			}
-
-			engine.broadBase(objectArray);
+			this.engine.broadBase(objectArray);
 		}
 	}
 	fireWeapon(ship){
@@ -490,7 +491,7 @@ class Circle extends Shape{
 }
 
 class World extends Rect{
-	constructor(x,y,width,height){
+	constructor(x,y,width,height,engine){
 		super(x,y,width,height,"orange");
 		this.baseBoundRadius = width;
 		this.damageRate = c.damageTickRate;
@@ -499,6 +500,7 @@ class World extends Rect{
 		this.whiteBound = new WhiteBound(width/2,height/2,this.baseBoundRadius);
 		this.blueBound = new BlueBound(width/2,height/2,this.baseBoundRadius);
 		this.center = {x:width/2,y:height/2};
+		this.engine = engine;
 	}
 	update(timeLeft){
 		this.updateBounds(timeLeft);
@@ -546,7 +548,7 @@ class World extends Rect{
 	}
 	findFreeLoc(obj){
 		var loc = this.getRandomLoc();
-		if(engine.checkCollideAll(loc, obj)){
+		if(this.engine.checkCollideAll(loc, obj)){
 			return this.findFreeLoc(obj);
 		}
 		return loc;
@@ -589,7 +591,7 @@ class World extends Rect{
 
 	spawnNewShip(id,color){
 		var loc = this.getRandomLoc();
-		return new Ship(loc.x,loc.y,color,id)
+		return new Ship(loc.x,loc.y,color,id);
 	}
 }
 
@@ -643,8 +645,10 @@ class Ship extends Rect{
 		this.velX = 0;
 		this.velY = 0;
 		this.droppedItem = null;
+		this.dt = 0;
 	}
-	update(){
+	update(dt){
+		this.dt = dt;
 		this.checkHP();
 		this.checkKills();
 		this.move();
@@ -715,7 +719,7 @@ class Ship extends Rect{
 	}
 	handleHit(object){
 		if(object.isWall){
-			engine.preventMovement(this,object);
+			_engine.preventMovement(this,object,this.dt);
 		}
 		if(object.owner != this.id && object.alive && object.damage != null){
 			if(this.shield != null && this.shield.alive){
