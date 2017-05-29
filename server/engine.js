@@ -1,6 +1,9 @@
 var utils = require('./utils.js');
 var bulletList;
 var shipList;
+var asteroidList;
+var planetList;
+var world;
 var dt;
 
 
@@ -8,9 +11,16 @@ exports.broadBase = function(objectArray){
 	broadBase(objectArray);
 }
 
-exports.buildPhysics = function(_bulletList, _shipList){
+exports.buildPhysics = function(_bulletList, _shipList, _world, _asteroidList, _planetList){
+	world = _world;
 	bulletList = _bulletList;
 	shipList = _shipList;
+	asteroidList = _asteroidList;
+	planetList = _planetList;
+}
+
+exports.checkCollideAll = function(loc, obj){
+	checkCollideAll(loc, obj);
 }
 exports.updatePhysics = function(_dt){
 	dt = _dt;
@@ -19,6 +29,10 @@ exports.updatePhysics = function(_dt){
 
 exports.preventMovement = function(obj,wall){
 	preventMovement(obj,wall);
+}
+
+exports.preventEscape = function(obj){
+	preventEscape(obj);
 }
 
 function broadBase(objectArray){
@@ -39,6 +53,31 @@ function broadBase(objectArray){
   	}
 }
 
+function checkCollideAll(loc, obj){
+	var result = false;
+	var testLoc = {x:loc.x, y:loc.y, r:(obj.width || obj.radius)};
+	var objectArray = [];
+	for(var shipSig in shipList){
+		objectArray.push(shipList[shipSig]);
+	}
+	for(var asteroidSig in asteroidList){
+		objectArray.push(asteroidList[asteroidSig]);
+	}
+	for(var planetSig in planetList){
+		objectArray.push(planetList[planetSig]);
+	}
+	for(var sig in bulletList){
+		objectArray.push(bulletList[sig]);
+	}
+	for(var i = 0; i < objectArray.length; i++){
+		result = checkDistance(testLoc, objectArray[i]);
+		if(result){
+			break;
+		}
+	}
+	return result;
+}
+
 function checkDistance(obj1,obj2){
 	var objX1 = obj1.newX || obj1.x;
 	var objY1 = obj1.newY || obj1.y;
@@ -51,6 +90,22 @@ function checkDistance(obj1,obj2){
 		return true;
 	}
 	return false;
+}
+
+function preventEscape(obj){
+	if(obj.newX - obj.width/2 < world.x){
+		//left
+		obj.newX = obj.x;
+	}
+	if(obj.newX + obj.width/2 > world.x + world.width){
+		obj.newX = obj.x;
+	}
+	if (obj.newY - obj.height/2 < world.y){
+		obj.newY = obj.y;
+	}
+	if(obj.newY + obj.height/2 > world.y + world.height){
+		obj.newY = obj.y;
+	}
 }
 
 function preventMovement(obj,wall){

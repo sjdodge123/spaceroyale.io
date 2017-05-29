@@ -234,7 +234,7 @@ class Game {
 	randomLocShips(){
 		for(var shipID in this.shipList){
 			var ship = this.shipList[shipID];
-			var loc = this.world.getRandomLoc();
+			var loc = this.world.findFreeLoc(ship);
 			ship.newX = loc.x;
 			ship.newY = loc.y;
 		}
@@ -250,7 +250,7 @@ class GameBoard {
 		this.asteroidList = asteroidList;
 		this.planetList = planetList;
 		this.itemList = itemList;
-		engine.buildPhysics(this.bulletList, this.shipList);
+		engine.buildPhysics(this.bulletList, this.shipList, this.world, this.asteroidList, this.planetList);
 	}
 	update(active, dt){
 		engine.updatePhysics(dt);
@@ -307,10 +307,12 @@ class GameBoard {
 		item.sig = sig;
 		this.itemList[sig] = item;
 	}
+
 	checkCollisions(active){
 		if(active){
 			var objectArray = [];
 			for(var ship in this.shipList){
+				engine.preventEscape(this.shipList[ship]);
 				objectArray.push(this.shipList[ship]);
 			}
 			for(var asteroidSig in this.asteroidList){
@@ -325,6 +327,7 @@ class GameBoard {
 			for(var sig in this.bulletList){
 				objectArray.push(this.bulletList[sig]);
 			}
+
 			engine.broadBase(objectArray);
 		}
 	}
@@ -397,14 +400,14 @@ class GameBoard {
 	populateWorld(){
 		if(c.generateAsteroids){
 			for(var i = 0; i<c.asteroidAmt;i++){
-				var loc = this.world.getRandomLoc();
+				var loc = this.world.getSafeLoc(c.asteroidMaxSize);
 				var sig = this.generateAsteroidSig();
 				this.asteroidList[sig] = new Asteroid(loc.x,loc.y,utils.getRandomInt(c.asteroidMinSize,c.asteroidMaxSize),sig);
 			}
 		}
 		if(c.generatePlanets){
 			for(var i = 0; i<c.planetAmt;i++){
-				var loc = this.world.getRandomLoc();
+				var loc = this.world.getSafeLoc(c.planetMaxSize);
 				var sig = this.generatePlanetSig();
 				this.planetList[sig] = new Planet(loc.x,loc.y,utils.getRandomInt(c.planetMinSize,c.planetMaxSize),sig);
 			}
@@ -541,8 +544,20 @@ class World extends Rect{
 		var whiteBound = new WhiteBound(loc.x,loc.y,newRadius);
 		return whiteBound;
 	}
+	findFreeLoc(obj){
+		var loc = this.getRandomLoc();
+		if(engine.checkCollideAll(loc, obj)){
+			return this.findFreeLoc(obj);
+		}
+		return loc;
+	}
+	getSafeLoc(size){
+		var objW = size + 15;
+		var objH = size + 15;
+		return {x:Math.floor(Math.random()*(this.width - 2*objW - this.x)) + this.x + objW, y:Math.floor(Math.random()*(this.height - 2*objH - this.y)) + this.y + objH};
+	}
 	getRandomLoc(){
-		 return {x:Math.floor(Math.random()*(this.width - this.x)) + this.x,y:Math.floor(Math.random()*(this.height - this.y)) + this.y};
+		return {x:Math.floor(Math.random()*(this.width - this.x)) + this.x, y:Math.floor(Math.random()*(this.height - this.y)) + this.y};
 	}
 	shrinkBound(){
 		this.shrinking = true;
@@ -676,7 +691,7 @@ class Ship extends Rect{
 			this.weapon.equip();
 			return;
 		}
-		
+
 	}
 	heal(amt){
 		if(this.health < this.baseHealth){
