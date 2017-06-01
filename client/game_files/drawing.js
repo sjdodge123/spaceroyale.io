@@ -137,6 +137,7 @@ function drawRelativeObjects(){
     drawItems();
 	drawBullets();
 	drawPlanets();
+	drawNebulas();
 	drawWorld();
 	drawBounds();
 }
@@ -189,6 +190,15 @@ function drawPlanet(planet){
 	canvasContext.beginPath();
 	canvasContext.fillStyle = planet.color;
 	canvasContext.arc(planet.x-myShip.x+camera.xOffset,planet.y-myShip.y+camera.yOffset,planet.radius,0,Math.PI*2,true);
+	canvasContext.fill();
+	canvasContext.restore();
+}
+
+function drawNebula(nebula){
+	canvasContext.save();
+	canvasContext.beginPath();
+	canvasContext.fillStyle = nebula.color;
+	canvasContext.arc(nebula.x-myShip.x+camera.xOffset,nebula.y-myShip.y+camera.yOffset,nebula.radius,0,Math.PI*2,true);
 	canvasContext.fill();
 	canvasContext.restore();
 }
@@ -284,6 +294,18 @@ function drawPlanets(){
 		}
 		if(camera.inBounds(planetList[sig])){
 			drawPlanet(planetList[sig]);
+		}
+
+	}
+}
+
+function drawNebulas(){
+	for(var sig in nebulaList){
+		if(nebulaList[sig] == null){
+			continue;
+		}
+		if(camera.inBounds(nebulaList[sig])){
+			drawNebula(nebulaList[sig]);
 		}
 
 	}

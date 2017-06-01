@@ -7,6 +7,7 @@ var myID = null,
 	planetList = {},
 	playerList = {},
 	bulletList = {},
+	nebulaList = {},
 	shipList = {};
 function clientConnect() {
 	var server = io();
@@ -124,6 +125,7 @@ function clientConnect() {
 		asteroidList = updatePacket.asteroidList;
 		planetList = updatePacket.planetList;
 		itemList = updatePacket.itemList;
+		nebulaList = updatePacket.nebulaList;
 		world = updatePacket.world;
 		gameStarted = updatePacket.state;
 		lobbyTimeLeft = updatePacket.lobbyTimeLeft;

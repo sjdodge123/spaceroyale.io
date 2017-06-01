@@ -4,6 +4,9 @@ var utils = require('./utils.js');
 exports.getEngine = function(bulletList,shipList,asteroidList,planetList){
 	return new Engine(bulletList,shipList,asteroidList,planetList);
 }
+exports.slowDown = function(obj,dt,amt){
+	slowDown(obj,dt,amt);
+}
 exports.preventEscape = function(obj,bound){
 	preventEscape(obj,bound);
 }
@@ -158,6 +161,13 @@ function preventMovement(obj,wall,dt){
 	var ay = dot * byDir;
 	obj.velX -= ax;
 	obj.velY -= ay;
+	obj.newX = obj.x+obj.velX*dt;
+	obj.newY = obj.y+obj.velY*dt;
+}
+
+function slowDown(obj,dt,amt){
+	obj.velX = obj.velX*(1-amt);
+	obj.velY = obj.velY*(1-amt);
 	obj.newX = obj.x+obj.velX*dt;
 	obj.newY = obj.y+obj.velY*dt;
 }

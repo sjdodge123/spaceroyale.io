@@ -41,6 +41,12 @@
     "planetMinSize":70,
     "planetMaxSize":150,
 
+    "generateNebulas":true,
+    "nebulaAmt":50,
+    "nebulaSlowAmt":0.25,
+    "nebulaMinSize":35,
+    "nebulaMaxSize":40,
+
     "playerBaseSpeed":294,
 
     "basegunCoolDown":0.2,
