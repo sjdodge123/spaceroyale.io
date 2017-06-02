@@ -1,6 +1,9 @@
 var myID = null,
 	timeSinceLastCom = 0,
 	serverTimeoutWait = 5,
+	ping = 0,
+	pingTimeout = null,
+	lastTime = null,
 	world,
 	asteroidList = {},
 	itemList = {},
@@ -11,6 +14,7 @@ var myID = null,
 	shipList = {};
 function clientConnect() {
 	var server = io();
+	
 
 	server.on('welcome', function(id){
 		myID = id;
@@ -47,6 +51,10 @@ function clientConnect() {
 		changeToSignIn();
     	$('#nameBox').val('').prop('disabled',false);
     	$('#playerProfile').hide();
+	});
+
+	server.on("drop",function(){
+		calcPing();
 	});
 
 	server.on("gameState", function(gameState){
@@ -152,8 +160,18 @@ function clientConnect() {
 		profile = player;
 		updateProfile(player);
 	});
-
    	return server;
+}
+
+function pingServer(){
+	clearTimeout(pingTimeout);
+	lastTime = new Date();
+	server.emit('drip');
+}
+
+function calcPing(){
+	ping = new Date() - lastTime;
+	pingTimeout = setTimeout(pingServer,1000);
 }
 
 function checkForTimeout(){
