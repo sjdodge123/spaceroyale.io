@@ -78,7 +78,7 @@ function drawTotalPlayers(){
 }
 
 function drawBoundArrow(){
-  	var rad = canvas.height/2 * 0.95;
+	var rad = canvas.height/2 * 0.95;
 	var angle = Math.atan2(world.whiteBound.y-myShip.y,world.whiteBound.x-myShip.x) + Math.PI/2;
 	var x = canvas.width/2 + rad * Math.cos(angle - Math.PI/2);
 	var y = canvas.height/2 + rad * Math.sin(angle - Math.PI/2);
@@ -132,9 +132,9 @@ function drawRelativeObjects(){
         camera.centerOnObject(myShip);
 		camera.draw();
 	}
-    drawShips();
-    drawAsteroids();
-    drawItems();
+  drawShips();
+  drawAsteroids();
+  drawItems();
 	drawBullets();
 	drawPlanets();
 	drawNebulas();

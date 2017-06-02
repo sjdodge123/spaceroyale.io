@@ -52,7 +52,7 @@ function setupPage(){
         if(profile == null){
             name = $('#nameBox').val();
             if(name == ""){
-                name = $('#nameBox').attr("placeholder"); 
+                name = $('#nameBox').attr("placeholder");
             }
         } else{
             name = profile.game_name;
@@ -389,16 +389,36 @@ function resize(){
         },
 
         inBounds: function(object){
-            var objDims = object.width || object.radius;
-            var leftBound = this.padding <= object.x + objDims - myShip.x  + this.xOffset;
-            var rightBound = this.width-this.padding >= object.x - objDims - myShip.x + this.xOffset;
-            var topBound = this.padding <= object.y + objDims - myShip.y  + this.yOffset;
-            var bottomBound = this.height-this.padding >= object.y - objDims - myShip.y + this.yOffset;
 
-            if(leftBound && rightBound && topBound && bottomBound){
-                return true;
+            if (object.radius != null){
+              var dx = Math.abs(object.x - myShip.x);
+              var dy = Math.abs(object.y - myShip.y);
+
+              if (dx > (this.xOffset - this.padding + object.radius)){ return false; }
+              if (dy > (this.yOffset - this.padding + object.radius)){ return false; }
+
+              if (dx <= (this.xOffset - this.padding)){
+                return true; }
+              if (dy <= (this.yOffset - this.padding)){
+                return true; }
+
+              var cornerDsq = Math.pow(dx - (this.xOffset - this.padding),2) + Math.pow(dy - (this.yOffset - this.padding),2);
+
+              return (cornerDsq <= Math.pow(object.radius,2));
             }
-            return false;
+            else {
+              var leftBound = object.x + object.width >= myShip.x - this.xOffset + this.padding;
+              var rightBound = object.x - object.width <= myShip.x - this.xOffset + this.width - this.padding;
+              var topBound = object.y + object.width >= myShip.y - this.yOffset + this.padding;
+              var bottomBound = object.y - object.width <= myShip.y - this.yOffset + this.height - this.padding;
+
+              if(leftBound && rightBound && topBound && bottomBound){
+                  return true;
+              }
+              return false;
+            }
+
+
         },
 
         move : function(x,y){
