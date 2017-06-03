@@ -197,6 +197,10 @@ class Game {
 		    if(this.shrinkingTimer != null){
 		        this.shrinkTimeLeft = this.shrinkingTimer.getTimeLeft().toFixed(1);
 		    }
+		    if(this.world.canSpawnTradeShip){
+		    	this.gameBoard.spawnTradeShip();
+		    	this.world.canSpawnTradeShip = false;
+		    }
 			this.checkForWin();
 		} else{
 			this.checkForGameStart()
@@ -328,7 +332,13 @@ class GameBoard {
 		item.sig = sig;
 		this.itemList[sig] = item;
 	}
-
+	spawnTradeShip(){
+		if(c.generateTradeShips){
+			var loc = this.world.getTradeShipLoc();
+			var sig = this.generateTradeShipSig();
+			this.tradeShipList[sig] = new TradeShip(loc.x1,loc.y1,180,60,utils.getRandomInt(c.tradeShipMinDelay,c.tradeShipMaxDelay),loc.x2,loc.y2);
+		}
+	}
 	checkCollisions(active){
 		if(active){
 			var objectArray = [];
@@ -460,13 +470,6 @@ class GameBoard {
 				this.nebulaList[sig] = new Nebula(loc.x,loc.y,utils.getRandomInt(c.nebulaMinSize,c.nebulaMaxSize),sig);
 			}
 		}
-		if(c.generateTradeShips){
-			for(var i = 0; i<c.tradeShipAmt;i++){
-				var loc = this.world.getTradeShipLoc();
-				var sig = this.generateTradeShipSig();
-				this.tradeShipList[sig] = new TradeShip(loc.x1,loc.y1,180,60,utils.getRandomInt(c.tradeShipMinDelay,c.tradeShipMaxDelay),loc.x2,loc.y2);
-			}
-		}
 	}
 }
 
@@ -550,6 +553,7 @@ class World extends Rect{
 		this.damageRate = c.damageTickRate;
 		this.damagePerTick = c.damagePerTick;
 		this.shrinking = false;
+		this.canSpawnTradeShip = true;
 		this.whiteBound = new WhiteBound(width/2,height/2,this.baseBoundRadius);
 		this.blueBound = new BlueBound(width/2,height/2,this.baseBoundRadius);
 		this.center = {x:width/2,y:height/2};
@@ -585,6 +589,7 @@ class World extends Rect{
 
 	drawNextBound(){
 		this.whiteBound = this._drawWhiteBound();
+		this.canSpawnTradeShip = true;
 	}
 	drawFirstBound(){
 		var newRadius = this.blueBound.radius/3;
@@ -615,7 +620,7 @@ class World extends Rect{
 		return {x:Math.floor(Math.random()*(this.width - this.x)) + this.x, y:Math.floor(Math.random()*(this.height - this.y)) + this.y};
 	}
 	getTradeShipLoc(){
-		return {x1:0,y1:0,x2:0,y2:0};
+		return {x1:-1000,y1:-1000,x2:3000,y2:3000};
 	}
 	shrinkBound(){
 		this.shrinking = true;
@@ -929,17 +934,40 @@ class TradeShip extends Rect{
 		this.delay = delay;
 		this.destX = destX;
 		this.destY = destY;
+		this.angle = (180/Math.PI)*Math.atan2(destY-this.y,destX-this.x);
+		this.destX = destX;
+		this.destY = destY;
+		this.speed = 5;
 		this.health = 100;
+		this.reachedDest = false;
 		this.item = RifleItem;
+		this.readyToMove = false;
 		this.alive = true;
 		this.sig = null;
+		setTimeout(this.startMove,this.delay*1000,this);
 	}
 	update(){
-
+		if(this.readyToMove){
+			if(!this.reachedDest){
+				this.move();
+			} else{
+				this.alive = false;	
+			}
+		}
+	}
+	startMove(ts){
+		ts.readyToMove = true;
 	}
 	dropItem(){
 		var item = new this.item(this.x+this.width/2,this.y+this.height/2,1);
 		return item;
+	}
+	move(){
+		this.x += this.speed;
+		this.y += this.speed;
+		if(this.x == this.destX && this.destY == this.destY){
+			this.reachedDest = true;
+		}
 	}
 	handleHit(object){
 		if(object.alive && object.damage != null){

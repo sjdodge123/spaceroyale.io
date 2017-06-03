@@ -239,8 +239,10 @@ function drawNebula(nebula){
 
 function drawTradeShip(tradeShip){
 	canvasContext.save();
+	canvasContext.translate(tradeShip.x-myShip.x+camera.xOffset,tradeShip.y-myShip.y+camera.yOffset);
 	canvasContext.fillStyle = tradeShip.color;
-	canvasContext.fillRect(tradeShip.x-myShip.x+camera.xOffset,tradeShip.y-myShip.y+camera.yOffset,tradeShip.width,tradeShip.height);
+	canvasContext.rotate(tradeShip.angle*Math.PI/180);
+	canvasContext.fillRect(-tradeShip.width/2,-tradeShip.height/2,tradeShip.width,tradeShip.height);
     canvasContext.restore();
 }
 
