@@ -616,11 +616,89 @@ class World extends Rect{
 		var objH = size + 15;
 		return {x:Math.floor(Math.random()*(this.width - 2*objW - this.x)) + this.x + objW, y:Math.floor(Math.random()*(this.height - 2*objH - this.y)) + this.y + objH};
 	}
+	getRandEdgeLoc(pad){
+		var loc = {x: null,y: null};
+		if (0.5 - Math.random() > 0){
+			//left or right edge
+			if (0.5 - Math.random() > 0){
+				//left
+				loc.x = -pad;
+			}
+			else{
+				//right
+				loc.x = this.width + pad;
+			}
+			loc.y = Math.floor(Math.random()*(this.height));
+		}
+		else{
+			//top or bottom edge
+			if (0.5 - Math.random() > 0){
+				//top
+				loc.y = -pad;
+			}
+			else{
+				//bot
+				loc.y = this.height + pad;
+			}
+			loc.x = Math.floor(Math.random()*(this.width));
+		}
+		return loc;
+	}
 	getRandomLoc(){
 		return {x:Math.floor(Math.random()*(this.width - this.x)) + this.x, y:Math.floor(Math.random()*(this.height - this.y)) + this.y};
 	}
 	getTradeShipLoc(){
-		return {x1:-1000,y1:-1000,x2:3000,y2:3000};
+		var loc = {x1:null,y1:null,x2:null,y2:null};
+		var pad = 500;
+		var loc1 = this.getRandEdgeLoc(pad);
+		loc.x1 = loc1.x;
+		loc.y1 = loc1.y;
+
+		var dx, dy, dd;
+		dx = this.whiteBound.x - loc.x1;
+		dy = this.whiteBound.y - loc.y1;
+		dd = utils.getMag(dx, dy);
+
+		var perpx, perpy;
+		perpx = dy/dd;
+		perpy = -dx/dd;
+
+		var xc, yc;
+		xc = this.whiteBound.x + c.tradeShipSpawnTolerance * this.whiteBound.radius * perpx;
+		yc = this.whiteBound.y + c.tradeShipSpawnTolerance * this.whiteBound.radius * perpy;
+
+		var xd, yd;
+		xd = this.whiteBound.x - c.tradeShipSpawnTolerance * this.whiteBound.radius * perpx;
+		yd = this.whiteBound.y - c.tradeShipSpawnTolerance * this.whiteBound.radius * perpy;
+
+		if (loc.y1 >= 0 && loc.y1 <= this.height){
+			//left or right start
+			if (loc.x1 < 0){
+				//starting left
+				loc.x2 = this.width + pad;
+			}
+			else{
+				loc.x2 = -pad;
+			}
+			var yt = ((yc - loc.y1)/(xc - loc.x1))*(loc.x2 - loc.x1) + loc.y1;
+			var yb = ((yd - loc.y1)/(xd - loc.x1))*(loc.x2 - loc.x1) + loc.y1;
+
+			loc.y2 = utils.getRandomInt(Math.min(yt,yb), Math.max(yt,yb));
+		}
+		else{
+			//top or bot start;
+			if (loc.y1 < 0){
+				loc.y2 = this.height + pad;
+			}
+			else{
+				loc.y2 = -pad;
+			}
+			var xt = ((xc - loc.x1)/(yc - loc.y1))*(loc.y2 - loc.y1) + loc.x1;
+			var xb = ((xd - loc.x1)/(yd - loc.y1))*(loc.y2 - loc.y1) + loc.x1;
+
+			loc.x2 = utils.getRandomInt(Math.min(xt,xb), Math.max(xt,xb));
+		}
+		return loc;
 	}
 	shrinkBound(){
 		this.shrinking = true;
@@ -937,7 +1015,7 @@ class TradeShip extends Rect{
 		this.angle = (180/Math.PI)*Math.atan2(destY-this.y,destX-this.x);
 		this.destX = destX;
 		this.destY = destY;
-		this.speed = 5;
+		this.speed = c.tradeShipSpeed;
 		this.health = 100;
 		this.reachedDest = false;
 		this.item = RifleItem;
@@ -951,7 +1029,7 @@ class TradeShip extends Rect{
 			if(!this.reachedDest){
 				this.move();
 			} else{
-				this.alive = false;	
+				this.alive = false;
 			}
 		}
 	}
@@ -963,8 +1041,8 @@ class TradeShip extends Rect{
 		return item;
 	}
 	move(){
-		this.x += this.speed;
-		this.y += this.speed;
+		this.x += this.speed * Math.cos(this.angle * (Math.PI/180));
+		this.y += this.speed * Math.sin(this.angle * (Math.PI/180));
 		if(this.x == this.destX && this.destY == this.destY){
 			this.reachedDest = true;
 		}

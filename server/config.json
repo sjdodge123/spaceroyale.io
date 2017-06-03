@@ -6,7 +6,7 @@
     "minPlayers":2,
     "maxPlayersInRoom":15,
     "roomKickTimeout":30,
-    "lobbyWaitTime":2,
+    "lobbyWaitTime":15,
 
     "baseTimeUntilShrink":30,
     "timeUntilShrinkSpeedup":0.75,
@@ -48,8 +48,10 @@
     "nebulaMaxSize":40,
 
     "generateTradeShips":true,
-    "tradeShipMinDelay":5,
-    "tradeShipMaxDelay":20,
+    "tradeShipMinDelay":3,
+    "tradeShipMaxDelay":5,
+    "tradeShipSpawnTolerance":0.7,
+    "tradeShipSpeed":5,
 
     "playerBaseSpeed":294,
 
