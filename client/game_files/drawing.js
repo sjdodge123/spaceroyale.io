@@ -34,6 +34,7 @@ function drawHUD(){
 	drawKillCounter();
     drawHPCounter();
     drawToast();
+    drawPing();
     drawTotalPlayers();
     drawEventLog();
 
@@ -76,6 +77,13 @@ function drawTotalPlayers(){
 		drawTextF(message,canvas.width-(message.length*5),canvas.height - 15,"#e0e0eb","10px Georgia");
 	}
 }
+function drawPing(){
+	if(ping != null){
+		var message = "Ping: " + ping;
+		drawTextF(message,canvas.width-(message.length*5) - 125,canvas.height - 15,"#e0e0eb","10px Georgia");
+	}
+}
+
 
 function drawBoundArrow(){
 	var dx = world.whiteBound.x - myShip.x;

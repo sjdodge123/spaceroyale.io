@@ -32,6 +32,7 @@ var server = null,
 
 window.onload = function() {
     server = clientConnect();
+    pingServer();
     setupPage();
 }
 

@@ -51,7 +51,7 @@ exports.messageRoomByUserID = function(id,header,payload){
 
 function checkForMail(client){
 	client.emit("welcome",client.id);
-	
+
 	client.on('register',function(creds){
 		creds.address = client.handshake.address;
 		creds.id = client.id;
@@ -102,6 +102,8 @@ function checkForMail(client){
   		client.emit('successfulSignout');
   	});
 
+  	
+
 	client.on('movement',function(packet){
 		var room = getRoomFromId(client.id);
 		if(room == undefined){
@@ -136,6 +138,10 @@ function checkForMail(client){
 		var ship = room.shipList[client.id];
 		room.game.gameBoard.fireWeapon(ship);
 	});
+
+	client.on('drip',function(){
+  		client.emit('drop');
+  	});
 }
 
 function messageUser(id,header,payload){
