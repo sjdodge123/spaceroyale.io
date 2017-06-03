@@ -17,6 +17,7 @@ class Room {
 		this.clientList = {};
 		this.planetList = {};
 		this.nebulaList = {};
+		this.tradeShipList = {};
 		this.asteroidList = {};
 		this.bulletList = {};
 		this.itemList = {};
@@ -24,9 +25,9 @@ class Room {
 		this.killedShips = {};
 		this.clientCount = 0;
 		this.alive = true;
-		this.engine = _engine.getEngine(this.bulletList, this.shipList, this.world, this.asteroidList, this.planetList);
+		this.engine = _engine.getEngine(this.bulletList, this.shipList, this.world, this.asteroidList, this.planetList,this.nebulaList,this.tradeShipList);
 		this.world = new World(0,0,c.lobbyWidth,c.lobbyHeight,this.engine);
-		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList,this.planetList,this.itemList,this.nebulaList,this.engine,this.sig);
+		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList,this.planetList,this.itemList,this.nebulaList,this.tradeShipList,this.engine,this.sig);
 	}
 	join(clientID){
 		var client = messenger.getClient(clientID);
@@ -83,6 +84,7 @@ class Room {
 			planetList:this.planetList,
 			itemList:this.itemList,
 			nebulaList:this.nebulaList,
+			tradeShipList:this.tradeShipList,
 			world:this.world,
 			state:this.game.active,
 			lobbyTimeLeft:this.game.lobbyTimeLeft,
@@ -111,7 +113,7 @@ class Room {
 }
 
 class Game {
-	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,nebulaList,engine,roomSig){
+	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,nebulaList,tradeShipList,engine,roomSig){
 		this.world = world;
 		this.clientList = clientList;
 		this.bulletList = bulletList;
@@ -120,6 +122,7 @@ class Game {
 		this.asteroidList = asteroidList;
 		this.itemList = itemList;
 		this.nebulaList = nebulaList;
+		this.tradeShipList = tradeShipList;
 		this.engine = engine;
 		this.roomSig = roomSig;
 
@@ -127,7 +130,6 @@ class Game {
 		this.minPlayers = c.minPlayers;
 		this.lobbyWaitTime = c.lobbyWaitTime;
 		this.timeUntilShrink = c.baseTimeUntilShrink;
-
 		this.shrinkingDurationSpeedup = c.shrinkingDurationSpeedup;
 		this.timeUntilShrinkSpeedup = c.timeUntilShrinkSpeedup;
 
@@ -146,7 +148,7 @@ class Game {
 		this.lobbyTimer = null;
 		this.lobbyTimeLeft = this.lobbyWaitTime;
 
-		this.gameBoard = new GameBoard(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,nebulaList,engine);
+		this.gameBoard = new GameBoard(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,nebulaList,this.tradeShipList,engine);
 	}
 
 	start(){
@@ -247,7 +249,7 @@ class Game {
 }
 
 class GameBoard {
-	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,nebulaList,engine){
+	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,nebulaList,tradeShipList,engine){
 		this.world = world;
 		this.clientList = clientList;
 		this.bulletList = bulletList;
@@ -256,12 +258,14 @@ class GameBoard {
 		this.planetList = planetList;
 		this.itemList = itemList;
 		this.nebulaList = nebulaList;
+		this.tradeShipList = tradeShipList;
 		this.engine = engine;
 	}
 	update(active, dt){
 		this.engine.update(dt);
 		this.checkCollisions(active);
 		this.updateShips(active,dt);
+		this.updateTradeShips();
 		this.updateBullets(dt);
 		this.updateAsteroids();
 		this.updateItems();
@@ -277,6 +281,17 @@ class GameBoard {
 				ship.droppedItem = null;
 			}
 			ship.update(dt);
+		}
+	}
+	updateTradeShips(){
+		for(var sig in this.tradeShipList){
+			var tradeShip = this.tradeShipList[sig];
+			if(tradeShip.alive == false){
+				this.spawnItem(tradeShip.dropItem());
+				delete this.tradeShipList[sig];
+				continue;
+			}
+			tradeShip.update();
 		}
 	}
 	updateBullets(){
@@ -329,6 +344,9 @@ class GameBoard {
 			}
 			for(var itemSig in this.itemList){
 				objectArray.push(this.itemList[itemSig]);
+			}
+			for(var tradeSig in this.tradeShipList){
+				objectArray.push(this.tradeShipList[tradeSig]);
 			}
 			for(var nebulaSig in this.nebulaList){
 				objectArray.push(this.nebulaList[nebulaSig]);
@@ -413,6 +431,13 @@ class GameBoard {
 		}
 		return this.generatePlanetSig();
 	}
+	generateTradeShipSig(){
+		var sig = utils.getRandomInt(0,99999);
+		if(this.tradeShipList[sig] == null || this.tradeShipList[sig] == undefined){
+			return sig;
+		}
+		return this.generateTradeShipSig();
+	}
 	populateWorld(){
 		if(c.generateAsteroids){
 			for(var i = 0; i<c.asteroidAmt;i++){
@@ -435,9 +460,16 @@ class GameBoard {
 				this.nebulaList[sig] = new Nebula(loc.x,loc.y,utils.getRandomInt(c.nebulaMinSize,c.nebulaMaxSize),sig);
 			}
 		}
+		if(c.generateTradeShips){
+			for(var i = 0; i<c.tradeShipAmt;i++){
+				//var loc = this.world.getOutsideLoc(30);
+				//var destLoc = this.world.getOutsideLoc();
+				var sig = this.generateTradeShipSig();
+				this.tradeShipList[sig] = new TradeShip(0,0,180,60,utils.getRandomInt(c.tradeShipMinDelay,c.tradeShipMaxDelay),0,0);
+			}
+		}
 	}
 }
-
 
 class Shape {
 	constructor(x,y,color){
@@ -886,6 +918,34 @@ class Nebula extends Circle {
 	}
 	handleHit(object){
 		return;
+	}
+}
+
+class TradeShip extends Rect{
+	constructor(x,y,width,height,delay,destX,destY){
+		super(x,y,width,height,"#808080");
+		this.delay = delay;
+		this.destX = destX;
+		this.destY = destY;
+		this.health = 100;
+		this.item = RifleItem;
+		this.alive = true;
+		this.sig = null;
+	}
+	update(){
+
+	}
+	dropItem(){
+		var item = new this.item(this.x+this.width/2,this.y+this.height/2,1);
+		return item;
+	}
+	handleHit(object){
+		if(object.alive && object.damage != null){
+			this.health -= object.damage;
+			if(this.health < 1){
+				this.alive = false;
+			}
+		}
 	}
 }
 

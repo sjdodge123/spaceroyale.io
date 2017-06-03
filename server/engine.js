@@ -1,8 +1,8 @@
 "use strict";
 var utils = require('./utils.js');
 
-exports.getEngine = function(bulletList,shipList,asteroidList,planetList){
-	return new Engine(bulletList,shipList,asteroidList,planetList);
+exports.getEngine = function(bulletList,shipList,asteroidList,planetList,nebulaList,tradeShipList){
+	return new Engine(bulletList,shipList,asteroidList,planetList,nebulaList,tradeShipList);
 }
 exports.slowDown = function(obj,dt,amt){
 	slowDown(obj,dt,amt);
@@ -15,11 +15,13 @@ exports.preventMovement = function(obj,wall,dt){
 }
 
 class Engine {
-	constructor(bulletList,shipList,asteroidList,planetList){
+	constructor(bulletList,shipList,asteroidList,planetList,nebulaList,tradeShipList){
 		this.bulletList = bulletList;
 		this.shipList = shipList;
 		this.asteroidList = asteroidList;
 		this.planetList = planetList;
+		this.nebulaList = nebulaList;
+		this.tradeShipList = tradeShipList;
 		this.dt = 0;
 	}
 
@@ -142,8 +144,8 @@ function checkDistance(obj1,obj2){
 	var objX2 = obj2.newX || obj2.x;
 	var objY2 = obj2.newY || obj2.y;
 	var distance = utils.getMag(objX2 - objX1,objY2 - objY1);
-  	distance -= obj1.radius || obj1.width;
-	distance -= obj2.radius || obj2.width;
+  	distance -= obj1.radius || obj1.height;
+	distance -= obj2.radius || obj2.height;
 	if(distance <= 0){
 		return true;
 	}
