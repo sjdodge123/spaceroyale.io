@@ -165,12 +165,13 @@ function drawRelativeObjects(){
         camera.centerOnObject(myShip);
 		camera.draw();
 	}
-  drawShips();
-  drawAsteroids();
-  drawItems();
+	drawShips();
+	drawAsteroids();
+	drawItems();
 	drawBullets();
 	drawPlanets();
 	drawNebulas();
+	drawTradeShips();
 	drawWorld();
 	drawBounds();
 }
@@ -234,6 +235,13 @@ function drawNebula(nebula){
 	canvasContext.arc(nebula.x-myShip.x+camera.xOffset,nebula.y-myShip.y+camera.yOffset,nebula.radius,0,Math.PI*2,true);
 	canvasContext.fill();
 	canvasContext.restore();
+}
+
+function drawTradeShip(tradeShip){
+	canvasContext.save();
+	canvasContext.fillStyle = tradeShip.color;
+	canvasContext.fillRect(tradeShip.x-myShip.x+camera.xOffset,tradeShip.y-myShip.y+camera.yOffset,tradeShip.width,tradeShip.height);
+    canvasContext.restore();
 }
 
 function drawBullet(bullet){
@@ -341,6 +349,16 @@ function drawNebulas(){
 			drawNebula(nebulaList[sig]);
 		}
 
+	}
+}
+function drawTradeShips(){
+	for(var sig in tradeShipList){
+		if(tradeShipList[sig] == null){
+			continue;
+		}
+		if(camera.inBounds(tradeShipList[sig])){
+			drawTradeShip(tradeShipList[sig]);
+		}
 	}
 }
 
