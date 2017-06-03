@@ -78,10 +78,35 @@ function drawTotalPlayers(){
 }
 
 function drawBoundArrow(){
+	var dx = world.whiteBound.x - myShip.x;
+	var dy = world.whiteBound.y - myShip.y;
+
+	var x, y;
+	var arrowPad = 20;
+	if (Math.abs(dy/dx) < (camera.yOffset) / (camera.xOffset)){
+		if (dx > 0){
+			//right edge
+			x = 2 * camera.xOffset - arrowPad;
+		}
+		else{
+			//left edge
+			x = arrowPad;
+		}
+		y = (dy/dx) * (x - camera.xOffset) + camera.yOffset;
+	}
+	else {
+		if (dy > 0){
+			//bottom edge
+			y = 2 * camera.yOffset - arrowPad;
+		}
+		else{
+			//top edge
+			y = arrowPad;
+		}
+		x = (dx/dy) * (y - camera.yOffset) + camera.xOffset;
+	}
 	var rad = canvas.height/2 * 0.95;
 	var angle = Math.atan2(world.whiteBound.y-myShip.y,world.whiteBound.x-myShip.x) + Math.PI/2;
-	var x = canvas.width/2 + rad * Math.cos(angle - Math.PI/2);
-	var y = canvas.height/2 + rad * Math.sin(angle - Math.PI/2);
 
 	canvasContext.save();
 	canvasContext.translate(x, y);
