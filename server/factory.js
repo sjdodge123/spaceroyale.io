@@ -462,10 +462,9 @@ class GameBoard {
 		}
 		if(c.generateTradeShips){
 			for(var i = 0; i<c.tradeShipAmt;i++){
-				//var loc = this.world.getOutsideLoc(30);
-				//var destLoc = this.world.getOutsideLoc();
+				var loc = this.world.getTradeShipLoc();
 				var sig = this.generateTradeShipSig();
-				this.tradeShipList[sig] = new TradeShip(0,0,180,60,utils.getRandomInt(c.tradeShipMinDelay,c.tradeShipMaxDelay),0,0);
+				this.tradeShipList[sig] = new TradeShip(loc.x1,loc.y1,180,60,utils.getRandomInt(c.tradeShipMinDelay,c.tradeShipMaxDelay),loc.x2,loc.y2);
 			}
 		}
 	}
@@ -614,6 +613,9 @@ class World extends Rect{
 	}
 	getRandomLoc(){
 		return {x:Math.floor(Math.random()*(this.width - this.x)) + this.x, y:Math.floor(Math.random()*(this.height - this.y)) + this.y};
+	}
+	getTradeShipLoc(){
+		return {x1:0,y1:0,x2:0,y2:0};
 	}
 	shrinkBound(){
 		this.shrinking = true;
