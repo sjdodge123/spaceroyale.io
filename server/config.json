@@ -56,9 +56,9 @@
 
     "playerBaseSpeed":294,
 
-    "basegunCoolDown":0.2,
+    "basegunCoolDown":0.3,
     "bulletLifetime":5,
-    "bulletSpeed":588,
+    "bulletSpeed":788,
     "bulletDamage":10,
 
     "shotgunCoolDown":1.2,

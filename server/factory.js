@@ -1232,7 +1232,6 @@ class Pistol extends Weapon{
 		this.level = level;
 		this.name = "Pistol";
 		this.cooldown = c.basegunCoolDown;
-		this.maxLevel = 1;
 		this.equipMessage = "Equiped Pistol";
 		this.upgradeMessage ="Upgraded Pistol";
 		this.item = PistolItem;
@@ -1243,8 +1242,21 @@ class Pistol extends Weapon{
 			return;
 		}
 		var bullets = [];
+		if(this.level > 1){
+			var bull1 = new Bullet(x,y,5,12,color,angle,id);
+			var bull2 = new Bullet(x,y,5,12,color,angle,id);
+			bull1.speed -= bull1.speed * .15;
+			bull2.speed -= bull2.speed * .3;
+			bullets.push(bull1,bull2);
+		}
 		bullets.push(new Bullet(x,y,5,12,color,angle,id));
 		return bullets;
+	}
+	upgrade(){
+		super.upgrade();
+		if(this.level == 3){
+			this.cooldown -= .1;
+		}
 	}
 }
 
@@ -1270,7 +1282,6 @@ class Shotgun extends Weapon{
 			bullets.push(shot1,shot3);
 		}
 		if(this.level > 2){
-
 			var shot1 = new Birdshot(x,y,4,10,color,angle-15,id);
 			shot1.speed -= 4;
 			var shot2 = new Birdshot(x,y,4,10,color,angle,id);
@@ -1278,7 +1289,6 @@ class Shotgun extends Weapon{
 			var shot3 = new Birdshot(x,y,4,10,color,angle+15,id);
 			shot3.speed -= 4;
 			bullets.push(shot1,shot2,shot3);
-
 		}
 		bullets.push(new Birdshot(x,y,4,10,color,angle-5,id));
 		bullets.push(new Birdshot(x,y,4,10,color,angle-2.5,id));
@@ -1301,7 +1311,6 @@ class Rifle extends Weapon{
 		this.name = "Rifle";
 		this.level = level;
 		this.cooldown = c.rifleCoolDown;
-		this.maxLevel = 1;
 		this.equipMessage = "Equiped Rifle";
 		this.upgradeMessage = "Upgraded Rifle";
 		this.item = RifleItem;
@@ -1311,8 +1320,27 @@ class Rifle extends Weapon{
 			return;
 		}
 		var bullets = [];
+
+		if(this.level > 1){
+			bullets.push(new RifleBullet(x,y,8,20,color,angle+10,id));
+			bullets.push(new RifleBullet(x,y,8,20,color,angle-10,id));
+		}
+		if(this.level > 2){
+			var bullet = new RifleBullet(x,y,15,30,color,angle,id);
+			bullet.speed += 500;
+			bullets.push(bullet);
+		}
 		bullets.push(new RifleBullet(x,y,8,20,color,angle,id));
 		return bullets;
+	}
+	upgrade(){
+		super.upgrade();
+		if(this.level == 2){
+			this.cooldown -= .2;
+		}
+		if(this.level == 3){
+			this.cooldown -= .3;
+		}
 	}
 }
 
