@@ -246,6 +246,17 @@ function drawTradeShip(tradeShip){
     canvasContext.restore();
 }
 
+function drawTradeShipTrail(circle){
+	canvasContext.save();
+	canvasContext.beginPath();
+	canvasContext.lineWidth = 3;
+	canvasContext.strokeStyle = circle.color;
+	console.log(circle.color);
+	canvasContext.arc(circle.x-myShip.x+camera.xOffset,circle.y-myShip.y+camera.yOffset,circle.radius,0,Math.PI*2,true);
+	canvasContext.stroke();
+	canvasContext.restore();
+}
+
 function drawBullet(bullet){
 	canvasContext.save();
 	canvasContext.translate(bullet.x-myShip.x+camera.xOffset,bullet.y-myShip.y+camera.yOffset);
@@ -357,6 +368,14 @@ function drawTradeShips(){
 	for(var sig in tradeShipList){
 		if(tradeShipList[sig] == null){
 			continue;
+		}
+		for(var trailSig in tradeShipList[sig].trailList){
+			var circle = tradeShipList[sig].trailList[trailSig];
+			if(circle != null){
+				if(camera.inBounds(circle)){
+					drawTradeShipTrail(circle);
+				}
+			}
 		}
 		if(camera.inBounds(tradeShipList[sig])){
 			drawTradeShip(tradeShipList[sig]);

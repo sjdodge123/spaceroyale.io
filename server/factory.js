@@ -1022,15 +1022,30 @@ class TradeShip extends Rect{
 		this.readyToMove = false;
 		this.alive = true;
 		this.sig = null;
+		this.trailSpawnTime = 1;
+		this.lastTrailSpawn = new Date();
+		this.trailList = {};
 		setTimeout(this.startMove,this.delay*1000,this);
 	}
 	update(){
 		if(this.readyToMove){
 			if(!this.reachedDest){
+				this.drawTrail();
 				this.move();
+				this.updateTrails();
 			} else{
 				this.alive = false;
 			}
+		}
+	}
+	updateTrails(){
+		for(var sig in this.trailList){
+			if(this.trailList[sig].alive){
+				this.trailList[sig].update();
+			}else{
+				delete this.trailList[sig];
+			}
+			
 		}
 	}
 	startMove(ts){
@@ -1047,6 +1062,22 @@ class TradeShip extends Rect{
 			this.reachedDest = true;
 		}
 	}
+	drawTrail(){
+		var currentTime = new Date();
+		if(currentTime - this.lastTrailSpawn > this.trailSpawnTime*1000){
+			var sig = this.generateTrailSig();
+			this.trailList[sig] = new Trail(this.x,this.y);
+			this.lastTrailSpawn = currentTime; 
+		}
+	}
+	generateTrailSig(){
+		var sig = utils.getRandomInt(0,99999);
+		if(this.trailList[sig] == null || this.trailList[sig] == undefined){
+			return sig;
+		}
+		return this.generateTrailSig();
+	}
+
 	handleHit(object){
 		if(object.alive && object.damage != null){
 			this.health -= object.damage;
@@ -1055,6 +1086,33 @@ class TradeShip extends Rect{
 			}
 		}
 	}
+}
+
+class Trail extends Circle {
+	constructor(x,y){
+		super(x,y,5,"rgba(176,196,222,1)");
+		this.lifetime = c.tradeShipTrailDuration*1000;
+		this.start = new Date();
+		this.alive = true;
+		this.alpha = 1;
+	}
+	update(){
+		var currentTime = new Date();
+		var remaining = this.lifetime - (currentTime - this.start);
+		if(remaining <= 0){
+			this.alive = false;
+			return;
+		}
+		this.alpha = remaining/this.lifetime;
+		this.radius += 1;
+		var newRGBA = this.color.substring(5,this.color.length-1).replace('/ /g','').split(',');
+		var colorString = "rgba(";
+		for(var i=0;i<newRGBA.length-1;i++){
+			colorString += newRGBA[i] + ',';
+		}
+		this.color = colorString + this.alpha.toFixed(2) +')'; 
+	}
+
 }
 
 class RectItem extends Rect{

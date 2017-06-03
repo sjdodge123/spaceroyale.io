@@ -48,9 +48,10 @@
     "nebulaMaxSize":40,
 
     "generateTradeShips":true,
-    "tradeShipMinDelay":3,
-    "tradeShipMaxDelay":5,
+    "tradeShipMinDelay":5,
+    "tradeShipMaxDelay":25,
     "tradeShipSpawnTolerance":0.7,
+    "tradeShipTrailDuration":10,
     "tradeShipSpeed":5,
 
     "playerBaseSpeed":294,
