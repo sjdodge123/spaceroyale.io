@@ -130,7 +130,6 @@ function checkForMail(client){
 	});
 
 	client.on('click',function(loc){
-		//if bullet should be spawned (could be clicking something else)
 		var room = getRoomFromId(client.id);
 		if(room == undefined){
 			return;

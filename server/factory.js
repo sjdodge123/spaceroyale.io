@@ -849,8 +849,11 @@ class Ship extends Rect{
 		}
 	}
 	fire(){
-		messenger.messageRoomByUserID(this.id,'weaponFired',{ship:this,weapon:this.weapon});
-		return this.weapon.fire(this.x,this.y,this.angle,this.baseColor,this.id);
+		var bullets = this.weapon.fire(this.x,this.y,this.angle,this.baseColor,this.id);
+		if(bullets != null){
+			messenger.messageRoomByUserID(this.id,'weaponFired',{ship:this,weapon:this.weapon});
+		}
+		return bullets;
 	}
 	move(){
 		this.x = this.newX;

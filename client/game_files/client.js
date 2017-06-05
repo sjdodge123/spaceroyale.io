@@ -91,6 +91,9 @@ function clientConnect() {
 	});
 
 	server.on("weaponFired",function(payload){
+		if(payload.ship.id == myID){
+			lastFired = new Date();
+		}
 		if(camera.inBounds(payload.ship)){
 			if(payload.weapon.name == "Pistol"){
             	playSound(pistolShot);
@@ -142,6 +145,10 @@ function clientConnect() {
 		shrinkTimeLeft = updatePacket.shrinkTimeLeft;
 		totalPlayers = updatePacket.totalPlayers;
 		timeSinceLastCom = 0;
+
+		if(myShip.weapon != null){
+			currentWeaponCooldown = myShip.weapon.cooldown*1000;
+		}
 	});
 
 	server.on("shotsFired",function(bullet){

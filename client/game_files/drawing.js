@@ -36,6 +36,7 @@ function drawHUD(){
     drawToast();
     drawPing();
     drawTotalPlayers();
+    drawWeaponCooldown();
     drawEventLog();
 
     if(!camera.inBounds(world.whiteBound)){
@@ -76,6 +77,16 @@ function drawTotalPlayers(){
 		var message = "Players on Server: " + totalPlayers;
 		drawTextF(message,canvas.width-(message.length*5),canvas.height - 15,"#e0e0eb","10px Georgia");
 	}
+}
+function drawWeaponCooldown(){
+	canvasContext.save();
+	canvasContext.lineWidth = 5;
+	canvasContext.strokeStyle = myShip.color;
+	canvasContext.beginPath();
+	canvasContext.moveTo(0,canvas.height);
+	canvasContext.lineTo( (1 - (cooldownRemaining/currentWeaponCooldown))*canvas.width,canvas.height);
+	canvasContext.stroke();
+	canvasContext.restore();
 }
 function drawPing(){
 	if(ping != null){

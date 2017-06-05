@@ -12,6 +12,9 @@ var server = null,
     //Gamevars
     skipAuth = false,
     gameRunning = false,
+    lastFired = new Date(),
+    cooldownRemaining = 0,
+    currentWeaponCooldown = 0,
     iAmAlive = true,
     timeOutChecker = null,
     gameStarted = false,
@@ -469,9 +472,12 @@ function gameLoop(){
     drawRelativeObjects();
     drawHUD();
     if(iAmAlive){
+        checkCooldown();
         checkForDamage();
     }
 }
+
+
 
 function cancelMovement(){
     turnLeft = false;
@@ -483,6 +489,13 @@ function cancelMovement(){
 
 function gameOver(){
     server.emit('movement',{turnLeft:false,moveForward:false,turnRight:false,moveBackward:false});
+}
+
+function checkCooldown(){
+    cooldownRemaining = currentWeaponCooldown - (new Date() - lastFired);
+    if(cooldownRemaining <= 0){
+        cooldownRemaining = 0;
+    }
 }
 
 function checkForDamage(){
