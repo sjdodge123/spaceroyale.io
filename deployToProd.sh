@@ -1,0 +1,1 @@
+scp -r /home/ubuntu/spaceroyale.io/ ec2-54-197-221-219.compute-1.amazonaws.com:/home/ubuntu/spaceroyale.io/
