@@ -26,7 +26,7 @@ window.onload = function(){
 }
 
 function createObjects(){
-	quadTree = new QuadTree(0, canvas.width, 0, canvas.height, 2, 5, 0);
+	quadTree = new QuadTree(0, canvas.width, 0, canvas.height, 3, 5, -1);
 
 	for(var i = 0; i < objectCount; i++){
 		var w = getRandomIntInRange(objectMinDim, objectMaxDim);
@@ -132,7 +132,7 @@ class QuadTree {
 		this.nodes.push(new QuadTree(this.minX, this.minX + subWidth, this.minY, this.minY + subHeight, this.maxDepth, this.maxChildren, this.level + 1));
 		this.nodes.push(new QuadTree(this.minX + subWidth, this.maxX, this.minY, this.minY + subHeight, this.maxDepth, this.maxChildren, this.level + 1));
 		this.nodes.push(new QuadTree(this.minX, this.minX + subWidth, this.minY + subHeight, this.maxY, this.maxDepth, this.maxChildren, this.level + 1));
-		this.nodes.push(new QuadTree(this.minX + subWidth, this.minX, this.minY + subHeight, this.maxY, this.maxDepth, this.maxChildren, this.level + 1));
+		this.nodes.push(new QuadTree(this.minX + subWidth, this.maxX, this.minY + subHeight, this.maxY, this.maxDepth, this.maxChildren, this.level + 1));
 	}
 	getIndex(obj){
 		var index = -1;
