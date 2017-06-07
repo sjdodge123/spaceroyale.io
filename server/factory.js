@@ -60,6 +60,7 @@ class Room {
 		for(var shipID in this.shipList){
 			var ship = this.shipList[shipID];
 			if(ship.alive == false){
+				this.engine.explodeObject(ship.x, ship.y, ship.explosionMaxDamage, ship.explosionRadius);
 				this.game.gameBoard.spawnItem(ship.weapon.drop(ship.x,ship.y));
 				if(ship.killedBy != null){
 					var murderer = this.shipList[ship.killedBy];
@@ -785,6 +786,8 @@ class Ship extends Rect{
 		this.velY = 0;
 		this.droppedItem = null;
 		this.dt = 0;
+		this.explosionRadius = c.playerExplosionRadius;
+		this.explosionMaxDamage = c.playerExplosionMaxDamage;
 	}
 	update(dt){
 		this.dt = dt;
@@ -884,11 +887,19 @@ class Ship extends Rect{
 			}
 		}
 	}
+
+	takeDamage(damage){
+		this.health -= Math.floor(damage);
+		this.checkHP();
+	}
 	iDied(killerID){
 		if(killerID){
 			this.killedBy = killerID;
 		}
+
+
 		this.alive = false;
+
 	}
 	checkHP(){
 		if(this.health < 1){
@@ -1048,7 +1059,7 @@ class TradeShip extends Rect{
 			}else{
 				delete this.trailList[sig];
 			}
-			
+
 		}
 	}
 	startMove(ts){
@@ -1070,7 +1081,7 @@ class TradeShip extends Rect{
 		if(currentTime - this.lastTrailSpawn > this.trailSpawnTime*1000){
 			var sig = this.generateTrailSig();
 			this.trailList[sig] = new Trail(this.x,this.y);
-			this.lastTrailSpawn = currentTime; 
+			this.lastTrailSpawn = currentTime;
 		}
 	}
 	generateTrailSig(){
@@ -1113,7 +1124,7 @@ class Trail extends Circle {
 		for(var i=0;i<newRGBA.length-1;i++){
 			colorString += newRGBA[i] + ',';
 		}
-		this.color = colorString + this.alpha.toFixed(2) +')'; 
+		this.color = colorString + this.alpha.toFixed(2) +')';
 	}
 
 }
