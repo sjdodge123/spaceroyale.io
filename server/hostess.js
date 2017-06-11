@@ -1,5 +1,5 @@
-var c = require('./config.json');
 var utils = require('./utils.js');
+var c = utils.loadConfig();
 var messenger = require('./messenger.js');
 var factory = require('./factory.js');
 
