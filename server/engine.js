@@ -1,5 +1,8 @@
 "use strict";
+var c = require('./config.json');
 var utils = require('./utils.js');
+
+var forceConstant = c.forceConstant;
 
 exports.getEngine = function(bulletList,shipList,asteroidList,planetList,nebulaList,tradeShipList){
 	return new Engine(bulletList,shipList,asteroidList,planetList,nebulaList,tradeShipList);
@@ -135,7 +138,19 @@ class Engine {
 		return result;
 	}
 
-	
+	explodeObject(xLoc, yLoc, maxDamage,  radius){
+		for (var shipSig in this.shipList){
+			var ship = this.shipList[shipSig];
+			var distance = utils.getMag(xLoc - ship.x, yLoc - ship.y);
+			if(distance  <= (radius + ship.height)){
+				var velContX = (forceConstant/Math.pow(distance,2))*(ship.x - xLoc)/distance;
+				var velContY = (forceConstant/Math.pow(distance,2))*(ship.y - yLoc)/distance;
+				ship.velX += velContX;
+				ship.velY += velContY;
+				ship.takeDamage(maxDamage * Math.abs(radius-distance)/radius);
+			}
+		}
+	}
 }
 
 function checkDistance(obj1,obj2){
@@ -188,5 +203,3 @@ function preventEscape(obj,bound){
 		obj.newY = obj.y;
 	}
 }
-
-

@@ -55,6 +55,10 @@
     "tradeShipSpeed":5,
 
     "playerBaseSpeed":294,
+    "playerExplosionRadius":60,
+    "playerExplosionMaxDamage":50,
+
+    "forceConstant": 500000,
 
     "basegunCoolDown":0.3,
     "bulletLifetime":5,
