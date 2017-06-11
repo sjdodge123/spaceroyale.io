@@ -1,6 +1,6 @@
 "use strict";
-var c = require('./config.json');
 var utils = require('./utils.js');
+var c = utils.loadConfig();
 
 var forceConstant = c.forceConstant;
 
