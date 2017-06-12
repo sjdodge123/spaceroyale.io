@@ -1,6 +1,8 @@
 "use strict";
 var fs = require('fs');
 var lastFrame = new Date();
+var c = require('./config.json');
+
 exports.getRandomInt = function(min,max){
 		min = Math.ceil(min);
 		max = Math.floor(max);
@@ -28,6 +30,19 @@ exports.getDT = function(){
 	var dt = currentFrame - lastFrame;
 	lastFrame = currentFrame;
 	return dt/1000;
+}
+exports.loadConfig = function(){
+    if(process.env.SRIO_ENV == "DEV"){
+        var d = require('./devConfig.json');
+        if(d.override == true){
+            for(var setting in c){
+                if(d[setting] != null){
+                    c[setting] = d[setting];
+                }
+            }
+        }
+    }
+    return c;
 }
 
 class Timer {

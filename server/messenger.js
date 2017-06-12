@@ -1,5 +1,5 @@
-var c = require('./config.json');
 var utils = require('./utils.js');
+var c = utils.loadConfig();
 var hostess = require('./hostess.js');
 var bouncer = require('./bouncer.js');
 var database = require('./database.js');

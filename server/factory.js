@@ -1,7 +1,6 @@
 'use strict';
-
-var c = require('./config.json');
 var utils = require('./utils.js');
+var c = utils.loadConfig();
 var messenger = require('./messenger.js');
 var database = require('./database.js');
 var _engine = require('./engine.js');

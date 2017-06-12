@@ -10,12 +10,11 @@ var io = require('socket.io').listen(server);
 
 var factory = require('./server/factory.js');
 var utils = require('./server/utils.js');
+var c = utils.loadConfig();
 var messenger = require('./server/messenger.js');
 var hostess = require('./server/hostess.js');
 var database = require('./server/database.js');
 var bouncer = require('./server/bouncer.js');
-var c = require('./server/config.json');
-
 
 
 //Base Server Settings
@@ -28,7 +27,6 @@ var serverSleeping = true,
 //Base Server Functions
 server.listen(c.port,c.host, function(){
 	messenger.build(io);
-
     console.log('listening on '+c.host+':'+c.port);
 });
 

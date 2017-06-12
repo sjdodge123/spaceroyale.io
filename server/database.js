@@ -1,8 +1,8 @@
 var mysql = require('mysql');
 var utils = require('./utils.js');
+var c = utils.loadConfig();
 var messenger = require('./messenger.js');
 var bcrypt = require('bcrypt');
-var c = require('./config.json');
 var authedUsers = {};
 
 exports.addAuthedUser = function(id,user_id){
