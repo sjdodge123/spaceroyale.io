@@ -9,24 +9,8 @@ function circleOnCircle(circleA, circleB){
 }
 
 function circleOnRect(circleA, rectB){
-    var vertices = [];
-    //set up relative vertices
-    var a = {x:-rectB.width/2, y: -rectB.height/2},
-        b = {x:rectB.width/2, y: -rectB.height/2},
-        c = {x:rectB.width/2, y: rectB.height/2},
-        d = {x:-rectB.width/2, y: rectB.height/2};
-    vertices.push(a, b, c, d);
-    var cos = Math.cos(rectB.angle * Math.PI/180);
-    var sin = Math.sin(rectB.angle * Math.PI/180);
+    var vertices = getRectVertices(rectB);
 
-    var tempX, tempY;
-    for (var i = 0; i < vertices.length; i++){
-        var vert = vertices[i];
-        tempX = vert.x * cos - vert.y * sin;
-        tempY = vert.x * sin + vert.y * cos;
-        vert.x = rectB.x + tempX;
-        vert.y = rectB.y + tempY;
-    }
     if(pointInRect(circleA.x, circleA.y, vertices)){
         return true;
     }
@@ -47,7 +31,41 @@ function circleOnRect(circleA, rectB){
 }
 
 function rectOnRect(rectA, rectB){
+    var verticesA = getRectVertices(rectA);
+    var verticesB = getRectVertices(rectB);
+
+    for (var i = 0; i < verticesA.length; i++){
+        if(pointInRect(verticesA[i].x,verticesA[i].y,verticesB)){
+            return true;
+        }
+    }
+    for (var i = 0; i < verticesB.length; i++){
+        if(pointInRect(verticesB[i].x,verticesB[i].y,verticesA)){
+            return true;
+        }
+    }
     return false;
+}
+function getRectVertices(rect){
+    var vertices = [];
+    //set up relative vertices
+    var a = {x:-rect.width/2, y: -rect.height/2},
+        b = {x:rect.width/2, y: -rect.height/2},
+        c = {x:rect.width/2, y: rect.height/2},
+        d = {x:-rect.width/2, y: rect.height/2};
+    vertices.push(a, b, c, d);
+    var cos = Math.cos(rect.angle * Math.PI/180);
+    var sin = Math.sin(rect.angle * Math.PI/180);
+
+    var tempX, tempY;
+    for (var i = 0; i < vertices.length; i++){
+        var vert = vertices[i];
+        tempX = vert.x * cos - vert.y * sin;
+        tempY = vert.x * sin + vert.y * cos;
+        vert.x = rect.x + tempX;
+        vert.y = rect.y + tempY;
+    }
+    return vertices;
 }
 
 function pointInRect(x, y, vertices){

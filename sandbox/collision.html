@@ -28,7 +28,8 @@ window.onload = function(){
 
 function init(){
 	//dynamic object
-	dynamicObj = new Circle(0, 0, 10, 'green');
+	//dynamicObj = new Circle(0, 0, 10, 'green');
+	dynamicObj = new Rect(0, 0, 50, 50, 45, 'green');
 	//static objects
 	objectList = [];
 	var obj1 = new Rect(500, 500, 100, 50, 0, 'blue');
@@ -36,7 +37,7 @@ function init(){
 	var obj3 = new Rect(500, 100, 100, 50, -45, 'blue');
 	var obj4 = new Circle(150, 450, 35, 'blue');
 	objectList.push(obj1, obj2, obj3, obj4);
-	
+
 	setInterval(gameLoop, 1000/30);
 }
 
