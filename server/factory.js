@@ -773,8 +773,6 @@ class Ship extends Rect{
 		this.id = id;
 		this.killList = [];
 		this.killedBy = null;
-		this.weapon = new Pistol(this.id);
-		this.weapon.level = 1;
 		this.shield = null;
 		this.newX = this.x;
 		this.newY = this.y;
@@ -787,6 +785,18 @@ class Ship extends Rect{
 		this.dt = 0;
 		this.explosionRadius = c.playerExplosionRadius;
 		this.explosionMaxDamage = c.playerExplosionMaxDamage;
+
+		if(c.playerSpawnWeapon == "Pistol"){
+			this.weapon = new Pistol(this.id);
+		}
+		if(c.playerSpawnWeapon == "Shotgun"){
+			this.weapon = new Shotgun(this.id);
+		}
+		if(c.playerSpawnWeapon == "Rifle"){
+			this.weapon = new Rifle(this.id);
+		}
+		
+		this.weapon.level = c.playerSpawnWeaponLevel;
 	}
 	update(dt){
 		this.dt = dt;
@@ -1257,10 +1267,8 @@ class Pistol extends Weapon{
 		var bullets = [];
 		if(this.level > 1){
 			var bull1 = new Bullet(x,y,5,12,color,angle,id);
-			var bull2 = new Bullet(x,y,5,12,color,angle,id);
 			bull1.speed -= bull1.speed * .15;
-			bull2.speed -= bull2.speed * .3;
-			bullets.push(bull1,bull2);
+			bullets.push(bull1);
 		}
 		bullets.push(new Bullet(x,y,5,12,color,angle,id));
 		return bullets;
@@ -1326,6 +1334,7 @@ class Rifle extends Weapon{
 		this.cooldown = c.rifleCoolDown;
 		this.equipMessage = "Equiped Rifle";
 		this.upgradeMessage = "Upgraded Rifle";
+		this.threeShot = false;
 		this.item = RifleItem;
 	}
 	fire(x,y,angle,color,id){
@@ -1333,15 +1342,17 @@ class Rifle extends Weapon{
 			return;
 		}
 		var bullets = [];
-
-		if(this.level > 1){
-			bullets.push(new RifleBullet(x,y,8,20,color,angle+10,id));
-			bullets.push(new RifleBullet(x,y,8,20,color,angle-10,id));
-		}
-		if(this.level > 2){
-			var bullet = new RifleBullet(x,y,15,30,color,angle,id);
-			bullet.speed += 500;
-			bullets.push(bullet);
+		if(this.level == 3 && this.threeShot){
+			var bull1 = new RifleBullet(x,y,8,20,color,angle,id);
+			var bull2 = new RifleBullet(x,y,8,20,color,angle,id);
+			bull1.speed -= bull1.speed * .25;
+			bull1.damage -= c.rifleBulletDamage*0.5;
+			bull2.speed -= bull2.speed * .40;
+			bull2.damage -= c.rifleBulletDamage*0.75;
+			bullets.push(bull1,bull2);
+			this.threeShot = false;
+		} else{
+			this.threeShot = true;
 		}
 		bullets.push(new RifleBullet(x,y,8,20,color,angle,id));
 		return bullets;
@@ -1349,10 +1360,10 @@ class Rifle extends Weapon{
 	upgrade(){
 		super.upgrade();
 		if(this.level == 2){
-			this.cooldown -= .2;
+			this.cooldown -= .7;
 		}
 		if(this.level == 3){
-			this.cooldown -= .3;
+			this.threeShot = true;
 		}
 	}
 }

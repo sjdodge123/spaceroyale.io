@@ -57,10 +57,12 @@
     "playerBaseSpeed":294,
     "playerExplosionRadius":60,
     "playerExplosionMaxDamage":50,
+    "playerSpawnWeapon":"Rifle",
+    "playerSpawnWeaponLevel":3,
 
     "forceConstant": 500000,
 
-    "basegunCoolDown":0.3,
+    "basegunCoolDown":0.5,
     "bulletLifetime":5,
     "bulletSpeed":788,
     "bulletDamage":10,
