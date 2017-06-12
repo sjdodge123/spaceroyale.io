@@ -1,0 +1,168 @@
+<html>
+<canvas id ="gameCanvas" width = "800" height = "600"></canvas>
+<script type="text/javascript" src="./engine.js"></script>
+<script type="text/javascript">
+
+"use strict";
+
+var width = window.innerWidth,
+	canvas = document.getElementById('gameCanvas');
+
+var canvasContext,
+	objectList,
+	mouseX,
+	mouseY,
+	dynamicObj;
+
+var	lastFrame = new Date();
+
+var currentFrame,
+	dt;
+
+window.onload = function(){
+	canvasContext = canvas.getContext('2d');
+	canvas.addEventListener("mousemove", calcMousePos, false);
+	init();
+
+}
+
+function init(){
+	//dynamic object
+	dynamicObj = new Circle(0, 0, 10, 'green');
+	//static objects
+	objectList = [];
+	var obj1 = new Rect(500, 500, 100, 50, 0, 'blue');
+	var obj2 = new Rect(200, 200, 50, 200, 0, 'blue');
+	var obj3 = new Rect(500, 100, 100, 50, -45, 'blue');
+	var obj4 = new Circle(150, 450, 35, 'blue');
+	objectList.push(obj1, obj2, obj3, obj4);
+	
+	setInterval(gameLoop, 1000/30);
+}
+
+function gameLoop(){
+	currentFrame = new Date();
+	dt = currentFrame - lastFrame;
+	lastFrame = currentFrame;
+
+	dynamicObj.x = mouseX;
+	dynamicObj.y = mouseY;
+
+	checkCollisions();
+
+	drawBackground();
+	drawStaticObjects();
+	drawDynamicObject();
+
+}
+function calcMousePos(evt){
+	var rect = canvas.getBoundingClientRect(),
+        root = document.documentElement;
+
+	mouseX = evt.pageX - rect.left - root.scrollLeft;
+	mouseY = evt.pageY - rect.top - root.scrollTop;
+}
+
+function checkCollisions(){
+	dynamicObj.colliding = false; //re-init dynamicObj collision.
+	for (var i = 0; i < objectList.length; i++){
+		var obj = objectList[i];
+		obj.colliding = false; //re-init obj collision.
+		var coll = false;
+		if (obj.radius){
+			if (dynamicObj.radius){
+				coll = circleOnCircle(dynamicObj, obj);
+			}
+			else{
+				coll = circleOnRect(obj, dynamicObj);
+			}
+		}
+		else{
+			if (dynamicObj.radius){
+				coll = circleOnRect(dynamicObj, obj);
+			}
+			else{
+				coll = rectOnRect(dynamicObj, obj);
+			}
+		}
+		if (coll){
+			obj.hit();
+			dynamicObj.hit();
+		}
+	}
+}
+function drawBackground(){
+	canvasContext.fillStyle = 'black';
+	canvasContext.fillRect(0,0,canvas.width,canvas.height);
+}
+
+function drawDynamicObject(){
+	dynamicObj.x = mouseX;
+	dynamicObj.y = mouseY;
+	dynamicObj.draw();
+}
+
+function drawStaticObjects(){
+	for (var i = 0; i < objectList.length; i++){
+		var obj = objectList[i];
+		obj.draw();
+	}
+}
+
+class Shape{
+	constructor(x, y, color){
+		this.x = x;
+		this.y = y;
+		this.colliding = false;
+		this.color = color;
+	}
+	hit(){
+		this.colliding = true;
+	}
+}
+class Rect extends Shape{
+	constructor(x, y, width, height, angle, color){
+		super(x, y, color);
+		this.width = width;
+		this.height = height;
+		this.angle = angle;
+	}
+	draw(){
+		var color;
+		if (this.colliding){
+			color = 'red';
+		}
+		else{
+			color = this.color;
+		}
+		canvasContext.save();
+		canvasContext.translate(this.x, this.y);
+		canvasContext.rotate(this.angle*Math.PI/180);
+		canvasContext.fillStyle = color;
+		canvasContext.fillRect(-this.width/2,-this.height/2,this.width,this.height);
+	    canvasContext.restore();
+	}
+}
+class Circle extends Shape{
+	constructor(x, y, radius, color){
+		super(x, y, color);
+		this.radius = radius;
+	}
+	draw(){
+		var color;
+		if (this.colliding){
+			color = 'red';
+		}
+		else{
+			color = this.color;
+		}
+		canvasContext.save();
+		canvasContext.beginPath();
+		canvasContext.fillStyle = color;
+		canvasContext.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
+		canvasContext.fill();
+		canvasContext.restore();
+	}
+}
+</script>
+</html>
