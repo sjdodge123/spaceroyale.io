@@ -95,13 +95,15 @@
             </form>
 
     </div>
-    <canvas id ="gameCanvas" width="800" height="600" hidden></canvas>
-    <div id="gameOverMenu" hidden>
-        <div id ="gameOverTop">
-            <label id="gameOverCause">You died!</label>
+    <div id="gameWindow">
+        <canvas id ="gameCanvas" width="1920" height="1080" hidden></canvas>
+        <div id="gameOverMenu" hidden>
+            <div id ="gameOverTop">
+                <label id="gameOverCause">You died!</label>
+            </div>
+            <div id ="gameOverBottom">
+                <input type="button" class="btn btn-danger" id="gameOverReturn" value="Return to Menu"></input>
         </div>
-        <div id ="gameOverBottom">
-            <input type="button" class="btn btn-danger" id="gameOverReturn" value="Return to Menu"></input>
     </div>
 </body>
 

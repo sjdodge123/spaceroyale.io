@@ -1,12 +1,27 @@
-html *{
+html {
 	overflow: none;
+	background: black;
 }
 
-#gameCanvas{
-	cursor: crosshair;
+#gameWindow{
+	background: black;
+	position: relative;
 	overflow: none;
 	width: 100%;
 	height: 100%;
+}
+
+#gameCanvas{
+	display: block;
+	cursor: crosshair;
+	overflow: none;
+	width: 100%;
+	height: auto;
+	margin: 0 auto;
+	position: absolute;
+	top: 50%;
+	left:50%;
+	transform:translate(-50%,-50%);
 }
 #main{
 	background: black;

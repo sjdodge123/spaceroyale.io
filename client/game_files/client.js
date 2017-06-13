@@ -157,7 +157,6 @@ function clientConnect() {
 
 	server.on("toast",function(message){
 		toastMessage = message;
-		eventLog.addEvent(message);
 		toastTimer = setTimeout(clearToast,1700);
 	});
 

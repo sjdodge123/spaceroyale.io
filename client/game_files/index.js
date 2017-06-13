@@ -26,6 +26,8 @@ var server = null,
     totalPlayers = null,
     myShip = null,
     healthLastFrame = 100,
+    newWidth = 0,
+    newHeight = 0,
     mousex,
     mousey,
     moveForward = false,
@@ -41,10 +43,7 @@ window.onload = function() {
 
 function setupPage(){
     $('#nameBox').attr("placeholder","Guest"+getRandomInt(0,999999));
-    $(window).resize(function(){
-        resize();
-    });
-
+    window.addEventListener('resize', resize, false);
     var skinArray = [];
     skinArray.push({image:'img/skins/Ship_Magenta.png',value:"#ff00bf"});
     skinArray.push({image:'img/skins/Ship_Blue.png',value:"#66b3ff"});
@@ -165,8 +164,7 @@ function setupPage(){
     })();
     canvas = document.getElementById('gameCanvas');
     canvasContext = canvas.getContext('2d');
-    canvasContext.canvas.width  = window.innerWidth;
-    canvasContext.canvas.height = window.innerHeight;
+    resize();
 
     userRegex = new RegExp('^[a-zA-Z0-9_-]{3,15}$');
     passRegex = new RegExp('^[a-zA-Z0-9_-]{6,20}$');
@@ -364,8 +362,23 @@ function init(){
 }
 
 function resize(){
-    canvasContext.canvas.width  = window.innerWidth;
-    canvasContext.canvas.height = window.innerHeight;
+
+    var viewport = {width:window.innerWidth,height:window.innerHeight};
+    var scaleToFitX = viewport.width / canvas.width;
+    var scaleToFitY = viewport.height / canvas.height;
+    var currentScreenRatio = viewport.width/viewport.height;
+    var optimalRatio = Math.min(scaleToFitX,scaleToFitY);
+
+    if(currentScreenRatio >= 1.77 && currentScreenRatio <= 1.79){
+        newWidth = viewport.width;
+        newHeight = viewport.height;
+    } else{
+        newWidth = canvas.width * optimalRatio;
+        newHeight = canvas.height * optimalRatio;
+    }
+    canvas.style.width = newWidth + "px";
+    canvas.style.height = newHeight + "px";
+    
     camera = {
         x : canvas.width/2,
         y : canvas.height/2,
@@ -508,11 +521,10 @@ function checkForDamage(){
 
 function calcMousePos(evt){
     evt.preventDefault();
-    var rect = canvas.getBoundingClientRect(),
-        root = document.documentElement;
+    var rect = canvas.getBoundingClientRect();
     if(myShip != null){
-        mouseX = evt.pageX - rect.left - root.scrollLeft + myShip.x - camera.xOffset;
-        mouseY = evt.pageY - rect.top - root.scrollTop + myShip.y - camera.yOffset;
+        mouseX = (((evt.pageX - rect.left)/newWidth)*canvas.width)+ myShip.x - camera.xOffset;
+        mouseY = (((evt.pageY - rect.top )/newHeight)*canvas.height) + myShip.y - camera.yOffset;
         server.emit('mousemove',{x:mouseX,y:mouseY});
     }
 }

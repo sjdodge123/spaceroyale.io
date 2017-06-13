@@ -57,8 +57,8 @@
     "playerBaseSpeed":294,
     "playerExplosionRadius":60,
     "playerExplosionMaxDamage":50,
-    "playerSpawnWeapon":"Rifle",
-    "playerSpawnWeaponLevel":3,
+    "playerSpawnWeapon":"Pistol",
+    "playerSpawnWeaponLevel":1,
 
     "forceConstant": 500000,
 
