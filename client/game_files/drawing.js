@@ -32,6 +32,7 @@ function drawTextF(text,x,y,color,font){
 
 //DRAWING HUD UI
 function drawHUD(){
+	drawJoysticks();
 	drawAliveCounter();
 	drawKillCounter();
     drawHPCounter();
@@ -51,6 +52,31 @@ function drawHUD(){
     	drawLobbyTimer();
     }
 
+}
+
+function drawJoysticks(){
+	if(joystickMovement != null && joystickMovement.pressed){
+		canvasContext.save();
+		canvasContext.beginPath();
+		canvasContext.strokeStyle = "blue";
+		canvasContext.arc(joystickMovement.baseX,joystickMovement.baseY,joystickMovement.baseRadius,0,Math.PI*2,true);
+		canvasContext.stroke();
+		canvasContext.beginPath();
+		canvasContext.arc(joystickMovement.stickX,joystickMovement.stickY,joystickMovement.stickRadius,0,Math.PI*2,true);
+		canvasContext.stroke();
+		canvasContext.restore();
+	}
+	if(joystickCamera != null && joystickCamera.pressed){
+		canvasContext.save();
+		canvasContext.beginPath();
+		canvasContext.strokeStyle = "red";
+		canvasContext.arc(joystickCamera.baseX,joystickCamera.baseY,joystickCamera.baseRadius,0,Math.PI*2,true);
+		canvasContext.stroke();
+		canvasContext.beginPath();
+		canvasContext.arc(joystickCamera.stickX,joystickCamera.stickY,joystickCamera.stickRadius,0,Math.PI*2,true);
+		canvasContext.stroke();
+		canvasContext.restore();
+	}
 }
 
 function drawAliveCounter(){

@@ -28,6 +28,8 @@ var server = null,
     healthLastFrame = 100,
     newWidth = 0,
     newHeight = 0,
+    joystickMovement = null,
+    joystickCamera = null,
     mousex,
     mousey,
     moveForward = false,
@@ -43,7 +45,6 @@ window.onload = function() {
 
 function setupPage(){
     $('#nameBox').attr("placeholder","Guest"+getRandomInt(0,999999));
-    window.addEventListener('resize', resize, false);
     var skinArray = [];
     skinArray.push({image:'img/skins/Ship_Magenta.png',value:"#ff00bf"});
     skinArray.push({image:'img/skins/Ship_Blue.png',value:"#66b3ff"});
@@ -162,10 +163,12 @@ function setupPage(){
                 window.setTimeout(callback, 1000 / 60);
               };
     })();
+    window.addEventListener('resize', resize, false);
     canvas = document.getElementById('gameCanvas');
     canvasContext = canvas.getContext('2d');
+    joystickMovement = new Joystick();
+    joystickCamera = new Joystick();
     resize();
-
     userRegex = new RegExp('^[a-zA-Z0-9_-]{3,15}$');
     passRegex = new RegExp('^[a-zA-Z0-9_-]{6,20}$');
     gameNameRegex = new RegExp('^[a-zA-Z0-9_-]{3,10}$');
@@ -323,6 +326,9 @@ function resetGameVariables(){
     shipList = {};
     canvas.removeEventListener("mousemove", calcMousePos, false);
     canvas.removeEventListener("mousedown", handleClick, false);
+    canvas.removeEventListener('touchstart', onTouchStart, false);
+    canvas.removeEventListener('touchend', onTouchEnd, false);
+    canvas.removeEventListener('touchmove',onTouchMove, false);
     window.removeEventListener("keydown", keyDown, false);
     window.removeEventListener("keyup", keyUp, false);
     window.removeEventListener('contextmenu', function(ev) {
@@ -347,6 +353,9 @@ function init(){
     animloop();
     canvas.addEventListener("mousemove", calcMousePos, false);
     canvas.addEventListener("mousedown", handleClick, false);
+    canvas.addEventListener('touchstart', onTouchStart, false);
+    canvas.addEventListener('touchend', onTouchEnd, false);
+    canvas.addEventListener('touchmove', onTouchMove, false);
     window.addEventListener("keydown", keyDown, false);
     window.addEventListener("keyup", keyUp, false);
     window.addEventListener('contextmenu', function(ev) {
@@ -490,8 +499,6 @@ function gameLoop(){
     }
 }
 
-
-
 function cancelMovement(){
     turnLeft = false;
     turnRight = false;
@@ -535,6 +542,63 @@ function handleClick(evt){
     if(iAmAlive){
        server.emit("click",{x:mouseX,y:mouseY});
     }
+}
+
+function onTouchStart(evt){
+    evt.preventDefault();
+    var rect = canvas.getBoundingClientRect();
+    var touch = evt.changedTouches[0];
+    var touchX = (((touch.pageX - rect.left)/newWidth)*canvas.width);
+    var touchY = (((touch.pageY - rect.top )/newHeight)*canvas.height);
+
+    if(touchX <= canvas.width/2){
+        if(joystickMovement.touchIdx == null){
+            joystickMovement.touchIdx = touch.identifier;
+            joystickMovement.onDown(touchX,touchY);
+        }     
+    }
+    if(touchX >= canvas.width/2) {
+        if(joystickCamera.touchIdx == null){
+            joystickCamera.touchIdx = touch.identifier;
+            joystickCamera.onDown(touchX,touchY);
+        }
+    }
+}
+function onTouchEnd(evt){
+    var touchList = event.changedTouches;
+    for(var i=0;i<touchList.length;i++){
+        if(touchList[i].identifier == joystickMovement.touchIdx){
+            joystickMovement.touchIdx = null;
+            joystickMovement.onUp();
+            return;
+        }
+        if(touchList[i].identifier == joystickCamera.touchIdx){
+            joystickCamera.touchIdx = null;
+            joystickCamera.onUp();
+            return;
+        }
+    }
+}
+function onTouchMove(evt){
+    evt.preventDefault();
+    var touchList = event.changedTouches;
+    var rect = canvas.getBoundingClientRect();
+    var touch, touchX,touchY;
+    for(var i=0;i<touchList.length;i++){
+        if(touchList[i].identifier  == joystickCamera.touchIdx){
+            touch = touchList[i];
+            touchX = (((touch.pageX - rect.left)/newWidth)*canvas.width);
+            touchY = (((touch.pageY - rect.top )/newHeight)*canvas.height);
+            joystickCamera.onMove(touchX,touchY);
+        }
+        if(touchList[i].identifier  == joystickMovement.touchIdx){
+            touch = touchList[i];
+            touchX = (((touch.pageX - rect.left)/newWidth)*canvas.width);
+            touchY = (((touch.pageY - rect.top )/newHeight)*canvas.height);
+            joystickMovement.onMove(touchX,touchY);
+        }
+    }
+
 }
 
 function keyDown(evt){
