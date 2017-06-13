@@ -129,6 +129,17 @@ function checkForMail(client){
 		}
 	});
 
+	client.on('touchaim',function(loc){
+		var room = getRoomFromId(client.id);
+		if(room == undefined){
+			return;
+		}
+		var ship = room.shipList[client.id];
+		if(ship != null && ship != undefined){
+			ship.angle = (180/Math.PI)*Math.atan2(loc.y2-loc.y1,loc.x2-loc.x1)-90;
+		}
+	});
+
 	client.on('click',function(loc){
 		var room = getRoomFromId(client.id);
 		if(room == undefined){

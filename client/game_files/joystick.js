@@ -8,6 +8,10 @@ class Joystick {
 		this.stickRadius = 100; 
 		this.stickX = x;
 		this.stickY = y;
+		this.dx = 0;
+		this.dy = 0;
+		this.deadzone = 75;
+		this.tapTolerance = 100;
 		this.touchIdx = null;
 		this.pressed = false;
 	}
@@ -15,18 +19,94 @@ class Joystick {
 	touchScreenAvailable(){
 		return 'createTouch' in document ? true : false;
 	}
+	checkForTap(){
+		if(Math.abs(this.dx) > this.tapTolerance || Math.abs(this.dy) > this.tapTolerance){
+			return true;
+		}
+		return false;
+	}
+
+
+	up(){
+		if(!this.pressed){
+			return false;
+		}
+		if(this.dy >= 0){
+			return false;
+		}
+		if(Math.abs(this.dy) <= this.deadzone){
+			return false;
+		}
+		if(Math.abs(this.dx) > 2 * Math.abs(this.dy)){
+			return false;
+		}
+		return true;
+	}
+
+	down(){
+		if(!this.pressed){
+			return false;
+		}
+		if(this.dy <= 0){
+			return false;
+		}
+		if(Math.abs(this.dy) <= this.deadzone){
+			return false;
+		}
+		if(Math.abs(this.dx) > 2 * Math.abs(this.dy)){
+			return false;
+		}
+		return true;
+	}
+
+	right(){
+		if(!this.pressed){
+			return false;
+		}
+		if(this.dx <= 0){
+			return false;
+		}
+		if(Math.abs(this.dx) <= this.deadzone){
+			return false;
+		}
+		if(Math.abs(this.dy) > 2*Math.abs(this.dx)){
+			return false;
+		}	
+		return true;
+	}
+
+	left(){
+		if(!this.pressed){
+			return false;
+		}
+		if(this.dx >= 0){
+			return false;
+		}
+		if(Math.abs(this.dx) <= this.deadzone){
+			return false;
+		}
+		if(Math.abs(this.dy) > 2*Math.abs(this.dx)){
+			return false;
+		}
+		return true;
+	}
+
 	onUp(){
 		this.pressed = false;
 		this.baseX = 0;
 		this.baseY = 0;
 		this.stickX = 0;
 		this.stickY = 0;
+		this.dx = 0;
+		this.dy = 0;
 	}
 	onMove(x,y){
 		if(this.pressed = true){
 			this.stickX = x;
 			this.stickY = y;
 		}
+		this.dx = this.stickX - this.baseX;
+		this.dy = this.stickY - this.baseY;
 	}
 	onDown(x,y){
 		this.pressed = true;

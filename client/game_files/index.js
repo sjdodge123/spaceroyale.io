@@ -539,8 +539,12 @@ function calcMousePos(evt){
 function handleClick(evt){
     //Run an interval here until mouseUP or something
     evt.preventDefault();
+    fireGun(mouseX,mouseY);
+}
+
+function fireGun(_x,_y){
     if(iAmAlive){
-       server.emit("click",{x:mouseX,y:mouseY});
+       server.emit("click",{x:_x,y:_y});
     }
 }
 
@@ -569,11 +573,15 @@ function onTouchEnd(evt){
     for(var i=0;i<touchList.length;i++){
         if(touchList[i].identifier == joystickMovement.touchIdx){
             joystickMovement.touchIdx = null;
+            cancelMovement();
             joystickMovement.onUp();
             return;
         }
         if(touchList[i].identifier == joystickCamera.touchIdx){
             joystickCamera.touchIdx = null;
+            if(joystickCamera.checkForTap()){
+                fireGun(joystickCamera.stickX + myShip.x - camera.xOffset,joystickCamera.stickY+ myShip.y - camera.yOffset);
+            }
             joystickCamera.onUp();
             return;
         }
@@ -590,14 +598,34 @@ function onTouchMove(evt){
             touchX = (((touch.pageX - rect.left)/newWidth)*canvas.width);
             touchY = (((touch.pageY - rect.top )/newHeight)*canvas.height);
             joystickCamera.onMove(touchX,touchY);
+            server.emit('touchaim',{
+                x1:joystickCamera.baseX,
+                y1:joystickCamera.baseY,
+                x2:joystickCamera.stickX,
+                y2:joystickCamera.stickY
+            });
         }
         if(touchList[i].identifier  == joystickMovement.touchIdx){
             touch = touchList[i];
             touchX = (((touch.pageX - rect.left)/newWidth)*canvas.width);
             touchY = (((touch.pageY - rect.top )/newHeight)*canvas.height);
             joystickMovement.onMove(touchX,touchY);
+            touchMovement();
         }
     }
+}
+
+function touchMovement(){
+    moveForward = joystickMovement.up();
+    moveBackward = joystickMovement.down();
+    turnRight = joystickMovement.right();
+    turnLeft = joystickMovement.left();
+    playThrust();
+    server.emit('movement',{turnLeft:turnLeft,moveForward:moveForward,turnRight:turnRight,moveBackward:moveBackward});
+}
+
+
+function stopTouchMovement(){
 
 }
 
