@@ -564,11 +564,11 @@ class World extends Rect{
 	}
 	updateBounds(timeLeft,dt){
 		if(this.shrinking){
-	      this.blueBound.velX = (this.whiteBound.x - this.blueBound.x)/(30*timeLeft);
-	      this.blueBound.velY = (this.whiteBound.y - this.blueBound.y)/(30*timeLeft);
+	      this.blueBound.velX = (this.whiteBound.x - this.blueBound.x)/((1/dt)*timeLeft);
+	      this.blueBound.velY = (this.whiteBound.y - this.blueBound.y)/((1/dt)*timeLeft);
 	      this.blueBound.x += this.blueBound.velX;
 	      this.blueBound.y += this.blueBound.velY;
-      	  this.blueBound.radius -= (this.blueBound.radius - this.whiteBound.radius)/(30*timeLeft);
+      	  this.blueBound.radius -= (this.blueBound.radius - this.whiteBound.radius)/((1/dt)*timeLeft);
 	      if(this.blueBound.radius <= this.whiteBound.radius){
           	this.blueBound.radius = this.whiteBound.radius;
           	this.blueBound.x = this.whiteBound.x;
