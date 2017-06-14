@@ -75,6 +75,12 @@ function drawJoysticks(){
 		canvasContext.beginPath();
 		canvasContext.arc(joystickCamera.stickX,joystickCamera.stickY,joystickCamera.stickRadius,0,Math.PI*2,true);
 		canvasContext.stroke();
+
+		canvasContext.beginPath();
+		canvasContext.moveTo(canvas.width/2,canvas.height/2);
+		canvasContext.lineTo(canvas.width/2+joystickCamera.dx*50,canvas.height/2+joystickCamera.dy*50);
+		canvasContext.stroke();
+
 		canvasContext.restore();
 	}
 }

@@ -160,7 +160,7 @@ function setupPage(){
               window.webkitRequestAnimationFrame ||
               window.mozRequestAnimationFrame    ||
               function( callback ){
-                window.setTimeout(callback, 1000 / 60);
+                window.setTimeout(callback, 1000 / 30);
               };
     })();
     window.addEventListener('resize', resize, false);
@@ -579,9 +579,7 @@ function onTouchEnd(evt){
         }
         if(touchList[i].identifier == joystickCamera.touchIdx){
             joystickCamera.touchIdx = null;
-            if(joystickCamera.checkForTap()){
-                fireGun(joystickCamera.stickX + myShip.x - camera.xOffset,joystickCamera.stickY+ myShip.y - camera.yOffset);
-            }
+            
             joystickCamera.onUp();
             return;
         }
@@ -598,6 +596,12 @@ function onTouchMove(evt){
             touchX = (((touch.pageX - rect.left)/newWidth)*canvas.width);
             touchY = (((touch.pageY - rect.top )/newHeight)*canvas.height);
             joystickCamera.onMove(touchX,touchY);
+
+
+            if(joystickCamera.checkForFire()){
+                fireGun(joystickCamera.stickX + myShip.x - camera.xOffset,joystickCamera.stickY+ myShip.y - camera.yOffset);
+            }
+
             server.emit('touchaim',{
                 x1:joystickCamera.baseX,
                 y1:joystickCamera.baseY,

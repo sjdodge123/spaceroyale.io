@@ -206,7 +206,7 @@ class Game {
 			this.checkForGameStart()
 		}
 		this.gameBoard.update(this.active, dt);
-		this.world.update(this.shrinkTimeLeft);
+		this.world.update(this.shrinkTimeLeft,dt);
 	}
 
 	checkForWin(){
@@ -559,16 +559,16 @@ class World extends Rect{
 		this.center = {x:width/2,y:height/2};
 		this.engine = engine;
 	}
-	update(timeLeft){
-		this.updateBounds(timeLeft);
+	update(timeLeft,dt){
+		this.updateBounds(timeLeft,dt);
 	}
-	updateBounds(timeLeft){
+	updateBounds(timeLeft,dt){
 		if(this.shrinking){
-	      this.blueBound.velX = (this.whiteBound.x - this.blueBound.x)/(60*timeLeft);
-	      this.blueBound.velY = (this.whiteBound.y - this.blueBound.y)/(60*timeLeft);
+	      this.blueBound.velX = (this.whiteBound.x - this.blueBound.x)/(dt*timeLeft);
+	      this.blueBound.velY = (this.whiteBound.y - this.blueBound.y)/(dt*timeLeft);
 	      this.blueBound.x += this.blueBound.velX;
 	      this.blueBound.y += this.blueBound.velY;
-      	  this.blueBound.radius -= (this.blueBound.radius - this.whiteBound.radius)/(60*timeLeft);
+      	  this.blueBound.radius -= (this.blueBound.radius - this.whiteBound.radius)/(dt*timeLeft);
 	      if(this.blueBound.radius <= this.whiteBound.radius){
           	this.blueBound.radius = this.whiteBound.radius;
           	this.blueBound.x = this.whiteBound.x;
@@ -769,16 +769,15 @@ class Ship extends Rect{
 		this.turnLeft = false;
 		this.turnRight = false;
 		this.alive = true;
-		this.speed = c.playerBaseSpeed;
 		this.id = id;
 		this.killList = [];
 		this.killedBy = null;
 		this.shield = null;
 		this.newX = this.x;
 		this.newY = this.y;
-		this.maxVelocity = 294;
+		this.maxVelocity = c.playerMaxSpeed;
+		this.acel = c.playerBaseAcel;
 		this.velocity = 0;
-		this.acel = 10000;
 		this.velX = 0;
 		this.velY = 0;
 		this.droppedItem = null;

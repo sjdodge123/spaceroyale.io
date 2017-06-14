@@ -10,8 +10,9 @@ class Joystick {
 		this.stickY = y;
 		this.dx = 0;
 		this.dy = 0;
-		this.deadzone = 75;
-		this.tapTolerance = 100;
+		this.deadzone = 100;
+		this.fireradius = 125;
+		this.fireradius2 = this.fireradius*this.fireradius;
 		this.touchIdx = null;
 		this.pressed = false;
 	}
@@ -19,13 +20,13 @@ class Joystick {
 	touchScreenAvailable(){
 		return 'createTouch' in document ? true : false;
 	}
-	checkForTap(){
-		if(Math.abs(this.dx) > this.tapTolerance || Math.abs(this.dy) > this.tapTolerance){
+	checkForFire(){
+		var d2 = getMagSquared(this.dx,this.dy);
+		if(d2 > this.fireradius2){
 			return true;
 		}
 		return false;
 	}
-
 
 	up(){
 		if(!this.pressed){

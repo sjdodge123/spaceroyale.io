@@ -83,11 +83,8 @@ class Engine {
 				dirX = Math.sqrt(2)/2;
 			}
 			if(ship.velocity < ship.maxVelocity){
-				ship.velX += ship.acel * dirX * this.dt - .1*ship.velX;
-				ship.velY += ship.acel * dirY * this.dt - .1*ship.velY;
-			} else{
-				ship.velX += ship.acel * dirX * this.dt - .5*ship.velX;
-				ship.velY += ship.acel * dirY * this.dt - .5*ship.velY;
+				ship.velX += ship.acel * dirX * this.dt - .075*ship.velX;
+				ship.velY += ship.acel * dirY * this.dt- .075*ship.velY;
 			}
 			ship.velocity = utils.getMag(ship.velX,ship.velY);
 			ship.newX += ship.velX * this.dt;
