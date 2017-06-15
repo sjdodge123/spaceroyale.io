@@ -605,7 +605,7 @@ class World extends Rect{
 		return whiteBound;
 	}
 	findFreeLoc(obj){
-		var loc = this.getRandomLoc();
+		var loc = this.getSafeLoc(obj.width || obj.radius);
 		if(this.engine.checkCollideAll(loc, obj)){
 			return this.findFreeLoc(obj);
 		}
