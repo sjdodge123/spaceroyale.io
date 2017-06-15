@@ -4,13 +4,15 @@
 <script type="text/javascript">
 "use strict";
 
-var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
-	height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,
-
+var width = window.innerWidth,
+	height = window.innerHeight,
 	canvas = document.getElementById('gameCanvas');
 
 var canvasContext,
-	objectList;
+    dynamicObj,
+    mouseX,
+    mouseY;
+var objectList = [];
 
 var objectCount = 25;
 var objectMaxDim = 30;
@@ -23,48 +25,80 @@ window.onload = function(){
 
 	drawBackground();
 	canvas.addEventListener("click", handleClick, false);
+    canvas.addEventListener("mousemove", calcMousePos, false);
+	init();
+}
+
+function init(){
+    //dynamic object - stuck to mouse
+    dynamicObj = new GameObject(0, 0, 20, 20, 'green');
+
+
+    createObjects();
+    setInterval(gameLoop, 1000/30);
+}
+
+function gameLoop(){
+
+    dynamicObj.x = mouseX;
+	dynamicObj.y = mouseY;
+    checkCollisions();
+    drawBackground();
+    dynamicObj.draw();
+	drawStaticObjects();
+
+
+}
+
+function checkCollisions(){
+    quadTree = new QuadTree(0, canvas.width, 0, canvas.height, 4, 6, -1);
+    sortObjects();
+}
+
+function drawStaticObjects(){
+	for (var i = 0; i < objectList.length; i++){
+		var obj = objectList[i];
+		obj.draw();
+	}
+    quadTree.draw();
+}
+function calcMousePos(evt){
+	var rect = canvas.getBoundingClientRect(),
+        root = document.documentElement;
+
+	mouseX = evt.pageX - rect.left - root.scrollLeft;
+	mouseY = evt.pageY - rect.top - root.scrollTop;
 }
 
 function createObjects(){
-	quadTree = new QuadTree(0, canvas.width, 0, canvas.height, 3, 5, -1);
-
 	for(var i = 0; i < objectCount; i++){
 		var w = getRandomIntInRange(objectMinDim, objectMaxDim);
 		var h = getRandomIntInRange(objectMinDim, objectMaxDim);
 		var x = getRandomIntInRange(0, canvas.width);
 		var y = getRandomIntInRange(0, canvas.height);
 
-		var obj = new GameObject(x, y, w, h);
+		var obj = new GameObject(x, y, w, h, 'red');
 		objectList.push(obj);
-		obj.draw();
 	}
-	console.log(quadTree);
 }
 
 function sortObjects(){
-	quadTree.clear();
-	for (var i = 0; i < objectList.length; i++){
-			quadTree.insert(objectList[i]);
+
+    quadTree.clear();
+    for (var i = 0; i < objectList.length; i++){
+        quadTree.insert(objectList[i]);
 	}
-	quadTree.draw();
 }
 function drawBackground(){
 	canvasContext.fillStyle = 'black';
 	canvasContext.fillRect(0,0,canvas.width,canvas.height);
 }
 
+
 function handleClick(evt){
-
-	//empty object list, refresh screen
-	objectList = [];
-	drawBackground();
-
-	//spawn new set of objects, draw.
-	createObjects();
-
-	//sort objects into quad tree.
-	sortObjects();
-
+    var returnObjects = [];
+	returnObjects = quadTree.retrieve(returnObjects, dynamicObj);
+    console.log(returnObjects);
 }
 
 class GameObject {
@@ -73,12 +107,13 @@ class GameObject {
 		this.y = y;
 		this.width = width;
 		this.height = height;
+        this.color = color;
 	}
 
 	draw(){
 		canvasContext.save();
 		canvasContext.translate(this.x, this.y);
-		canvasContext.fillStyle = 'red';
+		canvasContext.fillStyle = this.color;
 		canvasContext.fillRect(0, 0, this.width, this.height);
 		canvasContext.restore();
 	}
@@ -174,7 +209,6 @@ class QuadTree {
 				return;
 			}
 		}
-
 		this.objects.push(obj);
 
 		if (this.objects.length > this.maxChildren && this.level < this.maxDepth){
@@ -194,6 +228,16 @@ class QuadTree {
 				}
 			}
 		}
+	}
+	retrieve(returnObjects, obj){
+		var index = this.getIndex(obj);
+        //console.log(this.nodes[0]);
+
+		if (index != -1 && this.nodes[0] != null){
+			this.nodes[index].retrieve(returnObjects, obj);
+		}
+        returnObjects.push.apply(returnObjects, this.objects);
+		return returnObjects;
 	}
 }
 
