@@ -153,6 +153,13 @@ function setupPage(){
             );
         }
     });
+
+
+    $('#howToPlayHide').click(function(e){
+        $('#howToPlayMenu').hide();
+    });
+
+
     playSound(backgroundMusic);
 
     window.requestAnimFrame = (function(){
@@ -507,6 +514,12 @@ function cancelMovement(){
     server.emit('movement',{turnLeft:false,moveForward:false,turnRight:false,moveBackward:false});
 }
 
+function gameStart(){
+    stopSound(backgroundMusic);
+    playSound(gameStartMusic);
+    $('#howToPlayMenu').hide();
+}
+
 function gameOver(){
     server.emit('movement',{turnLeft:false,moveForward:false,turnRight:false,moveBackward:false});
 }
@@ -626,11 +639,6 @@ function touchMovement(){
     turnLeft = joystickMovement.left();
     playThrust();
     server.emit('movement',{turnLeft:turnLeft,moveForward:moveForward,turnRight:turnRight,moveBackward:moveBackward});
-}
-
-
-function stopTouchMovement(){
-
 }
 
 function keyDown(evt){

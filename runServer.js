@@ -6,8 +6,7 @@ var util = require('util');
 
 app.use(express.static(path.join(__dirname, './client')));
 var server = http.createServer(app);
-var io = require('socket.io').listen(server);
-
+var io = require('socket.io', { rememberTransport: false, transports: ['WebSocket', 'Flash Socket', 'AJAX long-polling'] }).listen(server);
 var factory = require('./server/factory.js');
 var utils = require('./server/utils.js');
 var c = utils.loadConfig();

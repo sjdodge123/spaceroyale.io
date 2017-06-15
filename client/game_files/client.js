@@ -102,8 +102,7 @@ function clientConnect() {
 	});
 
 	server.on("gameStart",function(){
-		stopSound(backgroundMusic);
-    	playSound(gameStartMusic);
+		gameStart();
 	});
 
 	server.on("shipDeath",function(id){
