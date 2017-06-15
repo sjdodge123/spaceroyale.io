@@ -1,5 +1,6 @@
 var background = new Image();
 background.src = 'img/background.jpg';
+
 function drawBackground() {
 	canvasContext.save();
 	canvasContext.fillStyle = 'black';
@@ -15,6 +16,8 @@ function drawFlashScreen(){
 	canvasContext.restore();
 }
 
+
+
 function drawText(text,x,y){
 	canvasContext.save();
 	canvasContext.fillStyle = 'white';
@@ -28,6 +31,14 @@ function drawTextF(text,x,y,color,font){
 	canvasContext.font=font;
 	canvasContext.fillText(text,x,y);
 	canvasContext.restore();
+}
+
+function drawFlashingText(text,x,y,color,font,flashColor,timeLeft){
+	if(timeLeft%2 == 1){
+		drawTextF(text,canvas.width/2,20,flashColor,font);
+	} else{
+		drawTextF(text,canvas.width/2,20,color,font);
+	}
 }
 
 //DRAWING HUD UI
@@ -191,10 +202,12 @@ function drawEventLog(){
 }
 
 function drawShrinkTimer(){
-	if(shrinkTimeLeft > 0){
+	if(shrinkTimeLeft > 5){
 		drawText(shrinkTimeLeft + " until shrink",canvas.width/2,20);
+	} else if(shrinkTimeLeft > 0){
+		drawFlashingText(shrinkTimeLeft + " until shrink",canvas.width/2,20,"white","22px Georgia","red",shrinkTimeLeft);
 	} else{
-		drawText("Shrinking world..",canvas.width/2,20);
+		drawFlashingText("Shrinking bounds..",(canvas.width/2)-25,20,"red","22px Georgia");
 	}
 }
 
@@ -296,7 +309,6 @@ function drawTradeShipTrail(circle){
 	canvasContext.beginPath();
 	canvasContext.lineWidth = 3;
 	canvasContext.strokeStyle = circle.color;
-	console.log(circle.color);
 	canvasContext.arc(circle.x-myShip.x+camera.xOffset,circle.y-myShip.y+camera.yOffset,circle.radius,0,Math.PI*2,true);
 	canvasContext.stroke();
 	canvasContext.restore();

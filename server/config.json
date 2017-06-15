@@ -51,7 +51,7 @@
     "tradeShipMinDelay":5,
     "tradeShipMaxDelay":25,
     "tradeShipSpawnTolerance":0.7,
-    "tradeShipTrailDuration":10,
+    "tradeShipTrailDuration":20,
     "tradeShipSpeed":5,
 
     "playerMaxSpeed":1500,
