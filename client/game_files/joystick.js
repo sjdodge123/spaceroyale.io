@@ -4,15 +4,19 @@ class Joystick {
 	constructor(x,y){
 		this.baseX = x;
 		this.baseY = y;
-		this.baseRadius = 50;
-		this.stickRadius = 100; 
 		this.stickX = x;
 		this.stickY = y;
+		this.staticBase = true;
+		this.baseRadius = 50;
+		this.stickRadius = 30; 
+		this.maxPullRadius = 200;
+		this.maxPullRadius = this.maxPullRadius*this.maxPullRadius;
 		this.dx = 0;
 		this.dy = 0;
-		this.deadzone = 100;
-		this.fireradius = 125;
+		this.deadzone = 50;
+		this.fireradius = 75;
 		this.fireradius2 = this.fireradius*this.fireradius;
+		this.distanceSquared  = 0;
 		this.touchIdx = null;
 		this.pressed = false;
 	}
@@ -21,8 +25,7 @@ class Joystick {
 		return 'createTouch' in document ? true : false;
 	}
 	checkForFire(){
-		var d2 = getMagSquared(this.dx,this.dy);
-		if(d2 > this.fireradius2){
+		if(this.distanceSquared > this.fireradius2){
 			return true;
 		}
 		return false;
@@ -94,25 +97,37 @@ class Joystick {
 
 	onUp(){
 		this.pressed = false;
-		this.baseX = 0;
-		this.baseY = 0;
-		this.stickX = 0;
-		this.stickY = 0;
+		if(this.staticBase){
+			this.stickX = this.baseX;
+			this.stickY = this.baseY;
+		} else{
+			this.baseX = 0;
+			this.baseY = 0;
+			this.stickX = 0;
+			this.stickY = 0;
+		}
 		this.dx = 0;
 		this.dy = 0;
 	}
+
 	onMove(x,y){
 		if(this.pressed = true){
-			this.stickX = x;
-			this.stickY = y;
+			this.dx = x - this.baseX;
+			this.dy = y - this.baseY;
+			this.distanceSquared = getMagSquared(this.dx,this.dy);
+			if(this.distanceSquared < this.maxPullRadius){
+				this.stickX = x;
+				this.stickY = y;
+			}
 		}
-		this.dx = this.stickX - this.baseX;
-		this.dy = this.stickY - this.baseY;
+		
 	}
 	onDown(x,y){
 		this.pressed = true;
-		this.baseX = x;
-		this.baseY = y;
+		if(!this.staticBase){
+			this.baseX = x;
+			this.baseY = y;
+		}
 		this.stickX = x;
 		this.stickY = y;
 	}

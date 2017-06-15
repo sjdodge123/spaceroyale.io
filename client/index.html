@@ -76,6 +76,7 @@
                     </div>
                     <input type="text" id="nameBox"></input>
                     <input type="submit"  class="btn btn-primary" id="playButton" value="Play!"></input>
+
                 </form>
             </div>
             <a href="#" id="soundControl" class="btn btn-info">
@@ -96,6 +97,7 @@
             </form>
 
     </div>
+
     <div id="gameWindow">
         <canvas id ="gameCanvas" width="1366" height="768" hidden></canvas>
         <div id="gameOverMenu" hidden>
@@ -119,7 +121,9 @@
                     <li>Gather new items by shooting the asteroids (orange circles) to improve your chances of winning</li>               
                 </ul>
             <input type="button" class="btn btn-success" id="howToPlayHide" value="Got it"></input>
+            <button onclick="goFullScreen();" class="btn btn-primary glyphicon glyphicon-fullscreen"></button>
             </div>
+
         </div>
     </div>
 </body>

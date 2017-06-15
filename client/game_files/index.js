@@ -5,6 +5,7 @@ var server = null,
     camera,
     userRegex = null,
     passRegex = null,
+    isTouchScreen = false,
     gameNameRegex = null,
     serverShutdownReason = "Error",
     profile = null,
@@ -173,8 +174,9 @@ function setupPage(){
     window.addEventListener('resize', resize, false);
     canvas = document.getElementById('gameCanvas');
     canvasContext = canvas.getContext('2d');
-    joystickMovement = new Joystick();
-    joystickCamera = new Joystick();
+    joystickMovement = new Joystick(250,canvas.height-250);
+    joystickCamera = new Joystick(canvas.width-250,canvas.height-250);
+    isTouchScreen = joystickMovement.touchScreenAvailable();
     resize();
     userRegex = new RegExp('^[a-zA-Z0-9_-]{3,15}$');
     passRegex = new RegExp('^[a-zA-Z0-9_-]{6,20}$');
@@ -298,6 +300,15 @@ function showGameOverScreen(cause){
             $('#main').show();
         });
     });
+}
+
+function goFullScreen(){
+    if(canvas.requestFullScreen)
+        canvas.requestFullScreen();
+    else if(canvas.webkitRequestFullScreen)
+        canvas.webkitRequestFullScreen();
+    else if(canvas.mozRequestFullScreen)
+        canvas.mozRequestFullScreen();
 }
 
 function resetGameVariables(){
@@ -461,10 +472,10 @@ function resize(){
     }
     eventLog = {
         backgroundColor:'#2a2a2a',
-        width:300,
-        height:300,
-        x: 10,
-        y: canvas.height-300-10,
+        width:500,
+        height:80,
+        x: (canvas.width/2)-250,
+        y: canvas.height-90,
         textColor:"white",
         textStyle:"15px Verdana",
         textSize:15,

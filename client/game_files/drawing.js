@@ -35,9 +35,9 @@ function drawTextF(text,x,y,color,font){
 
 function drawFlashingText(text,x,y,color,font,flashColor,timeLeft){
 	if(timeLeft%2 == 1){
-		drawTextF(text,canvas.width/2,20,flashColor,font);
+		drawTextF(text,x,y,flashColor,font);
 	} else{
-		drawTextF(text,canvas.width/2,20,color,font);
+		drawTextF(text,x,y,color,font);
 	}
 }
 
@@ -66,30 +66,41 @@ function drawHUD(){
 }
 
 function drawJoysticks(){
-	if(joystickMovement != null && joystickMovement.pressed){
+	if(joystickMovement != null && isTouchScreen){
 		canvasContext.save();
 		canvasContext.beginPath();
-		canvasContext.strokeStyle = "blue";
+		canvasContext.fillStyle = "rgba(0, 0, 255, 0.3)";
 		canvasContext.arc(joystickMovement.baseX,joystickMovement.baseY,joystickMovement.baseRadius,0,Math.PI*2,true);
-		canvasContext.stroke();
+		canvasContext.fill();
+
+		canvasContext.strokeStyle = "blue";
 		canvasContext.beginPath();
 		canvasContext.arc(joystickMovement.stickX,joystickMovement.stickY,joystickMovement.stickRadius,0,Math.PI*2,true);
 		canvasContext.stroke();
+
 		canvasContext.restore();
 	}
-	if(joystickCamera != null && joystickCamera.pressed){
+	if(joystickCamera != null && isTouchScreen){
 		canvasContext.save();
 		canvasContext.beginPath();
-		canvasContext.strokeStyle = "red";
+		canvasContext.fillStyle = "rgba(255, 0, 0, 0.3)";
 		canvasContext.arc(joystickCamera.baseX,joystickCamera.baseY,joystickCamera.baseRadius,0,Math.PI*2,true);
-		canvasContext.stroke();
+		canvasContext.fill();
+
+		if( 1 - (cooldownRemaining/currentWeaponCooldown) >= 1){
+			canvasContext.strokeStyle = "red";
+			canvasContext.beginPath();
+			canvasContext.arc(joystickCamera.baseX,joystickCamera.baseY,joystickCamera.fireradius,0,Math.PI*2,true);
+			canvasContext.stroke();
+		}
+		canvasContext.strokeStyle = "red";
 		canvasContext.beginPath();
 		canvasContext.arc(joystickCamera.stickX,joystickCamera.stickY,joystickCamera.stickRadius,0,Math.PI*2,true);
 		canvasContext.stroke();
 
 		canvasContext.beginPath();
 		canvasContext.moveTo(canvas.width/2,canvas.height/2);
-		canvasContext.lineTo(canvas.width/2+joystickCamera.dx*50,canvas.height/2+joystickCamera.dy*50);
+		canvasContext.lineTo(canvas.width/2+joystickCamera.dx*500,canvas.height/2+joystickCamera.dy*500);
 		canvasContext.stroke();
 
 		canvasContext.restore();
@@ -97,19 +108,27 @@ function drawJoysticks(){
 }
 
 function drawAliveCounter(){
-	drawText(getShipListCount() + " alive",canvas.width-60,20);
+	drawText(getShipListCount() + " alive",eventLog.x + eventLog.width-60,eventLog.y-40);
 }
 
 function drawKillCounter(){
-	drawText("Killed " + myShip.killList.length,canvas.width-190,20);
+	drawText("Killed " + myShip.killList.length,eventLog.x,eventLog.y-40);
 }
 
 function drawHPCounter(){
-	if(!iAmAlive){
-		drawText("HP:" + 0,10,20);
-		return;
-	}
-	drawText("HP:" + shipList[myID].health,10,20);
+	canvasContext.save();
+	canvasContext.fillStyle = "Green";
+	canvasContext.fillRect(eventLog.x,eventLog.y-30,eventLog.width/2,20);
+	
+	canvasContext.restore();
+	drawTextF("Health",eventLog.x+(eventLog.width/4)-30,eventLog.y-15,"#ECF0F1","17px Georgia");
+}
+function drawWeaponCooldown(){
+	canvasContext.save();
+	canvasContext.fillStyle = myShip.color;
+	canvasContext.fillRect(eventLog.x+eventLog.width/2,eventLog.y-30,(1 - (cooldownRemaining/currentWeaponCooldown))*eventLog.width/2,20);
+	canvasContext.restore();
+	drawTextF("Power",eventLog.x+eventLog.width/2+(eventLog.width/4)-30,eventLog.y-15,"#ECF0F1","17px Georgia");
 }
 
 function drawToast(){
@@ -123,16 +142,7 @@ function drawTotalPlayers(){
 		drawTextF(message,canvas.width-(message.length*5),canvas.height - 15,"#e0e0eb","10px Georgia");
 	}
 }
-function drawWeaponCooldown(){
-	canvasContext.save();
-	canvasContext.lineWidth = 5;
-	canvasContext.strokeStyle = myShip.color;
-	canvasContext.beginPath();
-	canvasContext.moveTo(0,canvas.height);
-	canvasContext.lineTo( (1 - (cooldownRemaining/currentWeaponCooldown))*canvas.width,canvas.height);
-	canvasContext.stroke();
-	canvasContext.restore();
-}
+
 function drawPing(){
 	if(ping != null){
 		var message = "Ping: " + ping;
@@ -203,16 +213,16 @@ function drawEventLog(){
 
 function drawShrinkTimer(){
 	if(shrinkTimeLeft > 5){
-		drawText(shrinkTimeLeft + " until shrink",canvas.width/2,20);
+		drawText(shrinkTimeLeft + " until shrink",eventLog.x + eventLog.width/2-60,eventLog.y-40);
 	} else if(shrinkTimeLeft > 0){
-		drawFlashingText(shrinkTimeLeft + " until shrink",canvas.width/2,20,"white","22px Georgia","red",shrinkTimeLeft);
+		drawFlashingText(shrinkTimeLeft + " until shrink",eventLog.x + eventLog.width/2-60,eventLog.y-40,"white","22px Georgia","red",shrinkTimeLeft);
 	} else{
-		drawFlashingText("Shrinking bounds..",(canvas.width/2)-25,20,"red","22px Georgia");
+		drawFlashingText("Shrinking bounds..",eventLog.x + eventLog.width/2-60,eventLog.y-40,"red","22px Georgia");
 	}
 }
 
 function drawLobbyTimer(){
-	drawText(lobbyTimeLeft + " until start",canvas.width/2,20);
+	drawText(lobbyTimeLeft + " until start",eventLog.x + eventLog.width/2-40,eventLog.y-40);
 }
 
 
