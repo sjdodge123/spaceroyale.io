@@ -117,9 +117,15 @@ function drawKillCounter(){
 
 function drawHPCounter(){
 	canvasContext.save();
-	canvasContext.fillStyle = "Green";
-	canvasContext.fillRect(eventLog.x,eventLog.y-30,eventLog.width/2,20);
+	if(shipList[myID].health > 70){
+		canvasContext.fillStyle = "Green";
+	}else if(shipList[myID].health > 30){
+		canvasContext.fillStyle = "yellow";
+	} else {
+		canvasContext.fillStyle = "tomato";
+	}
 	
+	canvasContext.fillRect(eventLog.x,eventLog.y-30,(shipList[myID].health/100)*eventLog.width/2,20);
 	canvasContext.restore();
 	drawTextF("Health",eventLog.x+(eventLog.width/4)-30,eventLog.y-15,"#ECF0F1","17px Georgia");
 }
