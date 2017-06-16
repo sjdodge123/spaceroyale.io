@@ -585,6 +585,7 @@ class World extends Rect{
 		this.center = {x:this.width/2,y:this.height/2};
 		this.whiteBound = new WhiteBound(this.width/2,this.height/2,this.baseBoundRadius);
 		this.blueBound = new BlueBound(this.width/2,this.height/2,this.baseBoundRadius);
+		this.engine.setWorldBounds(this.width,this.height);
 	}
 
 	drawNextBound(){
@@ -940,7 +941,6 @@ class Asteroid extends Circle{
 		this.dropRate = c.asteroidDropRate;
 		this.lootTable = c.asteroidLootTable;
 		this.baseHealth = 40;
-		this.damage = 0;
 		this.health = this.baseHealth;
 		this.alive = true;
 	}
@@ -1440,6 +1440,7 @@ class Bullet extends Rect{
 		this.alive = true;
 		this.owner = owner;
 		this.sig = null;
+		this.isBullet = true;
 
 		this.lifetime = c.bulletLifetime;
 		this.speed = c.bulletSpeed;

@@ -26,6 +26,9 @@ class Engine {
 		this.nebulaList = nebulaList;
 		this.tradeShipList = tradeShipList;
 		this.dt = 0;
+		this.worldWidth = 0;
+		this.worldHeight = 0;
+		this.quadTree = null;
 	}
 
 	update(dt){
@@ -93,7 +96,9 @@ class Engine {
 	}
 
 	broadBase(objectArray){
+		//this.quadTree.clear();
 		for (var i = 0; i < objectArray.length; i++) {
+			//this.quadTree.insert(objectArray[i]);
 	  		for (var j = 0; j < objectArray.length; j++) {
 
 	    		if(objectArray[i] == objectArray[j]){
@@ -108,6 +113,42 @@ class Engine {
 	    		}
 	  		}
   		}
+  		/*
+  		for(var j=0; j<objectArray.length;j++){
+  			var obj1 = objectArray[j];
+  			var collisionList = [];
+  			collisionList = this.quadTree.retrieve(collisionList,obj1);
+  			this.narrowBase(obj1,collisionList);
+  		}
+  		*/
+	}
+
+	narrowBase(obj1,collisionList){
+		var bulletList = [];
+		var otherList = [];
+
+		for(var i=0;i<collisionList.length;i++){
+			if(collisionList[i].isBullet){
+				bulletList.push(collisionList[i]);
+				continue;
+			}
+			otherList.push(collisionList[i]);
+		}
+		collisionList = [];
+		collisionList.push.apply(collisionList,otherList);
+		collisionList.push.apply(collisionList,bulletList);
+
+		for(var k=0; k<collisionList.length;k++){
+			var obj2 = collisionList[k];
+			if(obj1 == obj2){
+    			continue;
+    		}
+
+    		if(checkDistance(obj1,obj2)){
+  				obj1.handleHit(obj2);
+  				obj2.handleHit(obj1);
+    		}
+		}
 	}
 
 	checkCollideAll(loc,obj){
@@ -148,6 +189,111 @@ class Engine {
 			}
 		}
 	}
+	setWorldBounds(width,height){
+		this.worldWidth = width;
+		this.worldHeight = height;
+		this.quadTree = new QuadTree(0,this.worldWidth,0,this.worldHeight,3,20,-1);
+	}
+}
+
+class QuadTree {
+	constructor(minX, maxX, minY, maxY, maxDepth, maxChildren, level){
+		this.maxDepth = maxDepth;
+		this.maxChildren = maxChildren;
+		this.minX    = minX;
+		this.maxX    = maxX;
+		this.minY    = minY;
+		this.maxY    = maxY;
+		this.width   = maxX - minX;
+		this.height  = maxY - minY;
+		this.level   = level;
+		this.nodes   = [];
+		this.objects = [];
+	}
+	clear(){
+		this.objects = [];
+		this.nodes = [];
+	}
+	splitNode(){
+		var subWidth  = Math.floor((this.width)/2);
+		var subHeight = Math.floor((this.height)/2);
+
+		this.nodes.push(new QuadTree(this.minX, this.minX + subWidth, this.minY, this.minY + subHeight, this.maxDepth, this.maxChildren, this.level + 1));
+		this.nodes.push(new QuadTree(this.minX + subWidth, this.maxX, this.minY, this.minY + subHeight, this.maxDepth, this.maxChildren, this.level + 1));
+		this.nodes.push(new QuadTree(this.minX, this.minX + subWidth, this.minY + subHeight, this.maxY, this.maxDepth, this.maxChildren, this.level + 1));
+		this.nodes.push(new QuadTree(this.minX + subWidth, this.maxX, this.minY + subHeight, this.maxY, this.maxDepth, this.maxChildren, this.level + 1));
+	}
+	getIndex(obj){
+		var index = -1;
+		var horizontalMidpoint = this.minX + this.width/2;
+		var verticalMidpoint   = this.minY + this.height/2;
+		var xOffSet = obj.width/2 || obj.radius;
+		var yOffSet = obj.height/2 || obj.radius;
+
+
+		if (obj.x-xOffSet > this.minX && obj.x + xOffSet < horizontalMidpoint){
+			var leftQuadrant = true;
+		}
+		if (obj.x + xOffSet < this.maxX && obj.x-xOffSet > horizontalMidpoint){
+			var rightQuadrant = true;
+		}
+
+		if (obj.y-yOffSet > this.minY && obj.y + yOffSet < verticalMidpoint){
+			if (leftQuadrant){
+				index = 0;
+			}
+			else if (rightQuadrant){
+				index = 1;
+			}
+		}
+		else if (obj.y + yOffSet < this.maxY && obj.y - yOffSet > verticalMidpoint){
+			if (leftQuadrant){
+				index = 2;
+			}
+			else if (rightQuadrant){
+				index = 3;
+			}
+		}
+		return index;
+	}
+
+	insert(obj){
+		if (this.nodes[0] != null){
+			var index = this.getIndex(obj);
+			if (index != -1){
+				this.nodes[index].insert(obj);
+
+				return;
+			}
+		}
+		this.objects.push(obj);
+
+		if (this.objects.length > this.maxChildren && this.level < this.maxDepth){
+			if (this.nodes[0] == null){
+				this.splitNode();
+			}
+
+			var i = 0;
+			while(i < this.objects.length){
+				var index = this.getIndex(this.objects[i]);
+				if (index != -1){
+					this.nodes[index].insert(this.objects[i]);
+					this.objects.splice(i, 1);
+				}
+				else{
+					i++;
+				}
+			}
+		}
+	}
+	retrieve(returnObjects, obj){
+		var index = this.getIndex(obj);
+		if (index != -1 && this.nodes[0] != null){
+			this.nodes[index].retrieve(returnObjects, obj);
+		}
+        returnObjects.push.apply(returnObjects, this.objects);
+		return returnObjects;
+	}
 }
 
 function checkDistance(obj1,obj2){
@@ -156,8 +302,8 @@ function checkDistance(obj1,obj2){
 	var objX2 = obj2.newX || obj2.x;
 	var objY2 = obj2.newY || obj2.y;
 	var distance = utils.getMag(objX2 - objX1,objY2 - objY1);
-  	distance -= obj1.radius || obj1.height;
-	distance -= obj2.radius || obj2.height;
+  	distance -= obj1.radius || obj1.height/2;
+	distance -= obj2.radius || obj2.height/2;
 	if(distance <= 0){
 		return true;
 	}

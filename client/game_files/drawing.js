@@ -285,10 +285,10 @@ function drawAsteroid(asteroid){
 function drawItem(item){
 	canvasContext.save();
 	canvasContext.fillStyle = item.color;
-	canvasContext.fillRect(item.x-myShip.x+camera.xOffset,item.y-myShip.y+camera.yOffset,item.width,item.height);
+	canvasContext.fillRect(item.x-(item.width/2)-myShip.x+camera.xOffset,item.y-(item.height/2)-myShip.y+camera.yOffset,item.width,item.height);
 	canvasContext.strokeStyle = "white";
 	canvasContext.lineWidth=2;
-    canvasContext.rect(item.x-myShip.x+camera.xOffset,item.y-myShip.y+camera.yOffset,item.width,item.height);
+    canvasContext.rect(item.x-(item.width/2)-myShip.x+camera.xOffset,item.y-(item.height/2)-myShip.y+camera.yOffset,item.width,item.height);
     canvasContext.stroke();
     canvasContext.restore();
 }
