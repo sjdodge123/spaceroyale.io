@@ -1473,8 +1473,8 @@ class Bullet extends Rect{
 		if(object.isItem){
 			return;
 		}
-		//this.alive = false;
-		return true;
+		this.killSelf();
+		//return true;
 	}
 	killSelf(){
 		this.alive = false;
