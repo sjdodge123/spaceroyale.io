@@ -795,7 +795,7 @@ class Ship extends Rect{
 		if(c.playerSpawnWeapon == "Rifle"){
 			this.weapon = new Rifle(this.id);
 		}
-		
+
 		this.weapon.level = c.playerSpawnWeaponLevel;
 	}
 	update(dt){
@@ -1473,6 +1473,10 @@ class Bullet extends Rect{
 		if(object.isItem){
 			return;
 		}
+		//this.alive = false;
+		return true;
+	}
+	killSelf(){
 		this.alive = false;
 	}
 }

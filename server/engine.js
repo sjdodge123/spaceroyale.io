@@ -99,6 +99,7 @@ class Engine {
 		//this.quadTree.clear();
 		for (var i = 0; i < objectArray.length; i++) {
 			//this.quadTree.insert(objectArray[i]);
+
 	  		for (var j = 0; j < objectArray.length; j++) {
 
 	    		if(objectArray[i] == objectArray[j]){
@@ -112,42 +113,38 @@ class Engine {
 	  				obj2.handleHit(obj1);
 	    		}
 	  		}
+
   		}
-  		/*
+		/*
   		for(var j=0; j<objectArray.length;j++){
   			var obj1 = objectArray[j];
   			var collisionList = [];
   			collisionList = this.quadTree.retrieve(collisionList,obj1);
   			this.narrowBase(obj1,collisionList);
   		}
-  		*/
+		*/
 	}
 
 	narrowBase(obj1,collisionList){
-		var bulletList = [];
-		var otherList = [];
-
-		for(var i=0;i<collisionList.length;i++){
-			if(collisionList[i].isBullet){
-				bulletList.push(collisionList[i]);
-				continue;
-			}
-			otherList.push(collisionList[i]);
-		}
-		collisionList = [];
-		collisionList.push.apply(collisionList,otherList);
-		collisionList.push.apply(collisionList,bulletList);
-
-		for(var k=0; k<collisionList.length;k++){
-			var obj2 = collisionList[k];
+		var dyingBulletList = [];
+		for(var i=0; i<collisionList.length;i++){
+			var obj2 = collisionList[i];
 			if(obj1 == obj2){
     			continue;
     		}
 
     		if(checkDistance(obj1,obj2)){
-  				obj1.handleHit(obj2);
-  				obj2.handleHit(obj1);
+  				if(obj1.handleHit(obj2)){
+					dyingBulletList.push(obj1);
+				}
+  				if(obj2.handleHit(obj1)){
+					dyingBulletList.push(obj2);
+				}
     		}
+		}
+
+		for (var j=0; j<dyingBulletList.length;j++){
+			dyingBulletList[j].killSelf();
 		}
 	}
 
