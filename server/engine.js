@@ -123,6 +123,7 @@ class Engine {
   			this.narrowBase(obj1,collisionList);
   		}
 		*/
+
 	}
 
 	narrowBase(obj1,collisionList){
@@ -224,18 +225,17 @@ class QuadTree {
 		var index = -1;
 		var horizontalMidpoint = this.minX + this.width/2;
 		var verticalMidpoint   = this.minY + this.height/2;
-		var xOffSet = obj.width/2 || obj.radius;
-		var yOffSet = obj.height/2 || obj.radius;
 
+		var extents = obj.getExtents();
 
-		if (obj.x-xOffSet > this.minX && obj.x + xOffSet < horizontalMidpoint){
+		if (extents.minX > this.minX && extents.maxX < horizontalMidpoint){
 			var leftQuadrant = true;
 		}
-		if (obj.x + xOffSet < this.maxX && obj.x-xOffSet > horizontalMidpoint){
+		if (extents.maxX < this.maxX && extents.minX > horizontalMidpoint){
 			var rightQuadrant = true;
 		}
 
-		if (obj.y-yOffSet > this.minY && obj.y + yOffSet < verticalMidpoint){
+		if (extents.minY > this.minY && extents.maxY < verticalMidpoint){
 			if (leftQuadrant){
 				index = 0;
 			}
@@ -243,7 +243,7 @@ class QuadTree {
 				index = 1;
 			}
 		}
-		else if (obj.y + yOffSet < this.maxY && obj.y - yOffSet > verticalMidpoint){
+		else if (extents.maxY < this.maxY && extents.minY > verticalMidpoint){
 			if (leftQuadrant){
 				index = 2;
 			}

@@ -336,7 +336,8 @@ class GameBoard {
 		if(c.generateTradeShips){
 			var loc = this.world.getTradeShipLoc();
 			var sig = this.generateTradeShipSig();
-			this.tradeShipList[sig] = new TradeShip(loc.x1,loc.y1,180,60,utils.getRandomInt(c.tradeShipMinDelay,c.tradeShipMaxDelay),loc.x2,loc.y2);
+			var angle = (180/Math.PI)*Math.atan2(loc.y2-loc.y1, loc.x2-loc.x1);
+			this.tradeShipList[sig] = new TradeShip(loc.x1,loc.y1,180,60, angle, utils.getRandomInt(c.tradeShipMinDelay,c.tradeShipMaxDelay),loc.x2,loc.y2);
 		}
 	}
 	checkCollisions(active){
@@ -491,10 +492,50 @@ class Shape {
 }
 
 class Rect extends Shape{
-	constructor(x,y,width,height,color){
+	constructor(x,y,width,height, angle, color){
 		super(x,y,color);
 		this.width = width;
 		this.height = height;
+		this.angle = angle;
+		this.vertices = this.getVertices();
+
+	}
+
+	getVertices(){
+		var vertices = [];
+		var a = {x:-this.width/2, y: -this.height/2},
+	        b = {x:this.width/2, y: -this.height/2},
+	        c = {x:this.width/2, y: this.height/2},
+	        d = {x:-this.width/2, y: this.height/2};
+		vertices.push(a, b, c, d);
+
+		var cos = Math.cos(this.angle * Math.PI/180);
+	    var sin = Math.sin(this.angle * Math.PI/180);
+
+		var tempX, tempY;
+	    for (var i = 0; i < vertices.length; i++){
+	        var vert = vertices[i];
+	        tempX = vert.x * cos - vert.y * sin;
+	        tempY = vert.x * sin + vert.y * cos;
+	        vert.x = this.x + tempX;
+	        vert.y = this.y + tempY;
+	    }
+		return vertices;
+	}
+
+	getExtents(){
+		var minX = this.vertices[0].x,
+		maxX = minX,
+		minY = this.vertices[0].y,
+		maxY = minY;
+		for (var i = 0; i < this.vertices.length-1; i++){
+			var vert = this.vertices[i];
+			minX = (vert.x < minX) ? vert.x : minX;
+			maxX = (vert.x > maxX) ? vert.x : maxX;
+			minY = (vert.y < minY) ? vert.y : minY;
+			maxY = (vert.y > maxY) ? vert.y : maxY;
+		}
+		return {minX, maxX, minY, maxY};
 	}
 	testRect(rect){
 		if(this.x < rect.x &&
@@ -524,6 +565,9 @@ class Circle extends Shape{
 		super(x,y,color);
 		this.radius = radius;
 	}
+	getExtents(){
+		return {minX: this.x - this.radius, maxX: this.x + this.radius, minY: this.y - this.radius, maxY: this.y + this.radius};
+	}
 	testRect(rect){
 		var distance = Math.sqrt(Math.pow(rect.x-this.x,2) + Math.pow(rect.y-this.y,2));
 		if(distance+rect.width <= this.radius){
@@ -548,7 +592,7 @@ class Circle extends Shape{
 
 class World extends Rect{
 	constructor(x,y,width,height,engine){
-		super(x,y,width,height,"orange");
+		super(x,y,width,height, 0, "orange");
 		this.baseBoundRadius = width;
 		this.damageRate = c.damageTickRate;
 		this.damagePerTick = c.damagePerTick;
@@ -731,7 +775,7 @@ class World extends Rect{
 
 	spawnNewShip(id,color){
 		var loc = this.getRandomLoc();
-		return new Ship(loc.x,loc.y,color,id);
+		return new Ship(loc.x,loc.y, 90, color, id);
 	}
 }
 
@@ -756,13 +800,13 @@ class BlueBound extends Bound{
 }
 
 class Ship extends Rect{
-	constructor(x,y,color,id){
-		super(x,y,25,25,color);
+	constructor(x,y, angle, color, id){
+		super(x,y,25,25, angle, color);
 		this.baseHealth = 100;
 		this.health = this.baseHealth;
 		this.baseColor = color;
 		this.glowColor = color;
-		this.angle = 90;
+		this.angle = angle;
 		this.isHit = false;
 		this.damageTimer = false;
 		this.moveForward = false;
@@ -870,6 +914,7 @@ class Ship extends Rect{
 	move(){
 		this.x = this.newX;
 		this.y = this.newY;
+		this.vertices = this.getVertices();
 	}
 	handleHit(object){
 		if(object.isWall){
@@ -1029,12 +1074,9 @@ class Nebula extends Circle {
 }
 
 class TradeShip extends Rect{
-	constructor(x,y,width,height,delay,destX,destY){
-		super(x,y,width,height,"#808080");
+	constructor(x,y,width,height, angle, delay, destX, destY){
+		super(x,y,width,height, angle, "#808080");
 		this.delay = delay;
-		this.destX = destX;
-		this.destY = destY;
-		this.angle = (180/Math.PI)*Math.atan2(destY-this.y,destX-this.x);
 		this.destX = destX;
 		this.destY = destY;
 		this.speed = c.tradeShipSpeed;
@@ -1139,7 +1181,7 @@ class Trail extends Circle {
 
 class RectItem extends Rect{
 	constructor(x,y,color){
-		super(x,y,15,15,color);
+		super(x,y,15,15, 90, color);
 		this.isItem = true;
 		this.sig = null;
 		this.alive = true;
@@ -1265,11 +1307,11 @@ class Pistol extends Weapon{
 		}
 		var bullets = [];
 		if(this.level > 1){
-			var bull1 = new Bullet(x,y,5,12,color,angle,id);
+			var bull1 = new Bullet(x,y,5,12, angle, color, id);
 			bull1.speed -= bull1.speed * .15;
 			bullets.push(bull1);
 		}
-		bullets.push(new Bullet(x,y,5,12,color,angle,id));
+		bullets.push(new Bullet(x,y,5,12, angle, color, id));
 		return bullets;
 	}
 	upgrade(){
@@ -1297,24 +1339,24 @@ class Shotgun extends Weapon{
 		}
 		var bullets = [];
 		if(this.level > 1){
-			var shot1 = new Birdshot(x,y,4,10,color,angle-7.5,id);
-			var shot3 = new Birdshot(x,y,4,10,color,angle+7.5,id);
+			var shot1 = new Birdshot(x,y,4,10, angle-7.5, color, id);
+			var shot3 = new Birdshot(x,y,4,10, angle+7.5, color, id);
 			bullets.push(shot1,shot3);
 		}
 		if(this.level > 2){
-			var shot1 = new Birdshot(x,y,4,10,color,angle-15,id);
+			var shot1 = new Birdshot(x,y,4,10, angle-15, color,id);
 			shot1.speed -= 4;
-			var shot2 = new Birdshot(x,y,4,10,color,angle,id);
+			var shot2 = new Birdshot(x,y,4,10, angle, color, id);
 			shot2.speed -= 4;
-			var shot3 = new Birdshot(x,y,4,10,color,angle+15,id);
+			var shot3 = new Birdshot(x,y,4,10, angle+15, color, id);
 			shot3.speed -= 4;
 			bullets.push(shot1,shot2,shot3);
 		}
-		bullets.push(new Birdshot(x,y,4,10,color,angle-5,id));
-		bullets.push(new Birdshot(x,y,4,10,color,angle-2.5,id));
-		bullets.push(new Birdshot(x,y,4,10,color,angle,id));
-		bullets.push(new Birdshot(x,y,4,10,color,angle+2.5,id));
-		bullets.push(new Birdshot(x,y,4,10,color,angle+5,id));
+		bullets.push(new Birdshot(x,y,4,10,angle-5, color,id));
+		bullets.push(new Birdshot(x,y,4,10, angle-2.5, color, id));
+		bullets.push(new Birdshot(x,y,4,10, angle, color, id));
+		bullets.push(new Birdshot(x,y,4,10, angle+2.5, color, id));
+		bullets.push(new Birdshot(x,y,4,10, angle+5, color, id));
 		return bullets;
 	}
 	upgrade(){
@@ -1342,8 +1384,8 @@ class Rifle extends Weapon{
 		}
 		var bullets = [];
 		if(this.level == 3 && this.threeShot){
-			var bull1 = new RifleBullet(x,y,8,20,color,angle,id);
-			var bull2 = new RifleBullet(x,y,8,20,color,angle,id);
+			var bull1 = new RifleBullet(x,y,8,20, angle, color, id);
+			var bull2 = new RifleBullet(x,y,8,20, angle, color, id);
 			bull1.speed -= bull1.speed * .25;
 			bull1.damage -= c.rifleBulletDamage*0.5;
 			bull2.speed -= bull2.speed * .40;
@@ -1353,7 +1395,7 @@ class Rifle extends Weapon{
 		} else{
 			this.threeShot = true;
 		}
-		bullets.push(new RifleBullet(x,y,8,20,color,angle,id));
+		bullets.push(new RifleBullet(x,y,8,20, angle, color, id));
 		return bullets;
 	}
 	upgrade(){
@@ -1434,9 +1476,9 @@ class Shield extends Circle{
 }
 
 class Bullet extends Rect{
-	constructor(x,y,width,height,color,angle,owner){
-		super(x,y,width,height,color);
-		this.angle = angle;
+	constructor(x,y,width,height, angle, color, owner){
+		super(x,y,width,height, angle, color);
+		//this.angle = angle;
 		this.alive = true;
 		this.owner = owner;
 		this.sig = null;
@@ -1456,6 +1498,10 @@ class Bullet extends Rect{
 	move(){
 		this.x = this.newX;
 		this.y = this.newY;
+		for (var i = 0; i < this.vertices.length; i++){
+			this.vertices[i].x + (this.newX - this.x);
+			this.vertices[i].y + (this.newY - this.Y);
+		}
 	}
 	handleHit(object){
 		if(!this.alive){
@@ -1482,8 +1528,8 @@ class Bullet extends Rect{
 }
 
 class Birdshot extends Bullet{
-	constructor(x,y,width,height,color,angle,owner){
-		super(x,y,width,height,color,angle,owner);
+	constructor(x,y,width,height, angle, color, owner){
+		super(x,y,width,height, angle, color, owner);
 		this.damage = c.birdshotDamage;
 		this.speed = c.birdshotSpeed;
 	}
@@ -1491,8 +1537,8 @@ class Birdshot extends Bullet{
 }
 
 class RifleBullet extends Bullet{
-	constructor(x,y,width,height,color,angle,owner){
-		super(x,y,width,height,color,angle,owner);
+	constructor(x,y,width,height, angle, color, owner){
+		super(x,y,width,height,angle, color, owner);
 		this.damage = c.rifleBulletDamage;
 		this.speed = c.rifleBulletSpeed;
 	}
