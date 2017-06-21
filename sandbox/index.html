@@ -1,6 +1,6 @@
 <html>
 <canvas id ="gameCanvas" width = "800" height = "600"></canvas>
-
+<script type="text/javascript" src="./engine.js"></script>
 <script type="text/javascript">
 "use strict";
 
@@ -31,7 +31,7 @@ window.onload = function(){
 
 function init(){
     //dynamic object - stuck to mouse
-    dynamicObj = new GameObject(0, 0, 20, 20, 'green');
+    dynamicObj = new GameObject(0, 0, 20, 20, 0, 'green');
 
 
     createObjects();
@@ -53,6 +53,67 @@ function gameLoop(){
 function checkCollisions(){
     quadTree = new QuadTree(0, canvas.width, 0, canvas.height, 4, 6, -1);
     sortObjects();
+    
+	//dynamic against others
+	var returnObjects = [];
+	returnObjects = quadTree.retrieve(returnObjects, dynamicObj);
+	checkCollisionsNarrow(dynamicObj, returnObjects);
+    
+    
+	for (var i = 0; i < objectList.length; i++){
+		var obj1 = objectList[i];
+		returnObjects = [];
+		returnObjects = quadTree.retrieve(returnObjects, obj1);
+        checkCollisionsNarrow(obj1, returnObjects);
+	}
+}
+
+/*
+functions bruteforce(){
+    for (var i = 0; i < objectList.length; i++){
+        var obj1 = objectList[i];
+        for (var j = 0; j < objectList.length; j++){
+            var obj2 = objectList[j];
+            if(obj1==obj2){
+            continue;
+            }
+            
+        }
+    }
+}
+*/
+
+function checkCollisionsNarrow(obj1, returnObjects){
+    for (var i = 0; i < returnObjects.length; i++){
+		var obj2 = returnObjects[i];
+        if (obj1 == obj2){
+            continue;
+        }
+        
+        var coll = false;
+        if (obj2.radius){
+            
+            if (obj1.radius){
+                coll = circleOnCircle(obj1, obj2);
+            }
+            else{
+                coll = circleOnRect(obj2, obj1);
+            }
+        }
+        else{
+            if (obj1.radius){
+                coll = circleOnRect(obj1, obj2);
+            }
+            else{
+                coll = rectOnRect(obj1, obj2);
+            }
+        }
+        if (coll){
+            obj2.hit();
+            obj1.hit();
+        }
+	}
+    
 }
 
 function drawStaticObjects(){
@@ -77,7 +138,7 @@ function createObjects(){
 		var x = getRandomIntInRange(0, canvas.width);
 		var y = getRandomIntInRange(0, canvas.height);
 
-		var obj = new GameObject(x, y, w, h, 'red');
+		var obj = new GameObject(x, y, w, h, 0, 'blue');
 		objectList.push(obj);
 	}
 }
@@ -85,9 +146,14 @@ function createObjects(){
 function sortObjects(){
 
     quadTree.clear();
+
+	quadTree.insert(dynamicObj);
     for (var i = 0; i < objectList.length; i++){
-        quadTree.insert(objectList[i]);
+        var obj = objectList[i];
+        obj.colliding = false;
+        quadTree.insert(obj);
 	}
+    dynamicObj.colliding = false;
 }
 function drawBackground(){
 	canvasContext.fillStyle = 'black';
@@ -102,20 +168,32 @@ function handleClick(evt){
 }
 
 class GameObject {
-	constructor(x, y, width, height, color){
+	constructor(x, y, width, height, angle, color){
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
+        this.angle = angle;
         this.color = color;
+        this.basecolor = color;
+		this.colliding = false;
 	}
 
 	draw(){
+        if(this.colliding){
+            this.color = 'red';
+        }
+        else{
+            this.color = this.basecolor;
+        }
 		canvasContext.save();
 		canvasContext.translate(this.x, this.y);
 		canvasContext.fillStyle = this.color;
 		canvasContext.fillRect(0, 0, this.width, this.height);
 		canvasContext.restore();
+	}
+	hit(){
+		this.colliding = true;
 	}
 }
 
