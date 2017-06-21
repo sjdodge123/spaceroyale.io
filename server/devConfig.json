@@ -1,5 +1,5 @@
 {
 	"override":true,
 	"minPlayers":2,
-    "lobbyWaitTime":2
+    "lobbyWaitTime":10
 }
