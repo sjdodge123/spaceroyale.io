@@ -14,14 +14,18 @@ var canvasContext,
     mouseY;
 var objectList = [];
 
-var objectCount = 25;
+var rectCount = 25;
+var circleCount = 25;
 var objectMaxDim = 30;
 var objectMinDim = 20;
 var objectMinDD = 1;
-var objectMaxDD = 10;
+var objectMaxDD = 3;
 
 var quadTree;
 
+var lastFrame = new Date(),
+	currentFrame,
+	dt;
 window.onload = function(){
 	canvasContext = canvas.getContext('2d');
 
@@ -33,7 +37,8 @@ window.onload = function(){
 
 function init(){
     //dynamic object - stuck to mouse
-    mouseObj = new GameObject(0, 0, 20, 20, 0, 'green');
+    mouseObj = new RectObject(0, 0, 30, 30, 45, 0, 0,'green');
+	//mouseObj = new CircleObject(0, 0, 20, 0, 0, 'green');
 
 
     createObjects();
@@ -41,7 +46,10 @@ function init(){
 }
 
 function gameLoop(){
-
+	currentFrame = new Date();
+	dt = currentFrame - lastFrame;
+	lastFrame = currentFrame;
+	console.log(dt);
     checkCollisions();
 	updateObjects();
     drawBackground();
@@ -141,14 +149,23 @@ function calcMousePos(evt){
 }
 
 function createObjects(){
-	for(var i = 0; i < objectCount; i++){
+	for(var i = 0; i < rectCount; i++){
 		var w = getRandomIntInRange(objectMinDim, objectMaxDim);
 		var h = getRandomIntInRange(objectMinDim, objectMaxDim);
 		var x = getRandomIntInRange(0, canvas.width);
 		var y = getRandomIntInRange(0, canvas.height);
 		var dd = getRandomIntInRange(objectMinDD, objectMaxDD);
 		var rhat = getRandomIntInRange(0, 359);
-		var obj = new GameObject(x, y, w, h, 0, dd, rhat, 'blue');
+		var obj = new RectObject(x, y, w, h, 0, dd, rhat, 'blue');
+		objectList.push(obj);
+	}
+	for(var i = 0; i < circleCount; i++){
+		var r = getRandomIntInRange(objectMinDim, objectMaxDim);
+		var x = getRandomIntInRange(0, canvas.width);
+		var y = getRandomIntInRange(0, canvas.height);
+		var dd = getRandomIntInRange(objectMinDD, objectMaxDD);
+		var rhat = getRandomIntInRange(0, 359);
+		var obj = new CircleObject(x, y, r, dd, rhat, 'blue');
 		objectList.push(obj);
 	}
 }
@@ -176,33 +193,15 @@ function handleClick(evt){
 	returnObjects = quadTree.retrieve(returnObjects, mouseObj);
     console.log(returnObjects);
 }
-
 class GameObject {
-	constructor(x, y, width, height, angle, dd, angleDir, color){
+	constructor(x, y, dd, angleDir, color){
 		this.x = x;
 		this.y = y;
-		this.width = width;
-		this.height = height;
-        this.angle = angle;
         this.color = color;
         this.basecolor = color;
 		this.colliding = false;
 		this.dd = dd;
 		this.rhat = this.getDir(angleDir);
-	}
-
-	draw(){
-        if(this.colliding){
-            this.color = 'red';
-        }
-        else{
-            this.color = this.basecolor;
-        }
-		canvasContext.save();
-		canvasContext.translate(this.x, this.y);
-		canvasContext.fillStyle = this.color;
-		canvasContext.fillRect(0, 0, this.width, this.height);
-		canvasContext.restore();
 	}
 	hit(){
 		this.colliding = true;
@@ -222,7 +221,7 @@ class GameObject {
 			_x = this.x + this.dd * this.rhat.x;
 			hit = true;
 		}
-		else if(_x + this.width > canvas.width){
+		else if(_x > canvas.width){
 			if (this.rhat.x > 0){
 					this.rhat.x = -this.rhat.x;
 			}
@@ -236,20 +235,13 @@ class GameObject {
 			_y = this.y + this.dd * this.rhat.y;
 			hit = true;
 		}
-		else if(_y + this.height > canvas.height){
+		else if(_y > canvas.height){
 			if (this.rhat.y > 0){
 					this.rhat.y = -this.rhat.y;
 			}
 			_y = this.y + this.dd * this.rhat.y;
 			hit = true;
 		}
-		/*
-		if (hit){
-			var newPos = this.checkCoords(_x, _y);
-			_x = newPos.x;
-			_x = newPos.y;
-		}
-		*/
 		return {x:_x, y:_y};
 	}
 	getDir(theta){
@@ -259,6 +251,49 @@ class GameObject {
 		_x = _x/d;
 		_y = _y/d;
 		return {x:_x, y:_y}; // normalized
+	}
+}
+
+class RectObject extends GameObject{
+	constructor(x, y, width, height, angle, dd, angleDir, color){
+		super(x, y, dd, angleDir, color);
+		this.width = width;
+		this.height = height;
+		this.angle = angle;
+	}
+	draw(){
+        if(this.colliding){
+            this.color = 'red';
+        }
+        else{
+            this.color = this.basecolor;
+        }
+		canvasContext.save();
+		canvasContext.translate(this.x, this.y);
+		canvasContext.rotate(this.angle*Math.PI/180);
+		canvasContext.fillStyle = this.color;
+		canvasContext.fillRect(-this.width/2, -this.height/2, this.width, this.height);
+		canvasContext.restore();
+	}
+}
+class CircleObject extends GameObject{
+	constructor(x, y, radius, dd, angleDir, color){
+		super(x, y, dd, angleDir, color);
+		this.radius = radius;
+	}
+	draw(){
+		if(this.colliding){
+			this.color = 'red';
+		}
+		else{
+			this.color = this.basecolor;
+		}
+		canvasContext.save();
+		canvasContext.beginPath();
+		canvasContext.fillStyle = this.color;
+		canvasContext.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
+		canvasContext.fill();
+		canvasContext.restore();
 	}
 }
 
