@@ -6,12 +6,16 @@
     "minPlayers":2,
     "maxPlayersInRoom":15,
     "roomKickTimeout":30,
-    "lobbyWaitTime":15,
+    "lobbyWaitTime":30,
 
     "baseTimeUntilShrink":30,
     "timeUntilShrinkSpeedup":0.75,
     "baseShrinkingDuration": 40,
     "shrinkingDurationSpeedup":0.75,
+
+    "AISpawnPlayers":false,
+    "AISpawnNumber":2,
+
 
     "damageTickRate":2,
     "damagePerTick":15,

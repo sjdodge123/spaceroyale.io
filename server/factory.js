@@ -4,6 +4,7 @@ var c = utils.loadConfig();
 var messenger = require('./messenger.js');
 var database = require('./database.js');
 var _engine = require('./engine.js');
+var AI = require('./AI.js');
 
 exports.getRoom = function(sig,size){
 	return new Room(sig,size);
@@ -21,17 +22,19 @@ class Room {
 		this.bulletList = {};
 		this.itemList = {};
 		this.shipList = {};
+		this.AIList = {};
 		this.killedShips = {};
 		this.clientCount = 0;
 		this.alive = true;
 		this.engine = _engine.getEngine(this.bulletList, this.shipList, this.world, this.asteroidList, this.planetList,this.nebulaList,this.tradeShipList);
 		this.world = new World(0,0,c.lobbyWidth,c.lobbyHeight,this.engine);
-		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList,this.planetList,this.itemList,this.nebulaList,this.tradeShipList,this.engine,this.sig);
+		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList,this.planetList,this.itemList,this.nebulaList,this.tradeShipList,this.engine,this.AIList,this.sig);
 	}
 	join(clientID){
 		var client = messenger.getClient(clientID);
 		messenger.addRoomToMailBox(clientID,this.sig);
 		client.join(this.sig);
+		this.game.checkForAISpawn();
 		this.clientCount++;
 	}
 	leave(clientID){
@@ -113,7 +116,7 @@ class Room {
 }
 
 class Game {
-	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,nebulaList,tradeShipList,engine,roomSig){
+	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,nebulaList,tradeShipList,engine,AIList,roomSig){
 		this.world = world;
 		this.clientList = clientList;
 		this.bulletList = bulletList;
@@ -124,6 +127,7 @@ class Game {
 		this.nebulaList = nebulaList;
 		this.tradeShipList = tradeShipList;
 		this.engine = engine;
+		this.AIList = AIList;
 		this.roomSig = roomSig;
 
 		//Gamerules
@@ -206,6 +210,7 @@ class Game {
 			this.checkForGameStart()
 		}
 		this.gameBoard.update(this.active, dt);
+		this.updateAI(this.active);
 		this.world.update(this.shrinkTimeLeft,dt);
 	}
 
@@ -225,6 +230,19 @@ class Game {
 			}
 		} else{
 			this.cancelGameStart();
+		}
+	}
+	checkForAISpawn(){
+		if(c.AISpawnPlayers){
+			for(var i=0;i<c.AISpawnNumber;i++){
+				this.shipList[i] = this.world.spawnNewShip(i,"orange");
+				this.AIList[i] = AI.setAIController(this.shipList[i],this.world,this.gameBoard);
+			}
+		}
+	}
+	updateAI(active){
+		for(var sig in this.AIList){
+			this.AIList[sig].update(active);
 		}
 	}
 	cancelGameStart(){
