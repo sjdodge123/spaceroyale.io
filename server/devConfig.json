@@ -1,8 +1,8 @@
 {
 	"override":true,
 	"minPlayers":2,
-    "lobbyWaitTime":10,
+    "lobbyWaitTime":2,
 
-    "AISpawnPlayers":true,
+    "AISpawnPlayers":false,
     "AISpawnNumber":5
 }

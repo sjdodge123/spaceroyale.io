@@ -499,11 +499,13 @@ class Shape {
 		this.color = color;
 	}
 	inBounds(shape){
-		if(shape instanceof Rect){
-			return this.testRect(shape);
+		if(shape.radius){
+			//return this.testCircle(shape);
+			return _engine.checkDistance(this, shape);
 		}
-		if(shape instanceof Circle){
-			return this.testCircle(shape);
+		else if(shape.width){
+			//return this.testRect(shape);
+			return _engine.checkDistance(this,shape);
 		}
 		return false;
 	}
@@ -540,6 +542,18 @@ class Rect extends Shape{
 	    }
 		return vertices;
 	}
+	pointInRect(x, y){
+	    var ap = {x:x-this.vertices[0].x, y:y-this.vertices[0].y};
+	    var ab = {x:this.vertices[1].x - this.vertices[0].x, y:this.vertices[1].y - this.vertices[0].y};
+	    var ad = {x:this.vertices[3].x - this.vertices[0].x, y:this.vertices[3].y - this.vertices[0].y};
+
+		var dotW = utils.dotProduct(ap, ab);
+		var dotH = utils.dotProduct(ap, ad);
+		if ((0 <= dotW) && (dotW <= utils.dotProduct(ab, ab)) && (0 <= dotH) && (dotH <= utils.dotProduct(ad, ad))){
+			return true;
+		}
+	    return false;
+	}
 
 	getExtents(){
 		var minX = this.vertices[0].x,
@@ -556,25 +570,20 @@ class Rect extends Shape{
 		return {minX, maxX, minY, maxY};
 	}
 	testRect(rect){
-		if(this.x < rect.x &&
-           this.x + this.width > rect.x &&
-           this.y < rect.y &&
-           this.y + this.height > rect.y
-           ){
-           return true;
-        }
+		for (var i = 0; i < this.vertices.length; i++){
+	        if(this.pointInRect(this.vertices[i].x,this.vertices[i].y,rect.vertices)){
+	            return true;
+	        }
+	    }
+	    for (var i = 0; i < rect.vertices.length; i++){
+	        if(this.pointInRect(rect.vertices[i].x,rect.vertices[i].y,this.vertices)){
+	            return true;
+	        }
+	    }
         return false;
 	}
 	testCircle(circle){
-		var distX = Math.abs(circle.x - this.x-this.width/2);
-		var distY = Math.abs(circle.y - this.y-this.height/2);
-		if(distX > (this.width/2 + circle.radius)){return false;}
-		if(distY > (this.height/2 + circle.radius)){return false;}
-		if(distX <= (this.width/2)){return true;}
-		if(distY <= (this.height/2)){return true;}
-		var dx = distX-this.width/2;
-		var dy = distY-this.height/2;
-		return (dx*dx+dy*dy<=(circle.radius*circle.radius));
+		return circle.testRect(this);
 	}
 }
 
@@ -586,13 +595,6 @@ class Circle extends Shape{
 	getExtents(){
 		return {minX: this.x - this.radius, maxX: this.x + this.radius, minY: this.y - this.radius, maxY: this.y + this.radius};
 	}
-	testRect(rect){
-		var distance = Math.sqrt(Math.pow(rect.x-this.x,2) + Math.pow(rect.y-this.y,2));
-		if(distance+rect.width <= this.radius){
-			return true;
-		}
-		return false;
-	}
 
 	testCircle(circle){
 		var distance = Math.sqrt(Math.pow(circle.x-this.x,2) + Math.pow(circle.y-this.y,2));
@@ -601,6 +603,48 @@ class Circle extends Shape{
 		}
 		return false;
 	}
+
+	testRect(rect){
+
+		if(rect.pointInRect(this.x, this.y)){
+			return true;
+		}
+
+		if(this.lineIntersectCircle(rect.vertices[0], rect.vertices[1]) ||
+	       this.lineIntersectCircle(rect.vertices[1], rect.vertices[2]) ||
+	       this.lineIntersectCircle(rect.vertices[2], rect.vertices[3]) ||
+	       this.lineIntersectCircle(rect.vertices[3], rect.vertices[0])){
+	        return true;
+	    }
+
+		for (var i = 0; i < rect.vertices.length; i++){
+	        var distsq = utils.getMagSq(this.x, this.y, rect.vertices[i].x, rect.vertices[i].y);
+	        if (distsq < Math.pow(this.radius, 2)){
+	            return true;
+	        }
+	    }
+		return false;
+
+	}
+	lineIntersectCircle(a, b){
+
+	    var ap, ab, dirAB, magAB, projMag, perp, perpMag;
+	    ap = {x: this.x - a.x, y: this.y - a.y};
+	    ab = {x: b.x - a.x, y: b.y - a.y};
+	    magAB = Math.sqrt(utils.dotProduct(ab,ab));
+	    dirAB = {x: ab.x/magAB, y: ab.y/magAB};
+
+	    projMag = utils.dotProduct(ap, dirAB);
+
+	    perp = {x: ap.x - projMag*dirAB.x, y: ap.y - projMag*dirAB.y};
+	    perpMag = Math.sqrt(utils.dotProduct(perp, perp));
+	    if ((0 < perpMag) && (perpMag < this.radius) && (0 <  projMag) && (projMag < magAB)){
+	        return true;
+	    }
+	    return false;
+	}
+
+
 	getRandomCircleLoc(minR,maxR){
 		var r = Math.floor(Math.random()*(maxR - minR));
 		var angle = Math.floor(Math.random()*(Math.PI*2 - 0));
@@ -1140,6 +1184,7 @@ class TradeShip extends Rect{
 	move(){
 		this.x += this.speed * Math.cos(this.angle * (Math.PI/180));
 		this.y += this.speed * Math.sin(this.angle * (Math.PI/180));
+		this.vertices = this.getVertices();
 		if(this.x == this.destX && this.destY == this.destY){
 			this.reachedDest = true;
 		}
@@ -1514,12 +1559,15 @@ class Bullet extends Rect{
 		this.move();
 	}
 	move(){
+		var dx = this.newX - this.x;
+		var dy = this.newY - this.y;
+		for (var i = 0; i < this.vertices.length; i++){
+			this.vertices[i].x += dx;
+			this.vertices[i].y += dy;
+		}
+
 		this.x = this.newX;
 		this.y = this.newY;
-		for (var i = 0; i < this.vertices.length; i++){
-			this.vertices[i].x + (this.newX - this.x);
-			this.vertices[i].y + (this.newY - this.Y);
-		}
 	}
 	handleHit(object){
 		if(!this.alive){
@@ -1537,8 +1585,8 @@ class Bullet extends Rect{
 		if(object.isItem){
 			return;
 		}
-		this.killSelf();
-		//return true;
+		//this.killSelf();
+		return true;
 	}
 	killSelf(){
 		this.alive = false;

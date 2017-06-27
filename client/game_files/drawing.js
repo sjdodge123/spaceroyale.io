@@ -16,7 +16,22 @@ function drawFlashScreen(){
 	canvasContext.restore();
 }
 
+function drawQuadTree(currentQuad){
+	canvasContext.save();
+	canvasContext.translate(currentQuad.minX - myShip.x + camera.xOffset, currentQuad.minY - myShip.y + camera.yOffset);
+	canvasContext.beginPath();
+	canvasContext.lineWidth = "6";
+	canvasContext.strokeStyle = "blue";
+	canvasContext.rect(0, 0, currentQuad.width, currentQuad.height);
+	canvasContext.stroke();
+	canvasContext.restore();
 
+	for (var i = 0; i < currentQuad.nodes.length; i++){
+		if (currentQuad.nodes[i] != null){
+			drawQuadTree(currentQuad.nodes[i]);
+		}
+	}
+}
 
 function drawText(text,x,y){
 	canvasContext.save();
@@ -124,7 +139,7 @@ function drawHPCounter(){
 	} else {
 		canvasContext.fillStyle = "tomato";
 	}
-	
+
 	canvasContext.fillRect(eventLog.x,eventLog.y-30,(shipList[myID].health/100)*eventLog.width/2,20);
 	canvasContext.restore();
 	drawTextF("Health",eventLog.x+(eventLog.width/4)-30,eventLog.y-15,"#ECF0F1","17px Georgia");
@@ -248,6 +263,9 @@ function drawRelativeObjects(){
 	drawTradeShips();
 	drawWorld();
 	drawBounds();
+	if (quadTree != null){
+		drawQuadTree(quadTree);
+	}
 }
 function drawShip(ship){
 	if(ship.shield != null && ship.shield.alive){

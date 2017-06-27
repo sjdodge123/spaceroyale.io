@@ -17,6 +17,9 @@ exports.preventMovement = function(obj,wall,dt){
 	preventMovement(obj,wall,dt);
 }
 
+exports.checkDistance = function(obj1, obj2){
+	return checkDistance(obj1, obj2);
+}
 class Engine {
 	constructor(bulletList,shipList,asteroidList,planetList,nebulaList,tradeShipList){
 		this.bulletList = bulletList;
@@ -96,34 +99,16 @@ class Engine {
 	}
 
 	broadBase(objectArray){
-		//this.quadTree.clear();
+		this.quadTree.clear();
 		for (var i = 0; i < objectArray.length; i++) {
-			//this.quadTree.insert(objectArray[i]);
-
-	  		for (var j = 0; j < objectArray.length; j++) {
-
-	    		if(objectArray[i] == objectArray[j]){
-	    		  continue;
-	    		}
-	    		var obj1 = objectArray[i],
-	    			obj2 = objectArray[j];
-
-	    		if(checkDistance(obj1,obj2)){
-	  				obj1.handleHit(obj2);
-	  				obj2.handleHit(obj1);
-	    		}
-	  		}
-
+			this.quadTree.insert(objectArray[i]);
   		}
-		/*
   		for(var j=0; j<objectArray.length;j++){
   			var obj1 = objectArray[j];
   			var collisionList = [];
   			collisionList = this.quadTree.retrieve(collisionList,obj1);
   			this.narrowBase(obj1,collisionList);
   		}
-		*/
-
 	}
 
 	narrowBase(obj1,collisionList){
@@ -131,10 +116,9 @@ class Engine {
 		for(var i=0; i<collisionList.length;i++){
 			var obj2 = collisionList[i];
 			if(obj1 == obj2){
-    			continue;
-    		}
-
-    		if(checkDistance(obj1,obj2)){
+				continue;
+			}
+    		if(obj1.inBounds(obj2)){
   				if(obj1.handleHit(obj2)){
 					dyingBulletList.push(obj1);
 				}
@@ -190,7 +174,7 @@ class Engine {
 	setWorldBounds(width,height){
 		this.worldWidth = width;
 		this.worldHeight = height;
-		this.quadTree = new QuadTree(0,this.worldWidth,0,this.worldHeight,3,20,-1);
+		this.quadTree = new QuadTree(0,this.worldWidth,0,this.worldHeight,4,20,-1);
 	}
 }
 

@@ -5,6 +5,7 @@ var myID = null,
 	pingTimeout = null,
 	lastTime = null,
 	world,
+	quadTree,
 	asteroidList = {},
 	itemList = {},
 	planetList = {},
@@ -15,7 +16,7 @@ var myID = null,
 	shipList = {};
 function clientConnect() {
 	var server = io();
-	
+
 
 	server.on('welcome', function(id){
 		myID = id;
@@ -139,6 +140,7 @@ function clientConnect() {
 		nebulaList = updatePacket.nebulaList;
 		tradeShipList = updatePacket.tradeShipList;
 		world = updatePacket.world;
+		quadTree = updatePacket.quadTree;
 		gameStarted = updatePacket.state;
 		lobbyTimeLeft = updatePacket.lobbyTimeLeft;
 		shrinkTimeLeft = updatePacket.shrinkTimeLeft;

@@ -34,7 +34,8 @@ class AIController{
 	}
 
 	gameLoop(){
-		
+		this.faceTarget(this.world.whiteBound);
+		this.fireWeapon();
 	}
 	lobbyLoop(){
 		this.faceTarget(this.world.whiteBound);
