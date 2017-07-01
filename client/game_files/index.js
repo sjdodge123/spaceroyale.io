@@ -52,7 +52,7 @@ function setupPage(){
     skinArray.push({image:'img/skins/Ship_Red.png',value:"red"});
     skinArray.push({image:'img/skins/Ship_Green.png',value:"green"});
 
-    $('#nameForm').submit(function () {
+    $('#guestSignIn').submit(function () {
         var name;
         if(profile == null){
             name = $('#nameBox').val();
@@ -114,17 +114,11 @@ function setupPage(){
         $("#secondSkin").attr('src',skinArray[1].image).attr('data-selected',skinArray[1].value);
         $("#thirdSkin").attr('src',skinArray[2].image).attr('data-selected',skinArray[2].value);
     });
+
     //*******************************************************************************************
 
 
     //***************************Toggle for Signup screen*************************************
-    $('#signUpButton').click(function(e){
-        $('.collapse').collapse("hide");
-        $('#signUp').show();
-        $("#centerContainer").removeClass("enabled");
-        $("#centerContainer").addClass("disabled");
-    });
-
     $('#signUpCancel').click(function(e){
         $('#signUp').hide();
         $('#signUpError').hide();
@@ -262,24 +256,24 @@ function register(user,pass1,pass2,gameName){
 
 function failedToRegister(error){
     $('#signUpError').show().html(error);
-    $("#signUp").effect("shake");
+    $("#signUpModal").effect("shake");
 }
 
 function failedToAuth(){
-    $("#signIn").effect("shake");
+    $("#signInModal").effect("shake");
 }
 
 function changeToSignout(){
-    $('#nameBox').hide();
     $('#signUpButton').hide();
+    $('#nameBox').hide();
     $('#signInButton').click(function(){
         signOutUser();
-    }).attr('data-toggle','').attr('class','btn btn-danger').html('Sign out');
+    }).attr('data-toggle','').attr('class','btn btn-danger btn-lg').html('Sign out');
 }
 function changeToSignIn(){
     $('#nameBox').show();
     $('#signUpButton').show();
-    $('#signInButton').attr('data-toggle','collapse').attr('class','btn btn-info').html('Sign in');
+    $('#signInButton').attr('data-toggle','modal').attr('class','btn btn-info btn-lg').html('Sign in');
 }
 
 function signOutUser(){
@@ -360,6 +354,7 @@ function resetGameVariables(){
 
 function enterLobby(name,color){
     $('#gameCanvas').show();
+    $('#howToPlayMenu').show();
     clientSendStart(name,color);
     gameRunning = true;
     $('#main').hide();
@@ -389,7 +384,6 @@ function init(){
 }
 
 function resize(){
-
     var viewport = {width:window.innerWidth,height:window.innerHeight};
     var scaleToFitX = viewport.width / canvas.width;
     var scaleToFitY = viewport.height / canvas.height;
@@ -508,6 +502,7 @@ function gameLoop(){
     if(myID == null || myShip == null){
         return;
     }
+    drawFlashScreen();
     drawBackground();
     drawRelativeObjects();
     drawHUD();

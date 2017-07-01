@@ -14,7 +14,7 @@ class Joystick {
 		this.dx = 0;
 		this.dy = 0;
 		this.deadzone = 50;
-		this.fireradius = 75;
+		this.fireradius = 125;
 		this.fireradius2 = this.fireradius*this.fireradius;
 		this.distanceSquared  = 0;
 		this.touchIdx = null;

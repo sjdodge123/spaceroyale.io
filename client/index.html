@@ -1,7 +1,8 @@
 <html>
 <head>
-    <meta charset ="utf-8">
+	<meta charset ="utf-8">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="user-scalable=no" />
     <meta name="description" content="Kill or be killed. Control your ship and fight off other players in this online competitive pvp arena royale game. Be the last survivor to claim your space in the universe!">
     <meta name="keywords" content="space, spaceroyale, io, battleroyale, pvp, spacebattle, arena, game, games, web game, html5, fun, flash , competitive">
 
@@ -9,132 +10,215 @@
     <script src='socket.io/socket.io.js'></script>
     <script src="external_libs/jquery-min.js"></script>
     <script src="external_libs/jquery-ui.js"></script>
-    <script src="external_libs/bootstrap.min.js"></script>
-
-    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-    <script>
-      (adsbygoogle = window.adsbygoogle || []).push({
-        google_ad_client: "ca-pub-3825478059888262",
-        enable_page_level_ads: true
-      });
-    </script>
+    <script src="external_libs/tether-1.3.3/dist/js/tether.min.js"></script>
+    <script src="external_libs/bootstrap-4.0.0-alpha.6-dist/js/bootstrap.min.js"></script>
     
+
     <script src="game_files/index.js"></script>
     <script src="game_files/joystick.js"></script>
     <script src='game_files/client.js'></script>
     <script src='game_files/drawing.js'></script>
     <script src='game_files/utils.js'></script>
     <script src='game_files/audio.js'></script>
-
     <link rel="stylesheet" type="text/css" href="styles.css">
-    <link rel="stylesheet" type="text/css" href="external_libs/bootstrap.min.css">
+    <link rel="stylesheet" href="external_libs/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="external_libs/tether-1.3.3/dist/css/tether.min.css">
+    <link rel="stylesheet" type="text/css" href="external_libs/bootstrap-4.0.0-alpha.6-dist/css/bootstrap.min.css">
+    
 </head>
 <body>
-    <div id="main">
-        <img id="bgImg" src="img/background.jpg" style="width:100%;height:100%;position:absolute"></img>
-        <form id="signIn" class="collapse">
-                <input type="text" id="signInUser" placeholder="Username"></input>
-                <input type="password" id="signInPass" placeholder="Password"></input>
-                <input type="button" class="btn btn-success" id="signInSubmit" value="Submit"></input>
-        </form>
-        <div id="centerContainer">
-            <button class="btn btn-info" data-toggle="collapse" id="signInButton" data-target="#signIn">Sign in</button>
-            <button class="btn btn-warning" id="signUpButton">Sign up</button>
-            <div id="bannerBox">SpaceRoyale.io</div>
-            <div id="playerProfile" hidden>
-                <table id="playerTable">
-                    <tr>
-                        <th id="playerName"></th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                    <tr class="blankRow"><td colspan="3"></td></tr>
-                    <tr>
-                        <td id="playerExp"></td>
-                        <td id="playerKills"></td>
-                        <td id="playerWins"></td>
-                    </tr>
-                </table>
-            </div>
-            <div id="formBox">
-                <form id="nameForm">
-                    <div id="skinSelection">
-                        <div id="leftArrow"><img src="img/landingpage/Color_Selector_Arrow_left.png"></img></div>
-                        <div id="skinSelectionDisplay">
-                            <div id="skins">
-                                <ul>
-                                    <li style="left: 50px;">
-                                        <img id="firstSkin" src="img/skins/Ship_Magenta.png" data-selected="#ff00bf"></img>
-                                    </li>
-                                    <li style="left: 134px;">
-                                        <img id="secondSkin" src="img/skins/Ship_Blue.png" data-selected="#66b3ff"></img>
-                                    </li>
-                                    <li style="left: 218px;">
-                                        <img id="thirdSkin" src="img/skins/Ship_Red.png" data-selected="red"></img>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div id="skinSelector"></div>
-                        </div>
-                        <div id="rightArrow"><img src="img/landingpage/Color_Selector_Arrow_right.png"></img></div>
-                    </div>
-                    <input type="text" id="nameBox"></input>
-                    <input type="submit"  class="btn btn-primary" id="playButton" value="Play!"></input>
 
-                </form>
-            </div>
-            <a href="#" id="soundControl" class="btn btn-info">
-              <span id="soundIcon" class="glyphicon glyphicon-volume-up"></span>
-            </a>
-        </div>
-            <form id="signUp" hidden>
-                <label>Create an account</label>
-                <input type="text" id="signUpUser" placeholder="Username"></input>
-                <input type="password" id="signUpPass1" placeholder="Password"></input>
-                <input type="password" id="signUpPass2" placeholder="Retype Password"></input>
-                <input type="text" id="signUpGameName" placeholder="Callsign">          </input>
-                <div ="signUpButtons">
-                    <input type="button" class="btn btn-success" id="signUpSubmit" value="Submit"></input>
-                    <input type="button" class="btn btn-danger" id="signUpCancel" value="Cancel"></input>
-                </div>
-                <label id="signUpError" style="color:tomato" hidden></label>
-            </form>
-
-    </div>
+	<div id="main">
+		<img id="bgImg" src="img/background.jpg" style="width:100%;height:100%;position:absolute"></img>
+		<div id="centerContainer">
+			<div class="container-fluid">
+				<div id="bannerBox" class="jumbotron">
+					<h1>SpaceRoyale.io</h1>
+				</div>
+				<div id="playerProfile" class="jumbotron">
+					<div class="container-fluid">	
+						<div id="skinSelection">
+							<div class="row">
+								<div id="leftArrow" class="col-2">
+									<img src="img/landingpage/Color_Selector_Arrow_left.png"></img>
+								</div>
+								<div id="skinSelectionDisplay" class="col-8">
+									<div id="skins">
+	                                	<div class="row">
+	                                		<div class="col-4">
+		                                        <img id="firstSkin" class="img-fluid" src="img/skins/Ship_Magenta.png" data-selected="#ff00bf"></img>
+		                                    </div>
+	                                   		<div class="col-4">
+		                                        <img id="secondSkin" class="img-fluid" src="img/skins/Ship_Blue.png" data-selected="#66b3ff"></img>
+		                                    </div>
+		                                    <div class="col-4">
+		                                        <img id="thirdSkin" class="img-fluid" src="img/skins/Ship_Red.png" data-selected="red"></img>
+		                                    </div>
+		                                </div>
+		                                <div class="row">
+		                                	<div class="col-4"></div>
+		                                	<div class="col-4">
+		                                		<div id="skinSelector"></div>
+		                                	</div>
+		                                	<div class="col-4"></div>
+		                                </div>
+                    				</div>
+								</div>
+								<div id="rightArrow" class="col-2"><img src="img/landingpage/Color_Selector_Arrow_right.png"></img></div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-12">
+								<form id="guestSignIn">
+									<div class="form-group">
+										<div id="guestBar" class="input-group input-group-lg">
+						                	<span class="input-group-addon"><i class="fa fa-tag" aria-hidden="true"></i></span>
+						                	<input type="text" class="form-control" id="nameBox"></input>
+						                	<span class="input-group-btn">
+						                		<button type="submit" class="btn btn-primary" id="playButton" >Play!</button>
+						                	</span>
+						                </div>
+						            </div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-0 col-lg-9"></div>
+					<div id="authButtons" class="col-12 col-lg-3">
+						<span class="input-group-btn">
+							<button class="btn btn-info btn-lg" id="signInButton" data-toggle="modal" data-target="#signInModal">Sign in</button>
+	    					<button class="btn btn-warning btn-lg" id="signUpButton" data-toggle="modal" data-target="#signUpModal">Sign up</button>
+	    				</span>
+    				</div>
+				</div>
+			</div>
+		</div>	
+	</div>
 
     <div id="gameWindow">
-        <canvas id ="gameCanvas" width="1366" height="768" hidden></canvas>
-        <div id="gameOverMenu" hidden>
-            <div id ="gameOverTop">
-                <label id="gameOverCause">You died!</label>
-            </div>
-            <div id ="gameOverBottom">
-                <input type="button" class="btn btn-danger" id="gameOverReturn" value="Return to Menu"></input>
-            </div>
-        </div>
-        <div id="howToPlayMenu">
-            <div id="howToPlayText">
-                <p id="movementControls">Use <strong>WASD</strong> or the arrow keys to move<br/>
-                Use your mouse to aim and click to shoot
+		<canvas id ="gameCanvas" width="1366" height="768"></canvas>
 
-                </p><strong>Be the last survivor to win</strong></br> </br>
-                <ul id="howToPlayBullets">
-                    <li>Stay <strong>inside of the blue</strong> circle to survive</li>
-                    <li>The <strong>white</strong> circle shows you where the blue circle is shrinking to next</li>
-                    <li>Pay attention to the <strong>shrink timer</strong> at the top of your screen</li>
-                    <li>Gather new items by shooting the asteroids (orange circles) to improve your chances of winning</li>               
-                </ul>
-            <input type="button" class="btn btn-success" id="howToPlayHide" value="Got it"></input>
-            <button onclick="goFullScreen();" class="btn btn-primary glyphicon glyphicon-fullscreen"></button>
-            </div>
+			<!-- How to Play Menu -->
+			<div id="howToPlayMenu" tabIndex="-1"> 
+	            <div id="howToPlayText" tabIndex="-1">
+	                <p id="movementControls">Use <strong>WASD</strong> or the arrow keys to move<br/>
+	                Use your mouse to aim and click to shoot
 
-        </div>
-    </div>
-    <div style="display:none">
-        <h1>SpaceRoyale.io</h1>
-        <p>Kill or be killed. Control your ship and fight off other players in this online competitive pvp arena royale game. Be the last survivor to claim your space in the universe!</p>
-    </div>
+	                </p><strong>Be the last survivor to win</strong></br> </br>
+	                <ul id="howToPlayBullets">
+	                    <li>Stay <strong>inside of the blue</strong7> circle to survive</li>
+	                    <li>The <strong>white</strong> circle shows you where the blue circle is shrinking to next</li>
+	                    <li>Pay attention to the <strong>shrink timer</strong> at the top of your screen</li>
+	                    <li>Gather new items by shooting the asteroids (orange circles) to improve your chances of winning</li>               
+	                </ul>
+	            </div>
+    		</div>
+
+    		<!-- Game over menu -->
+    		<div id="gameOverMenu">
+	            <div id ="gameOverTop">
+	                <label id="gameOverCause">You died!</label>
+	            </div>
+	            <div id ="gameOverBottom">
+	                <input type="button" class="btn btn-danger" id="gameOverReturn" value="Return to Menu"></input>
+	            </div>
+        	</div>
+
+
+	    </div>
+	</div>
+
+	<!-- Sign In Modal -->
+	<div class="modal fade" id="signInModal" tabindex="-1" role="dialog" aria-labelledby="signInModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h2 class="modal-title"><strong>Sign in</strong></h2>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          				<span aria-hidden="true"><i class="fa fa-times" aria-hidden="true"></i></span>
+        			</button>
+				</div>
+				<div class ="modal-body">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-12">
+								<form id="signIn">
+									<div class="form-group">
+										<div class="input-group input-group-lg">
+											<span class="input-group-addon"><i class="fa fa-user-circle-o" aria-hidden="true"></i></span>
+											<input type="text" class="form-control" id="signInUser" placeholder="Username"></input>
+										</div>
+										<br/>
+										<div class="input-group input-group-lg">
+											<span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
+										  	<input type="password" class="form-control" id="signInPass" placeholder="Password"></input>
+										</div>
+					            	</div>
+								</form>
+							</div>
+						</div>
+						<div class="row">
+					    	<button type="submit" class="btn btn-success btn-lg" id="signInSubmit">Submit</button>
+					    </div>
+					</div>	
+				</div>
+			</div>
+		</div>
+	</div>
+
+ 	<!-- Sign Up Modal -->
+	<div class="modal fade" id="signUpModal" tabindex="-1" role="dialog" aria-labelledby="signUpModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h2 class="modal-title"><strong>Create an account</strong></h2>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          				<span ><i class="fa fa-times" aria-hidden="true"></i></span>
+        			</button>
+				</div>
+				<div class ="modal-body">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-12">
+								<form id="signUp">
+									<div class="form-group">
+					        			<div class="input-group input-group-lg">
+					        				<span class="input-group-addon"><i class="fa fa-user-circle-o" aria-hidden="true"></i></span>
+						        			<input class="form-control" type="text" id="signUpUser" placeholder="Username"></input>
+					        			</div>
+					        			<br/>
+					        			<div class="input-group input-group-lg">
+					        				<span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
+						                	<input class="form-control" type="password" id="signUpPass1" placeholder="Password"></input>
+						                </div>
+						                <br/>
+						                <div class="input-group input-group-lg">
+						                	<span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
+						                	<input class="form-control" type="password" id="signUpPass2" placeholder="Retype Password"></input>
+						                </div>
+						                <br/>
+						                <div class="input-group input-group-lg">
+						                	<span class="input-group-addon"><i class="fa fa-tag" aria-hidden="true"></i></span>
+						                	<input class="form-control" type="text" id="signUpGameName" placeholder="Callsign"></input>
+						                </div>
+						            </div>
+						        </form>
+						    </div>
+					    </div>
+					    <div class="row">
+					    	<button type="submit" class="btn btn-success btn-lg" id="signUpSubmit">Submit</button>
+					    </div>
+					    <div class="row">
+					    	<div class="col-12">
+					    		<h1 id="signUpError" style="display:none;color:tomato">Error</h1>
+					    	</div>
+					    </div>					    
+			    	</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
-
-
 </html>

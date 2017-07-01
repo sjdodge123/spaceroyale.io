@@ -26,7 +26,7 @@ function clientConnect() {
 		profile = player;
 		displayPlayerProfile(player);
 		changeToSignout();
-		$('.collapse').collapse("hide");
+		$('#signInModal').modal('toggle');
 		$('#signInUser').val('');
 		$('#signInPass').val('');
 	});
@@ -35,9 +35,7 @@ function clientConnect() {
 		profile = player;
 		displayPlayerProfile(player);
 		changeToSignout();
-		$('#signUp').hide();
-	    $("#centerContainer").removeClass("disabled");
-	    $("#centerContainer").addClass("enabled");
+		$('#signUpModal').modal('toggle');
 	});
 
 	server.on("unsuccessfulAuth", function(payload){
@@ -52,7 +50,6 @@ function clientConnect() {
 	server.on("successfulSignout",function(){
 		changeToSignIn();
     	$('#nameBox').val('').prop('disabled',false);
-    	$('#playerProfile').hide();
 	});
 
 	server.on("drop",function(){
