@@ -3,6 +3,7 @@
 	"minPlayers":2,
     "lobbyWaitTime":5,
 
-    "AISpawnPlayers":false,
+    "AISpawnPlayers":true,
     "AISpawnNumber":5
+
 }

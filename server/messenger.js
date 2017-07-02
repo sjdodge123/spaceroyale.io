@@ -37,7 +37,9 @@ exports.getClient = function(id){
 	return mailBoxList[id];
 }
 exports.toastPlayer = function(id,message){
-	mailBoxList[id].emit("toast",message);
+	if(mailBoxList[id] != null){
+		mailBoxList[id].emit("toast",message);
+	}
 }
 exports.messageUser = function(id,header,payload){
 	messageUser(id,header,payload);
@@ -71,7 +73,7 @@ function checkForMail(client){
 		console.log(message.name + " joined Room"+roomSig);
 
 		//Add this player to the list of current clients in the room
-		room.clientList[client.id] = message.name; 
+		room.clientList[client.id] = message.name;
 
 		//Spawn a ship for the new player
 		room.shipList[client.id] = room.world.spawnNewShip(client.id,message.color);
@@ -102,7 +104,7 @@ function checkForMail(client){
   		client.emit('successfulSignout');
   	});
 
-  	
+
 
 	client.on('movement',function(packet){
 		var room = getRoomFromId(client.id);
@@ -155,13 +157,17 @@ function checkForMail(client){
 }
 
 function messageUser(id,header,payload){
-	mailBoxList[id].emit(header,payload);
+	if(mailBoxList[id] != null){
+		mailBoxList[id].emit(header,payload);
+	}
 }
 function messageRoomBySig(sig,header,payload){
 	io.to(sig).emit(header,payload);
 }
 function messageRoomByUserID(id,header,payload){
-	io.to(roomMailList[id]).emit(header,payload);
+	if(roomMailList[id] != null){
+		io.to(roomMailList[id]).emit(header,payload);
+	}
 }
 function getRoomFromId(clientID){
 	return hostess.getRoomBySig(roomMailList[clientID]);

@@ -64,6 +64,7 @@
     "playerExplosionMaxDamage":50,
     "playerSpawnWeapon":"Pistol",
     "playerSpawnWeaponLevel":1,
+    "playerBaseHealth":100,
 
     "forceConstant": 500000,
 

@@ -236,7 +236,6 @@ class Game {
 		if(c.AISpawnPlayers){
 			for(var i=0;i<c.AISpawnNumber;i++){
 				this.shipList[i] = this.world.spawnNewShip(i,"orange");
-				this.shipList[i].isAI = true;
 				this.AIList[i] = AI.setAIController(this.shipList[i],this.world,this.gameBoard);
 			}
 		}
@@ -865,7 +864,7 @@ class BlueBound extends Bound{
 class Ship extends Rect{
 	constructor(x,y, angle, color, id){
 		super(x,y,25,25, angle, color);
-		this.baseHealth = 100;
+		this.baseHealth = c.playerBaseHealth;
 		this.health = this.baseHealth;
 		this.baseColor = color;
 		this.glowColor = color;
@@ -1257,6 +1256,7 @@ class HPItem extends RectItem {
 		super(x,y,"Red");
 		this.healAmt = 15;
 		this.equipMessage = "Applied health pack +" + this.healAmt;
+		this.name = 'HPItem';
 	}
 	handleHit(object){
 		if(!this.alive){
@@ -1275,6 +1275,7 @@ class EquipableItem extends RectItem{
 		this.dropDate = null;
 		this.pickUpCooldown = 1;
 		this.level = level || 1;
+		this.name = '';
 	}
 	handleHit(object){
 		if(!this.alive){
@@ -1293,22 +1294,26 @@ class EquipableItem extends RectItem{
 class PistolItem extends EquipableItem {
 	constructor(x,y,level){
 		super(x,y,"Magenta",level);
+		this.name = 'PistolItem';
 	}
 }
 
 class ShotgunItem extends EquipableItem {
 	constructor(x,y,level){
 		super(x,y,"Yellow",level);
+		this.name = 'ShotgunItem';
 	}
 }
 class RifleItem extends EquipableItem {
 	constructor(x,y,level){
 		super(x,y,"Green",level);
+		this.name = 'RifleItem';
 	}
 }
 class ShieldItem extends EquipableItem {
 	constructor(x,y){
 		super(x,y,"Aqua");
+		this.name = 'ShieldItem';
 	}
 }
 

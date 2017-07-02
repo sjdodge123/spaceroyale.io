@@ -56,37 +56,43 @@ class Engine {
 			var dirX = 0;
 			var dirY = 0;
 
-			if(ship.moveForward && ship.moveBackward == false && ship.turnLeft == false && ship.turnRight == false){
-				dirY = -1;
-				dirX = 0;
+			if (ship.isAI){
+				dirX = ship.targetDirX/2;
+				dirY = ship.targetDirY/2;
 			}
-			else if(ship.moveForward == false && ship.moveBackward && ship.turnLeft == false && ship.turnRight == false){
-				dirY = 1;
-				dirX = 0;
-			}
-			else if(ship.moveForward == false && ship.moveBackward == false && ship.turnLeft && ship.turnRight == false){
-				dirY = 0;
-				dirX = -1;
-			}
-			else if(ship.moveForward == false && ship.moveBackward == false && ship.turnLeft == false && ship.turnRight){
-				dirY = 0;
-				dirX = 1;
-			}
-			else if(ship.moveForward && ship.moveBackward == false && ship.turnLeft && ship.turnRight == false){
-				dirY = -Math.sqrt(2)/2;
-				dirX = -Math.sqrt(2)/2;
-			}
-			else if(ship.moveForward && ship.moveBackward == false && ship.turnLeft == false && ship.turnRight){
-				dirY = -Math.sqrt(2)/2;
-				dirX = Math.sqrt(2)/2;
-			}
-			else if(ship.moveForward == false && ship.moveBackward && ship.turnLeft && ship.turnRight == false){
-				dirY = Math.sqrt(2)/2;
-				dirX = -Math.sqrt(2)/2;
-			}
-			else if(ship.moveForward == false && ship.moveBackward && ship.turnLeft == false && ship.turnRight){
-				dirY = Math.sqrt(2)/2;
-				dirX = Math.sqrt(2)/2;
+			else{
+				if(ship.moveForward && ship.moveBackward == false && ship.turnLeft == false && ship.turnRight == false){
+					dirY = -1;
+					dirX = 0;
+				}
+				else if(ship.moveForward == false && ship.moveBackward && ship.turnLeft == false && ship.turnRight == false){
+					dirY = 1;
+					dirX = 0;
+				}
+				else if(ship.moveForward == false && ship.moveBackward == false && ship.turnLeft && ship.turnRight == false){
+					dirY = 0;
+					dirX = -1;
+				}
+				else if(ship.moveForward == false && ship.moveBackward == false && ship.turnLeft == false && ship.turnRight){
+					dirY = 0;
+					dirX = 1;
+				}
+				else if(ship.moveForward && ship.moveBackward == false && ship.turnLeft && ship.turnRight == false){
+					dirY = -Math.sqrt(2)/2;
+					dirX = -Math.sqrt(2)/2;
+				}
+				else if(ship.moveForward && ship.moveBackward == false && ship.turnLeft == false && ship.turnRight){
+					dirY = -Math.sqrt(2)/2;
+					dirX = Math.sqrt(2)/2;
+				}
+				else if(ship.moveForward == false && ship.moveBackward && ship.turnLeft && ship.turnRight == false){
+					dirY = Math.sqrt(2)/2;
+					dirX = -Math.sqrt(2)/2;
+				}
+				else if(ship.moveForward == false && ship.moveBackward && ship.turnLeft == false && ship.turnRight){
+					dirY = Math.sqrt(2)/2;
+					dirX = Math.sqrt(2)/2;
+				}
 			}
 			if(ship.velocity < ship.maxVelocity){
 				ship.velX += ship.acel * dirX * this.dt - .075*ship.velX;
