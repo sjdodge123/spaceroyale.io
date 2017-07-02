@@ -236,6 +236,7 @@ class Game {
 		if(c.AISpawnPlayers){
 			for(var i=0;i<c.AISpawnNumber;i++){
 				this.shipList[i] = this.world.spawnNewShip(i,"orange");
+				this.shipList[i].isAI = true;
 				this.AIList[i] = AI.setAIController(this.shipList[i],this.world,this.gameBoard);
 			}
 		}

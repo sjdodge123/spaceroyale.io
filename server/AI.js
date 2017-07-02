@@ -13,10 +13,13 @@ class AIController{
 		this.gameBoard = gameBoard;
 		this.targetAngle = 0;
 		this.rotationSpeed = 15;
+		this.targetDirX = 0;
+		this.targetDirY = 0;
+		this.closestPlayerShip = null;
 	}
 	update(active){
 		this.resetMovement();
-		this.updateRotation();
+		//this.updateRotation();
 
 		if(active){
 			this.gameLoop();
@@ -34,19 +37,53 @@ class AIController{
 	}
 
 	gameLoop(){
-		this.faceTarget(this.world.whiteBound);
-		this.fireWeapon();
+
+		if(this.closestPlayerShip == null){
+			this.findClosestPlayerShip();
+		} else{
+			this.faceTarget(this.closestPlayerShip);
+			this.fireWeapon();
+		}
+
+		
+		
+		//this.faceTarget(this.world.whiteBound);
+		//this.fireWeapon();
 	}
 	lobbyLoop(){
-		this.faceTarget(this.world.whiteBound);
-		this.fireWeapon();
+		if(this.closestPlayerShip == null){
+			this.findClosestPlayerShip();
+		} else{
+			this.faceTarget(this.closestPlayerShip);
+		}
+	}
+	findClosestPlayerShip(){
+		var playerShip = null;
+		var lastDist2 = Infinity;
+
+		for(var i in this.gameBoard.shipList){
+			var ship = this.gameBoard.shipList[i];
+			if(ship.isAI){
+				continue;
+			}
+			var dist2 = utils.getMagSq(this.ship.x,this.ship.y,ship.x,ship.y);
+			if(dist2 < lastDist2){
+				playerShip = ship;
+				lastDist2 = dist2;
+			}
+		}
+		this.closestPlayerShip = playerShip;
+		
 	}
 	fireWeapon(){
-		this.gameBoard.fireWeapon(this.ship);
+		if(this.alive){
+			this.gameBoard.fireWeapon(this.ship);
+		}
 	}
 
 	faceTarget(target){
-		this.targetAngle = (180/Math.PI)*Math.atan2(target.y-this.ship.y,target.x-this.ship.x)-90;;
+		this.targetAngle = (180/Math.PI)*Math.atan2(target.y-this.ship.y,target.x-this.ship.x)-90;
+		this.ship.angle = this.targetAngle;
 	}
 	resetMovement(){
 		this.ship.moveBackward = false;
