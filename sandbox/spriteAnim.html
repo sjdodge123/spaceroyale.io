@@ -1,0 +1,162 @@
+<html>
+<canvas id = "gameCanvas" width = "800" height = "600"></canvas>
+<script type= "text/javascript">
+var numberLine = new Image();
+numberLine.src = 'animations/numberline_mod.svg';
+"use strict";
+
+var width = window.innerWidth,
+	height = window.innerHeight,
+	canvas = document.getElementById('gameCanvas');
+
+var canvasContext,
+	timeLast,
+	mouseObj,
+	mouseX = 0,
+	mouseY = 0,
+	objectList = [];
+
+window.onload = function(){
+	canvasContext = canvas.getContext("2d");
+
+	init();
+}
+
+function init(){
+	canvas.addEventListener("click", handleClick, false);
+	canvas.addEventListener("mousemove", handleMouseMove, false);
+	drawBackground();
+
+	initObjects();
+	timeLast = Date.now();
+	main();
+}
+
+function initObjects(){
+	mouseObj = new MouseObject(mouseX, mouseY, 25, 'green');
+
+	//initialize other objects
+	//objectList.push(mouseObj);
+}
+function handleClick(evt){
+	console.log('click.');
+}
+
+function handleMouseMove(evt){
+	var rect = canvas.getBoundingClientRect(),
+		root = document.documentElement;
+
+	mouseX = evt.pageX - rect.left - root.scrollLeft;
+	mouseY = evt.pageY - rect.top - root.scrollTop;
+}
+
+function main(){
+	var timeNow = Date.now();
+	var dt = (timeNow - timeLast) / 1000.0;
+
+	update(dt);
+	render();
+
+	timeLast = timeNow;
+	requestAnimationFrame(main);
+}
+
+function update(dt){
+	mouseObj.update(dt);
+}
+
+function render(){
+	drawBackground();
+	drawObjects();
+}
+
+function drawBackground(){
+	canvasContext.fillStyle = 'black';
+	canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function drawObjects(){
+	/*
+	for (var i = 0; i < objectList.length; i++){
+		objectList[i].draw();
+	}
+	*/
+	mouseObj.draw();
+}
+
+class GameObject {
+	constructor(x, y, radius, color){
+		this.x = x;
+		this.y = y;
+		this.radius = radius;
+		this.color = color;
+	}
+	update(){
+
+	}
+	draw(){
+		canvasContext.save();
+		canvasContext.beginPath();
+		canvasContext.fillStyle = this.color;
+		canvasContext.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
+		canvasContext.fill();
+		canvasContext.restore();
+	}
+}
+
+class SpriteSheet {
+	constructor(image, x, y, width, height, frameCount, frameRate){
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+		this.frameCount = frameCount;
+		this.sw = Math.floor(this.width/this.frameCount);
+		this.sh = this.height;
+
+		this.image = image;
+		this.frameRate = frameRate;
+		this.ticksPerFrame = 1 / this.frameRate;
+		this.ticks = 0;
+		this.frameIndex = 0;
+		this.loopAnimation = true;
+	}
+	update(dt, x, y){
+		this.x = x;
+		this.y = y;
+		this.ticks += dt;
+		if (this.ticks > this.ticksPerFrame){
+			if (this.frameIndex < this.frameCount - 1){
+				this.frameIndex += 1;
+			}
+			else if (this.loopAnimation){
+				this.frameIndex = 0;
+			}
+			this.ticks = 0;
+		}
+	}
+
+	draw(){
+		canvasContext.drawImage(this.image, this.frameIndex * this.sw, 0, this.sw, this.sh, this.x - this.sw / 2, this.y - this.sh / 2, this.sw, this.sh);
+	}
+}
+
+class MouseObject extends GameObject {
+	constructor(x, y, radius, color){
+		super(x, y, radius, color);
+		this.attached = true;
+		this.spriteSheet = new SpriteSheet(numberLine, this.x, this.y, 1080, 160, 10, 3);
+	}
+	update(dt){
+		this.x = mouseX;
+		this.y = mouseY;
+		this.spriteSheet.update(dt, this.x, this.y);
+	}
+	draw(){
+		this.spriteSheet.draw();
+	}
+
+}
+
+</script>
+</html>
