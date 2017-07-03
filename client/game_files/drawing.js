@@ -1,6 +1,20 @@
 var background = new Image();
 background.src = 'img/background.jpg';
 
+var shipRedSVG = new Image(500,500);
+shipRedSVG.src = 'sprites/ship_red.svg';
+
+var shipGreenSVG = new Image(500,500);
+shipGreenSVG.src = 'sprites/ship_green.svg';
+
+var shipMagentaSVG = new Image(500,500);
+shipMagentaSVG.src = 'sprites/ship_magenta.svg';
+
+var shipBlueSVG = new Image(500,500);
+shipBlueSVG.src = 'sprites/ship_blue.svg';
+
+var cannonSVG = new Image(200,600);
+cannonSVG.src = 'sprites/blaster.svg';
 function drawBackground() {
 	canvasContext.save();
 	canvasContext.fillStyle = 'black';
@@ -272,15 +286,56 @@ function drawShip(ship){
 		drawShield(ship);
 	}
 	canvasContext.save();
+	//canvasContext.beginPath();
 	canvasContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
-	canvasContext.rotate(ship.angle*Math.PI/180);
+	canvasContext.rotate(ship.spriteAngle*Math.PI/180);
 	canvasContext.shadowColor = ship.glowColor;
 	canvasContext.shadowOffsetX = 1;
 	canvasContext.shadowOffsetY = 1;
 	canvasContext.shadowBlur = 16;
-	canvasContext.fillStyle = ship.color;
-	canvasContext.fillRect(-ship.width/2,-ship.height/2,ship.width,ship.height);
+
+	//canvasContext.fillStyle = ship.color;
+	//canvasContext.fillRect(-ship.width/2,-ship.height/2,ship.width,ship.height);
+	//canvasContext.arc(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset,ship.radius,0,Math.PI*2,true);
+	//canvasContext.fill();
+	//canvasContext.restore();
+	//canvasContext.save();
+	var shipSVG;
+	switch (ship.color){
+		default: {
+			shipSVG = shipRedSVG;
+			break;
+		}
+		case 'red':{
+			shipSVG = shipRedSVG;
+			break;
+		}
+		case 'green':{
+			shipSVG = shipGreenSVG;
+			break;
+		}
+		case '#ff00bf':{
+			shipSVG = shipMagentaSVG;
+			break;
+		}
+		case '#66b3ff':{
+			shipSVG = shipBlueSVG;
+			break;
+		}
+	}
+	canvasContext.drawImage(shipSVG, -ship.radius, -ship.radius, 2*ship.radius, 2*ship.radius);
 	canvasContext.restore();
+
+	drawCannon(ship);
+}
+function drawCannon(ship){
+	var svgscale = 2 * ship.radius / shipRedSVG.width;
+	canvasContext.save();
+	canvasContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
+	canvasContext.rotate((ship.angle + 180)*Math.PI/180);
+	canvasContext.drawImage(cannonSVG, - cannonSVG.width * svgscale / 2, -  cannonSVG.height * svgscale / 2, cannonSVG.width * svgscale, cannonSVG.height * svgscale);
+	canvasContext.restore();
+
 }
 function drawShield(ship){
 	canvasContext.save();

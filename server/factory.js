@@ -87,7 +87,7 @@ class Room {
 							murderer.killList.push(victimName);
 							messageToRoom = murdererName + " killed " + victim.AIName;
 							messenger.toastPlayer(murderer.id,"You killed " + victim.AIName);
-						}					
+						}
 					}
 
 					messenger.messageRoomBySig(this.sig,"eventMessage",remaining +" alive - " + messageToRoom);
@@ -96,11 +96,11 @@ class Room {
 						messenger.messageRoomBySig(this.sig,"eventMessage",remaining +" alive - "+ ship.AIName +" died from world damage");
 					} else{
 						messenger.messageRoomBySig(this.sig,"eventMessage",remaining +" alive - "+ this.clientList[shipID] + " died from world damage");
-					}	
+					}
 				}
 
 
-				
+
 				this.killedShips[shipID] = this.shipList[shipID];
 				delete this.shipList[shipID];
 				messenger.messageRoomBySig(this.sig,'shipDeath',shipID);
@@ -914,14 +914,16 @@ class BlueBound extends Bound{
 	}
 }
 
-class Ship extends Rect{
+class Ship extends Circle{
 	constructor(x,y, angle, color, id){
-		super(x,y,25,25, angle, color);
+		super(x, y, 25, color);
 		this.baseHealth = c.playerBaseHealth;
 		this.health = this.baseHealth;
 		this.baseColor = color;
 		this.glowColor = color;
 		this.angle = angle;
+		this.spriteAngle = 0;
+		this.rotationRate = 1;
 		this.isHit = false;
 		this.damageTimer = false;
 		this.moveForward = false;
@@ -959,6 +961,12 @@ class Ship extends Rect{
 	}
 	update(dt){
 		this.dt = dt;
+		if (this.spriteAngle < 359){
+			this.spriteAngle += this.rotationRate;
+		}
+		else{
+			this.spriteAngle = 0;
+		}
 		this.checkHP();
 		this.checkKills();
 		this.move();
@@ -1020,7 +1028,7 @@ class Ship extends Rect{
 		}
 	}
 	fire(){
-		var bullets = this.weapon.fire(this.x,this.y,this.angle,this.baseColor,this.id);
+		var bullets = this.weapon.fire(this.x + this.radius * Math.cos((this.angle + 90) * Math.PI/180), this.y + this.radius * Math.sin((this.angle + 90) * Math.PI/180), this.angle, this.baseColor,this.id);
 		if(bullets != null){
 			messenger.messageRoomByUserID(this.id,'weaponFired',{ship:this,weapon:this.weapon});
 		}
@@ -1029,7 +1037,7 @@ class Ship extends Rect{
 	move(){
 		this.x = this.newX;
 		this.y = this.newY;
-		this.vertices = this.getVertices();
+		//this.vertices = this.getVertices();
 	}
 	handleHit(object){
 		if(object.isWall){

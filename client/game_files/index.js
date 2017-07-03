@@ -47,10 +47,10 @@ window.onload = function() {
 function setupPage(){
     $('#nameBox').attr("placeholder","Guest"+getRandomInt(0,999999));
     var skinArray = [];
-    skinArray.push({image:'img/skins/Ship_Magenta.png',value:"#ff00bf"});
-    skinArray.push({image:'img/skins/Ship_Blue.png',value:"#66b3ff"});
-    skinArray.push({image:'img/skins/Ship_Red.png',value:"red"});
-    skinArray.push({image:'img/skins/Ship_Green.png',value:"green"});
+    skinArray.push({image:'sprites/ship_magenta.svg',value:"#ff00bf"});
+    skinArray.push({image:'sprites/ship_blue.svg',value:"#66b3ff"});
+    skinArray.push({image:'sprites/ship_red.svg',value:"red"});
+    skinArray.push({image:'sprites/ship_green.svg',value:"green"});
 
     $('#guestSignIn').submit(function () {
         var name;
@@ -398,7 +398,7 @@ function resize(){
     }
     canvas.style.width = newWidth + "px";
     canvas.style.height = newHeight + "px";
-    
+
     camera = {
         x : canvas.width/2,
         y : canvas.height/2,
@@ -578,7 +578,7 @@ function onTouchStart(evt){
         if(joystickMovement.touchIdx == null){
             joystickMovement.touchIdx = touch.identifier;
             joystickMovement.onDown(touchX,touchY);
-        }     
+        }
     }
     if(touchX >= canvas.width/2) {
         if(joystickCamera.touchIdx == null){
@@ -598,7 +598,7 @@ function onTouchEnd(evt){
         }
         if(touchList[i].identifier == joystickCamera.touchIdx){
             joystickCamera.touchIdx = null;
-            
+
             joystickCamera.onUp();
             return;
         }
