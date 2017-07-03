@@ -22,7 +22,7 @@ class AIController{
 		this.itemLootRange = 600;
 		this.itemLootRangeSq = this.itemLootRange * this.itemLootRange;
 
-		this.killingMaintainDistance = utils.getRandomInt(2,15);
+		this.killingMaintainDistance = utils.getRandomInt(75,150);
 		this.killingMaintainDistanceSq = this.killingMaintainDistance*this.killingMaintainDistance;
 
 		this.maintainDistance = utils.getRandomInt(100,300);
@@ -31,8 +31,12 @@ class AIController{
 		this.mood = this.determineMood();
 		this.fleeThreshold = utils.getRandomInt(30,70);
 
+		this.blueBoundRunLimit = 3;
+		this.blueBoundTimer = new Date();
+
 		this.closestPlayerShip = null;
 		this.closestAsteroid = null;
+		this.closestNebula == null;
 		this.closestItem = null;
 		this.desiredWeapon = '';
 		this.ship.isAI = true;
@@ -88,16 +92,32 @@ class AIController{
 		}
 	}
 	determineMood(){
-		var seed = utils.getRandomInt(0,4);
+		var seed = utils.getRandomInt(0,2);
 		if(seed == 0){
 			return "looting";
 		}
-		return "killing"
+		if(seed == 1){
+			this.fleeThreshold = this.ship.health - 5;
+			return "hiding";
+		}
+		return "killing";
 	}
 
 	determineMoveTarget(){
 		if(!this.world.blueBound.inBounds(this.ship)){
+			this.blueBoundTimer = new Date();
 			return this.world.blueBound;
+		}
+
+		if(new Date()-this.blueBoundTimer < this.blueBoundRunLimit*1000){
+			return this.world.blueBound;
+		}
+
+		if(this.mood == "hiding"){
+			this.findClosestNebula();
+			if(this.closestNebula != null){
+				return this.closestNebula;
+			}
 		}
 
 		if (this.closestAsteroid != null && !this.closestAsteroid.alive){
@@ -124,6 +144,9 @@ class AIController{
 		return this.world.whiteBound;
 	}
 	determineFireTarget(){
+		if(this.mood == "hiding"){
+			return;
+		}
 		if(this.closestPlayerShip != null && this.closestPlayerShip.alive){
 			return this.closestPlayerShip;
 		}
@@ -159,6 +182,22 @@ class AIController{
 			}
 		}
 		this.closestAsteroid = asteroid;
+	}
+	findClosestNebula(){
+		var nebula = null;
+		var lastDist2 = Infinity;
+		for(var i in this.gameBoard.nebulaList){
+			var currentNeb = this.gameBoard.nebulaList[i];
+			if (!this.world.blueBound.inBounds(currentNeb)){
+				continue;
+			}
+			var dist2 = utils.getMagSq(this.ship.x,this.ship.y,currentNeb.x,currentNeb.y);
+			if(dist2 < lastDist2){
+				nebula = currentNeb;
+				lastDist2 = dist2;
+			}
+		}
+		this.closestNebula = nebula;
 	}
 	findClosestItem(){
 		var item = null;
@@ -201,6 +240,10 @@ class AIController{
 				continue;
 			}
 
+			if(currentShip.isHiding){
+				continue;
+			}
+
 			var dist2 = utils.getMagSq(this.ship.x,this.ship.y,currentShip.x,currentShip.y);
 			if(this.mood == "looting"){
 				if(dist2 > this.aggroRangeSq/1.2){
@@ -212,10 +255,12 @@ class AIController{
 					continue;
 				}
 			}
+
 			if(dist2 < lastDist2){
 				playerShip = currentShip;
 				lastDist2 = dist2;
 			}
+
 		}
 
 		this.closestPlayerShip = playerShip;

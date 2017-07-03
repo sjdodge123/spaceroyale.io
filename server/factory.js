@@ -931,6 +931,7 @@ class Ship extends Circle{
 		this.turnLeft = false;
 		this.turnRight = false;
 		this.alive = true;
+		this.isHiding = false;
 		this.id = id;
 		this.killList = [];
 		this.killedBy = null;
@@ -1035,8 +1036,14 @@ class Ship extends Circle{
 		return bullets;
 	}
 	move(){
-		this.x = this.newX;
-		this.y = this.newY;
+		if(this.newX != this.x || this.newY != this.y){
+			this.x = this.newX;
+			this.y = this.newY;
+			if(this.isHiding){
+				this.isHiding = false;
+			}
+		}
+		
 		//this.vertices = this.getVertices();
 	}
 	handleHit(object){
@@ -1044,6 +1051,7 @@ class Ship extends Circle{
 			_engine.preventMovement(this,object,this.dt);
 		}
 		if(object.isNebula){
+			this.isHiding = true;
 			_engine.slowDown(this,this.dt,object.slowAmt);
 			return;
 		}

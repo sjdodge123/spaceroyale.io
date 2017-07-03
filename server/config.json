@@ -29,7 +29,7 @@
     "worldHeight": 5000,
 
     "generateAsteroids":true,
-    "asteroidAmt":250,
+    "asteroidAmt":150,
     "asteroidDropRate":30,
     "asteroidMinSize":45,
     "asteroidMaxSize":65,
@@ -83,7 +83,7 @@
     "rifleBulletDamage":50,
     "rifleBulletSpeed":2058,
 
-    "shieldRadius":26,
+    "shieldRadius":35,
     "shield1Protection":10,
     "shield2Protection":20,
     "shield3Protection":30,
