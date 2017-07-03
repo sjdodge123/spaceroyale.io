@@ -15,8 +15,22 @@ class AIController{
 		this.rotationSpeed = 15;
 		this.targetDirX = 0;
 		this.targetDirY = 0;
-		this.aggroRange = 200;
+
+		this.aggroRange = utils.getRandomInt(c.AIAggroRangeMin,c.AIAggroRangeMax);
 		this.aggroRangeSq = this.aggroRange * this.aggroRange;
+
+		this.itemLootRange = 600;
+		this.itemLootRangeSq = this.itemLootRange * this.itemLootRange;
+
+		this.killingMaintainDistance = utils.getRandomInt(2,15);
+		this.killingMaintainDistanceSq = this.killingMaintainDistance*this.killingMaintainDistance;
+
+		this.maintainDistance = utils.getRandomInt(100,300);
+		this.maintainDistanceSq = this.maintainDistance * this.maintainDistance;
+
+		this.mood = this.determineMood();
+		this.fleeThreshold = utils.getRandomInt(30,70);
+
 		this.closestPlayerShip = null;
 		this.closestAsteroid = null;
 		this.closestItem = null;
@@ -24,16 +38,16 @@ class AIController{
 		this.ship.isAI = true;
 		this.ship.targetDirX = 0;
 		this.ship.targetDirY = 0;
+		this.ship.AIName = this.generateAIName();
+		this.ship.color = this.generateAIColor();
+		this.ship.baseColor = this.ship.color;
+		this.ship.glowColor = this.ship.color;
 	}
 	update(active){
-		this.resetMovement();
-		//this.updateRotation();
-
 		if(active){
 			this.gameLoop();
 			return;
 		}
-		this.lobbyLoop();
 	}
 	updateRotation(){
 		if(this.ship.angle < this.targetAngle){
@@ -47,67 +61,75 @@ class AIController{
 	gameLoop(){
 		if(this.desiredWeapon == ''){
 			this.desiredWeapon = this.determineDesiredWeapon();
-			console.log(this.desiredWeapon);
 		}
-
 		if(this.closestAsteroid == null){
 			this.findClosestAsteroid();
 		}
 		this.findClosestPlayerShip();
 
+		var moveToTarget = this.determineMoveTarget();
+		this.moveToTarget(moveToTarget);
 
-		this.moveToTarget(this.determineMoveTarget());
 		var fireTarget = this.determineFireTarget();
-		this.faceTarget(fireTarget);
-		if (fireTarget.alive){
-			this.fireWeapon();
+		if(fireTarget){
+			this.faceTarget(fireTarget);
+			if (fireTarget.alive){
+				this.fireWeapon();
+			}
+		}
+		this.checkHP();
+	}
+
+	checkHP(){
+		if(this.ship.health < this.fleeThreshold){
+			this.mood = "looting";
+		} else {
+			this.mood = "killing";
+		}
+	}
+	determineMood(){
+		var seed = utils.getRandomInt(0,4);
+		if(seed == 0){
+			return "looting";
+		}
+		return "killing"
+	}
+
+	determineMoveTarget(){
+		if(!this.world.blueBound.inBounds(this.ship)){
+			return this.world.blueBound;
 		}
 
-		//this.faceTarget(this.world.whiteBound);
-		//this.fireWeapon();
-	}
-	lobbyLoop(){
-		if(this.closestPlayerShip == null){
-			this.findClosestPlayerShip();
-		} else{
-			this.faceTarget(this.closestPlayerShip);
-		}
-	}
-	determineMoveTarget(){
-		if (this.closestPlayerShip != null && !this.closestPlayerShip.alive){
-			this.findClosestPlayerShip();
-		}
 		if (this.closestAsteroid != null && !this.closestAsteroid.alive){
 			this.findClosestItem();
 			this.findClosestAsteroid();
 		}
+
 		if (this.closestItem != null && this.closestItem.alive){
 			return this.closestItem;
 		}
-		var dist2 = utils.getMagSq(this.ship.x, this.ship.y, this.closestPlayerShip.x, this.closestPlayerShip.y);
-		if (dist2 < this.aggroRangeSq){
+
+		if(this.mood == "killing"){
+			if(this.closestPlayerShip != null && this.closestPlayerShip.alive){
+				return this.closestPlayerShip;
+			}	
+		}
+		if (this.closestAsteroid != null && this.closestAsteroid.alive){
+			return this.closestAsteroid;
+		}
+		if(this.closestPlayerShip != null && this.closestPlayerShip.alive){
 			return this.closestPlayerShip;
 		}
-		if (this.closestAsteroid == null){
-			return this.closestPlayerShip;
-		}
-		return this.closestAsteroid;
+
+		return this.world.whiteBound;
 	}
 	determineFireTarget(){
-		if (this.closestPlayerShip != null && !this.closestPlayerShip.alive){
-			this.findClosestPlayerShip();
-		}
-		if (this.closestAsteroid != null && !this.closestAsteroid.alive){
-			this.findClosestAsteroid();
-		}
-		var dist2 = utils.getMagSq(this.ship.x, this.ship.y, this.closestPlayerShip.x, this.closestPlayerShip.y);
-		if (dist2 < this.aggroRangeSq){
+		if(this.closestPlayerShip != null && this.closestPlayerShip.alive){
 			return this.closestPlayerShip;
 		}
-		if (this.closestAsteroid == null){
-			return this.closestPlayerShip;
+		if (this.closestAsteroid != null && this.closestAsteroid.alive){
+			return this.closestAsteroid;
 		}
-		return this.closestAsteroid;
 	}
 	determineDesiredWeapon(){
 		switch (utils.getRandomInt(0,2)){
@@ -137,7 +159,6 @@ class AIController{
 			}
 		}
 		this.closestAsteroid = asteroid;
-
 	}
 	findClosestItem(){
 		var item = null;
@@ -151,6 +172,9 @@ class AIController{
 				continue;
 			}
 			var dist2 = utils.getMagSq(this.ship.x,this.ship.y, currentItem.x, currentItem.y);
+			if(dist2 > this.itemLootRangeSq){
+				continue;
+			}
 			if(dist2 < lastDist2){
 				item = currentItem;
 				lastDist2 = dist2;
@@ -173,17 +197,27 @@ class AIController{
 		for(var i in this.gameBoard.shipList){
 			var currentShip = this.gameBoard.shipList[i];
 
-			if(currentShip.isAI){
+			if(currentShip == this.ship){
 				continue;
 			}
 
 			var dist2 = utils.getMagSq(this.ship.x,this.ship.y,currentShip.x,currentShip.y);
+			if(this.mood == "looting"){
+				if(dist2 > this.aggroRangeSq/1.2){
+					continue;
+				}
+			}
+			if(this.mood == "killing"){
+				if(dist2 > this.aggroRangeSq*1.2){
+					continue;
+				}
+			}
 			if(dist2 < lastDist2){
-
 				playerShip = currentShip;
 				lastDist2 = dist2;
 			}
 		}
+
 		this.closestPlayerShip = playerShip;
 
 	}
@@ -202,15 +236,38 @@ class AIController{
 		this.targetDirX = Math.cos((this.targetAngle + 90) * Math.PI/180);
 		this.targetDirY = Math.sin((this.targetAngle + 90) * Math.PI/180);
 
-		//perhaps this is bad practice
-		//console.log(this.targetDirX);
-		this.ship.targetDirX = this.targetDirX;
-		this.ship.targetDirY = this.targetDirY;
+		if(target.isItem || target.isBound){
+			this.ship.targetDirX = this.targetDirX;
+			this.ship.targetDirY = this.targetDirY;
+			return;
+		}
+
+		var dist2 = utils.getMagSq(this.ship.x,this.ship.y,target.x,target.y);
+
+		if(this.mood == "killing"){
+			if(dist2 > this.killingMaintainDistanceSq){
+				this.ship.targetDirX = this.targetDirX;
+				this.ship.targetDirY = this.targetDirY;
+			}
+		}
+		if(this.mood == "looting"){
+			if(dist2 < this.maintainDistanceSq){
+				this.ship.targetDirX = -this.targetDirX;
+				this.ship.targetDirY = -this.targetDirY;
+			} else{
+				this.ship.targetDirX = this.targetDirX;
+				this.ship.targetDirY = this.targetDirY;
+			}
+		}
+
 	}
-	resetMovement(){
-		this.ship.moveBackward = false;
-		this.ship.moveForward = false;
-		this.ship.turnLeft = false;
-		this.ship.turnRight = false;
+
+	generateAIName(){
+		var nameInt = utils.getRandomInt(0,c.AINameList.length-1);
+		return c.AINameList[nameInt];
+	}
+	generateAIColor(){
+		var colorInt = utils.getRandomInt(0,c.AIColorList.length-1);
+		return c.AIColorList[colorInt];
 	}
 }

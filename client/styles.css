@@ -364,6 +364,15 @@ input {
 	}
 }
 
+@media screen and (max-width: 1300px){
+	#main {
+		margin-top: -15%;
+	}
+	#playerProfile{
+		margin-top: -10%;
+	}
+}
+
 @media screen and (max-width: 991px) and (orientation:landscape) {
 	#bannerBox h1{
 		font-size: 40px;

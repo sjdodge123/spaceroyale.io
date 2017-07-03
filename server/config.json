@@ -13,9 +13,11 @@
     "baseShrinkingDuration": 40,
     "shrinkingDurationSpeedup":0.75,
 
-    "AISpawnPlayers":false,
-    "AISpawnNumber":2,
-
+    "AISpawnPlayers":true,
+    "AIAggroRangeMin":250,
+    "AIAggroRangeMax":750,
+    "AINameList":["Danger","Ralph","Pincer","Holiday","Joey","Randy","A RABID DOG","noone","Guestl337","Ceasar","Pluto","mr. bone's wild ride","chuckie","Pharoh","pockets"],
+    "AIColorList":["#ff00bf","#66b3ff","red","green"],
 
     "damageTickRate":2,
     "damagePerTick":15,
@@ -27,26 +29,26 @@
     "worldHeight": 5000,
 
     "generateAsteroids":true,
-    "asteroidAmt":100,
-    "asteroidDropRate":40,
+    "asteroidAmt":250,
+    "asteroidDropRate":30,
     "asteroidMinSize":45,
     "asteroidMaxSize":65,
 
     "asteroidLootTable":{
-      "HPItem":4,
-      "ShieldItem":2,
-      "RifleItem":5,
-      "ShotgunItem":3,
-      "PistolItem":1
+      "ShieldItem":4,
+      "RifleItem":1,
+      "ShotgunItem":2,
+      "PistolItem":3,
+      "HPItem":5
     },
 
     "generatePlanets":true,
-    "planetAmt":40,
+    "planetAmt":20,
     "planetMinSize":70,
     "planetMaxSize":150,
 
     "generateNebulas":true,
-    "nebulaAmt":50,
+    "nebulaAmt":40,
     "nebulaSlowAmt":0.25,
     "nebulaMinSize":35,
     "nebulaMaxSize":40,
@@ -68,7 +70,7 @@
 
     "forceConstant": 500000,
 
-    "basegunCoolDown":0.5,
+    "basegunCoolDown":0.7,
     "bulletLifetime":5,
     "bulletSpeed":788,
     "bulletDamage":10,

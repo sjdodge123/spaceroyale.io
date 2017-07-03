@@ -238,7 +238,6 @@ function invalidRegister(user,pass1,pass2,gameName){
 
 function displayPlayerProfile(player){
     updateProfile(player);
-    $('#playerProfile').show();
 }
 function updateProfile(player){
     $('#playerName').html(player.game_name.trim());
@@ -467,14 +466,14 @@ function resize(){
     eventLog = {
         backgroundColor:'#2a2a2a',
         width:500,
-        height:80,
+        height:90,
         x: (canvas.width/2)-250,
         y: canvas.height-90,
         textColor:"white",
         textStyle:"15px Verdana",
         textSize:15,
         printList:[],
-        listMax:20,
+        listMax:5,
         textX: function(){
             return this.x+10;
         },
@@ -482,7 +481,8 @@ function resize(){
             return this.y+15;
         },
         addEvent:function(eventmsg){
-            if(this.printList.length == this.listMax){
+            console.log(this.listMax);
+            if(this.printList.length > this.listMax){
                 this.printList.shift();
             }
             this.printList.push(eventmsg);
