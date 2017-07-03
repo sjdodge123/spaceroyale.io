@@ -34,7 +34,6 @@ class Room {
 		var client = messenger.getClient(clientID);
 		messenger.addRoomToMailBox(clientID,this.sig);
 		client.join(this.sig);
-		this.game.checkForAISpawn();
 		this.clientCount++;
 	}
 	leave(clientID){
@@ -62,16 +61,46 @@ class Room {
 		for(var shipID in this.shipList){
 			var ship = this.shipList[shipID];
 			if(ship.alive == false){
+				var remaining = this.game.getShipCount()-1;
 				this.engine.explodeObject(ship.x, ship.y, ship.explosionMaxDamage, ship.explosionRadius);
 				this.game.gameBoard.spawnItem(ship.weapon.drop(ship.x,ship.y));
-				if(ship.killedBy != null){
+				if(ship.killedBy != null && this.shipList[ship.killedBy] != null){
 					var murderer = this.shipList[ship.killedBy];
+					var victim = ship;
 					var murdererName = this.clientList[ship.killedBy];
-					var deadPlayerName = this.clientList[shipID];
-					murderer.killList.push(deadPlayerName);
-					messenger.messageRoomByUserID(murderer.id,"eventMessage",murdererName + " killed " + deadPlayerName);
-					messenger.toastPlayer(murderer.id,"You killed " + deadPlayerName);
+					var victimName = this.clientList[shipID];
+
+					var messageToRoom = "";
+
+					if(murderer.isAI){
+						if(!victim.isAI){
+							messageToRoom = murderer.AIName +" killed " + victimName;
+						} else{
+							messageToRoom = murderer.AIName +" killed " + victim.AIName;
+						}
+					} else{
+						if(!victim.isAI){
+							murderer.killList.push(victimName);
+							messageToRoom = murdererName + " killed " + victimName;
+							messenger.toastPlayer(murderer.id,"You killed " + victimName);
+						} else{
+							murderer.killList.push(victimName);
+							messageToRoom = murdererName + " killed " + victim.AIName;
+							messenger.toastPlayer(murderer.id,"You killed " + victim.AIName);
+						}					
+					}
+
+					messenger.messageRoomBySig(this.sig,"eventMessage",remaining +" alive - " + messageToRoom);
+				} else{
+					if(ship.isAI){
+						messenger.messageRoomBySig(this.sig,"eventMessage",remaining +" alive - "+ ship.AIName +" died from world damage");
+					} else{
+						messenger.messageRoomBySig(this.sig,"eventMessage",remaining +" alive - "+ this.clientList[shipID] + " died from world damage");
+					}	
 				}
+
+
+				
 				this.killedShips[shipID] = this.shipList[shipID];
 				delete this.shipList[shipID];
 				messenger.messageRoomBySig(this.sig,'shipDeath',shipID);
@@ -161,9 +190,11 @@ class Game {
 		this.active = true;
 		this.world.resize();
 		this.gameBoard.populateWorld();
+		this.checkForAISpawn();
 		this.randomLocShips();
 		this.world.drawFirstBound();
 		this.resetTimeUntilShrink();
+
 	}
 	resetTimeUntilShrink(){
 		var game = this;
@@ -186,11 +217,14 @@ class Game {
 
 	gameover(){
 		this.active = false;
+		console.log("Room" + this.roomSig +"'s game has ended.");
 		for(var shipID in this.shipList){
-			console.log(this.clientList[shipID]+" wins!");
-			this.winner = shipID;
-			this.gameEnded = true;
+			if(!this.shipList[shipID].isAI){
+				console.log(this.clientList[shipID]+" wins!");
+				this.winner = shipID;
+			}
 		}
+		this.gameEnded = true;
 	}
 
 	update(dt){
@@ -205,7 +239,9 @@ class Game {
 		    	this.gameBoard.spawnTradeShip();
 		    	this.world.canSpawnTradeShip = false;
 		    }
-			this.checkForWin();
+			if(this.checkForWin()){
+				return;
+			}
 		} else{
 			this.checkForGameStart()
 		}
@@ -215,13 +251,19 @@ class Game {
 	}
 
 	checkForWin(){
+		if(this.getPlayerShipCount() == 0){
+			this.gameover();
+			return true;
+		}
 		if(this.getShipCount() == 1){
 			this.gameover();
+			return true;
 		}
+		return false;
 	}
 
 	checkForGameStart(){
-		if(this.getShipCount() >= this.minPlayers){
+		if(this.getPlayerShipCount() >= this.minPlayers){
 			if(this.lobbyTimer == null){
 				var game = this;
 				this.lobbyTimer = utils.getTimer(function(){game.start();},this.lobbyWaitTime*1000);
@@ -233,8 +275,9 @@ class Game {
 		}
 	}
 	checkForAISpawn(){
+		var spawnAmt = c.maxPlayersInRoom - this.getPlayerShipCount()
 		if(c.AISpawnPlayers){
-			for(var i=0;i<c.AISpawnNumber;i++){
+			for(var i=0;i<spawnAmt;i++){
 				this.shipList[i] = this.world.spawnNewShip(i,"orange");
 				this.AIList[i] = AI.setAIController(this.shipList[i],this.world,this.gameBoard);
 			}
@@ -257,6 +300,15 @@ class Game {
 		var shipCount = 0;
 		for(var shipID in this.shipList){
 			shipCount++;
+		}
+		return shipCount;
+	}
+	getPlayerShipCount(){
+		var shipCount = 0;
+		for(var shipID in this.shipList){
+			if(!this.shipList[shipID].isAI){
+				shipCount++;
+			}
 		}
 		return shipCount;
 	}
@@ -846,6 +898,7 @@ class Bound extends Circle{
 		super(x,y,radius,color);
 		this.velX = 0;
 		this.velY = 0;
+		this.isBound = true;
 	}
 }
 
@@ -1386,7 +1439,7 @@ class Pistol extends Weapon{
 	upgrade(){
 		super.upgrade();
 		if(this.level == 3){
-			this.cooldown -= .1;
+			this.cooldown = c.basegunCoolDown - .3;
 		}
 	}
 }
@@ -1431,7 +1484,7 @@ class Shotgun extends Weapon{
 	upgrade(){
 		super.upgrade();
 		if(this.level == 3){
-			this.cooldown -= .3;
+			this.cooldown = c.shotgunCoolDown - .3;
 		}
 	}
 }
@@ -1470,7 +1523,7 @@ class Rifle extends Weapon{
 	upgrade(){
 		super.upgrade();
 		if(this.level == 2){
-			this.cooldown -= .7;
+			this.cooldown = c.rifleCoolDown - .7;
 		}
 		if(this.level == 3){
 			this.threeShot = true;
