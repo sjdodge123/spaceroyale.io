@@ -47,6 +47,12 @@ class Engine {
 			bullet.velY = Math.sin((bullet.angle+90)*(Math.PI/180))*bullet.speed;
 			bullet.newX += bullet.velX * this.dt;
 			bullet.newY += bullet.velY * this.dt;
+
+			for (var i = 0; i < bullet.vertices.length; i++){
+				bullet.vertices[i].x += bullet.velX * this.dt;
+				bullet.vertices[i].y += bullet.velY * this.dt;
+			}
+
 		}
 	}
 

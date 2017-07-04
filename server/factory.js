@@ -556,9 +556,8 @@ class Shape {
 		if(shape.radius){
 			return this.testCircle(shape);
 		}
-		else if(shape.width){
-			return _engine.checkDistance(this,shape);
-			//return this.testRect(shape);
+		if(shape.width){
+			return this.testRect(shape);
 		}
 		return false;
 	}
@@ -624,12 +623,12 @@ class Rect extends Shape{
 	}
 	testRect(rect){
 		for (var i = 0; i < this.vertices.length; i++){
-	        if(this.pointInRect(this.vertices[i].x,this.vertices[i].y,rect.vertices)){
+	        if(rect.pointInRect(this.vertices[i].x,this.vertices[i].y)){
 	            return true;
 	        }
 	    }
 	    for (var i = 0; i < rect.vertices.length; i++){
-	        if(this.pointInRect(rect.vertices[i].x,rect.vertices[i].y,this.vertices)){
+	        if(this.pointInRect(rect.vertices[i].x,rect.vertices[i].y)){
 	            return true;
 	        }
 	    }
@@ -1647,12 +1646,6 @@ class Bullet extends Rect{
 		this.move();
 	}
 	move(){
-		var dx = this.newX - this.x;
-		var dy = this.newY - this.y;
-		for (var i = 0; i < this.vertices.length; i++){
-			this.vertices[i].x += dx;
-			this.vertices[i].y += dy;
-		}
 
 		this.x = this.newX;
 		this.y = this.newY;
