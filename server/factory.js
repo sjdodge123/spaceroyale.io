@@ -664,7 +664,9 @@ class Circle extends Shape{
 	}
 
 	testRect(rect){
-
+		if(this.lineIntersectCircle({x:rect.x, y:rect.y}, {x:rect.newX, y:rect.newY})){
+			return true;
+		}
 		if(rect.pointInRect(this.x, this.y)){
 			return true;
 		}
