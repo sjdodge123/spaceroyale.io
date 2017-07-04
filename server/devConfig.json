@@ -1,6 +1,11 @@
 {
 	"override":true,
 	"minPlayers":2,
+	"AISpawnPlayers":true,
+	"generateTradeShips":true,
+	"playerSpawnWeapon":"Pistol",
+    "playerSpawnWeaponLevel":1,
+    "playerBaseHealth":100,
     "lobbyWaitTime":5
 
 }

@@ -186,7 +186,8 @@ input {
 	background-color: transparent;
 }
 #skinSelector{
-	border-top: 4px solid white;
+	margin-top: 5px;
+	border-top: 10px solid white;
 }
 #leftArrow{
 	cursor: pointer;
@@ -365,6 +366,24 @@ input {
 }
 
 @media screen and (max-width: 1300px){
+	#main {
+		margin-top: -15%;
+	}
+	#playerProfile{
+		margin-top: -10%;
+	}
+}
+
+@media screen and (max-height: 1200px){
+	#main {
+		margin-top: -10%;
+	}
+	#playerProfile{
+		margin-top: -10%;
+	}
+}
+
+@media screen and (max-height: 600px){
 	#main {
 		margin-top: -15%;
 	}

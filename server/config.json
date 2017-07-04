@@ -5,6 +5,7 @@
 
     "minPlayers":2,
     "maxPlayersInRoom":15,
+    "randomizePlayersLocations":true,
     "roomKickTimeout":30,
     "lobbyWaitTime":30,
 

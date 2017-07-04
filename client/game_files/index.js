@@ -115,6 +115,24 @@ function setupPage(){
         $("#thirdSkin").attr('src',skinArray[2].image).attr('data-selected',skinArray[2].value);
     });
 
+
+    $('#firstSkin').click(function(){
+        var lastElement = skinArray.splice(skinArray.length-1,1)[0];
+        skinArray.unshift(lastElement);
+        $("#firstSkin").attr('src',skinArray[0].image).attr('data-selected',skinArray[0].value);
+        $("#secondSkin").attr('src',skinArray[1].image).attr('data-selected',skinArray[1].value);
+        $("#thirdSkin").attr('src',skinArray[2].image).attr('data-selected',skinArray[2].value);
+    });
+
+    $('#thirdSkin').click(function(){
+        var firstElement = skinArray.shift();
+        skinArray.push(firstElement);
+        $("#firstSkin").attr('src',skinArray[0].image).attr('data-selected',skinArray[0].value);
+        $("#secondSkin").attr('src',skinArray[1].image).attr('data-selected',skinArray[1].value);
+        $("#thirdSkin").attr('src',skinArray[2].image).attr('data-selected',skinArray[2].value);
+    });
+
+
     //*******************************************************************************************
 
 
@@ -481,7 +499,6 @@ function resize(){
             return this.y+15;
         },
         addEvent:function(eventmsg){
-            console.log(this.listMax);
             if(this.printList.length > this.listMax){
                 this.printList.shift();
             }

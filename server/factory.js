@@ -27,7 +27,7 @@ class Room {
 		this.clientCount = 0;
 		this.alive = true;
 		this.engine = _engine.getEngine(this.bulletList, this.shipList, this.world, this.asteroidList, this.planetList,this.nebulaList,this.tradeShipList);
-		this.world = new World(0,0,c.lobbyWidth,c.lobbyHeight,this.engine);
+		this.world = new World(0,0,c.lobbyWidth,c.lobbyHeight,this.engine,this.sig);
 		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList,this.planetList,this.itemList,this.nebulaList,this.tradeShipList,this.engine,this.AIList,this.sig);
 	}
 	join(clientID){
@@ -313,11 +313,13 @@ class Game {
 		return shipCount;
 	}
 	randomLocShips(){
-		for(var shipID in this.shipList){
-			var ship = this.shipList[shipID];
-			var loc = this.world.findFreeLoc(ship);
-			ship.newX = loc.x;
-			ship.newY = loc.y;
+		if(c.randomizePlayersLocations){
+			for(var shipID in this.shipList){
+				var ship = this.shipList[shipID];
+				var loc = this.world.findFreeLoc(ship);
+				ship.newX = loc.x;
+				ship.newY = loc.y;
+			}
 		}
 	}
 }
@@ -552,12 +554,11 @@ class Shape {
 	}
 	inBounds(shape){
 		if(shape.radius){
-			//return this.testCircle(shape);
-			return _engine.checkDistance(this, shape);
+			return this.testCircle(shape);
 		}
 		else if(shape.width){
-			//return this.testRect(shape);
 			return _engine.checkDistance(this,shape);
+			//return this.testRect(shape);
 		}
 		return false;
 	}
@@ -649,8 +650,15 @@ class Circle extends Shape{
 	}
 
 	testCircle(circle){
-		var distance = Math.sqrt(Math.pow(circle.x-this.x,2) + Math.pow(circle.y-this.y,2));
-		if(distance+circle.radius <= this.radius){
+		var objX1,objY1,objX2,objY2,distance;
+		objX1 = this.newX || this.x;
+		objY1 = this.newY || this.y;
+		objX2 = circle.newX || circle.x;
+		objY2 = circle.newY || circle.y;
+		distance = utils.getMag(objX2 - objX1,objY2 - objY1);
+	  	distance -= this.radius;
+		distance -= circle.radius;
+		if(distance <= 0){
 			return true;
 		}
 		return false;
@@ -705,7 +713,7 @@ class Circle extends Shape{
 }
 
 class World extends Rect{
-	constructor(x,y,width,height,engine){
+	constructor(x,y,width,height,engine,roomSig){
 		super(x,y,width,height, 0, "orange");
 		this.baseBoundRadius = width;
 		this.damageRate = c.damageTickRate;
@@ -716,6 +724,7 @@ class World extends Rect{
 		this.blueBound = new BlueBound(width/2,height/2,this.baseBoundRadius);
 		this.center = {x:width/2,y:height/2};
 		this.engine = engine;
+		this.roomSig = roomSig;
 	}
 	update(timeLeft,dt){
 		this.updateBounds(timeLeft,dt);
@@ -889,7 +898,7 @@ class World extends Rect{
 
 	spawnNewShip(id,color){
 		var loc = this.getRandomLoc();
-		return new Ship(loc.x,loc.y, 90, color, id);
+		return new Ship(loc.x,loc.y, 90, color, id,this.roomSig);
 	}
 }
 
@@ -915,7 +924,7 @@ class BlueBound extends Bound{
 }
 
 class Ship extends Circle{
-	constructor(x,y, angle, color, id){
+	constructor(x,y, angle, color, id, roomSig){
 		super(x, y, 25, color);
 		this.baseHealth = c.playerBaseHealth;
 		this.health = this.baseHealth;
@@ -945,6 +954,7 @@ class Ship extends Circle{
 		this.velY = 0;
 		this.droppedItem = null;
 		this.dt = 0;
+		this.roomSig = roomSig;
 		this.explosionRadius = c.playerExplosionRadius;
 		this.explosionMaxDamage = c.playerExplosionMaxDamage;
 
@@ -1031,7 +1041,7 @@ class Ship extends Circle{
 	fire(){
 		var bullets = this.weapon.fire(this.x + this.radius * Math.cos((this.angle + 90) * Math.PI/180), this.y + this.radius * Math.sin((this.angle + 90) * Math.PI/180), this.angle, this.baseColor,this.id);
 		if(bullets != null){
-			messenger.messageRoomByUserID(this.id,'weaponFired',{ship:this,weapon:this.weapon});
+			messenger.messageRoomBySig(this.roomSig,'weaponFired',{ship:this,weapon:this.weapon});
 		}
 		return bullets;
 	}
@@ -1043,11 +1053,10 @@ class Ship extends Circle{
 				this.isHiding = false;
 			}
 		}
-		
-		//this.vertices = this.getVertices();
 	}
 	handleHit(object){
 		if(object.isWall){
+			messenger.messageUser(this.id,"collideWithObject");
 			_engine.preventMovement(this,object,this.dt);
 		}
 		if(object.isNebula){
@@ -1056,6 +1065,7 @@ class Ship extends Circle{
 			return;
 		}
 		if(object.owner != this.id && object.alive && object.damage != null){
+			messenger.messageUser(object.owner,"shotLanded");
 			if(this.shield != null && this.shield.alive){
 				this.shield.handleHit(object);
 				if(this.shield.alive){
@@ -1129,6 +1139,9 @@ class Asteroid extends Circle{
 			return;
 		}
 		if(object.alive && object.damage != null){
+			if(object.owner != null){
+				messenger.messageUser(object.owner,"shotAsteroid",this);
+			}
 			this.health -= object.damage;
 		}
 		if(this.health < 1){

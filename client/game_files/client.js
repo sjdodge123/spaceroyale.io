@@ -96,7 +96,24 @@ function clientConnect() {
 			if(payload.weapon.name == "Pistol"){
             	playSound(pistolShot);
         	}
+        	if(payload.weapon.name == "Shotgun"){
+            	playSound(shotgunShot);
+        	}
 		}
+	});
+
+	server.on("shotLanded",function(){
+		playSound(shotPlayer);
+	});
+
+	server.on("shotAsteroid",function(asteroid){
+		if(camera.inBounds(asteroid)){
+			playSound(shotAsteroid);
+		}
+	});
+
+	server.on("collideWithObject",function(){
+		playSoundAfterFinish(collision);
 	});
 
 	server.on("gameStart",function(){
@@ -106,8 +123,13 @@ function clientConnect() {
 	server.on("shipDeath",function(id){
 		if(id == myID){
 			iAmAlive = false;
+			playSound(youDied);
 			delete shipList[id];
 			showGameOverScreen("You died!");
+			return;
+		}
+		if(camera.inBounds(shipList[id])){
+			playSound(shipDeath);
 		}
 	});
 

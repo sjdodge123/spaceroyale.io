@@ -4,8 +4,17 @@ var playerJoinSound = new Audio("./sounds/player_join.wav");
 var collision = new Audio("./sounds/collide_with_obj.wav");
 var takeDamage = new Audio("./sounds/take_damage.wav");
 var pistolShot = new Audio("./sounds/pistol_shot.wav");
+var shotgunShot = new Audio("./sounds/shotgun_shot.wav");
+
+
+
+var shotAsteroid = new Audio("./sounds/shot_asteroid.wav");
+var shotPlayer = new Audio("./sounds/shot_player.wav");
+
 var shipInitThrust = new Audio("./sounds/ship_init_thrust.wav");
 var shipThrust = new Audio("./sounds/ship_thrust.wav");
+var youDied = new Audio("./sounds/you_died.wav");
+var shipDeath = new Audio("./sounds/ship_death.wav");
 var backgroundMusic = new Audio('./sounds/Intergalactic.mp3');
 var gameStartMusic = new Audio('./sounds/Play_Ball.mp3');
 
@@ -25,6 +34,17 @@ function playSound (sound) {
 	playingSounds.push(sound);
 	if(!gameMuted){
 		if(sound.currentTime > 0){
+			sound.currentTime = 0;
+		}
+		sound.play();
+	}
+}
+function playSoundAfterFinish(sound){
+	playingSounds.push(sound);
+	if(!gameMuted){
+		if(sound.currentTime > 0 && !sound.ended){
+			return;
+		}else{
 			sound.currentTime = 0;
 		}
 		sound.play();
