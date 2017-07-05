@@ -3,10 +3,10 @@ var playingSounds = [];
 var playerJoinSound = new Audio("./sounds/player_join.wav");
 var collision = new Audio("./sounds/collide_with_obj.wav");
 var takeDamage = new Audio("./sounds/take_damage.wav");
-var pistolShot = new Audio("./sounds/pistol_shot.wav");
-var shotgunShot = new Audio("./sounds/shotgun_shot.wav");
 
 
+var blasterShot = new Audio("./sounds/blaster_shot.wav");
+var photonCannonShot = new Audio("./sounds/photonCannon_shot.wav");
 
 var shotAsteroid = new Audio("./sounds/shot_asteroid.wav");
 var shotPlayer = new Audio("./sounds/shot_player.wav");
@@ -19,15 +19,25 @@ var backgroundMusic = new Audio('./sounds/Intergalactic.mp3');
 var gameStartMusic = new Audio('./sounds/Play_Ball.mp3');
 
 
-var masterVolume = .5;
+var masterVolume = 1;
 
-pistolShot.volume = .1 * masterVolume;
-collision.volume = .5 * masterVolume;
-playerJoinSound.volume = .5 * masterVolume;
-shipInitThrust.volume = .3 * masterVolume;
-shipThrust.volume = .4 * masterVolume;
-backgroundMusic.volume = .1 * masterVolume;
-gameStartMusic.volume = .1 *masterVolume;
+playerJoinSound.volume *= .1 * masterVolume;
+collision.volume *= .1 * masterVolume;
+takeDamage.volume *= .5 * masterVolume;
+
+blasterShot.volume *= .1 * masterVolume;
+photonCannonShot.volume *= .3 * masterVolume;
+
+shotAsteroid.volume *= .2 * masterVolume;
+shotPlayer.volume *= .3 * masterVolume;
+
+shipInitThrust.volume *= .3 * masterVolume;
+shipThrust.volume *= .4 * masterVolume;
+youDied.volume *= .3 * masterVolume;
+shipDeath.volume *= .3 * masterVolume;
+
+backgroundMusic.volume *= .1 * masterVolume;
+gameStartMusic.volume *= .05 *masterVolume;
 shipThrust.loop = true;
 
 function playSound (sound) {

@@ -37,9 +37,9 @@
 
     "asteroidLootTable":{
       "ShieldItem":4,
-      "RifleItem":1,
-      "ShotgunItem":2,
-      "PistolItem":3,
+      "MassDriverItem":1,
+      "PhotonCannonItem":2,
+      "BlasterItem":3,
       "HPItem":5
     },
 
@@ -49,10 +49,10 @@
     "planetMaxSize":150,
 
     "generateNebulas":true,
-    "nebulaAmt":40,
-    "nebulaSlowAmt":0.25,
-    "nebulaMinSize":35,
-    "nebulaMaxSize":40,
+    "nebulaAmt":20,
+    "nebulaSlowAmt":0.075,
+    "nebulaMinSize":80,
+    "nebulaMaxSize":130,
 
     "generateTradeShips":true,
     "tradeShipMinDelay":5,
@@ -65,24 +65,24 @@
     "playerBaseAcel":1000,
     "playerExplosionRadius":60,
     "playerExplosionMaxDamage":50,
-    "playerSpawnWeapon":"Pistol",
+    "playerSpawnWeapon":"Blaster",
     "playerSpawnWeaponLevel":1,
     "playerBaseHealth":100,
 
     "forceConstant": 500000,
 
-    "basegunCoolDown":0.7,
+    "blasterCoolDown":0.7,
     "bulletLifetime":5,
     "bulletSpeed":788,
     "bulletDamage":10,
 
-    "shotgunCoolDown":1.2,
+    "photonCannonCoolDown":1.2,
     "birdshotDamage":11,
     "birdshotSpeed":941,
 
-    "rifleCoolDown":1.2,
-    "rifleBulletDamage":50,
-    "rifleBulletSpeed":2058,
+    "massDriverCoolDown":1.2,
+    "massDriverBulletDamage":50,
+    "massDriverBulletSpeed":2058,
 
     "shieldRadius":35,
     "shield1Protection":10,

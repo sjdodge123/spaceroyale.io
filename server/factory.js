@@ -959,14 +959,14 @@ class Ship extends Circle{
 		this.explosionRadius = c.playerExplosionRadius;
 		this.explosionMaxDamage = c.playerExplosionMaxDamage;
 
-		if(c.playerSpawnWeapon == "Pistol"){
-			this.weapon = new Pistol(this.id);
+		if(c.playerSpawnWeapon == "Blaster"){
+			this.weapon = new Blaster(this.id);
 		}
-		if(c.playerSpawnWeapon == "Shotgun"){
-			this.weapon = new Shotgun(this.id);
+		if(c.playerSpawnWeapon == "PhotonCannon"){
+			this.weapon = new PhotonCannon(this.id);
 		}
-		if(c.playerSpawnWeapon == "Rifle"){
-			this.weapon = new Rifle(this.id);
+		if(c.playerSpawnWeapon == "MassDriver"){
+			this.weapon = new MassDriver(this.id);
 		}
 
 		this.weapon.level = c.playerSpawnWeaponLevel;
@@ -995,33 +995,33 @@ class Ship extends Circle{
 				return;
 			}
 		}
-		if(item instanceof PistolItem){
-			if(this.weapon instanceof Pistol){
+		if(item instanceof BlasterItem){
+			if(this.weapon instanceof Blaster){
 				this.weapon.upgrade();
 				return;
 			}
 			this.droppedItem = this.weapon.drop(this.x,this.y,this.weapon.level);
-			this.weapon = new Pistol(this.id,item.level);
+			this.weapon = new Blaster(this.id,item.level);
 			this.weapon.equip();
 			return;
 		}
-		if(item instanceof ShotgunItem){
-			if(this.weapon instanceof Shotgun){
+		if(item instanceof PhotonCannonItem){
+			if(this.weapon instanceof PhotonCannon){
 				this.weapon.upgrade();
 				return;
 			}
 			this.droppedItem = this.weapon.drop(this.x,this.y,this.weapon.level);
-			this.weapon = new Shotgun(this.id,item.level);
+			this.weapon = new PhotonCannon(this.id,item.level);
 			this.weapon.equip();
 			return;
 		}
-		if(item instanceof RifleItem){
-			if(this.weapon instanceof Rifle){
+		if(item instanceof MassDriverItem){
+			if(this.weapon instanceof MassDriver){
 				this.weapon.upgrade();
 				return;
 			}
 			this.droppedItem = this.weapon.drop(this.x,this.y,this.weapon.level);
-			this.weapon = new Rifle(this.id,item.level);
+			this.weapon = new MassDriver(this.id,item.level);
 			this.weapon.equip();
 			return;
 		}
@@ -1125,8 +1125,10 @@ class Asteroid extends Circle{
 		this.sig = sig;
 		this.isWall = true;
 		this.item = null;
+		this.artType = utils.getRandomInt(0,2);
 		this.dropRate = c.asteroidDropRate;
 		this.lootTable = c.asteroidLootTable;
+		this.spriteAngle = utils.getRandomInt(1,360);
 		this.baseHealth = 40;
 		this.health = this.baseHealth;
 		this.alive = true;
@@ -1174,16 +1176,16 @@ class Asteroid extends Circle{
 				item = new HPItem(this.x,this.y);
 				break;
 			}
-			case "PistolItem": {
-				item = new PistolItem(this.x,this.y);
+			case "BlasterItem": {
+				item = new BlasterItem(this.x,this.y);
 				break;
 			}
-			case "ShotgunItem": {
-				item = new ShotgunItem(this.x,this.y);
+			case "PhotonCannonItem": {
+				item = new PhotonCannonItem(this.x,this.y);
 				break;
 			}
-			case "RifleItem": {
-				item = new RifleItem(this.x,this.y);
+			case "MassDriverItem": {
+				item = new MassDriverItem(this.x,this.y);
 				break;
 			}
 			case "ShieldItem": {
@@ -1199,6 +1201,7 @@ class Planet extends Circle {
 	constructor(x,y,radius,sig){
 		super(x,y,radius,"SkyBlue");
 		this.isWall = true;
+		this.artType = utils.getRandomInt(0,1);
 		this.sig = sig;
 	}
 	handleHit(object){
@@ -1374,23 +1377,23 @@ class EquipableItem extends RectItem{
 	}
 }
 
-class PistolItem extends EquipableItem {
+class BlasterItem extends EquipableItem {
 	constructor(x,y,level){
 		super(x,y,"Magenta",level);
-		this.name = 'PistolItem';
+		this.name = 'BlasterItem';
 	}
 }
 
-class ShotgunItem extends EquipableItem {
+class PhotonCannonItem extends EquipableItem {
 	constructor(x,y,level){
 		super(x,y,"Yellow",level);
-		this.name = 'ShotgunItem';
+		this.name = 'PhotonCannonItem';
 	}
 }
-class RifleItem extends EquipableItem {
+class MassDriverItem extends EquipableItem {
 	constructor(x,y,level){
 		super(x,y,"Green",level);
-		this.name = 'RifleItem';
+		this.name = 'MassDriverItem';
 	}
 }
 class ShieldItem extends EquipableItem {
@@ -1442,15 +1445,15 @@ class Weapon {
 	}
 }
 
-class Pistol extends Weapon{
+class Blaster extends Weapon{
 	constructor(owner,level){
 		super(owner);
 		this.level = level;
-		this.name = "Pistol";
-		this.cooldown = c.basegunCoolDown;
-		this.equipMessage = "Equiped Pistol";
-		this.upgradeMessage ="Upgraded Pistol";
-		this.item = PistolItem;
+		this.name = "Blaster";
+		this.cooldown = c.blasterCoolDown;
+		this.equipMessage = "Equiped Blaster";
+		this.upgradeMessage ="Upgraded Blaster";
+		this.item = BlasterItem;
 	}
 
 	fire(x,y,angle,color,id){
@@ -1474,15 +1477,15 @@ class Pistol extends Weapon{
 	}
 }
 
-class Shotgun extends Weapon{
+class PhotonCannon extends Weapon{
 	constructor(owner,level){
 		super(owner);
-		this.name = "Shotgun";
+		this.name = "PhotonCannon";
 		this.level = level;
-		this.cooldown = c.shotgunCoolDown;
-		this.equipMessage = "Equiped Shotgun";
-		this.upgradeMessage ="Upgraded Shotgun";
-		this.item = ShotgunItem;
+		this.cooldown = c.photonCannonCoolDown;
+		this.equipMessage = "Equiped Photon Cannon";
+		this.upgradeMessage ="Upgraded Photon Cannon";
+		this.item = PhotonCannonItem;
 	}
 
 	fire(x,y,angle,color,id){
@@ -1514,21 +1517,21 @@ class Shotgun extends Weapon{
 	upgrade(){
 		super.upgrade();
 		if(this.level == 3){
-			this.cooldown = c.shotgunCoolDown - .3;
+			this.cooldown = c.photonCannonCoolDown - .3;
 		}
 	}
 }
 
-class Rifle extends Weapon{
+class MassDriver extends Weapon{
 	constructor(owner,level){
 		super(owner);
-		this.name = "Rifle";
+		this.name = "MassDriver";
 		this.level = level;
-		this.cooldown = c.rifleCoolDown;
-		this.equipMessage = "Equiped Rifle";
-		this.upgradeMessage = "Upgraded Rifle";
+		this.cooldown = c.massDriverCoolDown;
+		this.equipMessage = "Equiped Mass Driver";
+		this.upgradeMessage = "Upgraded Mass Driver";
 		this.threeShot = false;
-		this.item = RifleItem;
+		this.item = MassDriverItem;
 	}
 	fire(x,y,angle,color,id){
 		if(this.onCoolDown()){
@@ -1536,24 +1539,24 @@ class Rifle extends Weapon{
 		}
 		var bullets = [];
 		if(this.level == 3 && this.threeShot){
-			var bull1 = new RifleBullet(x,y,8,20, angle, color, id);
-			var bull2 = new RifleBullet(x,y,8,20, angle, color, id);
+			var bull1 = new MassDriverBullet(x,y,8,20, angle, color, id);
+			var bull2 = new MassDriverBullet(x,y,8,20, angle, color, id);
 			bull1.speed -= bull1.speed * .25;
-			bull1.damage -= c.rifleBulletDamage*0.5;
+			bull1.damage -= c.massDriverBulletDamage*0.5;
 			bull2.speed -= bull2.speed * .40;
-			bull2.damage -= c.rifleBulletDamage*0.75;
+			bull2.damage -= c.massDriverBulletDamage*0.75;
 			bullets.push(bull1,bull2);
 			this.threeShot = false;
 		} else{
 			this.threeShot = true;
 		}
-		bullets.push(new RifleBullet(x,y,8,20, angle, color, id));
+		bullets.push(new MassDriverBullet(x,y,8,20, angle, color, id));
 		return bullets;
 	}
 	upgrade(){
 		super.upgrade();
 		if(this.level == 2){
-			this.cooldown = c.rifleCoolDown - .7;
+			this.cooldown = c.massDriverCoolDown - .7;
 		}
 		if(this.level == 3){
 			this.threeShot = true;
@@ -1685,10 +1688,10 @@ class Birdshot extends Bullet{
 
 }
 
-class RifleBullet extends Bullet{
+class MassDriverBullet extends Bullet{
 	constructor(x,y,width,height, angle, color, owner){
 		super(x,y,width,height,angle, color, owner);
-		this.damage = c.rifleBulletDamage;
-		this.speed = c.rifleBulletSpeed;
+		this.damage = c.massDriverBulletDamage;
+		this.speed = c.massDriverBulletSpeed;
 	}
 }

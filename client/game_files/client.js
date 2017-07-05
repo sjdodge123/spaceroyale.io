@@ -93,11 +93,11 @@ function clientConnect() {
 			lastFired = new Date();
 		}
 		if(camera.inBounds(payload.ship)){
-			if(payload.weapon.name == "Pistol"){
-            	playSound(pistolShot);
+			if(payload.weapon.name == "Blaster"){
+            	playSound(blasterShot);
         	}
-        	if(payload.weapon.name == "Shotgun"){
-            	playSound(shotgunShot);
+        	if(payload.weapon.name == "PhotonCannon"){
+            	playSound(photonCannonShot);
         	}
 		}
 	});

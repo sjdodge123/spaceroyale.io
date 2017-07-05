@@ -488,10 +488,10 @@ function resize(){
         x: (canvas.width/2)-250,
         y: canvas.height-90,
         textColor:"white",
-        textStyle:"15px Verdana",
-        textSize:15,
+        textStyle:"17px Verdana",
+        textSize:17,
         printList:[],
-        listMax:5,
+        listMax:4,
         textX: function(){
             return this.x+10;
         },

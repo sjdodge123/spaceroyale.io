@@ -157,13 +157,13 @@ class AIController{
 	determineDesiredWeapon(){
 		switch (utils.getRandomInt(0,2)){
 			case 0:{
-				return 'PistolItem';
+				return 'BlasterItem';
 			}
 			case 1:{
-				return 'ShotgunItem';
+				return 'PhotonCannonItem';
 			}
 			case 2:{
-				return 'RifleItem';
+				return 'MassDriverItem';
 			}
 		}
 	}
