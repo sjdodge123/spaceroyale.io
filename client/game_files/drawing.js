@@ -15,9 +15,6 @@ shipMagentaSVG.src = 'sprites/ship_magenta.svg';
 var shipBlueSVG = new Image(500,500);
 shipBlueSVG.src = 'sprites/ship_blue.svg';
 
-var cannonSVG = new Image(200,600);
-cannonSVG.src = 'sprites/blaster.svg';
-
 var tradeShipSVG = new Image();
 tradeShipSVG.src ="sprites/trade_ship.svg";
 
@@ -29,6 +26,30 @@ asteroidSVG.src ="sprites/asteroid_sheet.svg";
 
 var nebulaSVG = new Image();
 nebulaSVG.src ="sprites/nebula_sheet.svg";
+
+var blasterSVG = new Image(200,600);
+blasterSVG.src = 'sprites/blaster.svg';
+
+var photonCannonSVG = new Image(200,600);
+photonCannonSVG.src = 'sprites/photon_cannon.svg';
+
+var massDriverSVG = new Image(200,600);
+massDriverSVG.src = 'sprites/mass_driver.svg';
+
+var blasterItemSVG = new Image();
+blasterItemSVG.src = "sprites/items/blaster_item.svg";
+
+var photonCannonItemSVG = new Image();
+photonCannonItemSVG.src = "sprites/items/photon_cannon_item.svg";
+
+var massDriverItemSVG = new Image();
+massDriverItemSVG.src = "sprites/items/mass_driver_item.svg";
+
+var shieldItemSVG = new Image();
+shieldItemSVG.src = "sprites/items/shield_item.svg";
+
+var healthItemSVG = new Image();
+healthItemSVG.src = "sprites/items/health_item.svg";
 
 class SpriteSheet {
 	constructor(image,x,y,frameWidth,frameHeight,rows,columns){
@@ -66,7 +87,7 @@ class SpriteSheet {
 var planetSheet = new SpriteSheet(planetSVG,0,0,500,500,1,2);
 var asteroidSheet = new SpriteSheet(asteroidSVG,0,0,500,500,1,3);
 var nebulaSheet = new SpriteSheet(nebulaSVG,0,0,500,500,1,1);
-var tradeShipSheet = new SpriteSheet(tradeShipSVG,0,200,600,1,1);
+var tradeShipSheet = new SpriteSheet(tradeShipSVG,0,0,200,600,1,1);
 
 
 function drawBackground() {
@@ -375,14 +396,28 @@ function drawShip(ship){
 	canvasContext.drawImage(shipSVG, -ship.radius, -ship.radius, 2*ship.radius, 2*ship.radius);
 	canvasContext.restore();
 
-	drawGun(ship);
+	drawWeapon(ship);
 }
-function drawGun(ship){
+function drawWeapon(ship){
 	var svgscale = 2 * ship.radius / shipRedSVG.width;
 	canvasContext.save();
 	canvasContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
 	canvasContext.rotate((ship.angle + 180)*Math.PI/180);
-	canvasContext.drawImage(cannonSVG, - cannonSVG.width * svgscale / 2, -  cannonSVG.height * svgscale / 2, cannonSVG.width * svgscale, cannonSVG.height * svgscale);
+	switch(ship.weapon.name){
+		case "Blaster":{
+			canvasContext.drawImage(blasterSVG, - blasterSVG.width * svgscale / 2, -  blasterSVG.height * svgscale / 2, blasterSVG.width * svgscale, blasterSVG.height * svgscale);
+			break;
+		}
+		case "PhotonCannon":{
+			canvasContext.drawImage(photonCannonSVG, - photonCannonSVG.width * svgscale / 2, -  photonCannonSVG.height * svgscale / 2, photonCannonSVG.width * svgscale, photonCannonSVG.height * svgscale);
+			break;
+		}
+		case "MassDriver":{
+			canvasContext.drawImage(massDriverSVG, - massDriverSVG.width * svgscale / 2, -  massDriverSVG.height * svgscale / 2, massDriverSVG.width * svgscale, massDriverSVG.height * svgscale);
+			break;
+		}
+	}
+	
 	canvasContext.restore();
 
 }
@@ -407,12 +442,41 @@ function drawAsteroid(asteroid){
 
 function drawItem(item){
 	canvasContext.save();
-	canvasContext.fillStyle = item.color;
-	canvasContext.fillRect(item.x-(item.width/2)-myShip.x+camera.xOffset,item.y-(item.height/2)-myShip.y+camera.yOffset,item.width,item.height);
-	canvasContext.strokeStyle = "white";
-	canvasContext.lineWidth=2;
-    canvasContext.rect(item.x-(item.width/2)-myShip.x+camera.xOffset,item.y-(item.height/2)-myShip.y+camera.yOffset,item.width,item.height);
-    canvasContext.stroke();
+
+	switch(item.name){
+		default:{
+			canvasContext.beginPath();
+			canvasContext.fillStyle = item.color;
+			canvasContext.arc(item.x-myShip.x+camera.xOffset,item.y-myShip.y+camera.yOffset,item.radius,0,Math.PI*2,true);
+			canvasContext.fill();
+			canvasContext.beginPath();
+			canvasContext.strokeStyle = "white";
+			canvasContext.lineWidth=2;
+		    canvasContext.arc(item.x-myShip.x+camera.xOffset,item.y-myShip.y+camera.yOffset,item.radius,0,Math.PI*2,true);
+		    canvasContext.stroke();
+			break;
+		}
+		case "BlasterItem":{
+			canvasContext.drawImage(blasterItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
+			break;
+		}
+		case "PhotonCannonItem":{
+			canvasContext.drawImage(photonCannonItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
+			break;
+		}
+		case "MassDriverItem":{
+			canvasContext.drawImage(massDriverItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
+			break;
+		}
+		case "HPItem":{
+			canvasContext.drawImage(healthItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
+			break;
+		}
+		case "ShieldItem":{
+			canvasContext.drawImage(shieldItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
+			break;
+		}
+	}
     canvasContext.restore();
 }
 
@@ -434,15 +498,9 @@ function drawNebula(nebula){
 function drawTradeShip(tradeShip){
 	canvasContext.save();
 	canvasContext.translate(tradeShip.x-myShip.x+camera.xOffset,tradeShip.y-myShip.y+camera.yOffset);
-	canvasContext.rotate(tradeShip.angle*Math.PI/180);
+	canvasContext.rotate((tradeShip.angle+90)*Math.PI/180);
 	tradeShipSheet.move(0,0);
-	tradeShipSheet.draw(tradeShip.width,tradeShip.height);
-	//canvasContext.translate(tradeShip.x-myShip.x+camera.xOffset,tradeShip.y-myShip.y+camera.yOffset);
-	//canvasContext.rotate(tradeShip.angle*Math.PI/180);
-	//canvasContext.shadowColor = tradeShip.glowColor;
-	//canvasContext.shadowOffsetX = 1;
-	//canvasContext.shadowOffsetY = 1;
-	//canvasContext.shadowBlur = 16;
+	tradeShipSheet.draw(tradeShip.height,tradeShip.width);
     canvasContext.restore();
 }
 

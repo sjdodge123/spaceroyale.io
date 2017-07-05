@@ -1230,7 +1230,7 @@ class TradeShip extends Rect{
 		this.speed = c.tradeShipSpeed;
 		this.health = 100;
 		this.reachedDest = false;
-		this.item = RifleItem;
+		this.item = MassDriverItem;
 		this.readyToMove = false;
 		this.alive = true;
 		this.sig = null;
@@ -1328,16 +1328,16 @@ class Trail extends Circle {
 
 }
 
-class RectItem extends Rect{
+class CircleItem extends Circle{
 	constructor(x,y,color){
-		super(x,y,15,15, 90, color);
+		super(x,y,25,color);
 		this.isItem = true;
 		this.sig = null;
 		this.alive = true;
 	}
 }
 
-class HPItem extends RectItem {
+class HPItem extends CircleItem {
 	constructor(x,y){
 		super(x,y,"Red");
 		this.healAmt = 15;
@@ -1355,7 +1355,7 @@ class HPItem extends RectItem {
 	}
 }
 
-class EquipableItem extends RectItem{
+class EquipableItem extends CircleItem{
 	constructor(x,y,color,level){
 		super(x,y,color);
 		this.dropDate = null;
@@ -1472,7 +1472,7 @@ class Blaster extends Weapon{
 	upgrade(){
 		super.upgrade();
 		if(this.level == 3){
-			this.cooldown = c.basegunCoolDown - .3;
+			this.cooldown = c.blasterCoolDown - .3;
 		}
 	}
 }
