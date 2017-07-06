@@ -271,10 +271,11 @@ function displayPlayerProfile(player){
     updateProfile(player);
 }
 function updateProfile(player){
-    $('#playerName').html(player.game_name.trim());
-    $('#playerExp').html("Exp:" + player.total_exp.toString().trim());
-    $('#playerKills').html("Total Kills:" + player.total_kills.toString().trim());
-    $('#playerWins').html("Total Wins:" + player.total_wins.toString().trim());
+    $('#nameBox').val(player.game_name.trim());
+    $('#playerName').html("Welcome back, " + player.game_name.trim());
+    $('#playerExp').html("Exp: " + player.total_exp.toString().trim());
+    $('#playerKills').html("Kills: " + player.total_kills.toString().trim());
+    $('#playerWins').html("Wins: " + player.total_wins.toString().trim());
 }
 
 function register(user,pass1,pass2,gameName){
@@ -296,14 +297,16 @@ function failedToAuth(){
 
 function changeToSignout(){
     $('#signUpButton').hide();
-    $('#nameBox').hide();
+    $('#profileLoaded').show();
+    $('#nameBox').attr('disabled', 'disabled');
     $('#signInButton').click(function(){
         signOutUser();
     }).attr('data-toggle','').attr('class','btn btn-danger btn-lg').html('Sign out');
 }
 function changeToSignIn(){
-    $('#nameBox').show();
     $('#signUpButton').show();
+    $('#profileLoaded').hide();
+    $('#nameBox').removeAttr("disabled");
     $('#signInButton').click(function(){
         setTimeout(function() { $('#signInUser').focus() }, 500);
     }).attr('data-toggle','modal').attr('class','btn btn-info btn-lg').html('Sign in');

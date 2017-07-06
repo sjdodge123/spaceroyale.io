@@ -48,6 +48,26 @@ input:focus {
 	color: white;
 	font-size: 20px !important;
 	margin-bottom: -10%;
+	margin-top: -10%;
+
+}
+#profileLoaded{
+	background: transparent;
+	height: 125px;
+	display: none;
+	color: white;
+	margin-bottom: 25px;
+	border:1px solid white;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+     border-top-left-radius: 5px;
+     border-top-right-radius: 5px;
+}
+
+#profileLoaded *{
+	font-size: 30px !important;
 }
 
 #centerContainer{
@@ -311,7 +331,6 @@ input:focus {
 		margin-left: -25%;
    		top: 0%;
 	}
-
 	#gameOverMenu{
 		width: 20%;
 		height: 10%;
@@ -319,8 +338,11 @@ input:focus {
 }
 
 @media screen and (orientation:portrait) and (max-width: 991px) {
+	#bannerBox{
+		margin-top: -15%;
+	}
 	#bannerBox h1{
-		font-size: 90px;
+		font-size: 80px;
 	}
 	#movementControls{
 		display: none;
