@@ -408,15 +408,34 @@ input:focus {
 }
 
 @media screen and (max-height: 1200px){
+	#bannerBox h1{
+		font-size: 60px;
+	}
 	#main {
 		margin-top: -18%;
+	}
+	#skinSelection{
+		margin-top: 1%;
+	}
+	#guestBar {
+		margin-top: 1%;
+		margin-bottom: -10%;
+	}
+	#motd {
+		font-size: 16px !important;
 	}
 	#playerProfile{
 		margin-top: -10%;
 	}
+	#profileLoaded{
+		margin-top: -3%;
+	}
 }
 
 @media screen and (max-height: 600px){
+	#bannerBox h1{
+		font-size: 40px;
+	}
 	#main {
 		margin-top: -15%;
 	}
