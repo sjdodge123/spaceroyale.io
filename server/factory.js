@@ -449,7 +449,7 @@ class GameBoard {
 			}
 
 			this.engine.broadBase(objectArray);
-		} 
+		}
 		// In lobby state
 		else{
 			for(var ship in this.shipList){
@@ -549,7 +549,7 @@ class GameBoard {
 			}
 		}
 		if(c.generatePlanets){
-			for(var i = 0; i<c.planetAmt;i++){	
+			for(var i = 0; i<c.planetAmt;i++){
 				var sig = this.generatePlanetSig();
 				var planet = new Planet(0,0,utils.getRandomInt(c.planetMinSize,c.planetMaxSize),sig);
 				var loc = this.world.findFreeLoc(planet,0);
@@ -1278,8 +1278,8 @@ class TradeShip extends Rect{
 
 		this.weapon.level = c.tradeShipWeaponLevel;
 		}
-		
-		
+
+
 		this.trailSpawnTime = 1;
 		this.lastTrailSpawn = new Date();
 		this.trailList = {};
@@ -1307,7 +1307,7 @@ class TradeShip extends Rect{
 		}
 	}
 	fire(){
-		var bullets = this.weapon.fire(this.x + (this.width/2) * Math.cos((this.weapon.angle * Math.PI/90)), this.y + (this.height/2) * Math.sin(this.weapon.angle * Math.PI/180), this.weapon.angle, '#808080',this.sig);
+		var bullets = this.weapon.fire(this.x, this.y, this.weapon.angle, '#808080',this.sig);
 		if(bullets != null){
 			messenger.messageRoomBySig(this.roomSig,'weaponFired',{ship:this,weapon:this.weapon});
 		}

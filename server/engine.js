@@ -189,7 +189,7 @@ class Engine {
 	setWorldBounds(width,height){
 		this.worldWidth = width;
 		this.worldHeight = height;
-		this.quadTree = new QuadTree(0,this.worldWidth,0,this.worldHeight,4,20,-1);
+		this.quadTree = new QuadTree(0,this.worldWidth,0,this.worldHeight,c.quadTreeMaxDepth,c.quadTreeMaxCount,-1);
 	}
 }
 
