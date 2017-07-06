@@ -4,9 +4,13 @@ var playerJoinSound = new Audio("./sounds/player_join.wav");
 var collision = new Audio("./sounds/collide_with_obj.wav");
 var takeDamage = new Audio("./sounds/take_damage.wav");
 
+var timerTick = new Audio("./sounds/timer_tick.wav");
+var timerEnd = new Audio("./sounds/timer_End.wav");
 
 var blasterShot = new Audio("./sounds/blaster_shot.wav");
 var photonCannonShot = new Audio("./sounds/photonCannon_shot.wav");
+var massDriverShot1 = new Audio("./sounds/massdriver_shot1.wav");
+var massDriverShot2 = new Audio("./sounds/massdriver_shot2.wav");
 
 var shotAsteroid = new Audio("./sounds/shot_asteroid.wav");
 var shotPlayer = new Audio("./sounds/shot_player.wav");
@@ -21,12 +25,17 @@ var gameStartMusic = new Audio('./sounds/Play_Ball.mp3');
 
 var masterVolume = 1;
 
+timerTick.volume *= .1 *masterVolume;
+timerEnd.volume *= .1 * masterVolume;
+
 playerJoinSound.volume *= .1 * masterVolume;
 collision.volume *= .1 * masterVolume;
 takeDamage.volume *= .5 * masterVolume;
 
 blasterShot.volume *= .1 * masterVolume;
 photonCannonShot.volume *= .3 * masterVolume;
+massDriverShot1.volume *= .3 *masterVolume;
+massDriverShot2.volume *= .4 * masterVolume;
 
 shotAsteroid.volume *= .2 * masterVolume;
 shotPlayer.volume *= .3 * masterVolume;

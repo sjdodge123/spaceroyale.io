@@ -143,12 +143,16 @@ function drawTextF(text,x,y,color,font){
 	canvasContext.restore();
 }
 
-function drawFlashingText(text,x,y,color,font,flashColor,timeLeft){
+function drawFlashingText(text,x,y,color,font,flashColor,timeLeft,playTick){
 	if(timeLeft%2 == 1){
+		if(playTick){
+			playSoundAfterFinish(timerTick);
+		}
 		drawTextF(text,x,y,flashColor,font);
 	} else{
 		drawTextF(text,x,y,color,font);
 	}
+
 }
 
 //DRAWING HUD UI
@@ -373,7 +377,10 @@ function drawLobbyTimer(){
 	if(lobbyTimeLeft > 5){
 		drawFlashingText(lobbyTimeLeft + " until start",eventLog.x + eventLog.width/2-40,eventLog.y-40,"white","22px Georgia","red",lobbyTimeLeft);
 	} else{
-		drawFlashingText(lobbyTimeLeft + " until start",eventLog.x + eventLog.width/2-40,eventLog.y-40,"red","22px Georgia");
+		if(lobbyTimeLeft < .3 && lobbyTimeLeft > 0){
+			playSoundAfterFinish(timerEnd);
+		}
+		drawFlashingText(lobbyTimeLeft + " until start",eventLog.x + eventLog.width/2-40,eventLog.y-40,"red","22px Georgia","white",lobbyTimeLeft,true);
 	}
 }
 

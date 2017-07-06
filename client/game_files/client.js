@@ -101,6 +101,13 @@ function clientConnect() {
         	if(payload.weapon.name == "PhotonCannon"){
             	playSound(photonCannonShot);
         	}
+        	if(payload.weapon.name == "MassDriver"){
+        		if(payload.weapon.level == 3){
+        			playSound(massDriverShot2);
+        		} else{
+        			playSound(massDriverShot1);
+        		}
+        	}
 		}
 	});
 

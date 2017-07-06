@@ -411,7 +411,8 @@ class GameBoard {
 			var loc = this.world.getTradeShipLoc();
 			var sig = this.generateTradeShipSig();
 			var angle = (180/Math.PI)*Math.atan2(loc.y2-loc.y1, loc.x2-loc.x1);
-			this.tradeShipList[sig] = new TradeShip(loc.x1,loc.y1,180,60, angle, utils.getRandomInt(c.tradeShipMinDelay,c.tradeShipMaxDelay),loc.x2,loc.y2);
+			var ts = new TradeShip(loc.x1,loc.y1,180,60, angle, utils.getRandomInt(c.tradeShipMinDelay,c.tradeShipMaxDelay),loc.x2,loc.y2);
+			this.tradeShipList[sig] = ts;
 		}
 	}
 	checkCollisions(active){
@@ -1559,28 +1560,17 @@ class MassDriver extends Weapon{
 			return;
 		}
 		var bullets = [];
-		if(this.level == 3 && this.threeShot){
-			var bull1 = new MassDriverBullet(x,y,8,20, angle, color, id);
-			var bull2 = new MassDriverBullet(x,y,8,20, angle, color, id);
-			bull1.speed -= bull1.speed * .25;
-			bull1.damage -= c.massDriverBulletDamage*0.5;
-			bull2.speed -= bull2.speed * .40;
-			bull2.damage -= c.massDriverBulletDamage*0.75;
-			bullets.push(bull1,bull2);
-			this.threeShot = false;
-		} else{
-			this.threeShot = true;
+		var bullet = new MassDriverBullet(x,y,8,20, angle, color, id);
+		if(this.level == 3){
+			bullet.speed += bullet.speed * .35;
 		}
-		bullets.push(new MassDriverBullet(x,y,8,20, angle, color, id));
+		bullets.push(bullet);
 		return bullets;
 	}
 	upgrade(){
 		super.upgrade();
 		if(this.level == 2){
 			this.cooldown = c.massDriverCoolDown - .7;
-		}
-		if(this.level == 3){
-			this.threeShot = true;
 		}
 	}
 }
