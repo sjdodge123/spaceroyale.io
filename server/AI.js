@@ -130,21 +130,18 @@ class AIController{
 	}
 	updateBehaviorFromMood(){
 		if(this.mood =="aggresive"){
-			console.log(this.ship.AIName  + " is aggresive");
 			this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*.5;
 			this.fleeThresholdCurrent = this.fleeThresholdBase*.8;
 			this.aggroRangeSqCurrent = this.aggroRangeSqBase*1.5;
 			return;
 		}
 		if(this.mood == "defensive"){
-			console.log(this.ship.AIName  + " is defensive");
 			this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*2;
 			this.fleeThresholdCurrent = this.fleeThresholdBase*1.2;
 			this.aggroRangeSqCurrent = this.aggroRangeSqBase*.5;
 			return;
 		}
 		if(this.mood =="hiding"){
-			console.log(this.ship.AIName  + " is hiding");
 			this.maintainDistanceSqCurrent = 0;
 			this.fleeThresholdCurrent = this.ship.health-5;
 			this.aggroRangeSqCurrent = this.aggroRangeSqBase*.2;
@@ -153,7 +150,6 @@ class AIController{
 
 		if(this.mood == "looting"){
 			//Theorically the default state
-			console.log(this.ship.AIName + " is looting");
 			this.maintainDistanceSqCurrent = this.maintainDistanceSqBase;
 			this.fleeThresholdCurrent = this.fleeThresholdBase;
 			this.aggroRangeSqCurrent = this.aggroRangeSqBase;
@@ -397,7 +393,7 @@ class AITradeShipController{
 	}
 	update(active){
 		if(active && this.tradeShip.alive){
-			if(this.closestPlayerShip == null){
+			if(this.closestPlayerShip == null || !this.closestPlayerShip.alive || this.checkOutOfRange(this.closestPlayerShip)){
 				this.findClosestPlayerShip();
 			} else{
 				this.faceTarget(this.closestPlayerShip);
@@ -413,6 +409,13 @@ class AITradeShipController{
 	faceTarget(target){
 		this.targetAngle = (180/Math.PI)*Math.atan2(target.y-this.tradeShip.y,target.x-this.tradeShip.x)-90;
 		this.tradeShip.weapon.angle = this.targetAngle;
+	}
+
+	checkOutOfRange(object){
+		var dist2 = utils.getMagSq(this.tradeShip.x,this.tradeShip.y,object.x,object.y);
+		if(dist2 > this.aggroRangeSq){
+			return true;
+		}
 	}
 
 	findClosestPlayerShip(){
