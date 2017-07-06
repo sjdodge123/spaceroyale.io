@@ -63,8 +63,10 @@ class SpriteSheet {
 		this.columns = columns;
 
 		for(var i=0;i<rows;i++){
+			this.frameIndex[i] = [];
 			for(var j=0;j<columns;j++){
 				this.frameIndex[i][j] = {sx:j*frameWidth,sy:i*frameHeight};
+
 			}
 		}
 		this.XframeIndex = 0;
@@ -85,7 +87,7 @@ class SpriteSheet {
 }
 
 var planetSheet = new SpriteSheet(planetSVG,0,0,500,500,1,2);
-var asteroidSheet = new SpriteSheet(asteroidSVG,0,0,500,500,1,3);
+var asteroidSheet = new SpriteSheet(asteroidSVG,0,0,500,500,3,3);
 var nebulaSheet = new SpriteSheet(nebulaSVG,0,0,500,500,1,1);
 var tradeShipSheet = new SpriteSheet(tradeShipSVG,0,0,200,600,1,1);
 
@@ -461,7 +463,17 @@ function drawAsteroid(asteroid){
 	canvasContext.translate(asteroid.x-myShip.x+camera.xOffset,asteroid.y-myShip.y+camera.yOffset);
 	canvasContext.rotate(asteroid.spriteAngle*Math.PI/180);
 	asteroidSheet.move(0,0);
-	asteroidSheet.changeFrame(0,asteroid.artType);
+
+	if(asteroid.health == asteroid.baseHealth){
+		asteroidSheet.changeFrame(0,asteroid.artType);
+	}
+	if(asteroid.health < asteroid.baseHealth*.80){
+		asteroidSheet.changeFrame(1,asteroid.artType);
+	}
+	if(asteroid.health < asteroid.baseHealth*.40){
+		asteroidSheet.changeFrame(2,asteroid.artType);
+	}
+	
 	asteroidSheet.draw(asteroid.radius*2,asteroid.radius*2);
 	canvasContext.restore();	
 }
