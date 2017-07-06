@@ -446,10 +446,11 @@ function drawShip(ship){
 	drawWeapon(ship);
 }
 function drawWeapon(ship){
-	var svgscale = 2 * ship.radius / shipRedSVG.width;
+	var shipDim = ship.radius || ship.width/4; 
+	var svgscale = 2 * shipDim / shipRedSVG.width;
 	canvasContext.save();
 	canvasContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
-	canvasContext.rotate((ship.angle + 180)*Math.PI/180);
+	canvasContext.rotate((ship.weapon.angle + 180)*Math.PI/180);
 	switch(ship.weapon.name){
 		case "Blaster":{
 			canvasContext.drawImage(blasterSVG, - blasterSVG.width * svgscale / 2, -  blasterSVG.height * svgscale / 2, blasterSVG.width * svgscale, blasterSVG.height * svgscale);
@@ -559,6 +560,9 @@ function drawTradeShip(tradeShip){
 	tradeShipSheet.move(0,0);
 	tradeShipSheet.draw(tradeShip.height,tradeShip.width);
     canvasContext.restore();
+    if(tradeShip.weapon != null){
+    	drawWeapon(tradeShip);
+    }
 }
 
 function drawTradeShipTrail(circle){

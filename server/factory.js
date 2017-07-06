@@ -182,7 +182,7 @@ class Game {
 		this.lobbyTimer = null;
 		this.lobbyTimeLeft = this.lobbyWaitTime;
 
-		this.gameBoard = new GameBoard(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,nebulaList,this.tradeShipList,engine);
+		this.gameBoard = new GameBoard(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,nebulaList,this.tradeShipList,this.AIList,engine,this.roomSig);
 	}
 
 	start(){
@@ -327,7 +327,7 @@ class Game {
 }
 
 class GameBoard {
-	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,nebulaList,tradeShipList,engine){
+	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,nebulaList,tradeShipList,AIList,engine,roomSig){
 		this.world = world;
 		this.clientList = clientList;
 		this.bulletList = bulletList;
@@ -335,9 +335,11 @@ class GameBoard {
 		this.asteroidList = asteroidList;
 		this.planetList = planetList;
 		this.itemList = itemList;
+		this.AIList = AIList;
 		this.nebulaList = nebulaList;
 		this.tradeShipList = tradeShipList;
 		this.engine = engine;
+		this.roomSig = roomSig;
 	}
 	update(active, dt){
 		this.engine.update(dt);
@@ -411,7 +413,9 @@ class GameBoard {
 			var loc = this.world.getTradeShipLoc();
 			var sig = this.generateTradeShipSig();
 			var angle = (180/Math.PI)*Math.atan2(loc.y2-loc.y1, loc.x2-loc.x1);
-			var ts = new TradeShip(loc.x1,loc.y1,180,60, angle, utils.getRandomInt(c.tradeShipMinDelay,c.tradeShipMaxDelay),loc.x2,loc.y2);
+			var ts = new TradeShip(loc.x1,loc.y1,180,60, angle, utils.getRandomInt(c.tradeShipMinDelay,c.tradeShipMaxDelay),loc.x2,loc.y2,this.roomSig);
+			ts.sig = sig;
+			this.AIList[sig] = AI.setAITradeShipController(ts,this.world,this);
 			this.tradeShipList[sig] = ts;
 		}
 	}
@@ -1001,6 +1005,7 @@ class Ship extends Circle{
 		else{
 			this.spriteAngle = 0;
 		}
+		this.weapon.angle = this.angle;
 		this.checkHP();
 		this.checkKills();
 		this.move();
@@ -1244,7 +1249,7 @@ class Nebula extends Circle {
 }
 
 class TradeShip extends Rect{
-	constructor(x,y,width,height, angle, delay, destX, destY){
+	constructor(x,y,width,height, angle, delay, destX, destY,roomSig){
 		super(x,y,width,height, angle, "#808080");
 		this.delay = delay;
 		this.destX = destX;
@@ -1256,6 +1261,20 @@ class TradeShip extends Rect{
 		this.readyToMove = false;
 		this.alive = true;
 		this.sig = null;
+		this.roomSig = roomSig;
+
+		if(c.tradeShipWeapon == "Blaster"){
+			this.weapon = new Blaster(this.sig);
+		}
+		if(c.tradeShipWeapon == "PhotonCannon"){
+			this.weapon = new PhotonCannon(this.sig);
+		}
+		if(c.tradeShipWeapon == "MassDriver"){
+			this.weapon = new MassDriver(this.sig);
+		}
+
+		this.weapon.level = c.tradeShipWeaponLevel;
+		
 		this.trailSpawnTime = 1;
 		this.lastTrailSpawn = new Date();
 		this.trailList = {};
@@ -1281,6 +1300,13 @@ class TradeShip extends Rect{
 			}
 
 		}
+	}
+	fire(){
+		var bullets = this.weapon.fire(this.x + (this.width/2) * Math.cos((this.weapon.angle * Math.PI/90)), this.y + (this.height/2) * Math.sin(this.weapon.angle * Math.PI/180), this.weapon.angle, '#808080',this.sig);
+		if(bullets != null){
+			messenger.messageRoomBySig(this.roomSig,'weaponFired',{ship:this,weapon:this.weapon});
+		}
+		return bullets;
 	}
 	startMove(ts){
 		ts.readyToMove = true;
@@ -1315,6 +1341,9 @@ class TradeShip extends Rect{
 
 	handleHit(object){
 		if(object.alive && object.damage != null){
+			if(object.owner == this.sig){
+				return;
+			}
 			this.health -= object.damage;
 			if(this.health < 1){
 				this.alive = false;
@@ -1561,7 +1590,7 @@ class MassDriver extends Weapon{
 		}
 		var bullets = [];
 		var bullet = new MassDriverBullet(x,y,8,20, angle, color, id);
-		if(this.level == 3){
+		if(this.level > 1){
 			bullet.speed += bullet.speed * .35;
 		}
 		bullets.push(bullet);
@@ -1569,7 +1598,7 @@ class MassDriver extends Weapon{
 	}
 	upgrade(){
 		super.upgrade();
-		if(this.level == 2){
+		if(this.level == 3){
 			this.cooldown = c.massDriverCoolDown - .7;
 		}
 	}
@@ -1674,6 +1703,9 @@ class Bullet extends Rect{
 			return;
 		}
 		if(object.id == this.owner){
+			return;
+		}
+		if(object.sig == this.owner){
 			return;
 		}
 		if(object.isNebula){

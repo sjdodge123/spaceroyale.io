@@ -5,6 +5,10 @@ var c = utils.loadConfig();
 exports.setAIController = function(ship,world,gameBoard){
 	return new AIController(ship,world,gameBoard);
 };
+exports.setAITradeShipController = function(ts,world,gameBoard){
+	return new AITradeShipController(ts,world,gameBoard);
+};
+
 
 class AIController{
 	constructor(ship,world,gameBoard){
@@ -380,3 +384,59 @@ class AIController{
 		return c.AIColorList[colorInt];
 	}
 }
+
+class AITradeShipController{
+	constructor(ts,world,gameBoard){
+		this.tradeShip = ts;
+		this.world = world;
+		this.gameBoard = gameBoard;
+		this.aggroRange = 800;
+		this.aggroRangeSq = this.aggroRange * this.aggroRange;
+		this.closestPlayerShip = null;
+		this.targetAngle = 0;
+	}
+	update(active){
+		if(active && this.tradeShip.alive){
+			this.findClosestPlayerShip();
+			if(this.closestPlayerShip != null){
+				this.faceTarget(this.closestPlayerShip);
+				this.fireWeapon();
+			}
+		}
+	}
+
+	fireWeapon(){
+		this.gameBoard.fireWeapon(this.tradeShip);
+	}
+
+	faceTarget(target){
+		this.targetAngle = (180/Math.PI)*Math.atan2(target.y-this.tradeShip.y,target.x-this.tradeShip.x)-90;
+		this.tradeShip.weapon.angle = this.targetAngle;
+	}
+
+	findClosestPlayerShip(){
+		var playerShip = null;
+		var lastDist2 = Infinity;
+		for(var i in this.gameBoard.shipList){
+			var currentShip = this.gameBoard.shipList[i];
+			if(currentShip == this.ship){
+				continue;
+			}
+			if(currentShip.isHiding){
+				continue;
+			}
+			var dist2 = utils.getMagSq(this.tradeShip.x,this.tradeShip.y,currentShip.x,currentShip.y);
+
+			if(dist2 > this.aggroRangeSq){
+				continue;
+			}
+			if(dist2 < lastDist2){
+				playerShip = currentShip;
+				lastDist2 = dist2;
+			}
+		}
+
+		this.closestPlayerShip = playerShip;
+
+	}
+ }

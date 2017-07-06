@@ -60,6 +60,8 @@
     "tradeShipSpawnTolerance":0.7,
     "tradeShipTrailDuration":20,
     "tradeShipSpeed":5,
+    "tradeShipWeapon":"Blaster",
+    "tradeShipWeaponLevel":3,
 
     "playerMaxSpeed":1500,
     "playerBaseAcel":1000,
