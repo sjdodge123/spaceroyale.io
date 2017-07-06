@@ -21,7 +21,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -40,35 +40,36 @@
      inkscape:window-height="1017"
      id="namedview30"
      showgrid="false"
-     inkscape:zoom="0.70710678"
-     inkscape:cx="59.310951"
-     inkscape:cy="112.05565"
-     inkscape:window-x="-8"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="-36.095199"
+     inkscape:cy="193.30456"
+     inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer4" />
   <g
      inkscape:groupmode="layer"
      id="layer4"
-     inkscape:label="bg">
-    <rect
-       style="fill:#a6a6a6;fill-opacity:1;stroke:#cacaca;stroke-width:14.4439497;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect12358"
-       width="385.55603"
-       height="385.55606"
-       x="7.2219849"
-       y="7.2219696" />
+     inkscape:label="bg"
+     sodipodi:insensitive="true">
+    <circle
+       style="fill:none;fill-opacity:1;stroke:#cacaca;stroke-width:10.29221535;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path4140"
+       cx="200"
+       cy="200"
+       r="194.8539" />
   </g>
   <g
      inkscape:label="item"
      inkscape:groupmode="layer"
      id="strokes"
-     transform="translate(0,-100)">
+     transform="translate(0,-100)"
+     sodipodi:insensitive="true">
     <path
        sodipodi:nodetypes="ccccccccccccc"
        inkscape:connector-curvature="0"
        id="path13108"
        d="m 43.164165,336.64388 0,-73.28777 120.191885,-5e-5 6e-5,-120.19189 73.28777,0 6e-5,120.19189 120.19188,5e-5 0,73.28777 -120.19188,6e-5 -6e-5,120.19189 -73.28777,0 -6e-5,-120.19189 z"
-       style="fill:#ff1313;fill-opacity:1;stroke:#ffffff;stroke-width:13.81900024;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#ff1313;fill-opacity:1;stroke:#ffffff;stroke-width:10;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
   </g>
 </svg>
