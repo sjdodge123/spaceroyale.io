@@ -409,7 +409,7 @@ input:focus {
 
 @media screen and (max-height: 1200px){
 	#main {
-		margin-top: -10%;
+		margin-top: -18%;
 	}
 	#playerProfile{
 		margin-top: -10%;
@@ -479,5 +479,3 @@ input:focus {
 	}
 
 }
-
-
