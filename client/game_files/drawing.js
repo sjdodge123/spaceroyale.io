@@ -368,7 +368,7 @@ function drawLobbyTimer(){
 
 //DRAWING OBJECTS RELATIVE TO CAMERA
 function drawRelativeObjects(){
-	if(myID != null && shipList != null && shipList[myID] != null){
+	if(myID != null && shipList != null && shipList[myID] != null && iAmAlive){
         myShip = shipList[myID];
         camera.centerOnObject(myShip);
 		camera.draw();

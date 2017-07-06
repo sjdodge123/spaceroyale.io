@@ -15,21 +15,24 @@ class AIController{
 		this.rotationSpeed = 15;
 		this.targetDirX = 0;
 		this.targetDirY = 0;
+		this.shipsAlive = 0;
 
 		this.aggroRange = utils.getRandomInt(c.AIAggroRangeMin,c.AIAggroRangeMax);
-		this.aggroRangeSq = this.aggroRange * this.aggroRange;
+		this.aggroRangeSqBase = this.aggroRange * this.aggroRange;
+		this.aggroRangeSqCurrent = this.aggroRangeSqBase;
 
 		this.itemLootRange = 600;
 		this.itemLootRangeSq = this.itemLootRange * this.itemLootRange;
 
-		this.killingMaintainDistance = utils.getRandomInt(75,150);
-		this.killingMaintainDistanceSq = this.killingMaintainDistance*this.killingMaintainDistance;
-
 		this.maintainDistance = utils.getRandomInt(100,300);
-		this.maintainDistanceSq = this.maintainDistance * this.maintainDistance;
+		this.maintainDistanceSqBase = this.maintainDistance * this.maintainDistance;
+		this.maintainDistanceSqCurrent = this.maintainDistanceSqBase;
 
-		this.mood = this.determineMood();
-		this.fleeThreshold = utils.getRandomInt(30,70);
+		this.mood = this.determineBaseMood();
+
+		//When your HP drops below this number, change to Looting
+		this.fleeThresholdBase = utils.getRandomInt(20,40);
+		this.fleeThresholdCurrent = this.fleeThresholdBase;
 
 		this.blueBoundRunLimit = 3;
 		this.blueBoundTimer = new Date();
@@ -38,6 +41,7 @@ class AIController{
 		this.closestAsteroid = null;
 		this.closestNebula == null;
 		this.closestItem = null;
+		this.closestTradeship = null;
 		this.desiredWeapon = '';
 		this.ship.isAI = true;
 		this.ship.targetDirX = 0;
@@ -47,8 +51,10 @@ class AIController{
 		this.ship.baseColor = this.ship.color;
 		this.ship.glowColor = this.ship.color;
 	}
-	update(active){
-		if(active){
+	update(active,shipsAlive){
+		
+		if(active && this.ship.alive){
+			this.shipsAlive = shipsAlive;
 			this.gameLoop();
 			return;
 		}
@@ -81,26 +87,74 @@ class AIController{
 				this.fireWeapon();
 			}
 		}
-		this.checkHP();
+		this.updateMood();
+		this.updateBehaviorFromMood();
 	}
 
-	checkHP(){
-		if(this.ship.health < this.fleeThreshold){
-			this.mood = "looting";
-		} else {
-			this.mood = "killing";
+	updateMood(){
+		if(this.playersAlive <= 3){
+			this.mood = "aggresive";
+			return;
 		}
+		if(this.ship.weapon.level > 1 && this.ship.health > this.fleeThresholdCurrent){
+			var seed = utils.getRandomInt(0,1);
+			if(seed == 0){
+				this.mood = "aggresive";
+			} else{
+				this.mood = "hiding";
+			}
+			return;
+		}
+		if(this.ship.health < this.fleeThresholdCurrent){
+			this.mood = "defensive";
+			return;
+		}
+		this.mood = "looting";
 	}
-	determineMood(){
-		var seed = utils.getRandomInt(0,2);
+	determineBaseMood(){
+		var seed = utils.getRandomInt(0,3);
 		if(seed == 0){
 			return "looting";
 		}
 		if(seed == 1){
-			this.fleeThreshold = this.ship.health - 5;
 			return "hiding";
 		}
-		return "killing";
+		if(seed == 2){
+			return "defensive";
+		}
+		return "aggresive";
+	}
+	updateBehaviorFromMood(){
+		if(this.mood =="aggresive"){
+			console.log(this.ship.AIName  + " is aggresive");
+			this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*.5;
+			this.fleeThresholdCurrent = this.fleeThresholdBase*.8;
+			this.aggroRangeSqCurrent = this.aggroRangeSqBase*1.5;
+			return;
+		}
+		if(this.mood == "defensive"){
+			console.log(this.ship.AIName  + " is defensive");
+			this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*2;
+			this.fleeThresholdCurrent = this.fleeThresholdBase*1.2;
+			this.aggroRangeSqCurrent = this.aggroRangeSqBase*.5;
+			return;
+		}
+		if(this.mood =="hiding"){
+			console.log(this.ship.AIName  + " is hiding");
+			this.maintainDistanceSqCurrent = 0;
+			this.fleeThresholdCurrent = this.ship.health-5;
+			this.aggroRangeSqCurrent = this.aggroRangeSqBase*.2;
+			return;
+		}
+
+		if(this.mood == "looting"){
+			//Theorically the default state
+			console.log(this.ship.AIName + " is looting");
+			this.maintainDistanceSqCurrent = this.maintainDistanceSqBase;
+			this.fleeThresholdCurrent = this.fleeThresholdBase;
+			this.aggroRangeSqCurrent = this.aggroRangeSqBase;
+			return;
+		}
 	}
 
 	determineMoveTarget(){
@@ -129,7 +183,11 @@ class AIController{
 			return this.closestItem;
 		}
 
-		if(this.mood == "killing"){
+		if(this.mood == "aggresive"){
+			this.findClosestTradeship();
+			if(this.closestTradeship != null && this.closestTradeship.alive){
+				return this.closestTradeship;
+			}
 			if(this.closestPlayerShip != null && this.closestPlayerShip.alive){
 				return this.closestPlayerShip;
 			}	
@@ -146,6 +204,9 @@ class AIController{
 	determineFireTarget(){
 		if(this.mood == "hiding"){
 			return;
+		}
+		if(this.closestTradeship != null && this.closestTradeship.alive){
+			return this.closestTradeship;
 		}
 		if(this.closestPlayerShip != null && this.closestPlayerShip.alive){
 			return this.closestPlayerShip;
@@ -199,6 +260,22 @@ class AIController{
 		}
 		this.closestNebula = nebula;
 	}
+	findClosestTradeship(){
+		var tradeShip = null;
+		var lastDist2 = Infinity;
+		for(var i in this.gameBoard.tradeShipList){
+			var currentTS = this.gameBoard.tradeShipList[i];
+			if (!this.world.blueBound.inBounds(currentTS)){
+				continue;
+			}
+			var dist2 = utils.getMagSq(this.ship.x,this.ship.y,currentTS.x,currentTS.y);
+			if(dist2 < lastDist2){
+				tradeShip = currentTS;
+				lastDist2 = dist2;
+			}
+		}
+		this.closestTradeship = tradeShip;
+	}
 	findClosestItem(){
 		var item = null;
 		var lastDist2 = Infinity;
@@ -233,6 +310,7 @@ class AIController{
 	findClosestPlayerShip(){
 		var playerShip = null;
 		var lastDist2 = Infinity;
+
 		for(var i in this.gameBoard.shipList){
 			var currentShip = this.gameBoard.shipList[i];
 
@@ -245,15 +323,9 @@ class AIController{
 			}
 
 			var dist2 = utils.getMagSq(this.ship.x,this.ship.y,currentShip.x,currentShip.y);
-			if(this.mood == "looting"){
-				if(dist2 > this.aggroRangeSq/1.2){
-					continue;
-				}
-			}
-			if(this.mood == "killing"){
-				if(dist2 > this.aggroRangeSq*1.2){
-					continue;
-				}
+
+			if(dist2 > this.aggroRangeSqCurrent){
+				continue;
 			}
 
 			if(dist2 < lastDist2){
@@ -289,20 +361,12 @@ class AIController{
 
 		var dist2 = utils.getMagSq(this.ship.x,this.ship.y,target.x,target.y);
 
-		if(this.mood == "killing"){
-			if(dist2 > this.killingMaintainDistanceSq){
-				this.ship.targetDirX = this.targetDirX;
-				this.ship.targetDirY = this.targetDirY;
-			}
-		}
-		if(this.mood == "looting"){
-			if(dist2 < this.maintainDistanceSq){
-				this.ship.targetDirX = -this.targetDirX;
-				this.ship.targetDirY = -this.targetDirY;
-			} else{
-				this.ship.targetDirX = this.targetDirX;
-				this.ship.targetDirY = this.targetDirY;
-			}
+		if(dist2 < this.maintainDistanceSqCurrent){
+			this.ship.targetDirX = -this.targetDirX;
+			this.ship.targetDirY = -this.targetDirY;
+		} else{
+			this.ship.targetDirX = this.targetDirX;
+			this.ship.targetDirY = this.targetDirY;
 		}
 
 	}

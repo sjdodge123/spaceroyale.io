@@ -125,6 +125,7 @@ function clientConnect() {
 			iAmAlive = false;
 			playSound(youDied);
 			delete shipList[id];
+			cameraBouncing = true;
 			showGameOverScreen("You died!");
 			return;
 		}
@@ -166,7 +167,7 @@ function clientConnect() {
 		totalPlayers = updatePacket.totalPlayers;
 		timeSinceLastCom = 0;
 
-		if(myShip.weapon != null){
+		if(myShip != null && myShip.weapon != null){
 			currentWeaponCooldown = myShip.weapon.cooldown*1000;
 		}
 	});

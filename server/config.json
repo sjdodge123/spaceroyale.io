@@ -82,8 +82,8 @@
     "birdshotSpeed":941,
 
     "massDriverCoolDown":1.2,
-    "massDriverBulletDamage":50,
-    "massDriverBulletSpeed":2058,
+    "massDriverBulletDamage":35,
+    "massDriverBulletSpeed":1650,
 
     "shieldRadius":35,
     "shield1Protection":10,

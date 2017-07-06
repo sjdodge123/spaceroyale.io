@@ -17,6 +17,11 @@ var server = null,
     cooldownRemaining = 0,
     currentWeaponCooldown = 0,
     iAmAlive = true,
+    cameraBouncing = false,
+    cameraCenterSeed = null,
+    cameraBoundcingFirstPass = true,
+    lastCameraSwap = null,
+    recenterCameraTimeout = 5,
     timeOutChecker = null,
     gameStarted = false,
     victory = false,
@@ -433,6 +438,9 @@ function resize(){
         yOffset: canvas.height/2,
 
         centerOnObject : function(object){
+           if(object == null){
+                return;
+           }
            xOffset =  object.x - (canvas.width/2);
            yOffset =  object.y - (canvas.height/2);
         },
@@ -445,7 +453,9 @@ function resize(){
         },
 
         inBounds: function(object){
-
+            if(object == null || object == undefined || myShip == null || myShip == undefined){
+                return;
+            }
             if (object.radius != null){
               var dx = Math.abs(object.x - myShip.x);
               var dy = Math.abs(object.y - myShip.y);
@@ -518,6 +528,7 @@ function animloop(){
 
 function gameLoop(){
     if(myID == null || myShip == null){
+        recenterCamera();
         return;
     }
     drawFlashScreen();
@@ -527,7 +538,45 @@ function gameLoop(){
     if(iAmAlive){
         checkCooldown();
         checkForDamage();
+        return;
     }
+    recenterCamera();
+}
+
+function recenterCamera(){
+    if(cameraBouncing){
+        var currentTime = new Date();
+        if(lastCameraSwap == null){
+            lastCameraSwap = new Date(currentTime);
+            lastCameraSwap.setTime(lastCameraSwap.getTime() + recenterCameraTimeout*1000);
+        }
+        if(currentTime > lastCameraSwap){
+            lastCameraSwap = new Date(currentTime);
+            lastCameraSwap.setTime(lastCameraSwap.getTime() + recenterCameraTimeout*1000);
+            cameraCenterSeed = findAlivePlayerIndex();
+            cameraBoundcingFirstPass = false;
+        }
+        if(cameraBoundcingFirstPass){
+            return;
+        }
+        if(shipList[cameraCenterSeed] == null){
+            cameraCenterSeed = findAlivePlayerIndex();
+        }
+        myShip = shipList[cameraCenterSeed];   
+        camera.centerOnObject(myShip);
+        camera.draw();
+    }
+}
+
+function findAlivePlayerIndex(){
+    var shipCountList = [], index;
+    for(var i in shipList){
+        if(shipList[i].alive){
+            shipCountList.push(shipList[i]);
+        }
+    }
+    index = getRandomInt(0,shipCountList.length-1);
+    return index;
 }
 
 function cancelMovement(){

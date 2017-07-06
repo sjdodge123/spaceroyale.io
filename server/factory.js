@@ -173,6 +173,7 @@ class Game {
 		this.shrinkingTimer = null;
 		this.timeLeftUntilShrink = 60;
 		this.shrinkTimeLeft = 0;
+		this.shipsAlive = 0;
 
 		this.gameEnded = false;
 		this.firstPass = true;
@@ -246,7 +247,7 @@ class Game {
 			this.checkForGameStart()
 		}
 		this.gameBoard.update(this.active, dt);
-		this.updateAI(this.active);
+		this.updateAI(this.active,this.shipsAlive);
 		this.world.update(this.shrinkTimeLeft,dt);
 	}
 
@@ -301,6 +302,7 @@ class Game {
 		for(var shipID in this.shipList){
 			shipCount++;
 		}
+		this.shipsAlive = shipCount;
 		return shipCount;
 	}
 	getPlayerShipCount(){
