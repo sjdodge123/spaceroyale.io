@@ -94,6 +94,9 @@
     "shield3Protection":30,
     "shieldRestoreAmount":10,
 
+    "quadTreeMaxCount": 20,
+    "quadTreeMaxDepth": 4,
+    
     "sqlinfo":{
       "connectionLimit": 100,
       "host": "spdbdev.cj1qbrqikxsw.us-east-1.rds.amazonaws.com",
