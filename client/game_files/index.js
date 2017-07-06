@@ -172,6 +172,13 @@ function setupPage(){
         }
     });
 
+    $('#signInButton').click(function(){
+        setTimeout(function() { $('#signInUser').focus() }, 500);
+    })
+    $('#signUpButton').click(function(){
+        setTimeout(function() { $('#signUpUser').focus() }, 500);
+    })
+
 
     $('#howToPlayHide').click(function(e){
         $('#howToPlayMenu').hide();
@@ -277,6 +284,7 @@ function register(user,pass1,pass2,gameName){
     clientSendReg(user,pass1,gameName);
 }
 
+
 function failedToRegister(error){
     $('#signUpError').show().html(error);
     $("#signUpModal").effect("shake");
@@ -296,7 +304,9 @@ function changeToSignout(){
 function changeToSignIn(){
     $('#nameBox').show();
     $('#signUpButton').show();
-    $('#signInButton').attr('data-toggle','modal').attr('class','btn btn-info btn-lg').html('Sign in');
+    $('#signInButton').click(function(){
+        setTimeout(function() { $('#signInUser').focus() }, 500);
+    }).attr('data-toggle','modal').attr('class','btn btn-info btn-lg').html('Sign in');
 }
 
 function signOutUser(){

@@ -6,7 +6,11 @@ html {
 input {
     max-width: 100%;
     max-height: 100%;
-} 
+}
+
+input:focus {
+    outline: 2px solid #1a1a1a !important;
+}
 
 #gameWindow{
 	background: black;
@@ -37,6 +41,13 @@ input {
 	right: 0;
 	bottom: 0;
 	top: 0;
+	margin-top: -10%;
+}
+#motd{
+	background: transparent;
+	color: white;
+	font-size: 20px !important;
+	margin-bottom: -10%;
 }
 
 #centerContainer{
