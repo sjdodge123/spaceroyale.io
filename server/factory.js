@@ -316,7 +316,7 @@ class Game {
 		if(c.randomizePlayersLocations){
 			for(var shipID in this.shipList){
 				var ship = this.shipList[shipID];
-				var loc = this.world.findFreeLoc(ship);
+				var loc = this.world.findFreeLoc(ship,0);
 				ship.newX = loc.x;
 				ship.newY = loc.y;
 			}
@@ -413,6 +413,7 @@ class GameBoard {
 		}
 	}
 	checkCollisions(active){
+		//In game running
 		if(active){
 			var objectArray = [];
 			for(var ship in this.shipList){
@@ -439,6 +440,12 @@ class GameBoard {
 			}
 
 			this.engine.broadBase(objectArray);
+		} 
+		// In lobby state
+		else{
+			for(var ship in this.shipList){
+				_engine.preventEscape(this.shipList[ship],this.world);
+			}
 		}
 	}
 	fireWeapon(ship){
@@ -524,23 +531,32 @@ class GameBoard {
 	populateWorld(){
 		if(c.generateAsteroids){
 			for(var i = 0; i<c.asteroidAmt;i++){
-				var loc = this.world.getSafeLoc(c.asteroidMaxSize);
 				var sig = this.generateAsteroidSig();
-				this.asteroidList[sig] = new Asteroid(loc.x,loc.y,utils.getRandomInt(c.asteroidMinSize,c.asteroidMaxSize),sig);
+				var asteroid = new Asteroid(0,0,utils.getRandomInt(c.asteroidMinSize,c.asteroidMaxSize),sig);
+				var loc = this.world.findFreeLoc(asteroid,0);
+				asteroid.x = loc.x;
+				asteroid.y = loc.y;
+				this.asteroidList[sig] = asteroid;
 			}
 		}
 		if(c.generatePlanets){
-			for(var i = 0; i<c.planetAmt;i++){
-				var loc = this.world.getSafeLoc(c.planetMaxSize);
+			for(var i = 0; i<c.planetAmt;i++){	
 				var sig = this.generatePlanetSig();
-				this.planetList[sig] = new Planet(loc.x,loc.y,utils.getRandomInt(c.planetMinSize,c.planetMaxSize),sig);
+				var planet = new Planet(0,0,utils.getRandomInt(c.planetMinSize,c.planetMaxSize),sig);
+				var loc = this.world.findFreeLoc(planet,0);
+				planet.x = loc.x;
+				planet.y = loc.y;
+				this.planetList[sig] = planet;
 			}
 		}
 		if(c.generateNebulas){
 			for(var i = 0; i<c.nebulaAmt;i++){
-				var loc = this.world.getSafeLoc(c.nebulaMaxSize);
 				var sig = this.generateNebulaSig();
-				this.nebulaList[sig] = new Nebula(loc.x,loc.y,utils.getRandomInt(c.nebulaMinSize,c.nebulaMaxSize),sig);
+				var nebula = new Nebula(0,0,utils.getRandomInt(c.nebulaMinSize,c.nebulaMaxSize),sig);
+				var loc = this.world.findFreeLoc(nebula,0);
+				nebula.x = loc.x;
+				nebula.y = loc.y;
+				this.nebulaList[sig] = nebula;
 			}
 		}
 	}
@@ -781,8 +797,8 @@ class World extends Rect{
 		return loc;
 	}
 	getSafeLoc(size){
-		var objW = size + 15;
-		var objH = size + 15;
+		var objW = size + c.playerBaseRadius*2;
+		var objH = size + c.playerBaseRadius*2;
 		return {x:Math.floor(Math.random()*(this.width - 2*objW - this.x)) + this.x + objW, y:Math.floor(Math.random()*(this.height - 2*objH - this.y)) + this.y + objH};
 	}
 	getRandEdgeLoc(pad){
@@ -898,8 +914,11 @@ class World extends Rect{
 	}
 
 	spawnNewShip(id,color){
-		var loc = this.getRandomLoc();
-		return new Ship(loc.x,loc.y, 90, color, id,this.roomSig);
+		var ship = new Ship(0,0, 90, color, id,this.roomSig);
+		var loc = this.findFreeLoc(ship,0);
+		ship.x = loc.x;
+		ship.y = loc.y;
+		return ship;
 	}
 }
 
@@ -926,7 +945,7 @@ class BlueBound extends Bound{
 
 class Ship extends Circle{
 	constructor(x,y, angle, color, id, roomSig){
-		super(x, y, 25, color);
+		super(x, y, c.playerBaseRadius, color);
 		this.baseHealth = c.playerBaseHealth;
 		this.health = this.baseHealth;
 		this.baseColor = color;

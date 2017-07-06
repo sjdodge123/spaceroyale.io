@@ -149,6 +149,7 @@ function drawFlashingText(text,x,y,color,font,flashColor,timeLeft){
 function drawHUD(){
 	drawJoysticks();
 	drawAliveCounter();
+	drawWeaponHUD();
 	drawKillCounter();
     drawHPCounter();
     drawToast();
@@ -213,6 +214,31 @@ function drawJoysticks(){
 
 function drawAliveCounter(){
 	drawText(getShipListCount() + " alive",eventLog.x + eventLog.width-60,eventLog.y-40);
+}
+
+function drawWeaponHUD(){
+	if(myShip != null){
+		var svgscale = .25;
+		canvasContext.save();
+		canvasContext.translate(eventLog.x + eventLog.width + 50,eventLog.y+(eventLog.height/2));
+		canvasContext.rotate(Math.PI/180);
+		switch(myShip.weapon.name){
+			case "Blaster":{
+				canvasContext.drawImage(blasterSVG, - blasterSVG.width * svgscale / 2, -  blasterSVG.height * svgscale / 2, blasterSVG.width * svgscale, blasterSVG.height * svgscale);
+				break;
+			}
+			case "PhotonCannon":{
+				canvasContext.drawImage(photonCannonSVG, - photonCannonSVG.width * svgscale / 2, -  photonCannonSVG.height * svgscale / 2, photonCannonSVG.width * svgscale, photonCannonSVG.height * svgscale);
+				break;
+			}
+			case "MassDriver":{
+				canvasContext.drawImage(massDriverSVG, - massDriverSVG.width * svgscale / 2, -  massDriverSVG.height * svgscale / 2, massDriverSVG.width * svgscale, massDriverSVG.height * svgscale);
+				break;
+			}
+		}
+		canvasContext.restore();
+	}
+	
 }
 
 function drawKillCounter(){

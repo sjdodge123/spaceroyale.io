@@ -63,6 +63,7 @@
 
     "playerMaxSpeed":1500,
     "playerBaseAcel":1000,
+    "playerBaseRadius":25,
     "playerExplosionRadius":60,
     "playerExplosionMaxDamage":50,
     "playerSpawnWeapon":"Blaster",

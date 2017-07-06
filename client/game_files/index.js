@@ -186,6 +186,7 @@ function setupPage(){
     window.addEventListener('resize', resize, false);
     canvas = document.getElementById('gameCanvas');
     canvasContext = canvas.getContext('2d');
+    canvasContext.imageSmoothingEnabled = true;
     joystickMovement = new Joystick(250,canvas.height-250);
     joystickCamera = new Joystick(canvas.width-250,canvas.height-250);
     isTouchScreen = joystickMovement.touchScreenAvailable();

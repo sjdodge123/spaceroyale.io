@@ -147,13 +147,16 @@ class Engine {
 
 	checkCollideAll(loc,obj){
 		var result = false;
-		var testLoc = {x:loc.x, y:loc.y, r:(obj.width || obj.radius)};
+		var testLoc = {x:loc.x, y:loc.y, radius:(obj.width || obj.radius)};
 		var objectArray = [];
 		for(var shipSig in this.shipList){
 			objectArray.push(this.shipList[shipSig]);
 		}
 		for(var asteroidSig in this.asteroidList){
 			objectArray.push(this.asteroidList[asteroidSig]);
+		}
+		for(var nebulaSig in this.nebulaList){
+			objectArray.push(this.nebulaList[nebulaSig]);
 		}
 		for(var planetSig in this.planetList){
 			objectArray.push(this.planetList[planetSig]);
@@ -164,7 +167,7 @@ class Engine {
 		for(var i = 0; i < objectArray.length; i++){
 			result = checkDistance(testLoc, objectArray[i]);
 			if(result){
-				break;
+				return true;
 			}
 		}
 		return result;
@@ -326,16 +329,20 @@ function slowDown(obj,dt,amt){
 }
 
 function preventEscape(obj,bound){
-	if(obj.newX - obj.width/2 < bound.x){
+	if(obj.newX - obj.radius < bound.x){
 		obj.newX = obj.x;
+		obj.velX = -obj.velX * 0.25;
 	}
-	if(obj.newX + obj.width/2 > bound.x + bound.width){
+	if(obj.newX + obj.radius > bound.x + bound.width){
 		obj.newX = obj.x;
+		obj.velX = -obj.velX * 0.25;
 	}
-	if (obj.newY - obj.height/2 < bound.y){
+	if (obj.newY - obj.radius < bound.y){
 		obj.newY = obj.y;
+		obj.velY = -obj.velY * 0.25;
 	}
-	if(obj.newY + obj.height/2 > bound.y + bound.height){
+	if(obj.newY + obj.radius > bound.y + bound.height){
 		obj.newY = obj.y;
+		obj.velY = -obj.velY * 0.25;
 	}
 }
