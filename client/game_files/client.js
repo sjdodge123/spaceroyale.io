@@ -4,6 +4,7 @@ var myID = null,
 	ping = 0,
 	pingTimeout = null,
 	lastTime = null,
+	maxLobbyTime = null,
 	world,
 	quadTree,
 	asteroidList = {},
@@ -60,7 +61,7 @@ function clientConnect() {
 		playerList = gameState.playerList;
 		shipList = gameState.shipList;
 		world = gameState.world;
-
+		maxLobbyTime = gameState.maxLobbyTime;
 		for(var id in playerList){
 			eventLog.addEvent(playerList[id] + " has joined the battle");
 		}
@@ -68,6 +69,7 @@ function clientConnect() {
 		if(shipList[myID] != null){
 			myShip = shipList[myID];
 		}
+
 	});
 
 	server.on("playerJoin", function(appendPlayerList){

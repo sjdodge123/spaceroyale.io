@@ -92,6 +92,10 @@ var nebulaSheet = new SpriteSheet(nebulaSVG,0,0,500,500,1,1);
 var tradeShipSheet = new SpriteSheet(tradeShipSVG,0,0,200,600,1,1);
 
 
+
+
+var lastLobbyTime = null;
+
 function drawBackground() {
 	canvasContext.save();
 	canvasContext.fillStyle = 'black';
@@ -362,7 +366,15 @@ function drawShrinkTimer(){
 }
 
 function drawLobbyTimer(){
-	drawText(lobbyTimeLeft + " until start",eventLog.x + eventLog.width/2-40,eventLog.y-40);
+	if(maxLobbyTime == lobbyTimeLeft){
+		drawFlashingText("Waiting for more players..",eventLog.x + eventLog.width/2-100,eventLog.y-40,"white","22px Georgia","red",lobbyTimeLeft);
+		return;
+	}
+	if(lobbyTimeLeft > 5){
+		drawFlashingText(lobbyTimeLeft + " until start",eventLog.x + eventLog.width/2-40,eventLog.y-40,"white","22px Georgia","red",lobbyTimeLeft);
+	} else{
+		drawFlashingText(lobbyTimeLeft + " until start",eventLog.x + eventLog.width/2-40,eventLog.y-40,"red","22px Georgia");
+	}
 }
 
 
