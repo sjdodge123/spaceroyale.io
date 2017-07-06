@@ -152,7 +152,6 @@ function drawFlashingText(text,x,y,color,font,flashColor,timeLeft,playTick){
 	} else{
 		drawTextF(text,x,y,color,font);
 	}
-
 }
 
 //DRAWING HUD UI
@@ -230,7 +229,7 @@ function drawWeaponHUD(){
 	if(myShip != null){
 		var svgscale = .25;
 		canvasContext.save();
-		canvasContext.translate(eventLog.x + eventLog.width + 50,eventLog.y+(eventLog.height/2));
+		canvasContext.translate(eventLog.x + eventLog.width + 80,eventLog.y+(eventLog.height/2));
 		canvasContext.rotate(Math.PI/180);
 		switch(myShip.weapon.name){
 			case "Blaster":{
@@ -247,6 +246,7 @@ function drawWeaponHUD(){
 			}
 		}
 		canvasContext.restore();
+		drawText(myShip.weapon.name,eventLog.x + eventLog.width+80-((myShip.weapon.name.length*10)/2),eventLog.y+eventLog.height);
 	}
 	
 }
