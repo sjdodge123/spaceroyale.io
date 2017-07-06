@@ -60,6 +60,7 @@
     "tradeShipSpawnTolerance":0.7,
     "tradeShipTrailDuration":20,
     "tradeShipSpeed":5,
+    "tradeShipAIEnabled":true,
     "tradeShipWeapon":"Blaster",
     "tradeShipWeaponLevel":3,
 

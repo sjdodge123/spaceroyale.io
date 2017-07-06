@@ -397,8 +397,9 @@ class AITradeShipController{
 	}
 	update(active){
 		if(active && this.tradeShip.alive){
-			this.findClosestPlayerShip();
-			if(this.closestPlayerShip != null){
+			if(this.closestPlayerShip == null){
+				this.findClosestPlayerShip();
+			} else{
 				this.faceTarget(this.closestPlayerShip);
 				this.fireWeapon();
 			}

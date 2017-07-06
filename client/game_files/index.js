@@ -306,6 +306,7 @@ function changeToSignout(){
 function changeToSignIn(){
     $('#signUpButton').show();
     $('#profileLoaded').hide();
+    $('#nameBox').val('');
     $('#nameBox').removeAttr("disabled");
     $('#signInButton').click(function(){
         setTimeout(function() { $('#signInUser').focus() }, 500);

@@ -415,7 +415,9 @@ class GameBoard {
 			var angle = (180/Math.PI)*Math.atan2(loc.y2-loc.y1, loc.x2-loc.x1);
 			var ts = new TradeShip(loc.x1,loc.y1,180,60, angle, utils.getRandomInt(c.tradeShipMinDelay,c.tradeShipMaxDelay),loc.x2,loc.y2,this.roomSig);
 			ts.sig = sig;
-			this.AIList[sig] = AI.setAITradeShipController(ts,this.world,this);
+			if(c.tradeShipAIEnabled){
+				this.AIList[sig] = AI.setAITradeShipController(ts,this.world,this);
+			}
 			this.tradeShipList[sig] = ts;
 		}
 	}
@@ -1263,17 +1265,20 @@ class TradeShip extends Rect{
 		this.sig = null;
 		this.roomSig = roomSig;
 
-		if(c.tradeShipWeapon == "Blaster"){
-			this.weapon = new Blaster(this.sig);
-		}
-		if(c.tradeShipWeapon == "PhotonCannon"){
-			this.weapon = new PhotonCannon(this.sig);
-		}
-		if(c.tradeShipWeapon == "MassDriver"){
-			this.weapon = new MassDriver(this.sig);
-		}
+		if(c.tradeShipAIEnabled){
+			if(c.tradeShipWeapon == "Blaster"){
+				this.weapon = new Blaster(this.sig);
+			}
+			if(c.tradeShipWeapon == "PhotonCannon"){
+				this.weapon = new PhotonCannon(this.sig);
+			}
+			if(c.tradeShipWeapon == "MassDriver"){
+				this.weapon = new MassDriver(this.sig);
+			}
 
 		this.weapon.level = c.tradeShipWeaponLevel;
+		}
+		
 		
 		this.trailSpawnTime = 1;
 		this.lastTrailSpawn = new Date();
