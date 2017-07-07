@@ -3,18 +3,18 @@
     "port": 3000,
     "serverTickSpeed": 33.33,
 
-    "minPlayers":10,
-    "maxPlayersInRoom":15,
+    "minPlayers":3,
+    "maxPlayersInRoom":10,
     "randomizePlayersLocations":true,
     "roomKickTimeout":90,
-    "lobbyWaitTime":60,
+    "lobbyWaitTime":30,
 
     "baseTimeUntilShrink":30,
     "timeUntilShrinkSpeedup":0.75,
     "baseShrinkingDuration": 40,
     "shrinkingDurationSpeedup":0.75,
 
-    "AISpawnPlayers":false,
+    "AISpawnPlayers":true,
     "AIAggroRangeMin":250,
     "AIAggroRangeMax":750,
     "AINameList":["Danger","Ralph","Pincer","Holiday","Joey","Randy","A RABID DOG","noone","Guestl337","Ceasar","Pluto","mr. bone's wild ride","chuckie","Pharoh","pockets"],
@@ -50,7 +50,7 @@
 
     "generateNebulas":true,
     "nebulaAmt":20,
-    "nebulaSlowAmt":0.075,
+    "nebulaSlowAmt":0,
     "nebulaMinSize":80,
     "nebulaMaxSize":130,
 
@@ -64,10 +64,10 @@
     "tradeShipWeapon":"Blaster",
     "tradeShipWeaponLevel":3,
 
-    "playerMaxSpeed":1500,
-    "playerBaseAcel":1000,
+    "playerMaxSpeed":800,
+    "playerBaseAcel":700,
     "playerBaseRadius":25,
-    "playerExplosionRadius":60,
+    "playerExplosionRadius":300,
     "playerExplosionMaxDamage":50,
     "playerSpawnWeapon":"Blaster",
     "playerSpawnWeaponLevel":1,
@@ -76,7 +76,7 @@
     "forceConstant": 500000,
 
     "blasterCoolDown":0.7,
-    "bulletLifetime":5,
+    "bulletLifetime":0.5,
     "bulletSpeed":788,
     "bulletDamage":10,
 
@@ -94,8 +94,8 @@
     "shield3Protection":30,
     "shieldRestoreAmount":10,
 
-    "quadTreeMaxCount": 20,
-    "quadTreeMaxDepth": 4,
+    "quadTreeMaxCount": 70,
+    "quadTreeMaxDepth": 2,
     
     "sqlinfo":{
       "connectionLimit": 100,

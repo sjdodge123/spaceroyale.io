@@ -34,8 +34,8 @@ takeDamage.volume *= .5 * masterVolume;
 
 blasterShot.volume *= .1 * masterVolume;
 photonCannonShot.volume *= .3 * masterVolume;
-massDriverShot1.volume *= .3 *masterVolume;
-massDriverShot2.volume *= .4 * masterVolume;
+massDriverShot1.volume *= .2 *masterVolume;
+massDriverShot2.volume *= .25 * masterVolume;
 
 shotAsteroid.volume *= .2 * masterVolume;
 shotPlayer.volume *= .3 * masterVolume;

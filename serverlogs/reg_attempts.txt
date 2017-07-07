@@ -1,4 +1,0 @@
-Fri May 26 2017 17:33:53 GMT-0400 (Eastern Daylight Time) : sdodge(127.0.0.1)
-Fri Jun 30 2017 19:17:43 GMT-0400 (Eastern Daylight Time) : D3s7iny(127.0.0.1)
-Fri Jun 30 2017 19:35:13 GMT-0400 (Eastern Daylight Time) : Cadybug(127.0.0.1)
-Fri Jun 30 2017 19:38:25 GMT-0400 (Eastern Daylight Time) : sdodge(127.0.0.1)

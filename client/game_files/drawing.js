@@ -445,9 +445,12 @@ function drawShip(ship){
 	canvasContext.restore();
 
 	drawWeapon(ship);
-	if(ship.AIName != null || (playerList[ship.id] != null && ship != null)){
-		var name = ship.AIName || playerList[ship.id]+ "";
-		drawTextF(name,ship.x-myShip.x+camera.xOffset-(name.length*3),ship.y-myShip.y+camera.yOffset-35,ship.glowColor,"12px Helvetica")
+
+	if(ship.isHiding == false){
+		if(ship.AIName != null || (playerList[ship.id] != null && ship != null)){
+			var name = ship.AIName || playerList[ship.id]+ "";
+			drawTextF(name,ship.x-myShip.x+camera.xOffset-(name.length*3),ship.y-myShip.y+camera.yOffset-35,ship.glowColor,"12px Helvetica")
+		}
 	}
 }
 function drawWeapon(ship){
