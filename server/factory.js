@@ -5,6 +5,7 @@ var messenger = require('./messenger.js');
 var database = require('./database.js');
 var _engine = require('./engine.js');
 var AI = require('./AI.js');
+var compressor = require('./compressor.js');
 
 exports.getRoom = function(sig,size){
 	return new Room(sig,size);
@@ -111,7 +112,7 @@ class Room {
 	sendUpdates(){
 		messenger.messageRoomBySig(this.sig,"gameUpdates",{
 			shipList:this.shipList,
-			bulletList:this.bulletList,
+			bulletList:compressor.trimBullets(this.bulletList),
 			asteroidList:this.asteroidList,
 			planetList:this.planetList,
 			itemList:this.itemList,
@@ -1510,6 +1511,8 @@ class Blaster extends Weapon{
 		this.equipMessage = "Equiped Blaster";
 		this.upgradeMessage ="Upgraded Blaster";
 		this.item = BlasterItem;
+		this.bulletWidth = 5;
+		this.bulletHeight = 12;
 	}
 
 	fire(x,y,angle,color,id){
@@ -1518,11 +1521,11 @@ class Blaster extends Weapon{
 		}
 		var bullets = [];
 		if(this.level > 1){
-			var bull1 = new Bullet(x,y,5,12, angle, color, id);
+			var bull1 = new Bullet(x,y,this.bulletWidth,this.bulletHeight, angle, color, id);
 			bull1.speed -= bull1.speed * .15;
 			bullets.push(bull1);
 		}
-		bullets.push(new Bullet(x,y,5,12, angle, color, id));
+		bullets.push(new Bullet(x,y,this.bulletWidth,this.bulletHeight, angle, color, id));
 		return bullets;
 	}
 	upgrade(){
@@ -1678,7 +1681,6 @@ class Shield extends Circle{
 class Bullet extends Rect{
 	constructor(x,y,width,height, angle, color, owner){
 		super(x,y,width,height, angle, color);
-		//this.angle = angle;
 		this.alive = true;
 		this.owner = owner;
 		this.sig = null;

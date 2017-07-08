@@ -584,10 +584,16 @@ function drawTradeShipTrail(circle){
 }
 
 function drawBullet(bullet){
+	var color;
+	if(shipList[bullet.owner] == null){
+		color = '#C0C0C0';
+	} else{
+		color = shipList[bullet.owner].color;
+	}
 	canvasContext.save();
 	canvasContext.translate(bullet.x-myShip.x+camera.xOffset,bullet.y-myShip.y+camera.yOffset);
 	canvasContext.rotate(bullet.angle*Math.PI/180);
-	canvasContext.fillStyle = bullet.color;
+	canvasContext.fillStyle = color;
 	canvasContext.fillRect(-bullet.width/2,-bullet.height/2,bullet.width,bullet.height);
 	canvasContext.restore();
 }
@@ -714,6 +720,7 @@ function drawBullets(){
 		if(bulletList[sig] == null){
 			continue;
 		}
+
 		if(camera.inBounds(bulletList[sig])){
 			drawBullet(bulletList[sig]);
 		}

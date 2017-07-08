@@ -162,7 +162,7 @@ function clientConnect() {
 
 	server.on("gameUpdates",function(updatePacket){
 		shipList = updatePacket.shipList;
-		bulletList = updatePacket.bulletList;
+		bulletList = unpackBullets(updatePacket.bulletList);
 		asteroidList = updatePacket.asteroidList;
 		planetList = updatePacket.planetList;
 		itemList = updatePacket.itemList;
@@ -237,4 +237,22 @@ function clientSendReg(user,pass,gameName){
 
 function clientSendStart(myname,mycolor){
 	server.emit('enterLobby',{name:myname,color:mycolor});
+}
+
+function unpackBullets(bulletArray){
+	var bulletList = {},bulletProps,j,i,sig;
+
+	for(i=0;i<bulletArray.length;i++){
+		bulletProps = bulletArray[i];
+		bulletList[bulletProps[0]] = {};
+		bulletList[bulletProps[0]].type = bulletProps[1];
+		bulletList[bulletProps[0]].x = bulletProps[2];
+		bulletList[bulletProps[0]].y = bulletProps[3];
+		bulletList[bulletProps[0]].width = bulletProps[4];
+		bulletList[bulletProps[0]].height = bulletProps[5];
+		bulletList[bulletProps[0]].owner = bulletProps[6];
+		bulletList[bulletProps[0]].angle = bulletProps[7];
+	}
+	console.log(bulletList);
+	return bulletList;
 }
