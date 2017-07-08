@@ -252,6 +252,5 @@ function unpackBullets(bulletArray){
 		bulletList[bulletProps[0]].owner = bulletProps[5];
 		bulletList[bulletProps[0]].angle = bulletProps[6];
 	}
-	console.log(bulletList);
 	return bulletList;
 }
