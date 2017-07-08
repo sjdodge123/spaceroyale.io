@@ -241,17 +241,16 @@ function clientSendStart(myname,mycolor){
 
 function unpackBullets(bulletArray){
 	var bulletList = {},bulletProps,j,i,sig;
-
+	bulletArray = JSON.parse(bulletArray);
 	for(i=0;i<bulletArray.length;i++){
 		bulletProps = bulletArray[i];
 		bulletList[bulletProps[0]] = {};
-		bulletList[bulletProps[0]].type = bulletProps[1];
-		bulletList[bulletProps[0]].x = bulletProps[2];
-		bulletList[bulletProps[0]].y = bulletProps[3];
-		bulletList[bulletProps[0]].width = bulletProps[4];
-		bulletList[bulletProps[0]].height = bulletProps[5];
-		bulletList[bulletProps[0]].owner = bulletProps[6];
-		bulletList[bulletProps[0]].angle = bulletProps[7];
+		bulletList[bulletProps[0]].x = bulletProps[1];
+		bulletList[bulletProps[0]].y = bulletProps[2];
+		bulletList[bulletProps[0]].width = bulletProps[3];
+		bulletList[bulletProps[0]].height = bulletProps[4];
+		bulletList[bulletProps[0]].owner = bulletProps[5];
+		bulletList[bulletProps[0]].angle = bulletProps[6];
 	}
 	console.log(bulletList);
 	return bulletList;

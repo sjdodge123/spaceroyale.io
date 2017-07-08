@@ -13,7 +13,6 @@ exports.trimBullets = function (bulletList) {
 		bullet = bulletList[sig];
 		listItem = [
 			bullet.sig,
-			bullet.type,
 			bullet.x,
 			bullet.y,
 			bullet.width,
@@ -23,7 +22,23 @@ exports.trimBullets = function (bulletList) {
 		];
 		list.push(listItem);
 	}
+	list = JSON.stringify(list);
 	sig = null;
 	bullet = null;
+	//console.log(getUTF8Size(JSON.stringify(bulletList))); 
+	//console.log(getUTF8Size(list)); // 75% reduction in payload size;
 	return list;
 }
+
+function getUTF8Size (str) {
+  var sizeInBytes = str.split('')
+    .map(function( ch ) {
+      return ch.charCodeAt(0);
+    }).map(function( uchar ) {
+      return uchar < 128 ? 1 : 2;
+    }).reduce(function( curr, next ) {
+      return curr + next;
+    });
+
+  return sizeInBytes;
+};
