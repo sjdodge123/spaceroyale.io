@@ -38,7 +38,7 @@ massDriverShot1.volume *= .2 *masterVolume;
 massDriverShot2.volume *= .25 * masterVolume;
 
 shotAsteroid.volume *= .2 * masterVolume;
-shotPlayer.volume *= .3 * masterVolume;
+shotPlayer.volume *= 1 * masterVolume;
 
 shipInitThrust.volume *= .3 * masterVolume;
 shipThrust.volume *= .4 * masterVolume;

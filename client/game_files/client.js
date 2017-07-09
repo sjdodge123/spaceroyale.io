@@ -7,6 +7,7 @@ var myID = null,
 	maxLobbyTime = null,
 	world,
 	quadTree,
+	config,
 	asteroidList = {},
 	itemList = {},
 	planetList = {},
@@ -61,6 +62,8 @@ function clientConnect() {
 		playerList = gameState.playerList;
 		shipList = gameState.shipList;
 		world = gameState.world;
+		config = gameState.config;
+		interval = config.serverTickSpeed;
 		maxLobbyTime = gameState.maxLobbyTime;
 		for(var id in playerList){
 			eventLog.addEvent(playerList[id] + " has joined the battle");
@@ -91,23 +94,14 @@ function clientConnect() {
 	});
 
 	server.on("weaponFired",function(payload){
-		if(payload.ship.id == myID){
-			lastFired = new Date();
+		if(payload == null){
+			return;
 		}
-		if(camera.inBounds(payload.ship)){
-			if(payload.weapon.name == "Blaster"){
-            	playSound(blasterShot);
-        	}
-        	if(payload.weapon.name == "PhotonCannon"){
-            	playSound(photonCannonShot);
-        	}
-        	if(payload.weapon.name == "MassDriver"){
-        		if(payload.weapon.level == 3){
-        			playSound(massDriverShot2);
-        		} else{
-        			playSound(massDriverShot1);
-        		}
-        	}
+		weaponFired(payload);
+	});
+	server.on('terminateBullet',function(deadSigs){
+		for(var i=0;i<deadSigs.length;i++){
+			terminateBullet(deadSigs[i]);
 		}
 	});
 
@@ -162,7 +156,6 @@ function clientConnect() {
 
 	server.on("gameUpdates",function(updatePacket){
 		shipList = updatePacket.shipList;
-		bulletList = unpackBullets(updatePacket.bulletList);
 		asteroidList = updatePacket.asteroidList;
 		planetList = updatePacket.planetList;
 		itemList = updatePacket.itemList;
@@ -179,10 +172,6 @@ function clientConnect() {
 		if(myShip != null && myShip.weapon != null){
 			currentWeaponCooldown = myShip.weapon.cooldown*1000;
 		}
-	});
-
-	server.on("shotsFired",function(bullet){
-		bulletList[bullet.sig] = bullet;
 	});
 
 	server.on("toast",function(message){
@@ -239,18 +228,49 @@ function clientSendStart(myname,mycolor){
 	server.emit('enterLobby',{name:myname,color:mycolor});
 }
 
-function unpackBullets(bulletArray){
-	var bulletList = {},bulletProps,j,i,sig;
-	bulletArray = JSON.parse(bulletArray);
-	for(i=0;i<bulletArray.length;i++){
-		bulletProps = bulletArray[i];
-		bulletList[bulletProps[0]] = {};
-		bulletList[bulletProps[0]].x = bulletProps[1];
-		bulletList[bulletProps[0]].y = bulletProps[2];
-		bulletList[bulletProps[0]].width = bulletProps[3];
-		bulletList[bulletProps[0]].height = bulletProps[4];
-		bulletList[bulletProps[0]].owner = bulletProps[5];
-		bulletList[bulletProps[0]].angle = bulletProps[6];
+function weaponFired(payload){
+	var id,ship,weaponName,weaponLevel,numBullets,i,bullet;
+
+	payload = JSON.parse(payload);
+	id = payload[0];
+	ship = shipList[id];
+	weaponName = payload[1];
+	weaponLevel = payload[2];
+	numBullets = payload[3];
+
+	for(i=4;i<numBullets+4;i++){
+		bullet = payload[i];
+		if(bulletList[bullet[0]] == null){
+			bulletList[bullet[0]] = {};
+			bulletList[bullet[0]].velX = 0;
+			bulletList[bullet[0]].velY = 0;
+			bulletList[bullet[0]].owner = id;
+			bulletList[bullet[0]].x = bullet[1];
+			bulletList[bullet[0]].y = bullet[2];
+			bulletList[bullet[0]].angle = bullet[3];
+			bulletList[bullet[0]].speed = bullet[4];
+			bulletList[bullet[0]].width = bullet[5];
+			bulletList[bullet[0]].height = bullet[6];
+
+			setTimeout(terminateBullet,config.bulletLifetime*1000 + 200,bullet[0]);
+		}
 	}
-	return bulletList;
+	if(id == myID){
+		lastFired = new Date();
+	}
+	if(camera.inBounds(ship)){
+		if(weaponName == "Blaster"){
+        	playSound(blasterShot);
+    	}
+    	if(weaponName == "PhotonCannon"){
+        	playSound(photonCannonShot);
+    	}
+    	if(weaponName == "MassDriver"){
+    		if(weaponLevel == 3){
+    			playSound(massDriverShot2);
+    		} else{
+    			playSound(massDriverShot1);
+    		}
+    	}
+	}
 }

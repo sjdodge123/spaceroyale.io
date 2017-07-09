@@ -43,6 +43,15 @@ var server = null,
     turnLeft = false,
     turnRight = false;
 
+var maxFPS = 60,
+    frames,
+    now,
+    then = Date.now(),
+    interval = 1000/maxFPS,
+    deltaTime = maxFPS/1000,
+    dt;
+
+
 window.onload = function() {
     server = clientConnect();
     pingServer();
@@ -536,7 +545,15 @@ function resize(){
 function animloop(){
     if(gameRunning){
         requestAnimFrame(animloop);
-        gameLoop();
+        now = Date.now();
+        dt = now - then;
+        if(dt > interval){
+            then = now - (dt % interval);
+            deltaTime = dt/1000;
+            frames = 1000/dt;
+            gameLoop();
+        }
+        
     }
 }
 
@@ -545,6 +562,7 @@ function gameLoop(){
         recenterCamera();
         return;
     }
+    updateGameboard();
     drawFlashScreen();
     drawBackground();
     drawRelativeObjects();
@@ -619,6 +637,9 @@ function checkCooldown(){
 }
 
 function checkForDamage(){
+    if(shipList[myID] == null){
+        return;
+    }
     if(shipList[myID].health < healthLastFrame){
         playSound(takeDamage);
         drawFlashScreen();

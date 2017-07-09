@@ -1,7 +1,7 @@
 {
 	"override":true,
 	"minPlayers":2,
-	"AISpawnPlayers":true,
+	"AISpawnPlayers":false,
 	"generateTradeShips":false,
 	"playerSpawnWeapon":"Blaster",
     "playerSpawnWeaponLevel":1,

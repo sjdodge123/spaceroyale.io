@@ -1,7 +1,7 @@
 {
     "host": "0.0.0.0",
     "port": 3000,
-    "serverTickSpeed": 33.33,
+    "serverTickSpeed": 30,
 
     "minPlayers":3,
     "maxPlayersInRoom":10,
@@ -77,8 +77,8 @@
 
     "blasterCoolDown":0.7,
     "bulletLifetime":0.5,
-    "bulletSpeed":788,
-    "bulletDamage":10,
+    "blasterBulletSpeed":788,
+    "blasterBulletDamage":10,
 
     "photonCannonCoolDown":1.2,
     "birdshotDamage":11,

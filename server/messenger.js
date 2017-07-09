@@ -82,6 +82,7 @@ function checkForMail(client){
 		var gameState = {
 			playerList:room.clientList,
 			shipList:room.shipList,
+			config:c,
 			world:room.world,
 			maxLobbyTime:c.lobbyWaitTime
 		};

@@ -99,9 +99,6 @@ class Room {
 						messenger.messageRoomBySig(this.sig,"eventMessage",remaining +" alive - "+ this.clientList[shipID] + " died from world damage");
 					}
 				}
-
-
-
 				this.killedShips[shipID] = this.shipList[shipID];
 				delete this.shipList[shipID];
 				messenger.messageRoomBySig(this.sig,'shipDeath',shipID);
@@ -112,7 +109,6 @@ class Room {
 	sendUpdates(){
 		messenger.messageRoomBySig(this.sig,"gameUpdates",{
 			shipList:this.shipList,
-			bulletList:compressor.trimBullets(this.bulletList),
 			asteroidList:this.asteroidList,
 			planetList:this.planetList,
 			itemList:this.itemList,
@@ -376,13 +372,18 @@ class GameBoard {
 		}
 	}
 	updateBullets(){
+		var deadSigs = [];
 		for(var sig in this.bulletList){
 			var bullet = this.bulletList[sig];
 			if(bullet.alive == false){
+				deadSigs.push(sig);
 				delete this.bulletList[sig];
 				continue;
 			}
 			bullet.update();
+		}
+		if(deadSigs.length != 0){
+			messenger.messageRoomBySig(this.roomSig,'terminateBullet',deadSigs);
 		}
 	}
 	updateAsteroids(){
@@ -469,10 +470,12 @@ class GameBoard {
 			this.bulletList[bullet.sig] = bullet;
 			setTimeout(this.terminateBullet,bullet.lifetime*1000,{sig:bullet.sig,bulletList:this.bulletList});
 		}
+		var data = compressor.weaponFired(ship,ship.weapon,bullets);
+		messenger.messageRoomBySig(this.roomSig,'weaponFired',data);
 	}
 	terminateBullet(packet){
 		if(packet.bulletList[packet.sig] != undefined){
-			delete packet.bulletList[packet.sig];
+			packet.bulletList[packet.sig].alive = false;;
 		}
 	}
 	terminateAsteroid(asteroid){
@@ -1070,11 +1073,13 @@ class Ship extends Circle{
 		}
 	}
 	fire(){
-		var bullets = this.weapon.fire(this.x + this.radius * Math.cos((this.angle + 90) * Math.PI/180), this.y + this.radius * Math.sin((this.angle + 90) * Math.PI/180), this.angle, this.baseColor,this.id);
-		if(bullets != null){
-			messenger.messageRoomBySig(this.roomSig,'weaponFired',{ship:this,weapon:this.weapon});
+		var x = this.x + this.radius * Math.cos((this.angle + 90) * Math.PI/180);
+		var y = this.y + this.radius * Math.sin((this.angle + 90) * Math.PI/180);
+		var _bullets = this.weapon.fire(x,y,this.angle, this.baseColor,this.id);
+		if(_bullets == null){
+			return;
 		}
-		return bullets;
+		return _bullets;
 	}
 	move(){
 		if(this.newX != this.x || this.newY != this.y){
@@ -1685,10 +1690,9 @@ class Bullet extends Rect{
 		this.owner = owner;
 		this.sig = null;
 		this.isBullet = true;
-
 		this.lifetime = c.bulletLifetime;
-		this.speed = c.bulletSpeed;
-		this.damage = c.bulletDamage;
+		this.speed = c.blasterBulletSpeed;
+		this.damage = c.blasterBulletDamage;
 		this.velX = 0;
 		this.velY = 0;
 		this.newX = this.x;
@@ -1698,7 +1702,6 @@ class Bullet extends Rect{
 		this.move();
 	}
 	move(){
-
 		this.x = this.newX;
 		this.y = this.newY;
 	}
