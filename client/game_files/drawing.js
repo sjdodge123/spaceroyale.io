@@ -236,11 +236,11 @@ function drawWeaponHUD(){
 				canvasContext.drawImage(blasterSVG, - blasterSVG.width * svgscale / 2, -  blasterSVG.height * svgscale / 2, blasterSVG.width * svgscale, blasterSVG.height * svgscale);
 				break;
 			}
-			case "PhotonCannon":{
+			case "Photon Cannon":{
 				canvasContext.drawImage(photonCannonSVG, - photonCannonSVG.width * svgscale / 2, -  photonCannonSVG.height * svgscale / 2, photonCannonSVG.width * svgscale, photonCannonSVG.height * svgscale);
 				break;
 			}
-			case "MassDriver":{
+			case "Mass Driver":{
 				canvasContext.drawImage(massDriverSVG, - massDriverSVG.width * svgscale / 2, -  massDriverSVG.height * svgscale / 2, massDriverSVG.width * svgscale, massDriverSVG.height * svgscale);
 				break;
 			}
@@ -406,7 +406,7 @@ function drawRelativeObjects(){
 	}
 }
 function drawShip(ship){
-	if(ship.shield != null && ship.shield.alive){
+	if(ship.shield != null){
 		drawShield(ship);
 	}
 	
@@ -463,11 +463,11 @@ function drawWeapon(ship){
 			canvasContext.drawImage(blasterSVG, - blasterSVG.width * svgscale / 2, -  blasterSVG.height * svgscale / 2, blasterSVG.width * svgscale, blasterSVG.height * svgscale);
 			break;
 		}
-		case "PhotonCannon":{
+		case "Photon Cannon":{
 			canvasContext.drawImage(photonCannonSVG, - photonCannonSVG.width * svgscale / 2, -  photonCannonSVG.height * svgscale / 2, photonCannonSVG.width * svgscale, photonCannonSVG.height * svgscale);
 			break;
 		}
-		case "MassDriver":{
+		case "Mass Driver":{
 			canvasContext.drawImage(massDriverSVG, - massDriverSVG.width * svgscale / 2, -  massDriverSVG.height * svgscale / 2, massDriverSVG.width * svgscale, massDriverSVG.height * svgscale);
 			break;
 		}
@@ -478,9 +478,23 @@ function drawWeapon(ship){
 }
 function drawShield(ship){
 	canvasContext.save();
+	switch(ship.shield.level){
+		case 1:{
+			canvasContext.strokeStyle = config.shield1Color;
+			break;
+		}
+		case 2:{
+			canvasContext.strokeStyle = config.shield2Color;
+			break;
+		}
+		case 3:{
+			canvasContext.strokeStyle = config.shield3Color;
+			break;
+		}
+
+	}
 	canvasContext.beginPath();
-	canvasContext.strokeStyle = ship.shield.color;
-	canvasContext.arc(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset,ship.shield.radius,0,Math.PI*2,true);
+	canvasContext.arc(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset,config.shieldRadius,0,Math.PI*2,true);
 	canvasContext.stroke();
 	canvasContext.restore();
 }

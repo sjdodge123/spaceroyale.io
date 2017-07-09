@@ -1032,47 +1032,61 @@ class Ship extends Circle{
 		this.move();
 	}
 	equip(item){
-
-		//TODO equiping items with new net updates does not work
 		if(item instanceof ShieldItem){
 			if(this.shield == null){
 				this.shield = new Shield(this.id);
 				this.shield.equip();
+				var data = compressor.equipItem(item,this.shield);
+				messenger.messageRoomBySig(this.roomSig,"equipItem",data);
 				return;
 			}
 			if(this.shield instanceof Shield){
 				this.shield.upgrade();
+				var data = compressor.updateItem(item,this.shield);
+				messenger.messageRoomBySig(this.roomSig,"updateItem",data);
 				return;
 			}
 		}
 		if(item instanceof BlasterItem){
 			if(this.weapon instanceof Blaster){
 				this.weapon.upgrade();
+				var data = compressor.updateItem(item,this.weapon);
+				messenger.messageRoomBySig(this.roomSig,"updateItem",data);
 				return;
 			}
 			this.droppedItem = this.weapon.drop(this.x,this.y,this.weapon.level);
 			this.weapon = new Blaster(this.id,item.level);
 			this.weapon.equip();
+			var data = compressor.equipItem(item,this.weapon);
+			messenger.messageRoomBySig(this.roomSig,"equipItem",data);
 			return;
 		}
 		if(item instanceof PhotonCannonItem){
 			if(this.weapon instanceof PhotonCannon){
 				this.weapon.upgrade();
+				var data = compressor.updateItem(item,this.weapon);
+				messenger.messageRoomBySig(this.roomSig,"updateItem",data);
 				return;
 			}
 			this.droppedItem = this.weapon.drop(this.x,this.y,this.weapon.level);
 			this.weapon = new PhotonCannon(this.id,item.level);
 			this.weapon.equip();
+			var data = compressor.equipItem(item,this.weapon);
+			messenger.messageRoomBySig(this.roomSig,"equipItem",data);
 			return;
 		}
 		if(item instanceof MassDriverItem){
 			if(this.weapon instanceof MassDriver){
 				this.weapon.upgrade();
+				var data = compressor.updateItem(item,this.weapon);
+				messenger.messageRoomBySig(this.roomSig,"updateItem",data);
 				return;
 			}
 			this.droppedItem = this.weapon.drop(this.x,this.y,this.weapon.level);
 			this.weapon = new MassDriver(this.id,item.level);
 			this.weapon.equip();
+			var data = compressor.equipItem(item,this.weapon);
+			messenger.messageRoomBySig(this.roomSig,"equipItem",data);
 			return;
 		}
 
@@ -1643,7 +1657,7 @@ class MassDriver extends Weapon{
 
 class Shield extends Circle{
 	constructor(owner){
-		super(0,0,c.shieldRadius,"Aqua");
+		super(0,0,c.shieldRadius,c.shield1Color);
 		this.level = 1;
 		this.maxLevel = 3;
 		this.equipMessage = "Equiped Shield";
@@ -1689,17 +1703,14 @@ class Shield extends Circle{
 	checkLevel(){
 		if(this.health >= 1 && this.health <= c.shield1Protection){
 			this.level = 1;
-			this.color = "Aqua";
 			return;
 		}
 		if(this.health > c.shield1Protection && this.health <= c.shield2Protection){
 			this.level = 2;
-			this.color = "#FFFF00";
 			return;
 		}
 		if(this.health > c.shield2Protection && this.health <= c.shield3Protection){
 			this.level = 3;
-			this.color = "#FF6347";
 		}
 	}
 	equip(){

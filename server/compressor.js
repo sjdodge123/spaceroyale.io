@@ -95,7 +95,23 @@ exports.sendShipUpdates = function(shipList){
 	return packet;
 }
 
+exports.equipItem = function(item,equipedItem){
+	var packet = [];
+	packet[0] = equipedItem.owner;
+	packet[1] = item.name;
+	packet[2] = equipedItem.level;
+	packet = JSON.stringify(packet);
+	return packet;
+}
 
+exports.updateItem = function(item,equipedItem){
+	var packet = [];
+	packet[0] = equipedItem.owner;
+	packet[1] = item.name;
+	packet[2] = equipedItem.level;
+	packet = JSON.stringify(packet);
+	return packet;
+}
 
 exports.weaponFired = function(ship,weapon,bullets){
 	var packet = [];

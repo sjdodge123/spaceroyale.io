@@ -148,6 +148,18 @@ function clientConnect() {
 		}
 	});
 
+	server.on("equipItem",function(packet){
+		if(packet != null){
+			equipItem(packet);
+		}
+	});
+
+	server.on("updateItem",function(packet){
+		if(packet != null){
+			updateItem(packet);
+		}
+	});
+
 	server.on("spawnNebula",function(packet){
 		if(packet != null){
 			spawnNebula(packet);

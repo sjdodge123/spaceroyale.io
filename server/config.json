@@ -92,6 +92,9 @@
     "massDriverBulletSpeed":1650,
 
     "shieldRadius":35,
+    "shield1Color":"Aqua",
+    "shield2Color":"white",
+    "shield3Color":"orange",
     "shield1Protection":10,
     "shield2Protection":20,
     "shield3Protection":30,

@@ -152,6 +152,42 @@ function spawnItem(packet){
 	itemList[packet[0]].name = packet[3];
 }
 
+function equipItem(packet){
+	packet = JSON.parse(packet);
+	var name = packet[1];
+	var level = packet[2];
+
+	if(name == "ShieldItem"){
+		shipList[packet[0]].shield = {};
+		shipList[packet[0]].shield.level = level;
+		return;
+	}
+	if(name == "BlasterItem"){
+		shipList[packet[0]].weapon.name = "Blaster";
+		shipList[packet[0]].weapon.level = level;
+	}
+	if(name == "PhotonCannonItem"){
+		shipList[packet[0]].weapon.name = "Photon Cannon";
+		shipList[packet[0]].weapon.level = level;
+	}
+	if(name == "MassDriverItem"){
+		shipList[packet[0]].weapon.name = "Mass Driver";
+		shipList[packet[0]].weapon.level = level;
+	}
+}
+
+function updateItem(packet){
+	packet = JSON.parse(packet);
+	var name = packet[1];
+	var level = packet[2];
+
+	if(name == "ShieldItem"){
+		shipList[packet[0]].shield.level = level;
+		return;
+	}
+	shipList[packet[0]].weapon.level = level;
+}
+
 
 function spawnAsteroids(packet){
 	packet = JSON.parse(packet);
