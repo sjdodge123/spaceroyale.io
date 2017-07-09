@@ -101,7 +101,7 @@ class Room {
 				}
 				this.killedShips[shipID] = this.shipList[shipID];
 				delete this.shipList[shipID];
-				messenger.messageRoomBySig(this.sig,'shipDeath',shipID);
+				messenger.messageRoomBySig(this.sig,'shipDeath',[shipID,ship.killedBy]);
 			}
 		}
 	}
@@ -110,7 +110,6 @@ class Room {
 		var shipData = compressor.sendShipUpdates(this.shipList);
 		messenger.messageRoomBySig(this.sig,"gameUpdates",{
 			shipList:shipData,
-			itemList:this.itemList,
 			tradeShipList:this.tradeShipList,
 			state:this.game.active,
 			lobbyTimeLeft:this.game.lobbyTimeLeft,
@@ -397,21 +396,28 @@ class GameBoard {
 			asteroid.update();
 		}
 		if(deadSigs.length != 0){
-			messenger.messageRoomBySig(this.roomSig,'terminateAsteroid',deadSigs);
+			messenger.messageRoomBySig(this.roomSig,'terminateAsteroids',deadSigs);
 		}
 	}
 	updateItems(){
+		var deadSigs = [];
 		for(var itemSig in this.itemList){
 			var item = this.itemList[itemSig];
 			if(item.alive == false){
+				deadSigs.push(itemSig);
 				this.terminateItem(itemSig);
 			}
+
+		}
+		if(deadSigs.length != 0){
+			messenger.messageRoomBySig(this.roomSig,'terminateItems',deadSigs);
 		}
 	}
 	spawnItem(item){
 		var sig = this.generateItemSig();
 		item.sig = sig;
 		this.itemList[sig] = item;
+		messenger.messageRoomBySig(this.roomSig,'spawnItem',compressor.spawnItem(item));
 	}
 	spawnTradeShip(){
 		if(c.generateTradeShips){
@@ -1409,7 +1415,7 @@ class Trail extends Circle {
 
 class CircleItem extends Circle{
 	constructor(x,y,color){
-		super(x,y,25,color);
+		super(x,y,c.baseItemRadius,color);
 		this.isItem = true;
 		this.sig = null;
 		this.alive = true;

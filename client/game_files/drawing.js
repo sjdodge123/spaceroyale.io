@@ -395,12 +395,12 @@ function drawRelativeObjects(){
 	drawShips();
 	drawAsteroids();
 	drawItems();
-	drawBullets();
 	drawPlanets();
 	drawNebulas();
 	drawTradeShips();
 	drawWorld();
 	drawBounds();
+	drawBullets();
 	if (quadTree != null){
 		drawQuadTree(quadTree);
 	}

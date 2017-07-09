@@ -137,6 +137,17 @@ function clientConnect() {
 		playSound(shotPlayer);
 	});
 
+	server.on("spawnItem",function(packet){
+		if(packet != null){
+			spawnItem(packet);
+		}
+	})
+	server.on("terminateItems",function(deadSigs){
+		for(var i=0;i<deadSigs.length;i++){
+			terminateItem(deadSigs[i]);
+		}
+	});
+
 	server.on("spawnNebula",function(packet){
 		if(packet != null){
 			spawnNebula(packet);
@@ -155,7 +166,7 @@ function clientConnect() {
 		}
 	});
 
-	server.on("terminateAsteroid",function(deadSigs){
+	server.on("terminateAsteroids",function(deadSigs){
 		for(var i=0;i<deadSigs.length;i++){
 			terminateAsteroid(deadSigs[i]);
 		}
@@ -193,13 +204,19 @@ function clientConnect() {
 		}
 	});
 
-	server.on("shipDeath",function(id){
+	server.on("shipDeath",function(packet){
+		var id = packet[0];
+		var killerId = packet[1];
 		if(id == myID){
 			iAmAlive = false;
 			playSound(youDied);
 			cameraBouncing = true;
 			showGameOverScreen("You died!");
 			return;
+		}
+		if(killerId != null){
+			console.log(killerId);
+			shipList[killerId].kills += 1;
 		}
 		if(camera.inBounds(shipList[id])){
 			playSound(shipDeath);
@@ -230,7 +247,7 @@ function clientConnect() {
 
 	server.on("gameUpdates",function(updatePacket){
 		updateShipList(updatePacket.shipList);
-		itemList = updatePacket.itemList;
+		//itemList = updatePacket.itemList;
 		tradeShipList = updatePacket.tradeShipList;
 		gameStarted = updatePacket.state;
 		lobbyTimeLeft = updatePacket.lobbyTimeLeft;

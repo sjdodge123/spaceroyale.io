@@ -38,9 +38,7 @@ exports.getClient = function(id){
 	return mailBoxList[id];
 }
 exports.toastPlayer = function(id,message){
-	if(mailBoxList[id] != null){
-		mailBoxList[id].emit("toast",message);
-	}
+	toastPlayer(id,message);
 }
 exports.messageUser = function(id,header,payload){
 	messageUser(id,header,payload);
@@ -99,6 +97,7 @@ function checkForMail(client){
 			ship:appendShipData
 		};
 		client.broadcast.to(roomSig).emit("playerJoin",appendPlayerList);
+		toastPlayer(client.id,"Joined Room" +  roomSig);
 	});
 
 	client.on('playerLeaveRoom',function(){
@@ -165,6 +164,11 @@ function checkForMail(client){
 function messageUser(id,header,payload){
 	if(mailBoxList[id] != null){
 		mailBoxList[id].emit(header,payload);
+	}
+}
+function toastPlayer(id,message){
+	if(mailBoxList[id] != null){
+		mailBoxList[id].emit("toast",message);
 	}
 }
 function messageRoomBySig(sig,header,payload){

@@ -14,6 +14,8 @@
     "baseShrinkingDuration": 40,
     "shrinkingDurationSpeedup":0.75,
 
+    "baseItemRadius":25,
+
     "AISpawnPlayers":true,
     "AIAggroRangeMin":250,
     "AIAggroRangeMax":750,

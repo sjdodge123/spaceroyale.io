@@ -164,6 +164,16 @@ exports.spawnAsteroids = function(asteroidList){
 	return packet;
 }
 
+exports.spawnItem = function(item){
+	var packet = [];
+	packet[0] = item.sig;
+	packet[1] = item.x;
+	packet[2] = item.y;
+	packet[3] = item.name;
+	packet = JSON.stringify(packet);
+	return packet;
+}
+
 exports.spawnNebula = function(nebulaList){
 	var packet = [];
 	for(prop in nebulaList){

@@ -36,6 +36,13 @@ function terminateAsteroid(sig){
 		delete asteroidList[sig];
 	}
 }
+
+function terminateItem(sig){
+	if(itemList[sig] != undefined){
+		delete itemList[sig];
+	}
+}
+
 function connectSpawnShips(packet){
 	if(packet == null){
 		return;
@@ -133,6 +140,16 @@ function updateShipList(packet){
 			shipList[ship[0]].weapon.angle = ship[3];
 		}
 	}
+}
+
+function spawnItem(packet){
+	packet = JSON.parse(packet);
+	itemList[packet[0]] = {};
+	itemList[packet[0]].radius = config.baseItemRadius;
+	itemList[packet[0]].sig = packet[0];
+	itemList[packet[0]].x = packet[1];
+	itemList[packet[0]].y = packet[2];
+	itemList[packet[0]].name = packet[3];
 }
 
 
