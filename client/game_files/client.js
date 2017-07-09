@@ -109,6 +109,24 @@ function clientConnect() {
 		playSound(shotPlayer);
 	});
 
+	server.on("spawnAsteroids",function(packet){
+		if(packet != null){
+			spawnAsteroids(packet);
+		}
+	});
+
+	server.on("terminateAsteroid",function(deadSigs){
+		for(var i=0;i<deadSigs.length;i++){
+			terminateAsteroid(deadSigs[i]);
+		}
+	});
+
+	server.on("asteroidHurt",function(packet){
+		if(packet != null){
+			asteroidList[packet.sig].health = packet.health;
+		}
+	});
+
 	server.on("shotAsteroid",function(asteroid){
 		if(camera.inBounds(asteroid)){
 			playSound(shotAsteroid);
@@ -156,7 +174,6 @@ function clientConnect() {
 
 	server.on("gameUpdates",function(updatePacket){
 		shipList = updatePacket.shipList;
-		asteroidList = updatePacket.asteroidList;
 		planetList = updatePacket.planetList;
 		itemList = updatePacket.itemList;
 		nebulaList = updatePacket.nebulaList;
@@ -228,49 +245,3 @@ function clientSendStart(myname,mycolor){
 	server.emit('enterLobby',{name:myname,color:mycolor});
 }
 
-function weaponFired(payload){
-	var id,ship,weaponName,weaponLevel,numBullets,i,bullet;
-
-	payload = JSON.parse(payload);
-	id = payload[0];
-	ship = shipList[id];
-	weaponName = payload[1];
-	weaponLevel = payload[2];
-	numBullets = payload[3];
-
-	for(i=4;i<numBullets+4;i++){
-		bullet = payload[i];
-		if(bulletList[bullet[0]] == null){
-			bulletList[bullet[0]] = {};
-			bulletList[bullet[0]].velX = 0;
-			bulletList[bullet[0]].velY = 0;
-			bulletList[bullet[0]].owner = id;
-			bulletList[bullet[0]].x = bullet[1];
-			bulletList[bullet[0]].y = bullet[2];
-			bulletList[bullet[0]].angle = bullet[3];
-			bulletList[bullet[0]].speed = bullet[4];
-			bulletList[bullet[0]].width = bullet[5];
-			bulletList[bullet[0]].height = bullet[6];
-
-			setTimeout(terminateBullet,config.bulletLifetime*1000 + 200,bullet[0]);
-		}
-	}
-	if(id == myID){
-		lastFired = new Date();
-	}
-	if(camera.inBounds(ship)){
-		if(weaponName == "Blaster"){
-        	playSound(blasterShot);
-    	}
-    	if(weaponName == "PhotonCannon"){
-        	playSound(photonCannonShot);
-    	}
-    	if(weaponName == "MassDriver"){
-    		if(weaponLevel == 3){
-    			playSound(massDriverShot2);
-    		} else{
-    			playSound(massDriverShot1);
-    		}
-    	}
-	}
-}

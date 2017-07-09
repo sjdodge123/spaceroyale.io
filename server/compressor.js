@@ -4,6 +4,7 @@ var c = utils.loadConfig();
 
 var listItem = null;
 var bullet = null;
+var asteroid = null;
 var prop = null;
 
 exports.weaponFired = function(ship,weapon,bullets){
@@ -22,6 +23,27 @@ exports.weaponFired = function(ship,weapon,bullets){
 			bullet.speed,
 			bullet.width,
 			bullet.height,
+		];
+		packet.push(listItem);
+	}
+	packet = JSON.stringify(packet);
+	listItem = null;
+	prop = null;
+	bullet = null;
+	return packet;
+}
+
+exports.spawnAsteroids = function(asteroidList){
+	var packet = [];
+	for(prop in asteroidList){
+		asteroid = asteroidList[prop];
+		listItem = [
+			asteroid.sig,
+			asteroid.x,
+			asteroid.y,
+			asteroid.spriteAngle,
+			asteroid.radius,
+			asteroid.artType,
 		];
 		packet.push(listItem);
 	}

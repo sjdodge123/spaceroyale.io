@@ -109,7 +109,6 @@ class Room {
 	sendUpdates(){
 		messenger.messageRoomBySig(this.sig,"gameUpdates",{
 			shipList:this.shipList,
-			asteroidList:this.asteroidList,
 			planetList:this.planetList,
 			itemList:this.itemList,
 			nebulaList:this.nebulaList,
@@ -387,14 +386,18 @@ class GameBoard {
 		}
 	}
 	updateAsteroids(){
+		var deadSigs = [];
 		for(var asteroidSig in this.asteroidList){
 			var asteroid = this.asteroidList[asteroidSig];
 			if(asteroid.alive == false){
+				deadSigs.push(asteroidSig);
 				this.terminateAsteroid(asteroid);
 				continue;
 			}
 			asteroid.update();
-
+		}
+		if(deadSigs.length != 0){
+			messenger.messageRoomBySig(this.roomSig,'terminateAsteroid',deadSigs);
 		}
 	}
 	updateItems(){
@@ -545,12 +548,14 @@ class GameBoard {
 		if(c.generateAsteroids){
 			for(var i = 0; i<c.asteroidAmt;i++){
 				var sig = this.generateAsteroidSig();
-				var asteroid = new Asteroid(0,0,utils.getRandomInt(c.asteroidMinSize,c.asteroidMaxSize),sig);
+				var asteroid = new Asteroid(0,0,utils.getRandomInt(c.asteroidMinSize,c.asteroidMaxSize),sig,this.roomSig);
 				var loc = this.world.findFreeLoc(asteroid,0);
 				asteroid.x = loc.x;
 				asteroid.y = loc.y;
 				this.asteroidList[sig] = asteroid;
 			}
+			var data = compressor.spawnAsteroids(this.asteroidList);
+			messenger.messageRoomBySig(this.roomSig,"spawnAsteroids",data);
 		}
 		if(c.generatePlanets){
 			for(var i = 0; i<c.planetAmt;i++){
@@ -1155,16 +1160,17 @@ class Ship extends Circle{
 
 
 class Asteroid extends Circle{
-	constructor(x,y,radius,sig){
+	constructor(x,y,radius,sig,roomSig){
 		super(x,y,radius,"orange");
 		this.sig = sig;
 		this.isWall = true;
 		this.item = null;
+		this.roomSig = roomSig;
 		this.artType = utils.getRandomInt(0,2);
 		this.dropRate = c.asteroidDropRate;
 		this.lootTable = c.asteroidLootTable;
 		this.spriteAngle = utils.getRandomInt(1,360);
-		this.baseHealth = 40;
+		this.baseHealth = c.asteroidBaseHealth;
 		this.health = this.baseHealth;
 		this.alive = true;
 	}
@@ -1181,6 +1187,7 @@ class Asteroid extends Circle{
 				messenger.messageUser(object.owner,"shotAsteroid",this);
 			}
 			this.health -= object.damage;
+			messenger.messageRoomBySig(this.roomSig,'asteroidHurt',{health:this.health,sig:this.sig});
 		}
 		if(this.health < 1){
 			this.checkForDrop();

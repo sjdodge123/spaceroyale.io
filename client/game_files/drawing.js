@@ -489,16 +489,16 @@ function drawShield(ship){
 function drawAsteroid(asteroid){
 	canvasContext.save();
 	canvasContext.translate(asteroid.x-myShip.x+camera.xOffset,asteroid.y-myShip.y+camera.yOffset);
-	canvasContext.rotate(asteroid.spriteAngle*Math.PI/180);
+	canvasContext.rotate(asteroid.angle*Math.PI/180);
 	asteroidSheet.move(0,0);
 
-	if(asteroid.health == asteroid.baseHealth){
+	if(asteroid.health == config.asteroidBaseHealth){
 		asteroidSheet.changeFrame(0,asteroid.artType);
 	}
-	if(asteroid.health < asteroid.baseHealth*.80){
+	if(asteroid.health < config.asteroidBaseHealth*.80){
 		asteroidSheet.changeFrame(1,asteroid.artType);
 	}
-	if(asteroid.health < asteroid.baseHealth*.40){
+	if(asteroid.health < config.asteroidBaseHealth*.40){
 		asteroidSheet.changeFrame(2,asteroid.artType);
 	}
 	
