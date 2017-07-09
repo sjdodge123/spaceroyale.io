@@ -115,6 +115,12 @@ function clientConnect() {
 		}
 	});
 
+	server.on("spawnPlanets",function(packet){
+		if(packet != null){
+			spawnPlanets(packet);
+		}
+	});
+
 	server.on("terminateAsteroid",function(deadSigs){
 		for(var i=0;i<deadSigs.length;i++){
 			terminateAsteroid(deadSigs[i]);
@@ -174,7 +180,6 @@ function clientConnect() {
 
 	server.on("gameUpdates",function(updatePacket){
 		shipList = updatePacket.shipList;
-		planetList = updatePacket.planetList;
 		itemList = updatePacket.itemList;
 		nebulaList = updatePacket.nebulaList;
 		tradeShipList = updatePacket.tradeShipList;

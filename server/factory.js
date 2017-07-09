@@ -109,7 +109,6 @@ class Room {
 	sendUpdates(){
 		messenger.messageRoomBySig(this.sig,"gameUpdates",{
 			shipList:this.shipList,
-			planetList:this.planetList,
 			itemList:this.itemList,
 			nebulaList:this.nebulaList,
 			tradeShipList:this.tradeShipList,
@@ -566,6 +565,8 @@ class GameBoard {
 				planet.y = loc.y;
 				this.planetList[sig] = planet;
 			}
+			var data = compressor.spawnPlanets(this.planetList);
+			messenger.messageRoomBySig(this.roomSig,"spawnPlanets",data);
 		}
 		if(c.generateNebulas){
 			for(var i = 0; i<c.nebulaAmt;i++){

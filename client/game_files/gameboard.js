@@ -43,7 +43,21 @@ function spawnAsteroids(packet){
 	}
 }
 
+function spawnPlanets(packet){
+	packet = JSON.parse(packet);
 
+	for(var i=0;i<packet.length;i++){
+		var planet = packet[i];
+		if(planetList[planet[0]] == null){
+			planetList[planet[0]] = {};
+			planetList[planet[0]].sig = planet[0];
+			planetList[planet[0]].x = planet[1];
+			planetList[planet[0]].y = planet[2];
+			planetList[planet[0]].radius = planet[3];
+			planetList[planet[0]].artType = planet[4];
+		}
+	}
+}
 
 function weaponFired(payload){
 	var id,ship,weaponName,weaponLevel,numBullets,i,bullet;
