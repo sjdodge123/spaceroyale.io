@@ -64,11 +64,11 @@ class AIController{
 		}
 	}
 	updateRotation(){
-		if(this.ship.angle < this.targetAngle){
-			this.ship.angle += this.rotationSpeed;
+		if(this.ship.weapon.angle < this.targetAngle){
+			this.ship.weapon.angle += this.rotationSpeed;
 		}
-		if(this.ship.angle > this.targetAngle){
-			this.ship.angle -= this.rotationSpeed;
+		if(this.ship.weapon.angle > this.targetAngle){
+			this.ship.weapon.angle -= this.rotationSpeed;
 		}
 	}
 
@@ -346,7 +346,7 @@ class AIController{
 
 	faceTarget(target){
 		this.targetAngle = (180/Math.PI)*Math.atan2(target.y-this.ship.y,target.x-this.ship.x)-90;
-		this.ship.angle = this.targetAngle;
+		this.ship.weapon.angle = this.targetAngle;
 	}
 	moveToTarget(target){
 		this.targetAngle = (180/Math.PI)*Math.atan2(target.y-this.ship.y,target.x-this.ship.x)-90;

@@ -1,10 +1,23 @@
 function updateGameboard(){
+	updateShips();
 	updateBullets();
+}
+
+function updateShips(){
+	for(var id in shipList){
+		var ship = shipList[id];
+		if (ship.spriteAngle < 359){
+			ship.spriteAngle += ship.rotationRate;
+		}
+		else{
+			ship.spriteAngle = 0;
+		}
+	}
 }
 
 function updateBullets(){
 	for(var sig in bulletList){
-		var bullet = this.bulletList[sig];
+		var bullet = bulletList[sig];
 		bullet.velX = Math.cos((bullet.angle+90)*(Math.PI/180))*bullet.speed;
 		bullet.velY = Math.sin((bullet.angle+90)*(Math.PI/180))*bullet.speed;
 		bullet.x += bullet.velX * deltaTime;
@@ -21,6 +34,104 @@ function terminateBullet(sig){
 function terminateAsteroid(sig){
 	if(asteroidList[sig] != undefined){
 		delete asteroidList[sig];
+	}
+}
+function connectSpawnShips(packet){
+	if(packet == null){
+		return;
+	}
+	packet = JSON.parse(packet);
+	for(var i=0;i<packet.length;i++){
+		var ship = packet[i];
+		if(shipList[ship[0]] == null){
+			shipList[ship[0]] = {};
+			shipList[ship[0]].isHiding = false;
+			shipList[ship[0]].spriteAngle = 0;
+			shipList[ship[0]].rotationRate = 1;
+			shipList[ship[0]].kills = 0;
+			shipList[ship[0]].health = config.playerBaseHealth;
+			shipList[ship[0]].radius = config.playerBaseRadius;
+			shipList[ship[0]].id = ship[0];
+			shipList[ship[0]].x = ship[1];
+			shipList[ship[0]].y = ship[2];
+			shipList[ship[0]].color = ship[3];
+			shipList[ship[0]].weapon = {}
+			shipList[ship[0]].weapon.angle = ship[4];
+			shipList[ship[0]].weapon.name = ship[5];
+			shipList[ship[0]].weapon.level = ship[6];
+			shipList[ship[0]].weapon.cooldown = ship[7];
+		}
+	}
+	
+}
+
+function appendNewShip(packet){
+	if(packet == null){
+		return;
+	}
+	packet = JSON.parse(packet);
+	var ship = packet;
+	if(shipList[ship[0]] == null){
+		shipList[ship[0]] = {};
+		shipList[ship[0]].isHiding = false;
+		shipList[ship[0]].spriteAngle = 0;
+		shipList[ship[0]].rotationRate = 1;
+		shipList[ship[0]].kills = 0;
+		shipList[ship[0]].health = config.playerBaseHealth;
+		shipList[ship[0]].radius = config.playerBaseRadius;
+		shipList[ship[0]].id = ship[0];
+		shipList[ship[0]].x = ship[1];
+		shipList[ship[0]].y = ship[2];
+		shipList[ship[0]].color = ship[3];
+		shipList[ship[0]].weapon = {}
+		shipList[ship[0]].weapon.angle = ship[4];
+		shipList[ship[0]].weapon.name = ship[5];
+		shipList[ship[0]].weapon.level = ship[6];
+		shipList[ship[0]].weapon.cooldown = ship[7];
+	}
+}
+
+function spawnAIShips(payload){
+	var ship = payload;
+	payload = JSON.parse(payload);
+	for(var i=0;i<payload.length;i++){
+		var ship = payload[i];
+		if(shipList[ship[0]] == null){
+			shipList[ship[0]] = {};
+			shipList[ship[0]].isHiding = false;
+			shipList[ship[0]].spriteAngle = 0;
+			shipList[ship[0]].rotationRate = 1;
+			shipList[ship[0]].kills = 0;
+			shipList[ship[0]].health = config.playerBaseHealth;
+			shipList[ship[0]].radius = config.playerBaseRadius;
+			shipList[ship[0]].id = ship[0];
+			shipList[ship[0]].x = ship[1];
+			shipList[ship[0]].y = ship[2];
+			shipList[ship[0]].color = ship[3];
+			shipList[ship[0]].weapon = {}
+			shipList[ship[0]].weapon.angle = ship[4];
+			shipList[ship[0]].weapon.name = ship[5];
+			shipList[ship[0]].weapon.level = ship[6];
+			shipList[ship[0]].weapon.cooldown = ship[7];
+			shipList[ship[0]].AIName = ship[8];
+		}
+	}
+
+}
+
+function updateShipList(packet){
+	if(packet == null){
+		return;
+	}
+	packet = JSON.parse(packet);
+	for(var i=0;i<packet.length;i++){
+		var ship = packet[i];
+		if(shipList[ship[0]] != null){
+			shipList[ship[0]].id = ship[0];
+			shipList[ship[0]].x = ship[1];
+			shipList[ship[0]].y = ship[2];
+			shipList[ship[0]].weapon.angle = ship[3];
+		}
 	}
 }
 
@@ -89,8 +200,6 @@ function worldResize(payload){
 	world.whiteBound.x = payload[7];
 	world.whiteBound.y = payload[8];
 	world.whiteBound.radius = payload[9];
-	console.log("blueBound: " + world.blueBound.radius);
-	console.log("whiteBound: " + world.whiteBound.radius);
 }
 
 function whiteBoundShrinking(payload){

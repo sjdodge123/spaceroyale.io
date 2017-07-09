@@ -81,9 +81,10 @@ function checkForMail(client){
 
 		//Send the current gamestate to the new player
 		var worldData = compressor.worldResize(room.world);
+		var shipData = compressor.shipSpawns(room.shipList);
 		var gameState = {
 			playerList:room.clientList,
-			shipList:room.shipList,
+			shipList:shipData,
 			config:c,
 			world:worldData,
 			maxLobbyTime:c.lobbyWaitTime
@@ -91,10 +92,11 @@ function checkForMail(client){
 		client.emit("gameState" , gameState);
 
 		//Update all existing players with the new player's info
+		var appendShipData = compressor.appendShip(room.shipList[client.id]);
 		var appendPlayerList = {
 			name:message.name,
 			id:client.id,
-			ship:room.shipList[client.id]
+			ship:appendShipData
 		};
 		client.broadcast.to(roomSig).emit("playerJoin",appendPlayerList);
 	});
@@ -131,7 +133,7 @@ function checkForMail(client){
 		}
 		var ship = room.shipList[client.id];
 		if(ship != null && ship != undefined){
-			ship.angle = (180/Math.PI)*Math.atan2(loc.y-ship.y,loc.x-ship.x)-90;
+			ship.weapon.angle = (180/Math.PI)*Math.atan2(loc.y-ship.y,loc.x-ship.x)-90;
 		}
 	});
 
@@ -142,7 +144,7 @@ function checkForMail(client){
 		}
 		var ship = room.shipList[client.id];
 		if(ship != null && ship != undefined){
-			ship.angle = (180/Math.PI)*Math.atan2(loc.y2-loc.y1,loc.x2-loc.x1)-90;
+			ship.weapon.angle = (180/Math.PI)*Math.atan2(loc.y2-loc.y1,loc.x2-loc.x1)-90;
 		}
 	});
 

@@ -252,7 +252,7 @@ function drawWeaponHUD(){
 }
 
 function drawKillCounter(){
-	drawText("Killed " + myShip.killList.length,eventLog.x,eventLog.y-40);
+	drawText("Killed " + myShip.kills,eventLog.x,eventLog.y-40);
 }
 
 function drawHPCounter(){
@@ -413,7 +413,7 @@ function drawShip(ship){
 	canvasContext.save();
 	canvasContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
 	canvasContext.rotate(ship.spriteAngle*Math.PI/180);
-	canvasContext.shadowColor = ship.glowColor;
+	canvasContext.shadowColor = ship.color;
 	canvasContext.shadowOffsetX = 1;
 	canvasContext.shadowOffsetY = 1;
 	canvasContext.shadowBlur = 16;
@@ -445,11 +445,10 @@ function drawShip(ship){
 	canvasContext.restore();
 
 	drawWeapon(ship);
-
 	if(ship.isHiding == false){
-		if(ship.AIName != null || (playerList[ship.id] != null && ship != null)){
+		if(ship.AIName != null || (playerList[ship.id] != null)){
 			var name = ship.AIName || playerList[ship.id]+ "";
-			drawTextF(name,ship.x-myShip.x+camera.xOffset-(name.length*3),ship.y-myShip.y+camera.yOffset-35,ship.glowColor,"12px Helvetica")
+			drawTextF(name,ship.x-myShip.x+camera.xOffset-(name.length*3),ship.y-myShip.y+camera.yOffset-35,ship.color,"12px Helvetica");
 		}
 	}
 }

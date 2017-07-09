@@ -4,10 +4,98 @@ var c = utils.loadConfig();
 
 var listItem = null;
 var bullet = null;
+var ship = null;
 var nebula = null;
 var planet = null;
 var asteroid = null;
 var prop = null;
+
+exports.shipSpawns = function(shipList){
+	var packet = [];
+	for(prop in shipList){
+		ship = shipList[prop];
+		listItem = [
+			ship.id,
+			ship.x,
+			ship.y,
+			ship.color,
+			ship.weapon.angle,
+			ship.weapon.name,
+			ship.weapon.level,
+			ship.weapon.cooldown,
+		];
+		packet.push(listItem);
+	}
+	packet = JSON.stringify(packet);
+	ship = null;
+	listItem = null;
+	prop = null;
+	return packet;
+}
+exports.appendShip = function(ship){
+	var packet = [];
+	packet[0] = ship.id;
+	packet[1] = ship.x;
+	packet[2] = ship.y;
+	packet[3] = ship.color;
+	packet[4] = ship.weapon.angle;
+	packet[5] = ship.weapon.name;
+	packet[6] = ship.weapon.level;
+	packet[7] = ship.weapon.cooldown;
+	packet = JSON.stringify(packet);
+	ship = null;
+	listItem = null;
+	prop = null;
+	return packet;
+}
+
+exports.spawnAIShips = function(shipList){
+	var packet = [];
+	for(prop in shipList){
+		ship = shipList[prop];
+		if(!ship.isAI){
+			continue;
+		}
+		listItem = [
+			ship.id,
+			ship.x,
+			ship.y,
+			ship.color,
+			ship.weapon.angle,
+			ship.weapon.name,
+			ship.weapon.level,
+			ship.weapon.cooldown,
+			ship.AIName,
+		];
+		packet.push(listItem);
+	}
+	packet = JSON.stringify(packet);
+	ship = null;
+	listItem = null;
+	prop = null;
+	return packet;
+}
+
+exports.sendShipUpdates = function(shipList){
+	var packet = [];
+	for(prop in shipList){
+		ship = shipList[prop];
+		listItem = [
+			ship.id,
+			ship.x,
+			ship.y,
+			ship.weapon.angle,
+		];
+		packet.push(listItem);
+	}
+	packet = JSON.stringify(packet);
+	ship = null;
+	listItem = null;
+	prop = null;
+	return packet;
+}
+
+
 
 exports.weaponFired = function(ship,weapon,bullets){
 	var packet = [];

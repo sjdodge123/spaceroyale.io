@@ -107,8 +107,9 @@ class Room {
 	}
 
 	sendUpdates(){
+		var shipData = compressor.sendShipUpdates(this.shipList);
 		messenger.messageRoomBySig(this.sig,"gameUpdates",{
-			shipList:this.shipList,
+			shipList:shipData,
 			itemList:this.itemList,
 			tradeShipList:this.tradeShipList,
 			state:this.game.active,
@@ -275,6 +276,8 @@ class Game {
 				this.shipList[i] = this.world.spawnNewShip(i,"orange");
 				this.AIList[i] = AI.setAIController(this.shipList[i],this.world,this.gameBoard);
 			}
+			var data = compressor.spawnAIShips(this.shipList);
+			messenger.messageRoomBySig(this.roomSig,"spawnAIShips",data);
 		}
 	}
 	updateAI(active){
@@ -979,8 +982,6 @@ class Ship extends Circle{
 		this.baseColor = color;
 		this.glowColor = color;
 		this.angle = angle;
-		this.spriteAngle = 0;
-		this.rotationRate = 1;
 		this.isHit = false;
 		this.damageTimer = false;
 		this.moveForward = false;
@@ -1020,18 +1021,13 @@ class Ship extends Circle{
 	}
 	update(dt){
 		this.dt = dt;
-		if (this.spriteAngle < 359){
-			this.spriteAngle += this.rotationRate;
-		}
-		else{
-			this.spriteAngle = 0;
-		}
-		this.weapon.angle = this.angle;
 		this.checkHP();
 		this.checkKills();
 		this.move();
 	}
 	equip(item){
+
+		//TODO equiping items with new net updates does not work
 		if(item instanceof ShieldItem){
 			if(this.shield == null){
 				this.shield = new Shield(this.id);
@@ -1086,22 +1082,24 @@ class Ship extends Circle{
 		} else{
 			messenger.toastPlayer(this.id,"Full health");
 		}
+		messenger.messageUser(this.id,"myShipHealth",this.health);
 	}
 	fire(){
-		var x = this.x + this.radius * Math.cos((this.angle + 90) * Math.PI/180);
-		var y = this.y + this.radius * Math.sin((this.angle + 90) * Math.PI/180);
-		var _bullets = this.weapon.fire(x,y,this.angle, this.baseColor,this.id);
+		var x = this.x + this.radius * Math.cos((this.weapon.angle + 90) * Math.PI/180);
+		var y = this.y + this.radius * Math.sin((this.weapon.angle + 90) * Math.PI/180);
+		var _bullets = this.weapon.fire(x,y,this.weapon.angle, this.baseColor,this.id);
 		if(_bullets == null){
 			return;
 		}
 		return _bullets;
 	}
 	move(){
+		this.x = this.newX;
+		this.y = this.newY;
 		if(this.newX != this.x || this.newY != this.y){
-			this.x = this.newX;
-			this.y = this.newY;
 			if(this.isHiding){
 				this.isHiding = false;
+				//TODO Fix hiding messenger.messageRoomBySig(this.roomSig,"shipNotHiding",this.id);
 			}
 		}
 	}
@@ -1112,11 +1110,12 @@ class Ship extends Circle{
 		}
 		if(object.isNebula){
 			this.isHiding = true;
-			_engine.slowDown(this,this.dt,object.slowAmt);
+			//TODO Fix hiding messenger.messageRoomBySig(this.roomSig,"shipHiding",this.id);
+			//_engine.slowDown(this,this.dt,object.slowAmt);
 			return;
-		}
+		aw}
 		if(object.owner != this.id && object.alive && object.damage != null){
-			messenger.messageUser(object.owner,"shotLanded");
+			
 			if(this.shield != null && this.shield.alive){
 				this.shield.handleHit(object);
 				if(this.shield.alive){
@@ -1125,27 +1124,28 @@ class Ship extends Circle{
 				this.health -= Math.abs(this.shield.leftOverDamage);
 				this.shield = null;
 			} else{
-				this.health -= object.damage;
+				this.takeDamage(object.damage);
 			}
-
+			
 			if(this.health < 1){
 				this.iDied(object.owner);
+				return;
 			}
+			messenger.messageUser(object.owner,"shotLanded");
+			
 		}
 	}
 
 	takeDamage(damage){
 		this.health -= Math.floor(damage);
+		messenger.messageUser(this.id,"myShipHealth",this.health);
 		this.checkHP();
 	}
 	iDied(killerID){
 		if(killerID){
 			this.killedBy = killerID;
 		}
-
-
 		this.alive = false;
-
 	}
 	checkHP(){
 		if(this.health < 1){
@@ -1490,6 +1490,7 @@ class Weapon {
 		this.level = 1;
 		this.maxLevel = 3;
 		this.nextFire = 0;
+		this.angle = 0;
 		this.maxLevelMessage = "Weapon already at max";
 		this.upgradeMessage = "No upgrade message set";
 		this.equipMessage = "No equip message set";

@@ -59,10 +59,10 @@ function clientConnect() {
 	});
 
 	server.on("gameState", function(gameState){
-		playerList = gameState.playerList;
-		shipList = gameState.shipList;
-		worldResize(gameState.world);
 		config = gameState.config;
+		playerList = gameState.playerList;
+		connectSpawnShips(gameState.shipList);
+		worldResize(gameState.world);
 		interval = config.serverTickSpeed;
 		maxLobbyTime = gameState.maxLobbyTime;
 		for(var id in playerList){
@@ -79,7 +79,7 @@ function clientConnect() {
 		eventLog.addEvent(appendPlayerList.name + " has joined the battle");
 		playSound(playerJoinSound);
 		playerList[appendPlayerList.id] = appendPlayerList.name;
-		shipList[appendPlayerList.id] = appendPlayerList.ship;
+		appendNewShip(appendPlayerList.ship);
 	});
 
 	server.on("playerLeft", function(id){
@@ -112,6 +112,13 @@ function clientConnect() {
 			return;
 		}
 		blueBoundShrinking(payload);
+	});
+
+	server.on("spawnAIShips",function(payload){
+		if(payload == null){
+			return;
+		}
+		spawnAIShips(payload);
 	});
 
 	server.on("weaponFired",function(payload){
@@ -174,11 +181,22 @@ function clientConnect() {
 		gameStart();
 	});
 
+	server.on("shipHiding",function(id){
+		if(id != null){
+			shipList[id].isHiding = true;
+		}
+	});
+
+	server.on("shipNotHiding",function(id){
+		if(id != null){
+			shipList[id].isHiding = false;
+		}
+	});
+
 	server.on("shipDeath",function(id){
 		if(id == myID){
 			iAmAlive = false;
 			playSound(youDied);
-			delete shipList[id];
 			cameraBouncing = true;
 			showGameOverScreen("You died!");
 			return;
@@ -186,6 +204,11 @@ function clientConnect() {
 		if(camera.inBounds(shipList[id])){
 			playSound(shipDeath);
 		}
+		delete shipList[id];
+	});
+
+	server.on('myShipHealth',function(health){
+		shipList[myID].health = health;
 	});
 
 	server.on("gameOver",function(id){
@@ -206,7 +229,7 @@ function clientConnect() {
   	});
 
 	server.on("gameUpdates",function(updatePacket){
-		shipList = updatePacket.shipList;
+		updateShipList(updatePacket.shipList);
 		itemList = updatePacket.itemList;
 		tradeShipList = updatePacket.tradeShipList;
 		gameStarted = updatePacket.state;
