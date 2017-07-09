@@ -74,6 +74,43 @@ function spawnNebula(packet){
 	}
 }
 
+function worldResize(payload){
+	payload = JSON.parse(payload);
+	world = {};
+	world.x = payload[0];
+	world.y = payload[1];
+	world.width = payload[2];
+	world.height = payload[3];
+	world.blueBound = {};
+	world.blueBound.x = payload[4];
+	world.blueBound.y = payload[5];
+	world.blueBound.radius = payload[6];
+	world.whiteBound = {};
+	world.whiteBound.x = payload[7];
+	world.whiteBound.y = payload[8];
+	world.whiteBound.radius = payload[9];
+	console.log("blueBound: " + world.blueBound.radius);
+	console.log("whiteBound: " + world.whiteBound.radius);
+}
+
+function whiteBoundShrinking(payload){
+	payload = JSON.parse(payload);
+	if(world.whiteBound != null){
+		world.whiteBound.x = payload[0];
+		world.whiteBound.y = payload[1];
+		world.whiteBound.radius = payload[2];
+	}
+}
+
+function blueBoundShrinking(payload){
+	payload = JSON.parse(payload);
+	if(world.blueBound != null){
+		world.blueBound.x = payload[0];
+		world.blueBound.y = payload[1];
+		world.blueBound.radius = payload[2];
+	}
+}
+
 function weaponFired(payload){
 	var id,ship,weaponName,weaponLevel,numBullets,i,bullet;
 

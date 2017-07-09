@@ -602,7 +602,7 @@ function drawWorld(){
 	if(world != null){
 		canvasContext.save();
 		canvasContext.beginPath();
-        canvasContext.strokeStyle = world.color;
+        canvasContext.strokeStyle = "orange";
         canvasContext.rect(world.x-myShip.x+camera.xOffset,world.y-myShip.y+camera.yOffset,world.width,world.height);
         canvasContext.stroke();
         canvasContext.restore();
@@ -614,7 +614,7 @@ function drawBounds(){
 		canvasContext.save();
 		canvasContext.beginPath();
 		canvasContext.lineWidth = 3;
-		canvasContext.strokeStyle = world.whiteBound.color;
+		canvasContext.strokeStyle = "white";
 		canvasContext.arc(world.whiteBound.x-myShip.x+camera.xOffset,world.whiteBound.y-myShip.y+camera.yOffset,world.whiteBound.radius,0,Math.PI*2,true);
 		canvasContext.stroke();
 		canvasContext.restore();
@@ -623,7 +623,7 @@ function drawBounds(){
 		canvasContext.save();
 		canvasContext.beginPath();
 		canvasContext.lineWidth = 3;
-		canvasContext.strokeStyle = world.blueBound.color;
+		canvasContext.strokeStyle = "blue";
 		canvasContext.arc(world.blueBound.x-myShip.x+camera.xOffset,world.blueBound.y-myShip.y+camera.yOffset,world.blueBound.radius,0,Math.PI*2,true);
 		canvasContext.stroke();
 		canvasContext.restore();

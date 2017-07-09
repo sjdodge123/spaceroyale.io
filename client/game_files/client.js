@@ -61,7 +61,7 @@ function clientConnect() {
 	server.on("gameState", function(gameState){
 		playerList = gameState.playerList;
 		shipList = gameState.shipList;
-		world = gameState.world;
+		worldResize(gameState.world);
 		config = gameState.config;
 		interval = config.serverTickSpeed;
 		maxLobbyTime = gameState.maxLobbyTime;
@@ -91,6 +91,27 @@ function clientConnect() {
 			return;
 		}
 		console.log("I disconnected");
+	});
+
+	server.on("worldResize",function(payload){
+		if(payload == null){
+			return;
+		}
+		worldResize(payload);
+	});
+
+	server.on("whiteBoundShrinking",function(payload){
+		if(payload == null){
+			return;
+		}
+		whiteBoundShrinking(payload);
+	});
+
+	server.on("blueBoundShrinking",function(payload){
+		if(payload == null){
+			return;
+		}
+		blueBoundShrinking(payload);
 	});
 
 	server.on("weaponFired",function(payload){
@@ -188,8 +209,6 @@ function clientConnect() {
 		shipList = updatePacket.shipList;
 		itemList = updatePacket.itemList;
 		tradeShipList = updatePacket.tradeShipList;
-		world = updatePacket.world;
-		quadTree = updatePacket.quadTree;
 		gameStarted = updatePacket.state;
 		lobbyTimeLeft = updatePacket.lobbyTimeLeft;
 		shrinkTimeLeft = updatePacket.shrinkTimeLeft;

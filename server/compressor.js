@@ -95,6 +95,34 @@ exports.spawnNebula = function(nebulaList){
 	return packet;
 }
 
+exports.worldResize = function(world){
+	var packet = [];
+	packet[0] = world.x;
+	packet[1] = world.y;
+	packet[2] = world.width;
+	packet[3] = world.height;
+
+	packet[4] = world.blueBound.x;
+	packet[5] = world.blueBound.y;
+	packet[6] = world.blueBound.radius;
+
+	packet[7] = world.whiteBound.x;
+	packet[8] = world.whiteBound.y;
+	packet[9] = world.whiteBound.radius;
+
+	packet = JSON.stringify(packet);
+	return packet;
+}
+
+exports.shrinkBound = function(bound){
+	var packet = [];
+	packet[0] = bound.x;
+	packet[1] = bound.y;
+	packet[2] = bound.radius;
+	packet = JSON.stringify(packet);
+	return packet;
+}
+
 
 
 function getUTF8Size (str) {

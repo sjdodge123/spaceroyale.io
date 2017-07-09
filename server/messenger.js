@@ -3,6 +3,7 @@ var c = utils.loadConfig();
 var hostess = require('./hostess.js');
 var bouncer = require('./bouncer.js');
 var database = require('./database.js');
+var compressor = require('./compressor.js');
 
 var mailBoxList = {},
 	roomMailList = {},
@@ -79,11 +80,12 @@ function checkForMail(client){
 		room.shipList[client.id] = room.world.spawnNewShip(client.id,message.color);
 
 		//Send the current gamestate to the new player
+		var worldData = compressor.worldResize(room.world);
 		var gameState = {
 			playerList:room.clientList,
 			shipList:room.shipList,
 			config:c,
-			world:room.world,
+			world:worldData,
 			maxLobbyTime:c.lobbyWaitTime
 		};
 		client.emit("gameState" , gameState);

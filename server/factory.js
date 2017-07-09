@@ -111,7 +111,6 @@ class Room {
 			shipList:this.shipList,
 			itemList:this.itemList,
 			tradeShipList:this.tradeShipList,
-			world:this.world,
 			state:this.game.active,
 			lobbyTimeLeft:this.game.lobbyTimeLeft,
 			totalPlayers:messenger.getTotalPlayers(),
@@ -184,10 +183,10 @@ class Game {
 		this.gameBoard.clean();
 		this.active = true;
 		this.world.resize();
+		this.world.drawFirstBound();
 		this.gameBoard.populateWorld();
 		this.checkForAISpawn();
 		this.randomLocShips();
-		this.world.drawFirstBound();
 		this.resetTimeUntilShrink();
 
 	}
@@ -773,6 +772,7 @@ class World extends Rect{
 	      this.blueBound.x += this.blueBound.velX;
 	      this.blueBound.y += this.blueBound.velY;
       	  this.blueBound.radius -= (this.blueBound.radius - this.whiteBound.radius)/((1/dt)*timeLeft);
+
 	      if(this.blueBound.radius <= this.whiteBound.radius){
           	this.blueBound.radius = this.whiteBound.radius;
           	this.blueBound.x = this.whiteBound.x;
@@ -780,6 +780,8 @@ class World extends Rect{
           	this.shrinking = false;
           	this.drawNextBound();
 	      }
+	      var blueBoundData = compressor.shrinkBound(this.blueBound);
+      	  messenger.messageRoomBySig(this.roomSig,"blueBoundShrinking",blueBoundData);
     	}
 	}
 	resize(){
@@ -790,10 +792,14 @@ class World extends Rect{
 		this.whiteBound = new WhiteBound(this.width/2,this.height/2,this.baseBoundRadius);
 		this.blueBound = new BlueBound(this.width/2,this.height/2,this.baseBoundRadius);
 		this.engine.setWorldBounds(this.width,this.height);
+		var data = compressor.worldResize(this);
+		messenger.messageRoomBySig(this.roomSig,'worldResize',data);
 	}
 
 	drawNextBound(){
 		this.whiteBound = this._drawWhiteBound();
+		var whiteBoundData = compressor.shrinkBound(this.whiteBound);
+      	messenger.messageRoomBySig(this.roomSig,"whiteBoundShrinking",whiteBoundData);
 		this.canSpawnTradeShip = true;
 	}
 	drawFirstBound(){
@@ -801,6 +807,8 @@ class World extends Rect{
 		var x = utils.getRandomInt(this.x+newRadius,this.x+this.width-newRadius);
 		var y = utils.getRandomInt(this.y+newRadius,this.y+this.height-newRadius);
 		this.whiteBound = new WhiteBound(x,y,newRadius);
+		var whiteBoundData = compressor.shrinkBound(this.whiteBound);
+      	messenger.messageRoomBySig(this.roomSig,"whiteBoundShrinking",whiteBoundData);
 	}
 	_drawWhiteBound(){
 		var newRadius = this.blueBound.radius/2;
