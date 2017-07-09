@@ -109,15 +109,21 @@ function clientConnect() {
 		playSound(shotPlayer);
 	});
 
-	server.on("spawnAsteroids",function(packet){
+	server.on("spawnNebula",function(packet){
 		if(packet != null){
-			spawnAsteroids(packet);
+			spawnNebula(packet);
 		}
 	});
 
 	server.on("spawnPlanets",function(packet){
 		if(packet != null){
 			spawnPlanets(packet);
+		}
+	});
+
+	server.on("spawnAsteroids",function(packet){
+		if(packet != null){
+			spawnAsteroids(packet);
 		}
 	});
 
@@ -181,7 +187,6 @@ function clientConnect() {
 	server.on("gameUpdates",function(updatePacket){
 		shipList = updatePacket.shipList;
 		itemList = updatePacket.itemList;
-		nebulaList = updatePacket.nebulaList;
 		tradeShipList = updatePacket.tradeShipList;
 		world = updatePacket.world;
 		quadTree = updatePacket.quadTree;

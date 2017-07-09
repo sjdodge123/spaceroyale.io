@@ -1,7 +1,14 @@
 {
 	"override":true,
-	"minPlayers":2,
-	"AISpawnPlayers":false,
+	"minPlayers":1,
+	"maxPlayersInRoom":10,
+	"worldWidth": 5000,
+    "worldHeight": 5000,
+    "asteroidAmt":150,
+    "planetAmt":25,
+    "nebulaAmt":25,
+
+	"AISpawnPlayers":true,
 	"generateTradeShips":false,
 	"playerSpawnWeapon":"Blaster",
     "playerSpawnWeaponLevel":1,

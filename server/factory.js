@@ -110,7 +110,6 @@ class Room {
 		messenger.messageRoomBySig(this.sig,"gameUpdates",{
 			shipList:this.shipList,
 			itemList:this.itemList,
-			nebulaList:this.nebulaList,
 			tradeShipList:this.tradeShipList,
 			world:this.world,
 			state:this.game.active,
@@ -577,6 +576,8 @@ class GameBoard {
 				nebula.y = loc.y;
 				this.nebulaList[sig] = nebula;
 			}
+			var data = compressor.spawnNebula(this.nebulaList);
+			messenger.messageRoomBySig(this.roomSig,"spawnNebula",data);
 		}
 	}
 }

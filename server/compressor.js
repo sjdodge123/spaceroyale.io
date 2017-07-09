@@ -4,6 +4,7 @@ var c = utils.loadConfig();
 
 var listItem = null;
 var bullet = null;
+var nebula = null;
 var planet = null;
 var asteroid = null;
 var prop = null;
@@ -50,7 +51,7 @@ exports.spawnPlanets = function(planetList){
 	packet = JSON.stringify(packet);
 	listItem = null;
 	prop = null;
-	bullet = null;
+	planet = null;
 	return packet;
 }
 
@@ -71,9 +72,29 @@ exports.spawnAsteroids = function(asteroidList){
 	packet = JSON.stringify(packet);
 	listItem = null;
 	prop = null;
-	bullet = null;
+	asteroid = null;
 	return packet;
 }
+
+exports.spawnNebula = function(nebulaList){
+	var packet = [];
+	for(prop in nebulaList){
+		nebula = nebulaList[prop];
+		listItem = [
+			nebula.sig,
+			nebula.x,
+			nebula.y,
+			nebula.radius,
+		];
+		packet.push(listItem);
+	}
+	packet = JSON.stringify(packet);
+	listItem = null;
+	prop = null;
+	nebula = null;
+	return packet;
+}
+
 
 
 function getUTF8Size (str) {

@@ -59,6 +59,21 @@ function spawnPlanets(packet){
 	}
 }
 
+function spawnNebula(packet){
+	packet = JSON.parse(packet);
+
+	for(var i=0;i<packet.length;i++){
+		var nebula = packet[i];
+		if(nebulaList[nebula[0]] == null){
+			nebulaList[nebula[0]] = {};
+			nebulaList[nebula[0]].sig = nebula[0];
+			nebulaList[nebula[0]].x = nebula[1];
+			nebulaList[nebula[0]].y = nebula[2];
+			nebulaList[nebula[0]].radius = nebula[3];
+		}
+	}
+}
+
 function weaponFired(payload){
 	var id,ship,weaponName,weaponLevel,numBullets,i,bullet;
 
