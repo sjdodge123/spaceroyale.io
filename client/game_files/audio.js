@@ -5,7 +5,7 @@ var collision = new Audio("./sounds/collide_with_obj.wav");
 var takeDamage = new Audio("./sounds/take_damage.wav");
 
 var timerTick = new Audio("./sounds/timer_tick.wav");
-var timerEnd = new Audio("./sounds/timer_End.wav");
+var timerEnd = new Audio("./sounds/timer_end.wav");
 
 var blasterShot = new Audio("./sounds/blaster_shot.wav");
 var photonCannonShot = new Audio("./sounds/photonCannon_shot.wav");
