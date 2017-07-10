@@ -3,29 +3,20 @@
 	"minPlayers":2,
 	"maxPlayersInRoom":25,
 	"worldWidth": 7500,
-    "worldHeight": 7500,
-    "baseTimeUntilShrink":25,
-    "baseShrinkingDuration": 25,
-    "asteroidAmt":250,
-    "planetAmt":50,
-    "nebulaAmt":50,
+	"worldHeight": 7500,
+	"asteroidAmt":250,
+	"planetAmt":50,
+	"nebulaAmt":50,
 
-    "asteroidDropRate":100,
-    "asteroidLootTable":{
-      "ShieldItem":5,
-      "MassDriverItem":1,
-      "PhotonCannonItem":2,
-      "BlasterItem":3,
-      "HPItem":4
-    },
+	"asteroidDropRate":30,
 
-	"AISpawnPlayers":false,
+	"AISpawnPlayers":true,
 
 	"generateTradeShips":true,
 	"tradeShipSpeed":3,
 	"playerSpawnWeapon":"Blaster",
-    "playerSpawnWeaponLevel":1,
-    "playerBaseHealth":100000,
-    "lobbyWaitTime":5
+	"playerSpawnWeaponLevel":1,
+	"playerBaseHealth":100,
+	"lobbyWaitTime":15
 
 }

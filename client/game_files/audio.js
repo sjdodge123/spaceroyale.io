@@ -25,28 +25,28 @@ var gameStartMusic = new Audio('./sounds/Play_Ball.mp3');
 
 var masterVolume = 1;
 
-timerTick.volume *= .1 *masterVolume;
-timerEnd.volume *= .1 * masterVolume;
+timerTick.volume = .1 *masterVolume;
+timerEnd.volume = .1 * masterVolume;
 
 playerJoinSound.volume *= .1 * masterVolume;
-collision.volume *= .1 * masterVolume;
-takeDamage.volume *= .5 * masterVolume;
+collision.volume = .1 * masterVolume;
+takeDamage.volume = .5 * masterVolume;
 
-blasterShot.volume *= .1 * masterVolume;
-photonCannonShot.volume *= .3 * masterVolume;
-massDriverShot1.volume *= .2 *masterVolume;
-massDriverShot2.volume *= .25 * masterVolume;
+blasterShot.volume = .1 * masterVolume;
+photonCannonShot.volume = .3 * masterVolume;
+massDriverShot1.volume = .2 *masterVolume;
+massDriverShot2.volume = .1 * masterVolume;
 
-shotAsteroid.volume *= .2 * masterVolume;
-shotPlayer.volume *= 1 * masterVolume;
+shotAsteroid.volume = .2 * masterVolume;
+shotPlayer.volume = 1 * masterVolume;
 
-shipInitThrust.volume *= .3 * masterVolume;
-shipThrust.volume *= .4 * masterVolume;
-youDied.volume *= .3 * masterVolume;
-shipDeath.volume *= .3 * masterVolume;
+shipInitThrust.volume = .3 * masterVolume;
+shipThrust.volume = .4 * masterVolume;
+youDied.volume = .3 * masterVolume;
+shipDeath.volume = .3 * masterVolume;
 
-backgroundMusic.volume *= .1 * masterVolume;
-gameStartMusic.volume *= .05 *masterVolume;
+backgroundMusic.volume = .1 * masterVolume;
+gameStartMusic.volume = .05 *masterVolume;
 shipThrust.loop = true;
 
 function playSound (sound) {

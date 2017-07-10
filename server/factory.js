@@ -372,7 +372,6 @@ class GameBoard {
 			tradeShip.update();
 		}
 		if(deadSigs.length != 0){
-			console.log(deadSigs);
 			messenger.messageRoomBySig(this.roomSig,'terminateTradeShips',deadSigs);
 		}
 	}
@@ -1126,7 +1125,7 @@ class Ship extends Circle{
 		this.y = this.newY;
 		if(this.newX != this.x || this.newY != this.y){
 			if(this.isHiding){
-				this.isHiding = false;
+				//this.isHiding = false;
 				//TODO Fix hiding messenger.messageRoomBySig(this.roomSig,"shipNotHiding",this.id);
 			}
 		}
@@ -1137,7 +1136,7 @@ class Ship extends Circle{
 			_engine.preventMovement(this,object,this.dt);
 		}
 		if(object.isNebula){
-			this.isHiding = true;
+			//this.isHiding = true;
 			//TODO Fix hiding messenger.messageRoomBySig(this.roomSig,"shipHiding",this.id);
 			//_engine.slowDown(this,this.dt,object.slowAmt);
 			return;
@@ -1352,7 +1351,6 @@ class TradeShip extends Rect{
 			if(this.trailList[sig].alive){
 				this.trailList[sig].update();
 			}else{
-
 				delete this.trailList[sig];
 			}
 
@@ -1404,6 +1402,7 @@ class TradeShip extends Rect{
 				return;
 			}
 			this.health -= object.damage;
+			messenger.messageUser(object.owner,"shotLanded");
 			if(this.health < 1){
 				messenger.toastPlayer(object.owner,"You killed a TradeShip!");
 				this.alive = false;
@@ -1608,24 +1607,22 @@ class PhotonCannon extends Weapon{
 		}
 		var bullets = [];
 		if(this.level > 1){
-			var shot1 = new Birdshot(x,y,4,10, angle-7.5, color, id);
-			var shot3 = new Birdshot(x,y,4,10, angle+7.5, color, id);
-			bullets.push(shot1,shot3);
+			var shot1 = new Birdshot(x,y,4,10, angle-5, color, id);
+			var shot2 = new Birdshot(x,y,4,10, angle+5, color, id);
+			bullets.push(shot1,shot2);
 		}
 		if(this.level > 2){
-			var shot1 = new Birdshot(x,y,4,10, angle-15, color,id);
+			var shot1 = new Birdshot(x,y,4,10, angle-7.5, color,id);
 			shot1.speed -= 4;
-			var shot2 = new Birdshot(x,y,4,10, angle, color, id);
+			var shot2 = new Birdshot(x,y,4,10, angle+7.5, color, id);
 			shot2.speed -= 4;
-			var shot3 = new Birdshot(x,y,4,10, angle+15, color, id);
-			shot3.speed -= 4;
-			bullets.push(shot1,shot2,shot3);
+			bullets.push(shot1,shot2);
 		}
-		bullets.push(new Birdshot(x,y,4,10,angle-5, color,id));
-		bullets.push(new Birdshot(x,y,4,10, angle-2.5, color, id));
+		bullets.push(new Birdshot(x,y,4,10,angle-20, color,id));
+		bullets.push(new Birdshot(x,y,4,10, angle-10, color, id));
 		bullets.push(new Birdshot(x,y,4,10, angle, color, id));
-		bullets.push(new Birdshot(x,y,4,10, angle+2.5, color, id));
-		bullets.push(new Birdshot(x,y,4,10, angle+5, color, id));
+		bullets.push(new Birdshot(x,y,4,10, angle+10, color, id));
+		bullets.push(new Birdshot(x,y,4,10, angle+20, color, id));
 		return bullets;
 	}
 	upgrade(){
@@ -1784,6 +1781,7 @@ class Birdshot extends Bullet{
 		super(x,y,width,height, angle, color, owner);
 		this.damage = c.birdshotDamage;
 		this.speed = c.birdshotSpeed;
+		this.lifetime = c.birdshotLifetime;
 	}
 
 }

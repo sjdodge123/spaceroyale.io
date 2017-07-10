@@ -256,7 +256,7 @@ function drawHPCounter(){
 	if(shipList[myID] != null){
 		canvasContext.save();
 		if(shipList[myID].health > 70){
-			canvasContext.fillStyle = "Green";
+			canvasContext.fillStyle = "#1dba34";
 		}else if(shipList[myID].health > 30){
 			canvasContext.fillStyle = "yellow";
 		} else {
@@ -389,6 +389,7 @@ function drawRelativeObjects(){
         camera.centerOnObject(myShip);
 		camera.draw();
 	}
+	drawBullets();
 	drawShips();
 	drawAsteroids();
 	drawItems();
@@ -397,7 +398,6 @@ function drawRelativeObjects(){
 	drawTradeShips();
 	drawWorld();
 	drawBounds();
-	drawBullets();
 	if (quadTree != null){
 		drawQuadTree(quadTree);
 	}

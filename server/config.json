@@ -1,7 +1,7 @@
 {
     "host": "0.0.0.0",
     "port": 3000,
-    "serverTickSpeed": 30,
+    "serverTickSpeed": 33.33,
 
     "minPlayers":3,
     "maxPlayersInRoom":10,
@@ -18,7 +18,7 @@
 
     "AISpawnPlayers":true,
     "AIAggroRangeMin":250,
-    "AIAggroRangeMax":750,
+    "AIAggroRangeMax":400,
     "AINameList":["Danger","Ralph","Pincer","Holiday","Joey","Randy","A RABID DOG","noone","Guestl337","Ceasar","Pluto","mr. bone's wild ride","chuckie","Pharoh","pockets"],
     "AIColorList":["#ff00bf","#66b3ff","red","green"],
 
@@ -84,8 +84,9 @@
     "blasterBulletDamage":10,
 
     "photonCannonCoolDown":1.2,
+    "birdshotLifetime":0.4,
     "birdshotDamage":11,
-    "birdshotSpeed":941,
+    "birdshotSpeed":650,
 
     "massDriverCoolDown":1.2,
     "massDriverBulletDamage":35,

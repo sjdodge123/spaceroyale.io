@@ -8,6 +8,7 @@ var myID = null,
 	world,
 	quadTree,
 	config,
+	toastQueue = [],
 	asteroidList = {},
 	itemList = {},
 	planetList = {},
@@ -238,8 +239,7 @@ function clientConnect() {
 			showGameOverScreen("You died!");
 			return;
 		}
-		if(killerId != null){
-			console.log(killerId);
+		if(killerId != null && shipList[killerId] != null){
 			shipList[killerId].kills += 1;
 		}
 		if(camera.inBounds(shipList[id])){
@@ -284,8 +284,13 @@ function clientConnect() {
 	});
 
 	server.on("toast",function(message){
-		toastMessage = message;
-		toastTimer = setTimeout(clearToast,1700);
+		if(toastMessage == null){
+			toastMessage = message;
+			toastTimer = setTimeout(clearToast,1700);
+		} else{
+			toastQueue.push(message);
+		}
+		
 	});
 
 	server.on("eventMessage",function(message){
@@ -323,6 +328,11 @@ function checkForTimeout(){
 function clearToast(){
 	clearTimeout(toastTimer);
 	toastMessage = null;
+	if(toastQueue.length != 0){
+		toastMessage = toastQueue[0];
+		delete toastQueue[0];
+		toastTimer = setTimeout(clearToast,1700);
+	}
 }
 
 function clientSendAuth(user,pass){
