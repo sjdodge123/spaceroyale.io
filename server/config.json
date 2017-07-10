@@ -3,11 +3,11 @@
     "port": 3000,
     "serverTickSpeed": 33.33,
 
-    "minPlayers":3,
+    "minPlayers":1,
     "maxPlayersInRoom":10,
     "randomizePlayersLocations":true,
     "roomKickTimeout":90,
-    "lobbyWaitTime":30,
+    "lobbyWaitTime":60,
 
     "baseTimeUntilShrink":30,
     "timeUntilShrinkSpeedup":0.75,
