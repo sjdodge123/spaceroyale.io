@@ -194,7 +194,7 @@ function setupPage(){
     });
 
 
-    playSound(backgroundMusic);
+    //playSound(backgroundMusic);
 
     window.requestAnimFrame = (function(){
       return  window.requestAnimationFrame       ||
@@ -353,8 +353,8 @@ function goFullScreen(){
 
 function resetGameVariables(){
     clearInterval(timeOutChecker);
-    stopSound(gameStartMusic);
-    playSound(backgroundMusic);
+    //stopSound(gameStartMusic);
+    //playSound(backgroundMusic);
     skipAuth = false;
     gameRunning = false;
     iAmAlive = true;
@@ -622,8 +622,8 @@ function cancelMovement(){
 }
 
 function gameStart(){
-    stopSound(backgroundMusic);
-    playSound(gameStartMusic);
+    //stopSound(backgroundMusic);
+    //playSound(gameStartMusic);
     $('#howToPlayMenu').hide();
 }
 

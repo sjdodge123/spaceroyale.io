@@ -19,8 +19,8 @@ var shipInitThrust = new Audio("./sounds/ship_init_thrust.wav");
 var shipThrust = new Audio("./sounds/ship_thrust.wav");
 var youDied = new Audio("./sounds/you_died.wav");
 var shipDeath = new Audio("./sounds/ship_death.wav");
-var backgroundMusic = new Audio('./sounds/Intergalactic.mp3');
-var gameStartMusic = new Audio('./sounds/Play_Ball.mp3');
+//var backgroundMusic = new Audio('./sounds/Intergalactic.mp3');
+//var gameStartMusic = new Audio('./sounds/Play_Ball.mp3');
 
 
 var masterVolume = 1;
@@ -45,8 +45,8 @@ shipThrust.volume = .4 * masterVolume;
 youDied.volume = .3 * masterVolume;
 shipDeath.volume = .3 * masterVolume;
 
-backgroundMusic.volume = .1 * masterVolume;
-gameStartMusic.volume = .05 *masterVolume;
+//backgroundMusic.volume = .1 * masterVolume;
+//gameStartMusic.volume = .05 *masterVolume;
 shipThrust.loop = true;
 
 function playSound (sound) {
