@@ -381,6 +381,8 @@ function resetGameVariables(){
     planetList = {};
     playerList = {};
     bulletList = {};
+    nebulaList = {};
+    tradeShipList = {};
     shipList = {};
     canvas.removeEventListener("mousemove", calcMousePos, false);
     canvas.removeEventListener("mousedown", handleClick, false);
