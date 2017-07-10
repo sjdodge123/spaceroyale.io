@@ -1,6 +1,7 @@
 function updateGameboard(){
 	updateShips();
 	updateBullets();
+	updateTradeShips();
 }
 
 function updateShips(){
@@ -25,6 +26,22 @@ function updateBullets(){
 	}
 }
 
+function updateTradeShips(){
+	var tradeShip,trailItem,currentTime, remaining;
+	for(var sig in tradeShipList){
+		tradeShip = tradeShipList[sig];
+		for(var trailSig in tradeShip.trailList){
+			trailItem = tradeShip.trailList[trailSig];
+			currentTime = new Date();
+			remaining = trailItem.lifetime - (currentTime - trailItem.start);
+			
+			if(remaining <= 0){
+				delete tradeShip.trailList[trailSig];
+			}
+		}
+	}
+}
+
 function terminateBullet(sig){
 	if(bulletList[sig] != undefined){
 		delete bulletList[sig];
@@ -40,6 +57,15 @@ function terminateAsteroid(sig){
 function terminateItem(sig){
 	if(itemList[sig] != undefined){
 		delete itemList[sig];
+	}
+}
+function terminateTradeShip(sig){
+	var trailItem;
+	if(tradeShipList[sig] != undefined){
+		for(trailItem in tradeShipList[sig].trailList){
+			delete tradeShipList[sig].trailList[trailItem];
+		}
+		delete tradeShipList[sig];
 	}
 }
 
@@ -123,7 +149,6 @@ function spawnAIShips(payload){
 			shipList[ship[0]].AIName = ship[8];
 		}
 	}
-
 }
 
 function updateShipList(packet){
@@ -150,6 +175,58 @@ function spawnItem(packet){
 	itemList[packet[0]].x = packet[1];
 	itemList[packet[0]].y = packet[2];
 	itemList[packet[0]].name = packet[3];
+}
+
+function spawnTradeShip(packet){
+	packet = JSON.parse(packet);
+	if(tradeShipList[packet[0]] == null){
+		tradeShipList[packet[0]] = {};
+		tradeShipList[packet[0]].weapon = {};
+		tradeShipList[packet[0]].weapon.name = config.tradeShipWeapon;
+		tradeShipList[packet[0]].weapon.level = config.tradeShipWeaponLevel;
+		tradeShipList[packet[0]].weapon.angle = packet[5];
+		tradeShipList[packet[0]].trailList = {};
+		tradeShipList[packet[0]].sig = packet[0];
+		tradeShipList[packet[0]].x = packet[1];
+		tradeShipList[packet[0]].y = packet[2];
+		tradeShipList[packet[0]].height = packet[3];
+		tradeShipList[packet[0]].width = packet[4];
+		tradeShipList[packet[0]].angle = packet[5];
+	}
+}
+
+function updateTradeShipList(packet){
+	if(packet == null){
+		return;
+	}
+	var i,j,len1,ts,len2,trail,trailItem;
+	packet = JSON.parse(packet);
+	len1 = packet.length;
+
+	for(i=0;i<len1;i++){
+		ts = packet[i];
+		if(tradeShipList[ts[0]] != null){
+			tradeShipList[ts[0]].x = ts[1];
+			tradeShipList[ts[0]].y = ts[2];
+			tradeShipList[ts[0]].weapon.angle = ts[3];
+			trail = ts[4];
+			len2 = trail.length;
+			for(j=0;j<len2;j++){
+				trailItem = trail[j];
+				if(tradeShipList[ts[0]].trailList[trailItem[0]] == null){
+					tradeShipList[ts[0]].trailList[trailItem[0]] = {};
+					tradeShipList[ts[0]].trailList[trailItem[0]].lifetime = config.tradeShipTrailDuration*1000;
+					tradeShipList[ts[0]].trailList[trailItem[0]].start = new Date();
+					tradeShipList[ts[0]].trailList[trailItem[0]].sig = trailItem[0];
+				}
+				tradeShipList[ts[0]].trailList[trailItem[0]].x = trailItem[1];
+				tradeShipList[ts[0]].trailList[trailItem[0]].y = trailItem[2];
+				tradeShipList[ts[0]].trailList[trailItem[0]].radius = trailItem[3];
+				tradeShipList[ts[0]].trailList[trailItem[0]].color = trailItem[4];
+			}
+		}
+	}
+
 }
 
 function equipItem(packet){
@@ -275,7 +352,6 @@ function blueBoundShrinking(payload){
 
 function weaponFired(payload){
 	var id,ship,weaponName,weaponLevel,numBullets,i,bullet;
-
 	payload = JSON.parse(payload);
 	id = payload[0];
 	ship = shipList[id];

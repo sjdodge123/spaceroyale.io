@@ -5,6 +5,7 @@ var c = utils.loadConfig();
 var listItem = null;
 var bullet = null;
 var ship = null;
+var tradeShip = null;
 var nebula = null;
 var planet = null;
 var asteroid = null;
@@ -115,7 +116,7 @@ exports.updateItem = function(item,equipedItem){
 
 exports.weaponFired = function(ship,weapon,bullets){
 	var packet = [];
-	packet.push(ship.id);
+	packet.push(ship.id || ship.sig);
 	packet.push(weapon.name);
 	packet.push(weapon.level);
 	packet.push(bullets.length);
@@ -209,6 +210,53 @@ exports.spawnNebula = function(nebulaList){
 	return packet;
 }
 
+exports.spawnTradeShip = function(tradeShip){
+	var packet = []
+	packet[0] = tradeShip.sig;
+	packet[1] = tradeShip.x;
+	packet[2] = tradeShip.y;
+	packet[3] = tradeShip.height;
+	packet[4] = tradeShip.width;
+	packet[5] = tradeShip.angle;
+	packet = JSON.stringify(packet);
+	return packet;
+}
+
+exports.sendTradeShipUpdates = function(tradeShipList){
+	var packet = [], trailList = [], sig, trail, trailItem;
+
+	for(prop in tradeShipList){
+		tradeShip = tradeShipList[prop];
+
+		for(sig in tradeShip.trailList){
+			trail = tradeShip.trailList[sig];
+			trailItem = [];
+			trailItem.push(sig);
+			trailItem.push(trail.x);
+			trailItem.push(trail.y);
+			trailItem.push(trail.radius);
+			trailItem.push(trail.color);
+
+			trailList.push(trailItem);
+		}
+
+		listItem = [
+			tradeShip.sig,
+			tradeShip.x,
+			tradeShip.y,
+			tradeShip.weapon.angle,
+			trailList,
+		];
+		packet.push(listItem);
+	}
+	listItem = null;
+	prop = null;
+	tradeShip = null;
+
+	packet = JSON.stringify(packet);
+	return packet;
+}
+
 exports.worldResize = function(world){
 	var packet = [];
 	packet[0] = world.x;
@@ -236,8 +284,6 @@ exports.shrinkBound = function(bound){
 	packet = JSON.stringify(packet);
 	return packet;
 }
-
-
 
 function getUTF8Size (str) {
   var sizeInBytes = str.split('')

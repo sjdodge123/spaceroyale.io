@@ -142,6 +142,18 @@ function clientConnect() {
 			spawnItem(packet);
 		}
 	})
+
+	server.on("spawnTradeShip",function(packet){
+		if(packet != null){
+			spawnTradeShip(packet);	
+		}
+	});
+	server.on("terminateTradeShips",function(deadSigs){
+		for(var i=0;i<deadSigs.length;i++){
+			terminateTradeShip(deadSigs[i]);
+		}
+	});
+
 	server.on("terminateItems",function(deadSigs){
 		for(var i=0;i<deadSigs.length;i++){
 			terminateItem(deadSigs[i]);
@@ -259,8 +271,7 @@ function clientConnect() {
 
 	server.on("gameUpdates",function(updatePacket){
 		updateShipList(updatePacket.shipList);
-		//itemList = updatePacket.itemList;
-		tradeShipList = updatePacket.tradeShipList;
+		updateTradeShipList(updatePacket.tradeShipList);
 		gameStarted = updatePacket.state;
 		lobbyTimeLeft = updatePacket.lobbyTimeLeft;
 		shrinkTimeLeft = updatePacket.shrinkTimeLeft;

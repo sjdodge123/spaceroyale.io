@@ -91,9 +91,6 @@ var asteroidSheet = new SpriteSheet(asteroidSVG,0,0,500,500,3,3);
 var nebulaSheet = new SpriteSheet(nebulaSVG,0,0,500,500,1,1);
 var tradeShipSheet = new SpriteSheet(tradeShipSVG,0,0,200,600,1,1);
 
-
-
-
 var lastLobbyTime = null;
 
 function drawBackground() {

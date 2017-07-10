@@ -108,9 +108,10 @@ class Room {
 
 	sendUpdates(){
 		var shipData = compressor.sendShipUpdates(this.shipList);
+		var tradeShipData = compressor.sendTradeShipUpdates(this.tradeShipList);
 		messenger.messageRoomBySig(this.sig,"gameUpdates",{
 			shipList:shipData,
-			tradeShipList:this.tradeShipList,
+			tradeShipList:tradeShipData,
 			state:this.game.active,
 			lobbyTimeLeft:this.game.lobbyTimeLeft,
 			totalPlayers:messenger.getTotalPlayers(),
@@ -359,14 +360,20 @@ class GameBoard {
 		}
 	}
 	updateTradeShips(){
+		var deadSigs = [];
 		for(var sig in this.tradeShipList){
 			var tradeShip = this.tradeShipList[sig];
 			if(tradeShip.alive == false){
 				this.spawnItem(tradeShip.dropItem());
+				deadSigs.push(sig);
 				delete this.tradeShipList[sig];
 				continue;
 			}
 			tradeShip.update();
+		}
+		if(deadSigs.length != 0){
+			console.log(deadSigs);
+			messenger.messageRoomBySig(this.roomSig,'terminateTradeShips',deadSigs);
 		}
 	}
 	updateBullets(){
@@ -430,6 +437,7 @@ class GameBoard {
 				this.AIList[sig] = AI.setAITradeShipController(ts,this.world,this);
 			}
 			this.tradeShipList[sig] = ts;
+			messenger.messageRoomBySig(this.roomSig,'spawnTradeShip',compressor.spawnTradeShip(ts));
 		}
 	}
 	checkCollisions(active){
@@ -945,7 +953,7 @@ class World extends Rect{
 		if(packet.bounds.inBounds(packet.object)){
 			packet.object.damageTimer = false;
 		} else {
-			packet.object.health -= packet.damage;
+			packet.object.takeDamage(packet.damage);
 			setTimeout(packet.callback,packet.rate*1000,packet);
 		}
 	}
@@ -1344,6 +1352,7 @@ class TradeShip extends Rect{
 			if(this.trailList[sig].alive){
 				this.trailList[sig].update();
 			}else{
+
 				delete this.trailList[sig];
 			}
 
@@ -1352,7 +1361,8 @@ class TradeShip extends Rect{
 	fire(){
 		var bullets = this.weapon.fire(this.x, this.y, this.weapon.angle, '#808080',this.sig);
 		if(bullets != null){
-			messenger.messageRoomBySig(this.roomSig,'weaponFired',{ship:this,weapon:this.weapon});
+			var data = compressor.weaponFired(this,this.weapon,bullets);
+			messenger.messageRoomBySig(this.roomSig,'weaponFired',data);
 		}
 		return bullets;
 	}
@@ -1367,7 +1377,8 @@ class TradeShip extends Rect{
 		this.x += this.speed * Math.cos(this.angle * (Math.PI/180));
 		this.y += this.speed * Math.sin(this.angle * (Math.PI/180));
 		this.vertices = this.getVertices();
-		if(this.x == this.destX && this.destY == this.destY){
+		var dist2 = utils.getMagSq(this.x,this.y,this.destX,this.destY);
+		if(dist2 < 10000){
 			this.reachedDest = true;
 		}
 	}
@@ -1394,6 +1405,7 @@ class TradeShip extends Rect{
 			}
 			this.health -= object.damage;
 			if(this.health < 1){
+				messenger.toastPlayer(object.owner,"You killed a TradeShip!");
 				this.alive = false;
 			}
 		}
