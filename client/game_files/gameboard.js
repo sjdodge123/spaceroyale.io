@@ -1,6 +1,7 @@
 function updateGameboard(){
 	updateShips();
 	updateBullets();
+	updateItems();
 	updateTradeShips();
 }
 
@@ -26,13 +27,41 @@ function updateBullets(){
 	}
 }
 
+function updateItems(){
+	var item;
+	for(var sig in itemList){
+		item = itemList[sig];
+		if(item.name == "HPItem"){
+			continue;
+		}
+		var timeLeft = config.baseItemDecayRate-((Date.now()-item.dropDate)/1000);
+		timeLeft = timeLeft.toFixed(1);
+		if(timeLeft <= config.baseItemDecayRate*.33){
+			if(timeLeft % 0.5 == 0){
+				item.flash = true;
+			} else {
+				item.flash = false;
+			}
+			continue;
+		}
+
+		if(timeLeft <= config.baseItemDecayRate*.66){
+			if(timeLeft % 1 == 0){
+				item.flash = true;
+			} else{
+				item.flash = false;
+			}
+		}
+	}
+}
+
 function updateTradeShips(){
 	var tradeShip,trailItem,currentTime, remaining;
 	for(var sig in tradeShipList){
 		tradeShip = tradeShipList[sig];
 		for(var trailSig in tradeShip.trailList){
 			trailItem = tradeShip.trailList[trailSig];
-			currentTime = new Date();
+			currentTime = Date.now();
 			remaining = trailItem.lifetime - (currentTime - trailItem.start);
 			
 			if(remaining <= 0){
@@ -171,6 +200,8 @@ function spawnItem(packet){
 	packet = JSON.parse(packet);
 	itemList[packet[0]] = {};
 	itemList[packet[0]].radius = config.baseItemRadius;
+	itemList[packet[0]].dropDate = Date.now();
+	itemList[packet[0]].flash = false;
 	itemList[packet[0]].sig = packet[0];
 	itemList[packet[0]].x = packet[1];
 	itemList[packet[0]].y = packet[2];
@@ -216,7 +247,7 @@ function updateTradeShipList(packet){
 				if(tradeShipList[ts[0]].trailList[trailItem[0]] == null){
 					tradeShipList[ts[0]].trailList[trailItem[0]] = {};
 					tradeShipList[ts[0]].trailList[trailItem[0]].lifetime = config.tradeShipTrailDuration*1000;
-					tradeShipList[ts[0]].trailList[trailItem[0]].start = new Date();
+					tradeShipList[ts[0]].trailList[trailItem[0]].start = Date.now();
 					tradeShipList[ts[0]].trailList[trailItem[0]].sig = trailItem[0];
 				}
 				tradeShipList[ts[0]].trailList[trailItem[0]].x = trailItem[1];

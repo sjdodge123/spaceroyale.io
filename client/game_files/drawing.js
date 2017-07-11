@@ -517,6 +517,9 @@ function drawAsteroid(asteroid){
 }
 
 function drawItem(item){
+	if(item.flash == true){
+		return;
+	}
 	canvasContext.save();
 
 	switch(item.name){

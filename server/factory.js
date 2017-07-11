@@ -314,7 +314,7 @@ class Game {
 		if(c.randomizePlayersLocations){
 			for(var shipID in this.shipList){
 				var ship = this.shipList[shipID];
-				var loc = this.world.findFreeLoc(ship,0);
+				var loc = this.world.findFreeLoc(ship);
 				ship.newX = loc.x;
 				ship.newY = loc.y;
 			}
@@ -412,8 +412,9 @@ class GameBoard {
 			if(item.alive == false){
 				deadSigs.push(itemSig);
 				this.terminateItem(itemSig);
+				continue;
 			}
-
+			item.update();
 		}
 		if(deadSigs.length != 0){
 			messenger.messageRoomBySig(this.roomSig,'terminateItems',deadSigs);
@@ -562,7 +563,7 @@ class GameBoard {
 			for(var i = 0; i<c.asteroidAmt;i++){
 				var sig = this.generateAsteroidSig();
 				var asteroid = new Asteroid(0,0,utils.getRandomInt(c.asteroidMinSize,c.asteroidMaxSize),sig,this.roomSig);
-				var loc = this.world.findFreeLoc(asteroid,0);
+				var loc = this.world.findFreeLoc(asteroid);
 				asteroid.x = loc.x;
 				asteroid.y = loc.y;
 				this.asteroidList[sig] = asteroid;
@@ -574,7 +575,7 @@ class GameBoard {
 			for(var i = 0; i<c.planetAmt;i++){
 				var sig = this.generatePlanetSig();
 				var planet = new Planet(0,0,utils.getRandomInt(c.planetMinSize,c.planetMaxSize),sig);
-				var loc = this.world.findFreeLoc(planet,0);
+				var loc = this.world.findFreeLoc(planet);
 				planet.x = loc.x;
 				planet.y = loc.y;
 				this.planetList[sig] = planet;
@@ -586,7 +587,7 @@ class GameBoard {
 			for(var i = 0; i<c.nebulaAmt;i++){
 				var sig = this.generateNebulaSig();
 				var nebula = new Nebula(0,0,utils.getRandomInt(c.nebulaMinSize,c.nebulaMaxSize),sig);
-				var loc = this.world.findFreeLoc(nebula,0);
+				var loc = this.world.findFreeLoc(nebula);
 				nebula.x = loc.x;
 				nebula.y = loc.y;
 				this.nebulaList[sig] = nebula;
@@ -841,8 +842,8 @@ class World extends Rect{
 		return loc;
 	}
 	getSafeLoc(size){
-		var objW = size + c.playerBaseRadius*2;
-		var objH = size + c.playerBaseRadius*2;
+		var objW = size + c.playerBaseRadius*3;
+		var objH = size + c.playerBaseRadius*3;
 		return {x:Math.floor(Math.random()*(this.width - 2*objW - this.x)) + this.x + objW, y:Math.floor(Math.random()*(this.height - 2*objH - this.y)) + this.y + objH};
 	}
 	getRandEdgeLoc(pad){
@@ -959,7 +960,7 @@ class World extends Rect{
 
 	spawnNewShip(id,color){
 		var ship = new Ship(0,0, 90, color, id,this.roomSig);
-		var loc = this.findFreeLoc(ship,0);
+		var loc = this.findFreeLoc(ship);
 		ship.x = loc.x;
 		ship.y = loc.y;
 		return ship;
@@ -1442,8 +1443,17 @@ class CircleItem extends Circle{
 	constructor(x,y,color){
 		super(x,y,c.baseItemRadius,color);
 		this.isItem = true;
+		this.itemDecayRate = c.baseItemDecayRate*1000;
+		this.dropDate = Date.now();
 		this.sig = null;
 		this.alive = true;
+	}
+	update(){
+		if(this.itemDecayRate != null){
+			if(Date.now()-this.dropDate > this.itemDecayRate){
+				this.alive = false;
+			}
+		}
 	}
 }
 
@@ -1451,6 +1461,7 @@ class HPItem extends CircleItem {
 	constructor(x,y){
 		super(x,y,"Red");
 		this.healAmt = 15;
+		this.itemDecayRate = null;
 		this.equipMessage = "Applied health pack +" + this.healAmt;
 		this.name = 'HPItem';
 	}
@@ -1468,7 +1479,6 @@ class HPItem extends CircleItem {
 class EquipableItem extends CircleItem{
 	constructor(x,y,color,level){
 		super(x,y,color);
-		this.dropDate = null;
 		this.pickUpCooldown = 1;
 		this.level = level || 1;
 		this.name = '';
@@ -1477,7 +1487,7 @@ class EquipableItem extends CircleItem{
 		if(!this.alive){
 			return;
 		}
-		if(this.dropDate != null && new Date()-this.dropDate < this.pickUpCooldown*1000){
+		if(Date.now()-this.dropDate < this.pickUpCooldown*1000){
 			return;
 		}
 		if(object instanceof Ship){
@@ -1551,7 +1561,6 @@ class Weapon {
 	}
 	drop(x,y,level){
 		var item = new this.item(x,y,level);
-		item.dropDate = new Date();
 		return item;
 	}
 }
