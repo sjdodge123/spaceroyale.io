@@ -28,6 +28,10 @@ class AIController{
 		this.itemLootRange = 600;
 		this.itemLootRangeSq = this.itemLootRange * this.itemLootRange;
 
+		this.fireDistance = 400;
+		this.fireDistanceSqBase = this.fireDistance*this.fireDistance;
+		this.fireDistanceSqCurrent = this.fireDistanceSqBase;
+
 		this.maintainDistance = utils.getRandomInt(100,300);
 		this.maintainDistanceSqBase = this.maintainDistance * this.maintainDistance;
 		this.maintainDistanceSqCurrent = this.maintainDistanceSqBase;
@@ -41,6 +45,9 @@ class AIController{
 		this.blueBoundRunLimit = 3;
 		this.blueBoundTimer = new Date();
 
+		this.currentWeapon = null;
+		this.behaviorSet = false;
+
 		this.closestPlayerShip = null;
 		this.closestAsteroid = null;
 		this.closestNebula == null;
@@ -50,6 +57,7 @@ class AIController{
 		this.ship.isAI = true;
 		this.ship.targetDirX = 0;
 		this.ship.targetDirY = 0;
+		this.ship.braking = false;
 		this.ship.AIName = this.generateAIName();
 		this.ship.color = this.generateAIColor();
 		this.ship.baseColor = this.ship.color;
@@ -88,32 +96,42 @@ class AIController{
 		if(fireTarget){
 			this.faceTarget(fireTarget);
 			if (fireTarget.alive){
-				this.fireWeapon();
+				var dist2 = utils.getMagSq(this.ship.x,this.ship.y,fireTarget.x,fireTarget.y);
+				if(dist2 < this.fireDistanceSqCurrent){
+					this.fireWeapon();
+				}
 			}
 		}
 		this.updateMood();
 		this.updateBehaviorFromMood();
+		this.currentWeapon = this.ship.weapon.name;
+		this.updateBehaviorFromWeapon();
 	}
 
 	updateMood(){
 		if(this.playersAlive <= 3){
 			this.mood = "aggresive";
+			this.behaviorSet = false;
 			return;
 		}
 		if(this.ship.weapon.level > 1 && this.ship.health > this.fleeThresholdCurrent){
 			var seed = utils.getRandomInt(0,1);
 			if(seed == 0){
 				this.mood = "aggresive";
+				this.behaviorSet = false;
 			} else{
 				this.mood = "hiding";
+				this.behaviorSet = false;
 			}
 			return;
 		}
 		if(this.ship.health < this.fleeThresholdCurrent){
 			this.mood = "defensive";
+			this.behaviorSet = false;
 			return;
 		}
 		this.mood = "looting";
+		this.behaviorSet = false;
 	}
 	determineBaseMood(){
 		var seed = utils.getRandomInt(0,3);
@@ -129,20 +147,21 @@ class AIController{
 		return "aggresive";
 	}
 	updateBehaviorFromMood(){
+		if(this.behaviorSet){
+			return;
+		}
+		this.behaviorSet = true;
 		if(this.mood =="aggresive"){
-			this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*.5;
 			this.fleeThresholdCurrent = this.fleeThresholdBase*.8;
 			this.aggroRangeSqCurrent = this.aggroRangeSqBase*1.5;
 			return;
 		}
 		if(this.mood == "defensive"){
-			this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*2;
 			this.fleeThresholdCurrent = this.fleeThresholdBase*1.2;
 			this.aggroRangeSqCurrent = this.aggroRangeSqBase*.5;
 			return;
 		}
 		if(this.mood =="hiding"){
-			this.maintainDistanceSqCurrent = 0;
 			this.fleeThresholdCurrent = this.ship.health-5;
 			this.aggroRangeSqCurrent = this.aggroRangeSqBase*.2;
 			return;
@@ -150,10 +169,28 @@ class AIController{
 
 		if(this.mood == "looting"){
 			//Theorically the default state
-			this.maintainDistanceSqCurrent = this.maintainDistanceSqBase;
 			this.fleeThresholdCurrent = this.fleeThresholdBase;
 			this.aggroRangeSqCurrent = this.aggroRangeSqBase;
 			return;
+		}
+	}
+
+	updateBehaviorFromWeapon(){
+		if(this.mood =="hiding"){
+			this.maintainDistanceSqCurrent = 0;
+			return;
+		}
+		if(this.currentWeapon == "Blaster"){
+			this.maintainDistanceSqCurrent = this.maintainDistanceSqBase;
+			this.fireDistanceSqCurrent = this.fireDistanceSqBase;
+		}
+		if(this.currentWeapon == "PhotonCannon"){
+			this.maintainDistanceSqCurrent = 0;
+			this.fireDistanceSqCurrent = this.fireDistanceSqBase*.2;
+		}
+		if(this.currentWeapon == "MassDriver"){
+			this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*2;
+			this.fireDistanceSqCurrent = this.fireDistanceSqBase*2;
 		}
 	}
 
@@ -168,10 +205,15 @@ class AIController{
 		}
 
 		if(this.mood == "hiding"){
-			this.findClosestNebula();
+			if(this.closestNebula == null){
+				this.findClosestNebula();
+			}
 			if(this.closestNebula != null){
 				return this.closestNebula;
 			}
+		}
+		if(this.closestTradeship != null && !this.closestTradeship.alive){
+			this.findClosestItem();
 		}
 
 		if (this.closestAsteroid != null && !this.closestAsteroid.alive){
@@ -188,17 +230,13 @@ class AIController{
 			if(this.closestTradeship != null && this.closestTradeship.alive){
 				return this.closestTradeship;
 			}
-			if(this.closestPlayerShip != null && this.closestPlayerShip.alive){
-				return this.closestPlayerShip;
-			}	
-		}
-		if (this.closestAsteroid != null && this.closestAsteroid.alive){
-			return this.closestAsteroid;
 		}
 		if(this.closestPlayerShip != null && this.closestPlayerShip.alive){
 			return this.closestPlayerShip;
 		}
-
+		if (this.closestAsteroid != null && this.closestAsteroid.alive){
+			return this.closestAsteroid;
+		}
 		return this.world.whiteBound;
 	}
 	determineFireTarget(){
@@ -352,7 +390,7 @@ class AIController{
 		this.targetAngle = (180/Math.PI)*Math.atan2(target.y-this.ship.y,target.x-this.ship.x)-90;
 		this.targetDirX = Math.cos((this.targetAngle + 90) * Math.PI/180);
 		this.targetDirY = Math.sin((this.targetAngle + 90) * Math.PI/180);
-
+		this.ship.braking = false;
 		if(target.isItem || target.isBound){
 			this.ship.targetDirX = this.targetDirX;
 			this.ship.targetDirY = this.targetDirY;
@@ -364,6 +402,7 @@ class AIController{
 		if(dist2 < this.maintainDistanceSqCurrent){
 			this.ship.targetDirX = -this.targetDirX;
 			this.ship.targetDirY = -this.targetDirY;
+			this.ship.braking = true;
 		} else{
 			this.ship.targetDirX = this.targetDirX;
 			this.ship.targetDirY = this.targetDirY;

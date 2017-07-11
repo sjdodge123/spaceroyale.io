@@ -4,10 +4,11 @@
     "serverTickSpeed": 33.33,
 
     "minPlayers":1,
-    "maxPlayersInRoom":10,
+    "maxPlayersInRoom":25,
     "randomizePlayersLocations":true,
     "roomKickTimeout":90,
     "lobbyWaitTime":60,
+
 
     "baseTimeUntilShrink":30,
     "timeUntilShrinkSpeedup":0.75,
@@ -15,6 +16,7 @@
     "shrinkingDurationSpeedup":0.75,
 
     "baseItemRadius":25,
+    "baseItemDecayRate":15,
 
     "AISpawnPlayers":true,
     "AIAggroRangeMin":250,
@@ -28,11 +30,11 @@
     "lobbyWidth": 750,
     "lobbyHeight": 750,
 
-    "worldWidth": 5000,
-    "worldHeight": 5000,
+    "worldWidth": 7500,
+    "worldHeight": 7500,
 
     "generateAsteroids":true,
-    "asteroidAmt":150,
+    "asteroidAmt":300,
     "asteroidBaseHealth":40,
     "asteroidDropRate":30,
     "asteroidMinSize":45,
@@ -47,19 +49,19 @@
     },
 
     "generatePlanets":true,
-    "planetAmt":20,
-    "planetMinSize":70,
-    "planetMaxSize":150,
+    "planetAmt":100,
+    "planetMinSize":100,
+    "planetMaxSize":200,
 
     "generateNebulas":true,
-    "nebulaAmt":20,
+    "nebulaAmt":100,
     "nebulaSlowAmt":0,
-    "nebulaMinSize":80,
-    "nebulaMaxSize":130,
+    "nebulaMinSize":110,
+    "nebulaMaxSize":140,
 
     "generateTradeShips":true,
-    "tradeShipMinDelay":1,
-    "tradeShipMaxDelay":2,
+    "tradeShipMinDelay":5,
+    "tradeShipMaxDelay":15,
     "tradeShipSpawnTolerance":0.7,
     "tradeShipTrailDuration":15,
     "tradeShipSpeed":3,
@@ -84,13 +86,13 @@
     "blasterBulletDamage":10,
 
     "photonCannonCoolDown":1.2,
-    "birdshotLifetime":0.4,
-    "birdshotDamage":11,
-    "birdshotSpeed":650,
+    "birdshotLifetime":0.2,
+    "birdshotDamage":25,
+    "birdshotSpeed":700,
 
     "massDriverCoolDown":1.2,
     "massDriverBulletDamage":35,
-    "massDriverBulletSpeed":1650,
+    "massDriverBulletSpeed":1200,
 
     "shieldRadius":35,
     "shield1Color":"Aqua",

@@ -63,8 +63,8 @@ class Engine {
 			var dirY = 0;
 
 			if (ship.isAI){
-				dirX = ship.targetDirX/2;
-				dirY = ship.targetDirY/2;
+				dirX = ship.targetDirX*.8;
+				dirY = ship.targetDirY*.8;
 			}
 			else{
 				if(ship.moveForward && ship.moveBackward == false && ship.turnLeft == false && ship.turnRight == false){
