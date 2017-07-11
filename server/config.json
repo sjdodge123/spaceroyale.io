@@ -69,8 +69,8 @@
     "tradeShipWeapon":"Blaster",
     "tradeShipWeaponLevel":3,
 
-    "playerMaxSpeed":800,
-    "playerBaseAcel":700,
+    "playerMaxSpeed":350,
+    "playerBaseAcel":800,
     "playerBaseRadius":25,
     "playerExplosionRadius":300,
     "playerExplosionMaxDamage":50,
@@ -78,7 +78,7 @@
     "playerSpawnWeaponLevel":1,
     "playerBaseHealth":100,
     "playerDragCoeff": 0.045,
-    "playerBrakeCoeff": 0.135,
+    "playerBrakeCoeff": 0.235,
 
     "forceConstant": 500000,
 

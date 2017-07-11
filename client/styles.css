@@ -12,10 +12,15 @@ input:focus {
     outline: 2px solid #1a1a1a !important;
 }
 
+footer a:link{
+	color: blue;
+}
+
 #gameWindow{
 	background: black;
 	position: relative;
 	overflow: none;
+	display: none;
 	width: 100%;
 	height: 100%;
 }
@@ -36,13 +41,45 @@ input:focus {
 	background: black;
 	position: absolute;
 	overflow: none;
-	z-index: 200;
+	
 	left: 0;
 	right: 0;
 	bottom: 0;
 	top: 0;
 	margin-top: -10%;
 }
+#space-footer{
+	background-color: transparent;
+	width: 100%;
+	height: 50px;
+	position: fixed;
+	bottom: 0;
+}
+#footer-content-left{
+	float: left;
+	margin-left: 50px;
+	
+}
+#footer-content-right{
+	float: right;
+	margin-right: 50px;
+	
+}
+#footer-content-right *{
+	margin-left: 5px;
+	margin-right: 5px;
+	font-size: 25px;
+	display: inline;
+	color: white;
+}
+#footer-content-left *{
+	margin-left: 5px;
+	margin-right: 5px;
+	font-size: 25px;
+	display: inline;
+	color: white;
+}
+
 #motd{
 	background: transparent;
 	color: white;

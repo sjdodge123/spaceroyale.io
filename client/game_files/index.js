@@ -331,8 +331,9 @@ function showGameOverScreen(cause){
             server.emit('playerLeaveRoom');
             $('#gameOverMenu').hide();
             $('#gameCanvas').css('opacity', '1');
-            $('#gameCanvas').hide();
+            $('#gameWindow').hide();
             $('#main').show();
+            $('#space-footer').show();
         });
     });
 }
@@ -396,7 +397,7 @@ function resetGameVariables(){
 }
 
 function enterLobby(name,color){
-    $('#gameCanvas').show();
+    $('#gameWindow').show();
     $('#howToPlayMenu').show();
     clientSendStart(name,color);
     gameRunning = true;
@@ -626,6 +627,7 @@ function cancelMovement(){
 function gameStart(){
     //stopSound(backgroundMusic);
     //playSound(gameStartMusic);
+    $('#space-footer').hide();
     $('#howToPlayMenu').hide();
 }
 
