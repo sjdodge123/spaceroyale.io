@@ -50,13 +50,14 @@ class AIController{
 		this.ship.isAI = true;
 		this.ship.targetDirX = 0;
 		this.ship.targetDirY = 0;
+		this.ship.braking = false;
 		this.ship.AIName = this.generateAIName();
 		this.ship.color = this.generateAIColor();
 		this.ship.baseColor = this.ship.color;
 		this.ship.glowColor = this.ship.color;
 	}
 	update(active,shipsAlive){
-		
+
 		if(active && this.ship.alive){
 			this.shipsAlive = shipsAlive;
 			this.gameLoop();
@@ -190,7 +191,7 @@ class AIController{
 			}
 			if(this.closestPlayerShip != null && this.closestPlayerShip.alive){
 				return this.closestPlayerShip;
-			}	
+			}
 		}
 		if (this.closestAsteroid != null && this.closestAsteroid.alive){
 			return this.closestAsteroid;
@@ -352,7 +353,7 @@ class AIController{
 		this.targetAngle = (180/Math.PI)*Math.atan2(target.y-this.ship.y,target.x-this.ship.x)-90;
 		this.targetDirX = Math.cos((this.targetAngle + 90) * Math.PI/180);
 		this.targetDirY = Math.sin((this.targetAngle + 90) * Math.PI/180);
-
+		this.ship.braking = false;
 		if(target.isItem || target.isBound){
 			this.ship.targetDirX = this.targetDirX;
 			this.ship.targetDirY = this.targetDirY;
@@ -364,6 +365,7 @@ class AIController{
 		if(dist2 < this.maintainDistanceSqCurrent){
 			this.ship.targetDirX = -this.targetDirX;
 			this.ship.targetDirY = -this.targetDirY;
+			this.ship.braking = true;
 		} else{
 			this.ship.targetDirX = this.targetDirX;
 			this.ship.targetDirY = this.targetDirY;

@@ -75,6 +75,8 @@
     "playerSpawnWeapon":"Blaster",
     "playerSpawnWeaponLevel":1,
     "playerBaseHealth":100,
+    "playerDragCoeff": 0.045,
+    "playerBrakeCoeff": 0.135,
 
     "forceConstant": 500000,
 
@@ -103,7 +105,7 @@
 
     "quadTreeMaxCount": 70,
     "quadTreeMaxDepth": 2,
-    
+
     "sqlinfo":{
       "connectionLimit": 100,
       "host": "spdbdev.cj1qbrqikxsw.us-east-1.rds.amazonaws.com",

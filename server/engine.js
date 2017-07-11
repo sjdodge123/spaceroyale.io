@@ -61,10 +61,11 @@ class Engine {
 			var ship = this.shipList[shipSig];
 			var dirX = 0;
 			var dirY = 0;
-
+			var braking = false;
 			if (ship.isAI){
 				dirX = ship.targetDirX/2;
 				dirY = ship.targetDirY/2;
+				braking = ship.braking;
 			}
 			else{
 				if(ship.moveForward && ship.moveBackward == false && ship.turnLeft == false && ship.turnRight == false){
@@ -99,12 +100,36 @@ class Engine {
 					dirY = Math.sqrt(2)/2;
 					dirX = Math.sqrt(2)/2;
 				}
+				else{
+					braking = true;
+				}
 			}
-			if(ship.velocity < ship.maxVelocity){
-				ship.velX += ship.acel * dirX * this.dt - .075*ship.velX;
-				ship.velY += ship.acel * dirY * this.dt- .075*ship.velY;
+
+			var newVelX, newVelY, newVel, newDirX, newDirY;
+			newVelX = ship.velX + ship.acel * dirX  * this.dt;
+			newVelY = ship.velY + ship.acel * dirY  * this.dt;
+
+			if(braking){
+				newVelX -= ship.brakeCoeff * ship.velX;
+				newVelY -= ship.brakeCoeff * ship.velY;
 			}
-			ship.velocity = utils.getMag(ship.velX,ship.velY);
+			else{
+				newVelX -= ship.dragCoeff * ship.velX;
+				newVelY -= ship.dragCoeff * ship.velY;
+			}
+
+			newVel = utils.getMag(newVelX,newVelY);
+
+			newDirX = newVelX / newVel;
+			newDirY = newVelY / newVel;
+			if (newVel > ship.maxVelocity){
+				ship.velX = ship.maxVelocity * newDirX;
+				ship.velY = ship.maxVelocity * newDirY;
+			}
+			else{
+				ship.velX = newVelX;
+				ship.velY = newVelY;
+			}
 			ship.newX += ship.velX * this.dt;
 			ship.newY += ship.velY * this.dt;
 		}

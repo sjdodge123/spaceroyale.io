@@ -1014,7 +1014,8 @@ class Ship extends Circle{
 		this.newY = this.y;
 		this.maxVelocity = c.playerMaxSpeed;
 		this.acel = c.playerBaseAcel;
-		this.velocity = 0;
+		this.dragCoeff = c.playerDragCoeff;
+		this.brakeCoeff = c.playerBrakeCoeff;
 		this.velX = 0;
 		this.velY = 0;
 		this.droppedItem = null;
