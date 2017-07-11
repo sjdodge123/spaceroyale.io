@@ -146,7 +146,7 @@ function clientConnect() {
 
 	server.on("spawnTradeShip",function(packet){
 		if(packet != null){
-			spawnTradeShip(packet);	
+			spawnTradeShip(packet);
 		}
 	});
 	server.on("terminateTradeShips",function(deadSigs){
@@ -272,6 +272,7 @@ function clientConnect() {
 	server.on("gameUpdates",function(updatePacket){
 		updateShipList(updatePacket.shipList);
 		updateTradeShipList(updatePacket.tradeShipList);
+		updateBulletList(updatePacket.bulletList);
 		gameStarted = updatePacket.state;
 		lobbyTimeLeft = updatePacket.lobbyTimeLeft;
 		shrinkTimeLeft = updatePacket.shrinkTimeLeft;
@@ -290,7 +291,7 @@ function clientConnect() {
 		} else{
 			toastQueue.push(message);
 		}
-		
+
 	});
 
 	server.on("eventMessage",function(message){
@@ -346,4 +347,3 @@ function clientSendReg(user,pass,gameName){
 function clientSendStart(myname,mycolor){
 	server.emit('enterLobby',{name:myname,color:mycolor});
 }
-

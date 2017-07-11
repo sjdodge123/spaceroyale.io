@@ -43,12 +43,7 @@ var server = null,
     turnLeft = false,
     turnRight = false;
 
-var maxFPS = 60,
-    frames,
-    now,
-    then = Date.now(),
-    interval = 1000/maxFPS,
-    deltaTime = maxFPS/1000,
+var then = Date.now(),
     dt;
 
 
@@ -546,6 +541,7 @@ function resize(){
 
 function animloop(){
     if(gameRunning){
+        /*
         requestAnimFrame(animloop);
         now = Date.now();
         dt = now - then;
@@ -555,7 +551,13 @@ function animloop(){
             frames = 1000/dt;
             gameLoop();
         }
-        
+        */
+        var now = Date.now();
+    	dt = now - then;
+        gameLoop();
+
+    	then = now;
+    	requestAnimFrame(animloop);
     }
 }
 
@@ -596,7 +598,7 @@ function recenterCamera(){
         if(shipList[cameraCenterSeed] == null){
             cameraCenterSeed = findAlivePlayerIndex();
         }
-        myShip = shipList[cameraCenterSeed];   
+        myShip = shipList[cameraCenterSeed];
         camera.centerOnObject(myShip);
         camera.draw();
     }

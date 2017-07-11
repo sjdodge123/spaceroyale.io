@@ -109,9 +109,11 @@ class Room {
 	sendUpdates(){
 		var shipData = compressor.sendShipUpdates(this.shipList);
 		var tradeShipData = compressor.sendTradeShipUpdates(this.tradeShipList);
+		var bulletData = compressor.sendBulletUpdates(this.bulletList);
 		messenger.messageRoomBySig(this.sig,"gameUpdates",{
 			shipList:shipData,
 			tradeShipList:tradeShipData,
+			bulletList:bulletData,
 			state:this.game.active,
 			lobbyTimeLeft:this.game.lobbyTimeLeft,
 			totalPlayers:messenger.getTotalPlayers(),
@@ -1012,7 +1014,8 @@ class Ship extends Circle{
 		this.newY = this.y;
 		this.maxVelocity = c.playerMaxSpeed;
 		this.acel = c.playerBaseAcel;
-		this.velocity = 0;
+		this.dragCoeff = c.playerDragCoeff;
+		this.brakeCoeff = c.playerBrakeCoeff;
 		this.velX = 0;
 		this.velY = 0;
 		this.droppedItem = null;
@@ -1143,7 +1146,7 @@ class Ship extends Circle{
 			return;
 		aw}
 		if(object.owner != this.id && object.alive && object.damage != null){
-			
+
 			if(this.shield != null && this.shield.alive){
 				this.shield.handleHit(object);
 				if(this.shield.alive){
@@ -1154,13 +1157,13 @@ class Ship extends Circle{
 			} else{
 				this.takeDamage(object.damage);
 			}
-			
+
 			if(this.health < 1){
 				this.iDied(object.owner);
 				return;
 			}
 			messenger.messageUser(object.owner,"shotLanded");
-			
+
 		}
 	}
 
