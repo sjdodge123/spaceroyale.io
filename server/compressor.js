@@ -139,7 +139,23 @@ exports.weaponFired = function(ship,weapon,bullets){
 	bullet = null;
 	return packet;
 }
-
+exports.sendBulletUpdates = function(bulletList){
+	var packet = [];
+	for(prop in bulletList){
+		bullet = bulletList[prop];
+		listItem = [
+			bullet.sig,
+			bullet.x,
+			bullet.y
+		];
+		packet.push(listItem);
+	}
+	packet = JSON.stringify(packet);
+	bullet = null;
+	listItem = null;
+	prop = null;
+	return packet;
+}
 exports.spawnPlanets = function(planetList){
 	var packet = [];
 	for(prop in planetList){

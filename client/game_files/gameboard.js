@@ -1,6 +1,5 @@
 function updateGameboard(){
 	updateShips();
-	updateBullets();
 	updateItems();
 	updateTradeShips();
 }
@@ -14,16 +13,6 @@ function updateShips(){
 		else{
 			ship.spriteAngle = 0;
 		}
-	}
-}
-
-function updateBullets(){
-	for(var sig in bulletList){
-		var bullet = bulletList[sig];
-		bullet.velX = Math.cos((bullet.angle+90)*(Math.PI/180))*bullet.speed;
-		bullet.velY = Math.sin((bullet.angle+90)*(Math.PI/180))*bullet.speed;
-		bullet.x += bullet.velX * deltaTime;
-		bullet.y += bullet.velY * deltaTime;
 	}
 }
 
@@ -63,7 +52,7 @@ function updateTradeShips(){
 			trailItem = tradeShip.trailList[trailSig];
 			currentTime = Date.now();
 			remaining = trailItem.lifetime - (currentTime - trailItem.start);
-			
+
 			if(remaining <= 0){
 				delete tradeShip.trailList[trailSig];
 			}
@@ -124,7 +113,7 @@ function connectSpawnShips(packet){
 			shipList[ship[0]].weapon.cooldown = ship[7];
 		}
 	}
-	
+
 }
 
 function appendNewShip(packet){
@@ -255,6 +244,22 @@ function updateTradeShipList(packet){
 				tradeShipList[ts[0]].trailList[trailItem[0]].radius = trailItem[3];
 				tradeShipList[ts[0]].trailList[trailItem[0]].color = trailItem[4];
 			}
+		}
+	}
+
+}
+
+function updateBulletList(packet){
+	if(packet == null){
+		return;
+	}
+	packet = JSON.parse(packet);
+	for(var i=0;i<packet.length;i++){
+		var bullet = packet[i];
+		if(bulletList[bullet[0]] != null){
+			bulletList[bullet[0]].id = bullet[0];
+			bulletList[bullet[0]].x = bullet[1];
+			bulletList[bullet[0]].y = bullet[2];
 		}
 	}
 
