@@ -15,14 +15,20 @@ footer a:link{
 	color: blue;
 }
 
+.input-group .form-control{
+	z-index: 0 !important;
+}
+
 .navbar-default{
 	background-color: black;
+	max-width: 60%;
 	margin-left: 5% !important;
-	margin-bottom: 2% !important;
-	padding-top: 0 !important;
-	padding-bottom: 0 !important;
 	letter-spacing: 1px;
     color: white;
+    padding: 0rem 0rem !important;
+}
+.navbar-nav{
+	z-index: 9999;
 }
 .navbar-default > .navbar-toggler{
 	margin-left: 5% !important;
@@ -92,7 +98,7 @@ footer a:link{
 }
 
 #space-footer{
-	height: 50px;
+	height: 60px;
 	background-color: black;
 	width: 100%;
 	position: fixed;
@@ -102,12 +108,12 @@ footer a:link{
 }
 #footer-content-right{
 	float: right;
-	margin: auto 0 0;
+	margin: auto 2% 10%;
 }
 #footer-content-right *{
-	margin-left: 5px;
-	margin-right: 5px;
-	font-size: 25px;
+	margin-left: 10px;
+	margin-right: 10px;
+	font-size: 35px;
 	display: inline;
 	color: white;
 }
@@ -290,7 +296,6 @@ footer a:link{
 }
 #leftArrow{
 	cursor: pointer;
-	z-index:99;
 	filter:brightness(80%);
 }
 #skinSelectionDisplay{
@@ -302,7 +307,6 @@ footer a:link{
 #rightArrow{
 	cursor: pointer;
 	filter:brightness(80%);
-	z-index:99;
 }
 #nameBox{
 	color:black;
@@ -409,6 +413,16 @@ footer a:link{
 	#bannerBox{
 		margin-top: -15%;
 	}
+	#leftArrow{
+		display: none;
+	}
+	#rightArrow{
+		display: none;
+	}
+	#skins{
+		width: 250px;
+		margin-left: -20%;
+	}
 	#bannerBox h1{
 		font-size: 40px !important;
 	}
@@ -416,13 +430,13 @@ footer a:link{
 		display: none;
 	}
 	.btn-lg {
-	    padding: 15px 15px !important;
+	    padding: 10px 10px !important;
 	    font-size: 20px !important;
 	    border-radius: 5px;
 	}
 	#guestBar{
-		margin-left: 0% !important;
-		width: 300px !important;
+		margin-left: -35% !important;
+		width: 350px !important;
 	}
 	#guestBar *{
 		font-size: 15px !important;
@@ -441,9 +455,7 @@ footer a:link{
 		margin: 10 7 2;
 	}
 	.navbar-default{
-		margin-top: 2% !important;
-		margin-left: -3% !important;
-		margin-bottom: 10% !important;
+		margin-bottom: 15% !important;
 	}
 	
 }
@@ -563,9 +575,11 @@ footer a:link{
 	#space-footer {
 		background-color: black;
 	}
-	#space-footer * {
-		margin: auto 5 5;
-		font-size: 22px !important;
+	#footer-content-right {
+		margin: 10 7 2;
+	}
+	.navbar-default{
+		margin-bottom: 10% !important;
 	}
 
 }
