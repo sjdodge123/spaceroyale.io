@@ -2,7 +2,6 @@ html {
 	overflow: none;
 	background: black;
 }
-
 input {
     max-width: 100%;
     max-height: 100%;
@@ -14,6 +13,27 @@ input:focus {
 
 footer a:link{
 	color: blue;
+}
+
+.navbar-default{
+	margin-left: 5% !important;
+	margin-bottom: 2% !important;
+	letter-spacing: 1px;
+    opacity: 0.8;
+    color: white;          
+    filter:(opacity=80);
+}
+.navbar-default > .navbar-toggler{
+	margin-left: 5% !important;
+	margin-bottom: 10px !important;
+}
+.navbar-default .navbar-brand {
+	font-size: 28px;
+    color: white;
+}
+.navbar-default .navbar-nav > .nav-item > .nav-link{
+	font-size: 25px;
+    color: white;
 }
 
 #gameWindow{
@@ -71,21 +91,16 @@ footer a:link{
 }
 
 #space-footer{
-	background-color: transparent;
-	width: 100%;
 	height: 50px;
+	background-color: black;
+	width: 100%;
 	position: fixed;
 	bottom: 0;
 }
-#footer-content-left{
-	float: left;
-	margin-left: 50px;
-	
-}
 #footer-content-right{
 	float: right;
-	margin-right: 50px;
-	
+	margin-right: 5%;
+	margin-bottom: 2%;
 }
 #footer-content-right *{
 	margin-left: 5px;
@@ -94,14 +109,6 @@ footer a:link{
 	display: inline;
 	color: white;
 }
-#footer-content-left *{
-	margin-left: 5px;
-	margin-right: 5px;
-	font-size: 25px;
-	display: inline;
-	color: white;
-}
-
 #motd{
 	background: transparent;
 	color: white;
@@ -396,29 +403,27 @@ footer a:link{
 	}
 }
 
-@media screen and (orientation:portrait) and (max-width: 991px) {
+@media screen and (orientation:portrait) and (max-width: 600px) {
 	#bannerBox{
 		margin-top: -15%;
 	}
 	#bannerBox h1{
-		font-size: 80px;
+		font-size: 40px !important;
 	}
 	#movementControls{
 		display: none;
 	}
 	.btn-lg {
-	    padding: 50px 50px !important;
-	    font-size: 35px !important;
-	    border-radius: 10px;
+	    padding: 15px 15px !important;
+	    font-size: 20px !important;
+	    border-radius: 5px;
+	}
+	#guestBar{
+		margin-left: 0% !important;
+		width: 300px !important;
 	}
 	#guestBar *{
-		font-size: 40px !important;
-	}
-	#signIn *{
-		font-size: 40px !important;
-	}
-	#signUp *{
-		font-size: 40px !important;
+		font-size: 15px !important;
 	}
 	#gameOverMenu{
 		margin-left: -15%;
@@ -430,31 +435,14 @@ footer a:link{
 		margin-left: -25%;
    		top: 0%;
 	}
-	.modal-header {
-		margin-left: -100px;
-		height: 150px;
-		width: 700px;
-		padding:9px 15px;
-	    border-bottom:1px solid #eee;
-	    background-color: #1a1a1a;
-	    -webkit-border-top-left-radius: 5px;
-	    -webkit-border-top-right-radius: 5px;
-	    -moz-border-radius-topleft: 5px;
-	    -moz-border-radius-topright: 5px;
-	     border-top-left-radius: 5px;
-	     border-top-right-radius: 5px;
+	#space-footer * {
+		margin: auto 2 2;
 	}
-	.modal-body
-	{
-		margin-left: -100px;
-		height: auto;
-		width: 700px;
-	    background-color: #1a1a1a;
+	.navbar-default{
+		margin-bottom: 10% !important;
+		margin-left: -3% !important;
 	}
-	.modal-content h2,span{
-		font-size: 40px !important;
-		color: white;
-	}
+	
 }
 
 @media screen and (max-width: 1300px){
@@ -507,8 +495,24 @@ footer a:link{
 	#bannerBox h1{
 		font-size: 40px;
 	}
+	#guestSignIn {
+		margin-top: 0%;
+		margin-bottom: 0%;
+	}
 	#guestBar *{
-		font-size: 20px !important;
+		font-size: 15px !important;
+	}
+	#authButtons *{
+		margin: 2px 0 auto;
+	}
+	#profileLoaded {
+		height: 60px;
+		display: all;
+		margin-bottom: 5px;
+	}
+	#profileLoaded *{
+		font-size: 15px !important;
+		
 	}
 	#gameOverMenu{
 		margin-left: -15%;
@@ -529,23 +533,21 @@ footer a:link{
 	#movementControls{
 		display: none;
 	}
-	#signInButton{
-		float: left
-	}
-	#signUpButton{
-
-	}
 	#signIn *{
 		font-size: 20px !important;
 	}
 	#signUp *{
 		font-size: 15px !important;
 	}
+	#bannerBox {
+		margin-bottom: 0%;
+	}
 	#main {
-		margin-top: -25%;
+		margin-top: -35%;
 	}
 	#playerProfile{
-		margin-top: -10%;
+		margin-top: -25%;
+		margin-bottom: 10px;
 	}
 	#authButtons{
 		margin-top: -5%;
@@ -554,6 +556,13 @@ footer a:link{
 		padding: 5px 5px !important;
 	    font-size: 20px !important;
 	    border-radius: 5px;
+	}
+	#space-footer {
+		background-color: black;
+	}
+	#space-footer * {
+		margin: auto 5 5;
+		font-size: 22px !important;
 	}
 
 }
