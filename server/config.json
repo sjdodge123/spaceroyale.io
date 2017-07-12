@@ -43,9 +43,10 @@
     "asteroidLootTable":{
       "ShieldItem":4,
       "MassDriverItem":1,
-      "PhotonCannonItem":2,
-      "BlasterItem":3,
-      "HPItem":5
+      "PhotonCannonItem":3,
+      "BlasterItem":5,
+      "HPItem":6,
+      "OverdriveItem":2
     },
 
     "generatePlanets":true,

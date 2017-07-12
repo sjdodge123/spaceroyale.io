@@ -104,10 +104,9 @@ class Engine {
 					braking = true;
 				}
 			}
-
 			var newVelX, newVelY, newVel, newDirX, newDirY;
-			newVelX = ship.velX + ship.acel * dirX  * this.dt;
-			newVelY = ship.velY + ship.acel * dirY  * this.dt;
+			newVelX = ship.velX + (ship.acel + ship.speedBoost) * dirX  * this.dt;
+			newVelY = ship.velY + (ship.acel + ship.speedBoost) * dirY  * this.dt;
 
 			if(braking){
 				newVelX -= ship.brakeCoeff * ship.velX;

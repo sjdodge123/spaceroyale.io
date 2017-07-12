@@ -525,7 +525,7 @@ function drawItem(item){
 	switch(item.name){
 		default:{
 			canvasContext.beginPath();
-			canvasContext.fillStyle = item.color;
+			canvasContext.fillStyle = "red";
 			canvasContext.arc(item.x-myShip.x+camera.xOffset,item.y-myShip.y+camera.yOffset,item.radius,0,Math.PI*2,true);
 			canvasContext.fill();
 			canvasContext.beginPath();

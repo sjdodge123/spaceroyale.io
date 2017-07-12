@@ -999,6 +999,8 @@ class Ship extends Circle{
 		this.glowColor = color;
 		this.angle = angle;
 		this.isHit = false;
+		this.speedBoost = 0;
+		this.boostList = {};
 		this.damageTimer = false;
 		this.moveForward = false;
 		this.moveBackward = false;
@@ -1039,6 +1041,7 @@ class Ship extends Circle{
 	update(dt){
 		this.dt = dt;
 		this.checkHP();
+		this.checkBoostList();
 		this.checkKills();
 		this.move();
 	}
@@ -1114,6 +1117,30 @@ class Ship extends Circle{
 			messenger.toastPlayer(this.id,"Full health");
 		}
 		messenger.messageUser(this.id,"myShipHealth",this.health);
+	}
+	applyBoost(type,amt,duration,msg,exitMsg,refreshMsg){
+		switch(type){
+			case "speed":{
+				//Check to see if the player already has the boost
+				if(this.speedBoost == amt){
+					messenger.toastPlayer(this.id,refreshMsg);
+				} else{
+					messenger.toastPlayer(this.id,msg);
+					this.speedBoost = amt;
+				}
+				break;
+			}
+		}
+		
+		this.boostList[type] = {exitMsg:exitMsg,duration:duration,applyDate:Date.now(),type:type};
+	}
+	removeBoost(type){
+		switch(type){
+			case "speed":{
+				this.speedBoost = 0;
+				break;
+			}
+		}
 	}
 	fire(){
 		var x = this.x + this.radius * Math.cos((this.weapon.angle + 90) * Math.PI/180);
@@ -1197,6 +1224,16 @@ class Ship extends Circle{
 			this.color = "#ffffff";
 		}
 	}
+	checkBoostList(){
+		for(var sig in this.boostList){
+			var boost = this.boostList[sig];
+			if(boost.duration*1000 - (Date.now() - boost.applyDate) < 0){
+				messenger.toastPlayer(this.id,boost.exitMsg);
+				this.removeBoost(boost.type);
+				delete this.boostList[sig];
+			}
+		}
+	}
 }
 
 
@@ -1257,6 +1294,10 @@ class Asteroid extends Circle{
 		switch(itemName){
 			case "HPItem":{
 				item = new HPItem(this.x,this.y);
+				break;
+			}
+			case "OverdriveItem":{
+				item = new OverdriveItem(this.x,this.y);
 				break;
 			}
 			case "BlasterItem": {
@@ -1478,6 +1519,43 @@ class HPItem extends CircleItem {
 		}
 	}
 }
+
+
+class Boost extends CircleItem {
+	constructor(x,y){
+		super(x,y,"Red");
+		this.boostAmt = 1000;
+		this.duration = 10;
+		this.boostMessage = "Unset";
+		this.refreshMessage = "Unset";
+		this.exitMessage = "Unset";
+		this.type = 'Unset';
+		this.name = 'Unset';
+	}
+	handleHit(object){
+		if(!this.alive){
+			return;
+		}
+		if(object instanceof Ship){
+			object.applyBoost(this.type,this.boostAmt,this.duration,this.boostMessage,this.exitMessage,this.refreshMessage);
+			this.alive = false;
+		}
+	}
+}
+
+class OverdriveItem extends Boost{
+	constructor(x,y){
+		super(x,y);
+		this.boostAmt = 1500;
+		this.duration = 15;
+		this.boostMessage = "Engaged Overdrive";
+		this.refreshMessage = "Overdrive extended";
+		this.exitMessage = "Overdrive expired";
+		this.type = 'speed';
+		this.name = 'OverdriveItem';
+	}
+}
+
 
 class EquipableItem extends CircleItem{
 	constructor(x,y,color,level){
