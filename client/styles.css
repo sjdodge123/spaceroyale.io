@@ -16,12 +16,13 @@ footer a:link{
 }
 
 .navbar-default{
+	background-color: black;
 	margin-left: 5% !important;
 	margin-bottom: 2% !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
 	letter-spacing: 1px;
-    opacity: 0.8;
-    color: white;          
-    filter:(opacity=80);
+    color: white;
 }
 .navbar-default > .navbar-toggler{
 	margin-left: 5% !important;
@@ -96,11 +97,12 @@ footer a:link{
 	width: 100%;
 	position: fixed;
 	bottom: 0;
+	opacity: 0.9;          
+    filter:(opacity=90);
 }
 #footer-content-right{
 	float: right;
-	margin-right: 5%;
-	margin-bottom: 2%;
+	margin: auto 0 0;
 }
 #footer-content-right *{
 	margin-left: 5px;
@@ -435,12 +437,13 @@ footer a:link{
 		margin-left: -25%;
    		top: 0%;
 	}
-	#space-footer * {
-		margin: auto 2 2;
+	#footer-content-right {
+		margin: 10 7 2;
 	}
 	.navbar-default{
-		margin-bottom: 10% !important;
+		margin-top: 2% !important;
 		margin-left: -3% !important;
+		margin-bottom: 10% !important;
 	}
 	
 }
