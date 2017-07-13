@@ -1,0 +1,151 @@
+<html>
+<canvas id = "gameCanvas" width = "800" height = "600"></canvas>
+<script type= "text/javascript">
+"use strict";
+
+var width = window.innerWidth,
+	height = window.innerHeight,
+	canvas = document.getElementById('gameCanvas');
+
+var canvasContext,
+	timeLast,
+	mouseObj,
+	mouseX = 0,
+	mouseY = 0,
+	objectList = [];
+
+window.onload = function(){
+	canvasContext = canvas.getContext("2d");
+
+	init();
+}
+
+function init(){
+	canvas.addEventListener("click", handleClick, false);
+	canvas.addEventListener("mousemove", handleMouseMove, false);
+	drawBackground();
+
+	initObjects();
+	timeLast = Date.now();
+	main();
+}
+
+function initObjects(){
+	mouseObj = new MouseObject(mouseX, mouseY, 25, 'green', 15);
+
+	//initialize other objects
+	//objectList.push(mouseObj);
+}
+function handleClick(evt){
+	console.log('click.');
+}
+
+function handleMouseMove(evt){
+	var rect = canvas.getBoundingClientRect(),
+		root = document.documentElement;
+
+	mouseX = evt.pageX - rect.left - root.scrollLeft;
+	mouseY = evt.pageY - rect.top - root.scrollTop;
+}
+
+function main(){
+	var timeNow = Date.now();
+	var dt = (timeNow - timeLast) / 1000.0;
+
+	update(dt);
+	render();
+
+	timeLast = timeNow;
+	requestAnimationFrame(main);
+}
+
+function update(){
+	mouseObj.update();
+}
+
+function render(){
+	drawBackground();
+	drawObjects();
+}
+
+function drawBackground(){
+	canvasContext.fillStyle = 'black';
+	canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function drawObjects(){
+	/*
+	for (var i = 0; i < objectList.length; i++){
+		objectList[i].draw();
+	}
+	*/
+	mouseObj.draw();
+}
+
+class GameObject {
+	constructor(x, y, radius, color){
+		this.x = x;
+		this.y = y;
+		this.radius = radius;
+		this.color = color;
+		
+	}
+	update(){
+
+	}
+	draw(){
+		canvasContext.save();
+		canvasContext.beginPath();
+		canvasContext.fillStyle = this.color;
+		canvasContext.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
+		canvasContext.fill();
+		canvasContext.restore();
+	}
+}
+
+class Trail {
+	constructor(initialPosition, length){
+		this.vertices = [];
+		this.length = length;
+		for (var i = 0; i < this.length; i++){
+			this.vertices.push(initialPosition);
+		}
+	}
+	draw(){
+		canvasContext.save();
+		canvasContext.beginPath();
+		canvasContext.moveTo(this.vertices[0].x,this.vertices[0].y);
+		for (var i = 1; i < this.length; i++){
+			var point = this.vertices[i];
+			canvasContext.lineTo(point.x, point.y);
+		}
+		canvasContext.strokeStyle = "red";
+		canvasContext.stroke();
+		canvasContext.restore();
+	}
+	update(currentPosition){
+		for (var i = this.length - 1; i > 0; i--){
+			this.vertices[i] = this.vertices[i-1];
+		}
+		this.vertices[0] = currentPosition;
+	}
+}
+class MouseObject extends GameObject {
+	constructor(x, y, radius, color, trailLength){
+		super(x, y, radius, color);
+		this.trail = new Trail({x:this.x, y:this.y}, trailLength);
+		this.attached = true;
+	}
+	update(){
+		this.x = mouseX;
+		this.y = mouseY;
+		this.trail.update({x:this.x, y:this.y});
+	}
+	draw(){
+		this.trail.draw();
+		super.draw();
+	}
+}
+
+</script>
+</html>
