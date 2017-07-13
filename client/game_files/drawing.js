@@ -51,6 +51,10 @@ shieldItemSVG.src = "sprites/items/shield_item.svg";
 var healthItemSVG = new Image();
 healthItemSVG.src = "sprites/items/health_item.svg";
 
+var overdriveItemSVG = new Image();
+overdriveItemSVG.src = "sprites/items/overdrive_item.svg";
+
+
 class SpriteSheet {
 	constructor(image,x,y,frameWidth,frameHeight,rows,columns){
 		this.image = image;
@@ -535,6 +539,11 @@ function drawItem(item){
 		    canvasContext.stroke();
 			break;
 		}
+		case "OverdriveItem":{
+			canvasContext.drawImage(overdriveItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
+			break;
+		}
+
 		case "BlasterItem":{
 			canvasContext.drawImage(blasterItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
 			break;
