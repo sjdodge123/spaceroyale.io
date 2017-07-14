@@ -101,6 +101,7 @@ exports.equipItem = function(item,equipedItem){
 	packet[0] = equipedItem.owner;
 	packet[1] = item.name;
 	packet[2] = equipedItem.level;
+	packet[3] = equipedItem.cooldown;
 	packet = JSON.stringify(packet);
 	return packet;
 }
@@ -110,6 +111,14 @@ exports.updateItem = function(item,equipedItem){
 	packet[0] = equipedItem.owner;
 	packet[1] = item.name;
 	packet[2] = equipedItem.level;
+	packet = JSON.stringify(packet);
+	return packet;
+}
+exports.updateShield = function(shield){
+	var packet = [];
+	packet[0] = shield.owner;
+	packet[1] = shield.level;
+	packet[2] = shield.alive;
 	packet = JSON.stringify(packet);
 	return packet;
 }

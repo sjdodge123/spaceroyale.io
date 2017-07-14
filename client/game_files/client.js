@@ -172,6 +172,11 @@ function clientConnect() {
 			updateItem(packet);
 		}
 	});
+	server.on("updateShield",function(packet){
+		if(packet != null){
+			updateShield(packet);
+		}
+	})
 
 	server.on("spawnNebula",function(packet){
 		if(packet != null){
@@ -232,30 +237,50 @@ function clientConnect() {
 	server.on("shipDeath",function(packet){
 		var id = packet[0];
 		var killerId = packet[1];
-		if(id == myID){
+		var killerName = '';
+		if(killerId != null && shipList[killerId] != null){
+			shipList[killerId].kills += 1;
+			killerName = playerList[killerId] || shipList[killerId].AIName;
+
+		}
+		delete shipList[id];
+		if(id == myID && iAmAlive){
 			iAmAlive = false;
 			playSound(youDied);
 			cameraBouncing = true;
+			if(id != null && killerId != null && killerName != ''){
+				showGameOverScreen("You were killed by " + killerName);
+				return;
+			}
 			showGameOverScreen("You died!");
 			return;
 		}
-		if(killerId != null && shipList[killerId] != null){
-			shipList[killerId].kills += 1;
-		}
+		
 		if(camera.inBounds(shipList[id])){
 			playSound(shipDeath);
 		}
-		delete shipList[id];
 	});
 
-	server.on('myShipHealth',function(health){
-		shipList[myID].health = health;
+	server.on('shipHealth',function(packet){
+		if(packet == null){
+			return;
+		}
+		if(packet.id == null){
+			return;
+		}
+		if(packet.health == null){
+			return;
+		}
+		if(shipList[packet.id] == null){
+			return;
+		}
+		shipList[packet.id].health = packet.health;
 	});
 
 	server.on("gameOver",function(id){
+		delete shipList[id];
 		if(id == myID && iAmAlive){
 			iAmAlive = false;
-			delete shipList[id];
 			gameOver();
 			showGameOverScreen("Winner winner chicken dinner!");
 		}

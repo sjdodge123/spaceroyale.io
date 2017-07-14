@@ -237,11 +237,11 @@ function drawWeaponHUD(){
 				canvasContext.drawImage(blasterSVG, - blasterSVG.width * svgscale / 2, -  blasterSVG.height * svgscale / 2, blasterSVG.width * svgscale, blasterSVG.height * svgscale);
 				break;
 			}
-			case "Photon Cannon":{
+			case "PhotonCannon":{
 				canvasContext.drawImage(photonCannonSVG, - photonCannonSVG.width * svgscale / 2, -  photonCannonSVG.height * svgscale / 2, photonCannonSVG.width * svgscale, photonCannonSVG.height * svgscale);
 				break;
 			}
-			case "Mass Driver":{
+			case "MassDriver":{
 				canvasContext.drawImage(massDriverSVG, - massDriverSVG.width * svgscale / 2, -  massDriverSVG.height * svgscale / 2, massDriverSVG.width * svgscale, massDriverSVG.height * svgscale);
 				break;
 			}
@@ -257,17 +257,17 @@ function drawKillCounter(){
 }
 
 function drawHPCounter(){
-	if(shipList[myID] != null){
+	if(myShip != null){
 		canvasContext.save();
-		if(shipList[myID].health > 70){
+		if(myShip.health > 70){
 			canvasContext.fillStyle = "#1dba34";
-		}else if(shipList[myID].health > 30){
+		}else if(myShip.health > 30){
 			canvasContext.fillStyle = "yellow";
 		} else {
 			canvasContext.fillStyle = "tomato";
 		}
 
-		canvasContext.fillRect(eventLog.x,eventLog.y-30,(shipList[myID].health/100)*eventLog.width/2,20);
+		canvasContext.fillRect(eventLog.x,eventLog.y-30,(myShip.health/100)*eventLog.width/2,20);
 		canvasContext.restore();
 		drawTextF("Health",eventLog.x+(eventLog.width/4)-30,eventLog.y-15,"#ECF0F1","17px Georgia");
 	}
@@ -388,11 +388,6 @@ function drawLobbyTimer(){
 
 //DRAWING OBJECTS RELATIVE TO CAMERA
 function drawRelativeObjects(){
-	if(myID != null && shipList != null && shipList[myID] != null && iAmAlive){
-        myShip = shipList[myID];
-        camera.centerOnObject(myShip);
-		camera.draw();
-	}
 	drawBullets();
 	drawShips();
 	drawAsteroids();
@@ -464,11 +459,11 @@ function drawWeapon(ship){
 			canvasContext.drawImage(blasterSVG, - blasterSVG.width * svgscale / 2, -  blasterSVG.height * svgscale / 2, blasterSVG.width * svgscale, blasterSVG.height * svgscale);
 			break;
 		}
-		case "Photon Cannon":{
+		case "PhotonCannon":{
 			canvasContext.drawImage(photonCannonSVG, - photonCannonSVG.width * svgscale / 2, -  photonCannonSVG.height * svgscale / 2, photonCannonSVG.width * svgscale, photonCannonSVG.height * svgscale);
 			break;
 		}
-		case "Mass Driver":{
+		case "MassDriver":{
 			canvasContext.drawImage(massDriverSVG, - massDriverSVG.width * svgscale / 2, -  massDriverSVG.height * svgscale / 2, massDriverSVG.width * svgscale, massDriverSVG.height * svgscale);
 			break;
 		}

@@ -7,7 +7,7 @@
     "maxPlayersInRoom":25,
     "randomizePlayersLocations":true,
     "roomKickTimeout":90,
-    "lobbyWaitTime":60,
+    "lobbyWaitTime":90,
 
 
     "baseTimeUntilShrink":30,
@@ -30,11 +30,10 @@
     "lobbyWidth": 750,
     "lobbyHeight": 750,
 
-    "worldWidth": 7500,
-    "worldHeight": 7500,
-
+    "worldWidth": 5000,
+    "worldHeight": 5000,
     "generateAsteroids":true,
-    "asteroidAmt":300,
+    "asteroidAmt":80,
     "asteroidBaseHealth":40,
     "asteroidDropRate":30,
     "asteroidMinSize":45,
@@ -50,15 +49,15 @@
     },
 
     "generatePlanets":true,
-    "planetAmt":100,
+    "planetAmt":30,
     "planetMinSize":100,
     "planetMaxSize":200,
 
     "generateNebulas":true,
-    "nebulaAmt":100,
+    "nebulaAmt":40,
     "nebulaSlowAmt":0,
-    "nebulaMinSize":110,
-    "nebulaMaxSize":140,
+    "nebulaMinSize":130,
+    "nebulaMaxSize":250,
 
     "generateTradeShips":true,
     "tradeShipMinDelay":5,
@@ -84,14 +83,14 @@
     "forceConstant": 500000,
 
     "blasterCoolDown":0.7,
-    "bulletLifetime":0.5,
+    "bulletLifetime":0.75,
     "blasterBulletSpeed":788,
     "blasterBulletDamage":10,
 
     "photonCannonCoolDown":1.2,
-    "birdshotLifetime":0.2,
-    "birdshotDamage":25,
-    "birdshotSpeed":700,
+    "birdshotLifetime":0.45,
+    "birdshotDamage":15,
+    "birdshotSpeed":800,
 
     "massDriverCoolDown":1.2,
     "massDriverBulletDamage":35,

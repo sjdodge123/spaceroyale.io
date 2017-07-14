@@ -214,13 +214,18 @@ class Game {
 
 	gameover(){
 		this.active = false;
+		var winnerName = '';
 		console.log("Room" + this.roomSig +"'s game has ended.");
 		for(var shipID in this.shipList){
 			if(!this.shipList[shipID].isAI){
+				winnerName = this.clientList[shipID];
 				console.log(this.clientList[shipID]+" wins!");
-				this.winner = shipID;
+			} else{
+				winnerName = this.shipList[shipID].AIName;
 			}
+			this.winner = shipID;
 		}
+		messenger.messageRoomBySig(this.roomSig,'eventMessage',winnerName + " wins the game!");
 		this.gameEnded = true;
 	}
 
@@ -248,10 +253,12 @@ class Game {
 	}
 
 	checkForWin(){
+		/*
 		if(this.getPlayerShipCount() == 0){
 			this.gameover();
 			return true;
 		}
+		*/
 		if(this.getShipCount() == 1){
 			this.gameover();
 			return true;
@@ -1116,7 +1123,7 @@ class Ship extends Circle{
 		} else{
 			messenger.toastPlayer(this.id,"Full health");
 		}
-		messenger.messageUser(this.id,"myShipHealth",this.health);
+		messenger.messageRoomBySig(this.roomSig,"shipHealth",{health:this.health,id:this.id});
 	}
 	applyBoost(type,amt,duration,msg,exitMsg,refreshMsg){
 		switch(type){
@@ -1179,7 +1186,8 @@ class Ship extends Circle{
 				if(this.shield.alive){
 					return;
 				}
-				this.health -= Math.abs(this.shield.leftOverDamage);
+				this.takeDamage(this.shield.leftOverDamage);
+				messenger.messageRoomBySig(this.roomSig,'updateShield',compressor.updateShield(this.shield));
 				this.shield = null;
 			} else{
 				this.takeDamage(object.damage);
@@ -1187,16 +1195,14 @@ class Ship extends Circle{
 
 			if(this.health < 1){
 				this.iDied(object.owner);
-				return;
 			}
-			messenger.messageUser(object.owner,"shotLanded");
-
+			messenger.messageUser(object.owner,"shotLanded");			
 		}
 	}
 
 	takeDamage(damage){
-		this.health -= Math.floor(damage);
-		messenger.messageUser(this.id,"myShipHealth",this.health);
+		this.health -= Math.abs(damage);
+		messenger.messageRoomBySig(this.roomSig,"shipHealth",{health:this.health,id:this.id});
 		this.checkHP();
 	}
 	iDied(killerID){
@@ -1560,7 +1566,7 @@ class OverdriveItem extends Boost{
 class EquipableItem extends CircleItem{
 	constructor(x,y,color,level){
 		super(x,y,color);
-		this.pickUpCooldown = 1;
+		this.pickUpCooldown = 0;
 		this.level = level || 1;
 		this.name = '';
 	}
@@ -1642,6 +1648,7 @@ class Weapon {
 	}
 	drop(x,y,level){
 		var item = new this.item(x,y,level);
+		item.pickUpCooldown = 1.5;
 		return item;
 	}
 }

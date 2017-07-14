@@ -269,6 +269,7 @@ function equipItem(packet){
 	packet = JSON.parse(packet);
 	var name = packet[1];
 	var level = packet[2];
+	var cooldown = packet[3];
 
 	if(name == "ShieldItem"){
 		shipList[packet[0]].shield = {};
@@ -278,14 +279,17 @@ function equipItem(packet){
 	if(name == "BlasterItem"){
 		shipList[packet[0]].weapon.name = "Blaster";
 		shipList[packet[0]].weapon.level = level;
+		shipList[packet[0]].weapon.cooldown = cooldown;
 	}
 	if(name == "PhotonCannonItem"){
-		shipList[packet[0]].weapon.name = "Photon Cannon";
+		shipList[packet[0]].weapon.name = "PhotonCannon";
 		shipList[packet[0]].weapon.level = level;
+		shipList[packet[0]].weapon.cooldown = cooldown;
 	}
 	if(name == "MassDriverItem"){
-		shipList[packet[0]].weapon.name = "Mass Driver";
+		shipList[packet[0]].weapon.name = "MassDriver";
 		shipList[packet[0]].weapon.level = level;
+		shipList[packet[0]].weapon.cooldown = cooldown;
 	}
 }
 
@@ -299,6 +303,18 @@ function updateItem(packet){
 		return;
 	}
 	shipList[packet[0]].weapon.level = level;
+}
+function updateShield(packet){
+	packet = JSON.parse(packet);
+	var owner = packet[0];
+	var level = packet[1];
+	var alive = packet[2];
+
+	if(!alive){
+		shipList[owner].shield = null;
+		return;
+	}
+	shipList[owner].shield.level = level;
 }
 
 
@@ -413,7 +429,7 @@ function weaponFired(payload){
 		}
 	}
 	if(id == myID){
-		lastFired = new Date();
+		lastFired = Date.now();
 	}
 	if(camera.inBounds(ship)){
 		if(weaponName == "Blaster"){

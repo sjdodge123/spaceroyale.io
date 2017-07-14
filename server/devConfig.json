@@ -1,30 +1,31 @@
 {
 	"override":true,
-	"minPlayers":2,
+	"minPlayers":1,
 	"maxPlayersInRoom":25,
-	"worldWidth": 7500,
-	"worldHeight": 7500,
-	"asteroidAmt":400,
-	"planetAmt":100,
-	"nebulaAmt":100,
-
+	"worldWidth": 5000,
+	"worldHeight": 5000,
+	"asteroidAmt":160,
+	"planetAmt":20,
+	"nebulaAmt":20,
 
 	"nebulaMinSize":130,
     "nebulaMaxSize":250,
 
-	"asteroidDropRate":100,
+	"asteroidDropRate":30,
 	"lobbyWaitTime":5,
 
-	"AISpawnPlayers":false,
+	"AISpawnPlayers":true,
 
 	"generateTradeShips":true,
 	"tradeShipSpeed":3,
 	"playerSpawnWeapon":"Blaster",
-	"playerSpawnWeaponLevel":3,
+	"playerSpawnWeaponLevel":1,
 	"playerBaseHealth":100,
 
+	"bulletLifetime":0.75,
+
 	"photonCannonCoolDown":1.2,
-    "birdshotLifetime":0.2,
-    "birdshotDamage":25,
-    "birdshotSpeed":700
+    "birdshotLifetime":0.45,
+    "birdshotDamage":15,
+    "birdshotSpeed":800
 }

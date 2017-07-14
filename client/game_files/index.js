@@ -12,6 +12,7 @@ var server = null,
 
     //Gamevars
     skipAuth = false,
+    iAmFiring = false,
     gameRunning = false,
     lastFired = new Date(),
     cooldownRemaining = 0,
@@ -19,7 +20,7 @@ var server = null,
     iAmAlive = true,
     cameraBouncing = false,
     cameraCenterSeed = null,
-    cameraBoundcingFirstPass = true,
+    cameraBouncingFirstPass = true,
     lastCameraSwap = null,
     recenterCameraTimeout = 5,
     timeOutChecker = null,
@@ -354,6 +355,7 @@ function resetGameVariables(){
     skipAuth = false;
     gameRunning = false;
     iAmAlive = true;
+    iAmFiring = false;
     timeOutChecker = null;
     gameStarted = false;
     victory = false;
@@ -382,6 +384,7 @@ function resetGameVariables(){
     shipList = {};
     canvas.removeEventListener("mousemove", calcMousePos, false);
     canvas.removeEventListener("mousedown", handleClick, false);
+    canvas.addEventListener("mouseup", handleUnClick, false);
     canvas.removeEventListener('touchstart', onTouchStart, false);
     canvas.removeEventListener('touchend', onTouchEnd, false);
     canvas.removeEventListener('touchmove',onTouchMove, false);
@@ -397,6 +400,7 @@ function resetGameVariables(){
 }
 
 function enterLobby(name,color){
+    $('#space-footer').hide();
     $('#gameWindow').show();
     $('#howToPlayMenu').show();
     clientSendStart(name,color);
@@ -410,6 +414,7 @@ function init(){
     animloop();
     canvas.addEventListener("mousemove", calcMousePos, false);
     canvas.addEventListener("mousedown", handleClick, false);
+    canvas.addEventListener("mouseup", handleUnClick, false);
     canvas.addEventListener('touchstart', onTouchStart, false);
     canvas.addEventListener('touchend', onTouchEnd, false);
     canvas.addEventListener('touchmove', onTouchMove, false);
@@ -542,17 +547,6 @@ function resize(){
 
 function animloop(){
     if(gameRunning){
-        /*
-        requestAnimFrame(animloop);
-        now = Date.now();
-        dt = now - then;
-        if(dt > interval){
-            then = now - (dt % interval);
-            deltaTime = dt/1000;
-            frames = 1000/dt;
-            gameLoop();
-        }
-        */
         var now = Date.now();
     	dt = now - then;
         gameLoop();
@@ -563,26 +557,28 @@ function animloop(){
 }
 
 function gameLoop(){
-    if(myID == null || myShip == null){
-        recenterCamera();
+    recenterCamera();
+    if(myShip == null){
         return;
+    }
+    if(iAmFiring){
+        fireGun(mouseX,mouseY);
     }
     updateGameboard();
     drawFlashScreen();
     drawBackground();
     drawRelativeObjects();
     drawHUD();
-    if(iAmAlive){
-        checkCooldown();
-        checkForDamage();
-        return;
-    }
-    recenterCamera();
+    checkCooldown();
+    checkForDamage()
 }
 
 function recenterCamera(){
     if(cameraBouncing){
         var currentTime = new Date();
+        if(myShip == null){
+            cameraCenterSeed = findAlivePlayerIndex();
+        }
         if(lastCameraSwap == null){
             lastCameraSwap = new Date(currentTime);
             lastCameraSwap.setTime(lastCameraSwap.getTime() + recenterCameraTimeout*1000);
@@ -591,15 +587,16 @@ function recenterCamera(){
             lastCameraSwap = new Date(currentTime);
             lastCameraSwap.setTime(lastCameraSwap.getTime() + recenterCameraTimeout*1000);
             cameraCenterSeed = findAlivePlayerIndex();
-            cameraBoundcingFirstPass = false;
+            
+            cameraBouncingFirstPass = false;
         }
-        if(cameraBoundcingFirstPass){
+        if(cameraBouncingFirstPass){
             return;
         }
-        if(shipList[cameraCenterSeed] == null){
-            cameraCenterSeed = findAlivePlayerIndex();
-        }
-        myShip = shipList[cameraCenterSeed];
+        myID = cameraCenterSeed;
+    }
+    if(myID != null && shipList != null && shipList[myID] != null){
+        myShip = shipList[myID];
         camera.centerOnObject(myShip);
         camera.draw();
     }
@@ -608,12 +605,13 @@ function recenterCamera(){
 function findAlivePlayerIndex(){
     var shipCountList = [], index;
     for(var i in shipList){
-        if(shipList[i].alive){
-            shipCountList.push(shipList[i]);
+        if(shipList[i] != null && shipList[i] != undefined){
+            shipCountList.push(shipList[i].id);
         }
     }
+
     index = getRandomInt(0,shipCountList.length-1);
-    return index;
+    return shipCountList[index];
 }
 
 function cancelMovement(){
@@ -627,7 +625,6 @@ function cancelMovement(){
 function gameStart(){
     //stopSound(backgroundMusic);
     //playSound(gameStartMusic);
-    $('#space-footer').hide();
     $('#howToPlayMenu').hide();
 }
 
@@ -636,21 +633,18 @@ function gameOver(){
 }
 
 function checkCooldown(){
-    cooldownRemaining = currentWeaponCooldown - (new Date() - lastFired);
+    cooldownRemaining = currentWeaponCooldown - (Date.now() - lastFired);
     if(cooldownRemaining <= 0){
         cooldownRemaining = 0;
     }
 }
 
 function checkForDamage(){
-    if(shipList[myID] == null){
-        return;
-    }
-    if(shipList[myID].health < healthLastFrame){
+    if(myShip.health < healthLastFrame){
         playSound(takeDamage);
         drawFlashScreen();
     }
-    healthLastFrame = shipList[myID].health;
+    healthLastFrame = myShip.health;
 }
 
 function calcMousePos(evt){
@@ -664,9 +658,15 @@ function calcMousePos(evt){
 }
 
 function handleClick(evt){
-    //Run an interval here until mouseUP or something
+    if(!iAmFiring){
+        iAmFiring = true;
+    }
     evt.preventDefault();
-    fireGun(mouseX,mouseY);
+}
+function handleUnClick(evt){
+    if(iAmFiring){
+        iAmFiring = false;
+    }
 }
 
 function fireGun(_x,_y){
