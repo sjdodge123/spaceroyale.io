@@ -86,7 +86,7 @@ class SpriteSheet {
 	}
 
 	draw(width,height){
-		canvasContext.drawImage(this.image,this.frameIndex[this.XframeIndex][this.YframeIndex].sx,this.frameIndex[this.XframeIndex][this.YframeIndex].sy,this.frameWidth,this.frameHeight,this.x-(width/2),this.y-(height/2),width,height);
+		gameContext.drawImage(this.image,this.frameIndex[this.XframeIndex][this.YframeIndex].sx,this.frameIndex[this.XframeIndex][this.YframeIndex].sy,this.frameWidth,this.frameHeight,this.x-(width/2),this.y-(height/2),width,height);
 	}
 }
 
@@ -98,29 +98,25 @@ var tradeShipSheet = new SpriteSheet(tradeShipSVG,0,0,200,600,1,1);
 var lastLobbyTime = null;
 
 function drawBackground() {
-	canvasContext.save();
-	canvasContext.fillStyle = 'black';
-	canvasContext.fillRect(0,0,canvas.width,canvas.height);
-	canvasContext.drawImage(background,world.x-myShip.x,world.y-myShip.y,world.width+canvas.width,world.height+canvas.height);
-	canvasContext.restore();
+	gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 }
 
 function drawFlashScreen(){
-	canvasContext.save();
-	canvasContext.fillStyle = 'red';
-	canvasContext.fillRect(0,0,canvas.width,canvas.height);
-	canvasContext.restore();
+	gameContext.save();
+	gameContext.fillStyle = 'red';
+	gameContext.fillRect(0,0,gameCanvas.width,gameCanvas.height);
+	gameContext.restore();
 }
 
 function drawQuadTree(currentQuad){
-	canvasContext.save();
-	canvasContext.translate(currentQuad.minX - myShip.x + camera.xOffset, currentQuad.minY - myShip.y + camera.yOffset);
-	canvasContext.beginPath();
-	canvasContext.lineWidth = "6";
-	canvasContext.strokeStyle = "blue";
-	canvasContext.rect(0, 0, currentQuad.width, currentQuad.height);
-	canvasContext.stroke();
-	canvasContext.restore();
+	gameContext.save();
+	gameContext.translate(currentQuad.minX - myShip.x + camera.xOffset, currentQuad.minY - myShip.y + camera.yOffset);
+	gameContext.beginPath();
+	gameContext.lineWidth = "6";
+	gameContext.strokeStyle = "blue";
+	gameContext.rect(0, 0, currentQuad.width, currentQuad.height);
+	gameContext.stroke();
+	gameContext.restore();
 
 	for (var i = 0; i < currentQuad.nodes.length; i++){
 		if (currentQuad.nodes[i] != null){
@@ -130,18 +126,18 @@ function drawQuadTree(currentQuad){
 }
 
 function drawText(text,x,y){
-	canvasContext.save();
-	canvasContext.fillStyle = 'white';
-	canvasContext.font="20px Georgia";
-	canvasContext.fillText(text,x,y);
-	canvasContext.restore();
+	gameContext.save();
+	gameContext.fillStyle = 'white';
+	gameContext.font="20px Georgia";
+	gameContext.fillText(text,x,y);
+	gameContext.restore();
 }
 function drawTextF(text,x,y,color,font){
-	canvasContext.save();
-	canvasContext.fillStyle = color;
-	canvasContext.font=font;
-	canvasContext.fillText(text,x,y);
-	canvasContext.restore();
+	gameContext.save();
+	gameContext.fillStyle = color;
+	gameContext.font=font;
+	gameContext.fillText(text,x,y);
+	gameContext.restore();
 }
 
 function drawFlashingText(text,x,y,color,font,flashColor,timeLeft,playTick){
@@ -182,43 +178,43 @@ function drawHUD(){
 
 function drawJoysticks(){
 	if(joystickMovement != null && isTouchScreen){
-		canvasContext.save();
-		canvasContext.beginPath();
-		canvasContext.fillStyle = "rgba(0, 0, 255, 0.3)";
-		canvasContext.arc(joystickMovement.baseX,joystickMovement.baseY,joystickMovement.baseRadius,0,Math.PI*2,true);
-		canvasContext.fill();
+		gameContext.save();
+		gameContext.beginPath();
+		gameContext.fillStyle = "rgba(0, 0, 255, 0.3)";
+		gameContext.arc(joystickMovement.baseX,joystickMovement.baseY,joystickMovement.baseRadius,0,Math.PI*2,true);
+		gameContext.fill();
 
-		canvasContext.strokeStyle = "blue";
-		canvasContext.beginPath();
-		canvasContext.arc(joystickMovement.stickX,joystickMovement.stickY,joystickMovement.stickRadius,0,Math.PI*2,true);
-		canvasContext.stroke();
+		gameContext.strokeStyle = "blue";
+		gameContext.beginPath();
+		gameContext.arc(joystickMovement.stickX,joystickMovement.stickY,joystickMovement.stickRadius,0,Math.PI*2,true);
+		gameContext.stroke();
 
-		canvasContext.restore();
+		gameContext.restore();
 	}
 	if(joystickCamera != null && isTouchScreen){
-		canvasContext.save();
-		canvasContext.beginPath();
-		canvasContext.fillStyle = "rgba(255, 0, 0, 0.3)";
-		canvasContext.arc(joystickCamera.baseX,joystickCamera.baseY,joystickCamera.baseRadius,0,Math.PI*2,true);
-		canvasContext.fill();
+		gameContext.save();
+		gameContext.beginPath();
+		gameContext.fillStyle = "rgba(255, 0, 0, 0.3)";
+		gameContext.arc(joystickCamera.baseX,joystickCamera.baseY,joystickCamera.baseRadius,0,Math.PI*2,true);
+		gameContext.fill();
 
 		if( 1 - (cooldownRemaining/currentWeaponCooldown) >= 1){
-			canvasContext.strokeStyle = "red";
-			canvasContext.beginPath();
-			canvasContext.arc(joystickCamera.baseX,joystickCamera.baseY,joystickCamera.fireradius,0,Math.PI*2,true);
-			canvasContext.stroke();
+			gameContext.strokeStyle = "red";
+			gameContext.beginPath();
+			gameContext.arc(joystickCamera.baseX,joystickCamera.baseY,joystickCamera.fireradius,0,Math.PI*2,true);
+			gameContext.stroke();
 		}
-		canvasContext.strokeStyle = "red";
-		canvasContext.beginPath();
-		canvasContext.arc(joystickCamera.stickX,joystickCamera.stickY,joystickCamera.stickRadius,0,Math.PI*2,true);
-		canvasContext.stroke();
+		gameContext.strokeStyle = "red";
+		gameContext.beginPath();
+		gameContext.arc(joystickCamera.stickX,joystickCamera.stickY,joystickCamera.stickRadius,0,Math.PI*2,true);
+		gameContext.stroke();
 
-		canvasContext.beginPath();
-		canvasContext.moveTo(canvas.width/2,canvas.height/2);
-		canvasContext.lineTo(canvas.width/2+joystickCamera.dx*500,canvas.height/2+joystickCamera.dy*500);
-		canvasContext.stroke();
+		gameContext.beginPath();
+		gameContext.moveTo(gameCanvas.width/2,gameCanvas.height/2);
+		gameContext.lineTo(gameCanvas.width/2+joystickCamera.dx*500,gameCanvas.height/2+joystickCamera.dy*500);
+		gameContext.stroke();
 
-		canvasContext.restore();
+		gameContext.restore();
 	}
 }
 
@@ -229,24 +225,24 @@ function drawAliveCounter(){
 function drawWeaponHUD(){
 	if(myShip != null){
 		var svgscale = .25;
-		canvasContext.save();
-		canvasContext.translate(eventLog.x + eventLog.width + 80,eventLog.y+(eventLog.height/2));
-		canvasContext.rotate(Math.PI/180);
+		gameContext.save();
+		gameContext.translate(eventLog.x + eventLog.width + 80,eventLog.y+(eventLog.height/2));
+		gameContext.rotate(Math.PI/180);
 		switch(myShip.weapon.name){
 			case "Blaster":{
-				canvasContext.drawImage(blasterSVG, - blasterSVG.width * svgscale / 2, -  blasterSVG.height * svgscale / 2, blasterSVG.width * svgscale, blasterSVG.height * svgscale);
+				gameContext.drawImage(blasterSVG, - blasterSVG.width * svgscale / 2, -  blasterSVG.height * svgscale / 2, blasterSVG.width * svgscale, blasterSVG.height * svgscale);
 				break;
 			}
 			case "PhotonCannon":{
-				canvasContext.drawImage(photonCannonSVG, - photonCannonSVG.width * svgscale / 2, -  photonCannonSVG.height * svgscale / 2, photonCannonSVG.width * svgscale, photonCannonSVG.height * svgscale);
+				gameContext.drawImage(photonCannonSVG, - photonCannonSVG.width * svgscale / 2, -  photonCannonSVG.height * svgscale / 2, photonCannonSVG.width * svgscale, photonCannonSVG.height * svgscale);
 				break;
 			}
 			case "MassDriver":{
-				canvasContext.drawImage(massDriverSVG, - massDriverSVG.width * svgscale / 2, -  massDriverSVG.height * svgscale / 2, massDriverSVG.width * svgscale, massDriverSVG.height * svgscale);
+				gameContext.drawImage(massDriverSVG, - massDriverSVG.width * svgscale / 2, -  massDriverSVG.height * svgscale / 2, massDriverSVG.width * svgscale, massDriverSVG.height * svgscale);
 				break;
 			}
 		}
-		canvasContext.restore();
+		gameContext.restore();
 		drawText(myShip.weapon.name,eventLog.x + eventLog.width+80-((myShip.weapon.name.length*10)/2),eventLog.y+eventLog.height);
 	}
 	
@@ -258,44 +254,44 @@ function drawKillCounter(){
 
 function drawHPCounter(){
 	if(myShip != null){
-		canvasContext.save();
+		gameContext.save();
 		if(myShip.health > 70){
-			canvasContext.fillStyle = "#1dba34";
+			gameContext.fillStyle = "#1dba34";
 		}else if(myShip.health > 30){
-			canvasContext.fillStyle = "yellow";
+			gameContext.fillStyle = "yellow";
 		} else {
-			canvasContext.fillStyle = "tomato";
+			gameContext.fillStyle = "tomato";
 		}
 
-		canvasContext.fillRect(eventLog.x,eventLog.y-30,(myShip.health/100)*eventLog.width/2,20);
-		canvasContext.restore();
+		gameContext.fillRect(eventLog.x,eventLog.y-30,(myShip.health/100)*eventLog.width/2,20);
+		gameContext.restore();
 		drawTextF("Health",eventLog.x+(eventLog.width/4)-30,eventLog.y-15,"#ECF0F1","17px Georgia");
 	}
 }
 function drawWeaponCooldown(){
-	canvasContext.save();
-	canvasContext.fillStyle = myShip.color;
-	canvasContext.fillRect(eventLog.x+eventLog.width/2,eventLog.y-30,(1 - (cooldownRemaining/currentWeaponCooldown))*eventLog.width/2,20);
-	canvasContext.restore();
+	gameContext.save();
+	gameContext.fillStyle = myShip.color;
+	gameContext.fillRect(eventLog.x+eventLog.width/2,eventLog.y-30,(1 - (cooldownRemaining/currentWeaponCooldown))*eventLog.width/2,20);
+	gameContext.restore();
 	drawTextF("Power",eventLog.x+eventLog.width/2+(eventLog.width/4)-30,eventLog.y-15,"#ECF0F1","17px Georgia");
 }
 
 function drawToast(){
 	if(toastMessage != null){
-		drawText(toastMessage,canvas.width/2-(toastMessage.length*5),canvas.height/2+50);
+		drawText(toastMessage,gameCanvas.width/2-(toastMessage.length*5),gameCanvas.height/2+50);
 	}
 }
 function drawTotalPlayers(){
 	if(totalPlayers !=null){
 		var message = "Players on Server: " + totalPlayers;
-		drawTextF(message,canvas.width-(message.length*5),canvas.height - 15,"#e0e0eb","10px Georgia");
+		drawTextF(message,gameCanvas.width-(message.length*5),gameCanvas.height - 15,"#e0e0eb","10px Georgia");
 	}
 }
 
 function drawPing(){
 	if(ping != null){
 		var message = "Ping: " + ping;
-		drawTextF(message,canvas.width-(message.length*5) - 125,canvas.height - 15,"#e0e0eb","10px Georgia");
+		drawTextF(message,gameCanvas.width-(message.length*5) - 125,gameCanvas.height - 15,"#e0e0eb","10px Georgia");
 	}
 }
 
@@ -328,36 +324,36 @@ function drawBoundArrow(){
 		}
 		x = (dx/dy) * (y - camera.yOffset) + camera.xOffset;
 	}
-	var rad = canvas.height/2 * 0.95;
+	var rad = gameCanvas.height/2 * 0.95;
 	var angle = Math.atan2(world.whiteBound.y-myShip.y,world.whiteBound.x-myShip.x) + Math.PI/2;
 
-	canvasContext.save();
-	canvasContext.translate(x, y);
-	canvasContext.rotate(angle);
-	canvasContext.strokeStyle = myShip.color;
-	canvasContext.beginPath();
-	canvasContext.lineWidth = 5;
-	canvasContext.moveTo(-20,23);
-	canvasContext.lineTo(0,3);
-	canvasContext.lineTo(20,23);
-	canvasContext.stroke();
-	canvasContext.restore();
+	gameContext.save();
+	gameContext.translate(x, y);
+	gameContext.rotate(angle);
+	gameContext.strokeStyle = myShip.color;
+	gameContext.beginPath();
+	gameContext.lineWidth = 5;
+	gameContext.moveTo(-20,23);
+	gameContext.lineTo(0,3);
+	gameContext.lineTo(20,23);
+	gameContext.stroke();
+	gameContext.restore();
 }
 
 function drawEventLog(){
-	canvasContext.save();
-	canvasContext.globalAlpha = 0.5;
-	canvasContext.fillStyle = eventLog.backgroundColor;
-	canvasContext.fillRect(eventLog.x,eventLog.y,eventLog.width,eventLog.height);
-	canvasContext.fillStyle = eventLog.textColor;
-	canvasContext.font=	eventLog.textStyle;
+	gameContext.save();
+	gameContext.globalAlpha = 0.5;
+	gameContext.fillStyle = eventLog.backgroundColor;
+	gameContext.fillRect(eventLog.x,eventLog.y,eventLog.width,eventLog.height);
+	gameContext.fillStyle = eventLog.textColor;
+	gameContext.font=	eventLog.textStyle;
 	var len = eventLog.printList.length-1;
 	if(len != -1){
 		for(var i=len;i>=0;i--){
-			canvasContext.fillText(eventLog.printList[i],eventLog.textX(),eventLog.textY()+(i*eventLog.textSize));
+			gameContext.fillText(eventLog.printList[i],eventLog.textX(),eventLog.textY()+(i*eventLog.textSize));
 		}
 	}
-	canvasContext.restore();
+	gameContext.restore();
 }
 
 function drawShrinkTimer(){
@@ -406,13 +402,13 @@ function drawShip(ship){
 		drawShield(ship);
 	}
 	
-	canvasContext.save();
-	canvasContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
-	canvasContext.rotate(ship.spriteAngle*Math.PI/180);
-	canvasContext.shadowColor = ship.color;
-	canvasContext.shadowOffsetX = 1;
-	canvasContext.shadowOffsetY = 1;
-	canvasContext.shadowBlur = 16;
+	gameContext.save();
+	gameContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
+	gameContext.rotate(ship.spriteAngle*Math.PI/180);
+	gameContext.shadowColor = ship.color;
+	gameContext.shadowOffsetX = 1;
+	gameContext.shadowOffsetY = 1;
+	gameContext.shadowBlur = 16;
 
 	var shipSVG;
 	switch (ship.color){
@@ -437,8 +433,8 @@ function drawShip(ship){
 			break;
 		}
 	}
-	canvasContext.drawImage(shipSVG, -ship.radius, -ship.radius, 2*ship.radius, 2*ship.radius);
-	canvasContext.restore();
+	gameContext.drawImage(shipSVG, -ship.radius, -ship.radius, 2*ship.radius, 2*ship.radius);
+	gameContext.restore();
 
 	drawWeapon(ship);
 	if(ship.isHiding == false){
@@ -451,54 +447,54 @@ function drawShip(ship){
 function drawWeapon(ship){
 	var shipDim = ship.radius || ship.width/4; 
 	var svgscale = 2 * shipDim / shipRedSVG.width;
-	canvasContext.save();
-	canvasContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
-	canvasContext.rotate((ship.weapon.angle + 180)*Math.PI/180);
+	gameContext.save();
+	gameContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
+	gameContext.rotate((ship.weapon.angle + 180)*Math.PI/180);
 	switch(ship.weapon.name){
 		case "Blaster":{
-			canvasContext.drawImage(blasterSVG, - blasterSVG.width * svgscale / 2, -  blasterSVG.height * svgscale / 2, blasterSVG.width * svgscale, blasterSVG.height * svgscale);
+			gameContext.drawImage(blasterSVG, - blasterSVG.width * svgscale / 2, -  blasterSVG.height * svgscale / 2, blasterSVG.width * svgscale, blasterSVG.height * svgscale);
 			break;
 		}
 		case "PhotonCannon":{
-			canvasContext.drawImage(photonCannonSVG, - photonCannonSVG.width * svgscale / 2, -  photonCannonSVG.height * svgscale / 2, photonCannonSVG.width * svgscale, photonCannonSVG.height * svgscale);
+			gameContext.drawImage(photonCannonSVG, - photonCannonSVG.width * svgscale / 2, -  photonCannonSVG.height * svgscale / 2, photonCannonSVG.width * svgscale, photonCannonSVG.height * svgscale);
 			break;
 		}
 		case "MassDriver":{
-			canvasContext.drawImage(massDriverSVG, - massDriverSVG.width * svgscale / 2, -  massDriverSVG.height * svgscale / 2, massDriverSVG.width * svgscale, massDriverSVG.height * svgscale);
+			gameContext.drawImage(massDriverSVG, - massDriverSVG.width * svgscale / 2, -  massDriverSVG.height * svgscale / 2, massDriverSVG.width * svgscale, massDriverSVG.height * svgscale);
 			break;
 		}
 	}
 	
-	canvasContext.restore();
+	gameContext.restore();
 
 }
 function drawShield(ship){
-	canvasContext.save();
+	gameContext.save();
 	switch(ship.shield.level){
 		case 1:{
-			canvasContext.strokeStyle = config.shield1Color;
+			gameContext.strokeStyle = config.shield1Color;
 			break;
 		}
 		case 2:{
-			canvasContext.strokeStyle = config.shield2Color;
+			gameContext.strokeStyle = config.shield2Color;
 			break;
 		}
 		case 3:{
-			canvasContext.strokeStyle = config.shield3Color;
+			gameContext.strokeStyle = config.shield3Color;
 			break;
 		}
 
 	}
-	canvasContext.beginPath();
-	canvasContext.arc(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset,config.shieldRadius,0,Math.PI*2,true);
-	canvasContext.stroke();
-	canvasContext.restore();
+	gameContext.beginPath();
+	gameContext.arc(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset,config.shieldRadius,0,Math.PI*2,true);
+	gameContext.stroke();
+	gameContext.restore();
 }
 
 function drawAsteroid(asteroid){
-	canvasContext.save();
-	canvasContext.translate(asteroid.x-myShip.x+camera.xOffset,asteroid.y-myShip.y+camera.yOffset);
-	canvasContext.rotate(asteroid.angle*Math.PI/180);
+	gameContext.save();
+	gameContext.translate(asteroid.x-myShip.x+camera.xOffset,asteroid.y-myShip.y+camera.yOffset);
+	gameContext.rotate(asteroid.angle*Math.PI/180);
 	asteroidSheet.move(0,0);
 
 	if(asteroid.health == config.asteroidBaseHealth){
@@ -512,92 +508,92 @@ function drawAsteroid(asteroid){
 	}
 	
 	asteroidSheet.draw(asteroid.radius*2,asteroid.radius*2);
-	canvasContext.restore();	
+	gameContext.restore();	
 }
 
 function drawItem(item){
 	if(item.flash == true){
 		return;
 	}
-	canvasContext.save();
+	gameContext.save();
 
 	switch(item.name){
 		default:{
-			canvasContext.beginPath();
-			canvasContext.fillStyle = "red";
-			canvasContext.arc(item.x-myShip.x+camera.xOffset,item.y-myShip.y+camera.yOffset,item.radius,0,Math.PI*2,true);
-			canvasContext.fill();
-			canvasContext.beginPath();
-			canvasContext.strokeStyle = "white";
-			canvasContext.lineWidth=2;
-		    canvasContext.arc(item.x-myShip.x+camera.xOffset,item.y-myShip.y+camera.yOffset,item.radius,0,Math.PI*2,true);
-		    canvasContext.stroke();
+			gameContext.beginPath();
+			gameContext.fillStyle = "red";
+			gameContext.arc(item.x-myShip.x+camera.xOffset,item.y-myShip.y+camera.yOffset,item.radius,0,Math.PI*2,true);
+			gameContext.fill();
+			gameContext.beginPath();
+			gameContext.strokeStyle = "white";
+			gameContext.lineWidth=2;
+		    gameContext.arc(item.x-myShip.x+camera.xOffset,item.y-myShip.y+camera.yOffset,item.radius,0,Math.PI*2,true);
+		    gameContext.stroke();
 			break;
 		}
 		case "OverdriveItem":{
-			canvasContext.drawImage(overdriveItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
+			gameContext.drawImage(overdriveItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
 			break;
 		}
 
 		case "BlasterItem":{
-			canvasContext.drawImage(blasterItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
+			gameContext.drawImage(blasterItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
 			break;
 		}
 		case "PhotonCannonItem":{
-			canvasContext.drawImage(photonCannonItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
+			gameContext.drawImage(photonCannonItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
 			break;
 		}
 		case "MassDriverItem":{
-			canvasContext.drawImage(massDriverItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
+			gameContext.drawImage(massDriverItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
 			break;
 		}
 		case "HPItem":{
-			canvasContext.drawImage(healthItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
+			gameContext.drawImage(healthItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
 			break;
 		}
 		case "ShieldItem":{
-			canvasContext.drawImage(shieldItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
+			gameContext.drawImage(shieldItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
 			break;
 		}
 	}
-    canvasContext.restore();
+    gameContext.restore();
 }
 
 function drawPlanet(planet){
-	canvasContext.save();
+	gameContext.save();
 	planetSheet.move(planet.x-myShip.x+camera.xOffset,planet.y-myShip.y+camera.yOffset);
 	planetSheet.changeFrame(0,planet.artType);
 	planetSheet.draw(planet.radius*2,planet.radius*2);
-	canvasContext.restore();
+	gameContext.restore();
 }
 
 function drawNebula(nebula){
-	canvasContext.save();
+	gameContext.save();
 	nebulaSheet.move(nebula.x-myShip.x+camera.xOffset,nebula.y-myShip.y+camera.yOffset);
 	nebulaSheet.draw(nebula.radius*2,nebula.radius*2);
-	canvasContext.restore();
+	gameContext.restore();
 }
 
 function drawTradeShip(tradeShip){
-	canvasContext.save();
-	canvasContext.translate(tradeShip.x-myShip.x+camera.xOffset,tradeShip.y-myShip.y+camera.yOffset);
-	canvasContext.rotate((tradeShip.angle+90)*Math.PI/180);
+	gameContext.save();
+	gameContext.translate(tradeShip.x-myShip.x+camera.xOffset,tradeShip.y-myShip.y+camera.yOffset);
+	gameContext.rotate((tradeShip.angle+90)*Math.PI/180);
 	tradeShipSheet.move(0,0);
 	tradeShipSheet.draw(tradeShip.height,tradeShip.width);
-    canvasContext.restore();
+    gameContext.restore();
     if(tradeShip.weapon != null){
     	drawWeapon(tradeShip);
     }
 }
 
 function drawTradeShipTrail(circle){
-	canvasContext.save();
-	canvasContext.beginPath();
-	canvasContext.lineWidth = 3;
-	canvasContext.strokeStyle = circle.color;
-	canvasContext.arc(circle.x-myShip.x+camera.xOffset,circle.y-myShip.y+camera.yOffset,circle.radius,0,Math.PI*2,true);
-	canvasContext.stroke();
-	canvasContext.restore();
+	gameContext.save();
+	gameContext.beginPath();
+	gameContext.lineWidth = 3;
+	gameContext.strokeStyle = circle.color;
+	gameContext.arc(circle.x-myShip.x+camera.xOffset,circle.y-myShip.y+camera.yOffset,circle.radius,0,Math.PI*2,true);
+	gameContext.stroke();
+	gameContext.restore();
 }
 
 function drawBullet(bullet){
@@ -607,43 +603,43 @@ function drawBullet(bullet){
 	} else{
 		color = shipList[bullet.owner].color;
 	}
-	canvasContext.save();
-	canvasContext.translate(bullet.x-myShip.x+camera.xOffset,bullet.y-myShip.y+camera.yOffset);
-	canvasContext.rotate(bullet.angle*Math.PI/180);
-	canvasContext.fillStyle = color;
-	canvasContext.fillRect(-bullet.width/2,-bullet.height/2,bullet.width,bullet.height);
-	canvasContext.restore();
+	gameContext.save();
+	gameContext.translate(bullet.x-myShip.x+camera.xOffset,bullet.y-myShip.y+camera.yOffset);
+	gameContext.rotate(bullet.angle*Math.PI/180);
+	gameContext.fillStyle = color;
+	gameContext.fillRect(-bullet.width/2,-bullet.height/2,bullet.width,bullet.height);
+	gameContext.restore();
 }
 
 function drawWorld(){
 	if(world != null){
-		canvasContext.save();
-		canvasContext.beginPath();
-        canvasContext.strokeStyle = "orange";
-        canvasContext.rect(world.x-myShip.x+camera.xOffset,world.y-myShip.y+camera.yOffset,world.width,world.height);
-        canvasContext.stroke();
-        canvasContext.restore();
+		gameContext.save();
+		gameContext.beginPath();
+        gameContext.strokeStyle = "orange";
+        gameContext.rect(world.x-myShip.x+camera.xOffset,world.y-myShip.y+camera.yOffset,world.width,world.height);
+        gameContext.stroke();
+        gameContext.restore();
 	}
 }
 
 function drawBounds(){
 	if(world.whiteBound != null){
-		canvasContext.save();
-		canvasContext.beginPath();
-		canvasContext.lineWidth = 3;
-		canvasContext.strokeStyle = "white";
-		canvasContext.arc(world.whiteBound.x-myShip.x+camera.xOffset,world.whiteBound.y-myShip.y+camera.yOffset,world.whiteBound.radius,0,Math.PI*2,true);
-		canvasContext.stroke();
-		canvasContext.restore();
+		gameContext.save();
+		gameContext.beginPath();
+		gameContext.lineWidth = 3;
+		gameContext.strokeStyle = "white";
+		gameContext.arc(world.whiteBound.x-myShip.x+camera.xOffset,world.whiteBound.y-myShip.y+camera.yOffset,world.whiteBound.radius,0,Math.PI*2,true);
+		gameContext.stroke();
+		gameContext.restore();
 	}
 	if(world.blueBound != null){
-		canvasContext.save();
-		canvasContext.beginPath();
-		canvasContext.lineWidth = 3;
-		canvasContext.strokeStyle = "blue";
-		canvasContext.arc(world.blueBound.x-myShip.x+camera.xOffset,world.blueBound.y-myShip.y+camera.yOffset,world.blueBound.radius,0,Math.PI*2,true);
-		canvasContext.stroke();
-		canvasContext.restore();
+		gameContext.save();
+		gameContext.beginPath();
+		gameContext.lineWidth = 3;
+		gameContext.strokeStyle = "blue";
+		gameContext.arc(world.blueBound.x-myShip.x+camera.xOffset,world.blueBound.y-myShip.y+camera.yOffset,world.blueBound.radius,0,Math.PI*2,true);
+		gameContext.stroke();
+		gameContext.restore();
 	}
 }
 

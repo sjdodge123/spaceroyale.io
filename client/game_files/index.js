@@ -1,6 +1,11 @@
 var server = null,
-    canvas = null,
-    canvasContext = null,
+    uiCanvas = null,
+    gameCanvas = null,
+    backgroundCanvas = null,
+    uiContext = null,
+    gameContext = null,
+    backgroundContext = null,
+    backgroundImage = null,
     eventLog,
     camera,
     userRegex = null,
@@ -201,11 +206,18 @@ function setupPage(){
               };
     })();
     window.addEventListener('resize', resize, false);
-    canvas = document.getElementById('gameCanvas');
-    canvasContext = canvas.getContext('2d');
-    canvasContext.imageSmoothingEnabled = true;
-    joystickMovement = new Joystick(250,canvas.height-250);
-    joystickCamera = new Joystick(canvas.width-250,canvas.height-250);
+
+    gameCanvas = document.getElementById('gameCanvas');
+    uiCanvas = document.getElementById('uiCanvas');
+    backgroundCanvas = document.getElementById('backgroundCanvas');
+    backgroundImage = document.getElementById('backgroundImage');
+
+    gameContext = gameCanvas.getContext('2d');
+    uiContext = uiCanvas.getContext('2d');
+    backgroundCanvas = backgroundCanvas.getContext('2d');
+
+    joystickMovement = new Joystick(250,gameCanvas.height-250);
+    joystickCamera = new Joystick(gameCanvas.width-250,gameCanvas.height-250);
     isTouchScreen = joystickMovement.touchScreenAvailable();
     resize();
     userRegex = new RegExp('^[a-zA-Z0-9_-]{3,15}$');
@@ -340,12 +352,12 @@ function showGameOverScreen(cause){
 }
 
 function goFullScreen(){
-    if(canvas.requestFullScreen)
-        canvas.requestFullScreen();
-    else if(canvas.webkitRequestFullScreen)
-        canvas.webkitRequestFullScreen();
-    else if(canvas.mozRequestFullScreen)
-        canvas.mozRequestFullScreen();
+    if(uiCanvas.requestFullScreen)
+        uiCanvas.requestFullScreen();
+    else if(uiCanvas.webkitRequestFullScreen)
+        uiCanvas.webkitRequestFullScreen();
+    else if(uiCanvas.mozRequestFullScreen)
+        uiCanvas.mozRequestFullScreen();
 }
 
 function resetGameVariables(){
@@ -382,12 +394,12 @@ function resetGameVariables(){
     nebulaList = {};
     tradeShipList = {};
     shipList = {};
-    canvas.removeEventListener("mousemove", calcMousePos, false);
-    canvas.removeEventListener("mousedown", handleClick, false);
-    canvas.addEventListener("mouseup", handleUnClick, false);
-    canvas.removeEventListener('touchstart', onTouchStart, false);
-    canvas.removeEventListener('touchend', onTouchEnd, false);
-    canvas.removeEventListener('touchmove',onTouchMove, false);
+    uiCanvas.removeEventListener("mousemove", calcMousePos, false);
+    uiCanvas.removeEventListener("mousedown", handleClick, false);
+    uiCanvas.addEventListener("mouseup", handleUnClick, false);
+    uiCanvas.removeEventListener('touchstart', onTouchStart, false);
+    uiCanvas.removeEventListener('touchend', onTouchEnd, false);
+    uiCanvas.removeEventListener('touchmove',onTouchMove, false);
     window.removeEventListener("keydown", keyDown, false);
     window.removeEventListener("keyup", keyUp, false);
     window.removeEventListener('contextmenu', function(ev) {
@@ -395,8 +407,12 @@ function resetGameVariables(){
         return false;
     }, false);
     $(window).off("blur");
-    canvas = document.getElementById('gameCanvas');
-    canvasContext = canvas.getContext('2d');
+    gameCanvas = document.getElementById('gameCanvas');
+    uiCanvas = document.getElementById('uiCanvas');
+    backgroundCanvas = document.getElementById('backgroundCanvas');
+    backgroundImage = document.getElementById('backgroundImage');
+    
+    gameContext = gameCanvas.getContext('2d');
 }
 
 function enterLobby(name,color){
@@ -412,12 +428,12 @@ function enterLobby(name,color){
 function init(){
     timeOutChecker = setInterval(checkForTimeout,1000);
     animloop();
-    canvas.addEventListener("mousemove", calcMousePos, false);
-    canvas.addEventListener("mousedown", handleClick, false);
-    canvas.addEventListener("mouseup", handleUnClick, false);
-    canvas.addEventListener('touchstart', onTouchStart, false);
-    canvas.addEventListener('touchend', onTouchEnd, false);
-    canvas.addEventListener('touchmove', onTouchMove, false);
+    uiCanvas.addEventListener("mousemove", calcMousePos, false);
+    uiCanvas.addEventListener("mousedown", handleClick, false);
+    uiCanvas.addEventListener("mouseup", handleUnClick, false);
+    uiCanvas.addEventListener('touchstart', onTouchStart, false);
+    uiCanvas.addEventListener('touchend', onTouchEnd, false);
+    uiCanvas.addEventListener('touchmove', onTouchMove, false);
     window.addEventListener("keydown", keyDown, false);
     window.addEventListener("keyup", keyUp, false);
     window.addEventListener('contextmenu', function(ev) {
@@ -434,8 +450,8 @@ function init(){
 
 function resize(){
     var viewport = {width:window.innerWidth,height:window.innerHeight};
-    var scaleToFitX = viewport.width / canvas.width;
-    var scaleToFitY = viewport.height / canvas.height;
+    var scaleToFitX = viewport.width / gameCanvas.width;
+    var scaleToFitY = viewport.height / gameCanvas.height;
     var currentScreenRatio = viewport.width/viewport.height;
     var optimalRatio = Math.min(scaleToFitX,scaleToFitY);
 
@@ -443,39 +459,42 @@ function resize(){
         newWidth = viewport.width;
         newHeight = viewport.height;
     } else{
-        newWidth = canvas.width * optimalRatio;
-        newHeight = canvas.height * optimalRatio;
+        newWidth = gameCanvas.width * optimalRatio;
+        newHeight = gameCanvas.height * optimalRatio;
     }
-    canvas.style.width = newWidth + "px";
-    canvas.style.height = newHeight + "px";
+
+    gameCanvas.style.width = newWidth + "px";
+    gameCanvas.style.height = newHeight + "px";
+    backgroundImage.style.width = newWidth + "px";
+    backgroundImage.style.height = newHeight + "px";
 
     camera = {
-        x : canvas.width/2,
-        y : canvas.height/2,
-        width : canvas.width,
-        height : canvas.height,
+        x : gameCanvas.width/2,
+        y : gameCanvas.height/2,
+        width : gameCanvas.width,
+        height : gameCanvas.height,
         color : 'yellow',
         padding: -10,
         left: 0,
         right:0,
         top:0,
         bottom:0,
-        xOffset: canvas.width/2,
-        yOffset: canvas.height/2,
+        xOffset: gameCanvas.width/2,
+        yOffset: gameCanvas.height/2,
 
         centerOnObject : function(object){
            if(object == null){
                 return;
            }
-           xOffset =  object.x - (canvas.width/2);
-           yOffset =  object.y - (canvas.height/2);
+           xOffset =  object.x - (gameCanvas.width/2);
+           yOffset =  object.y - (gameCanvas.height/2);
         },
 
         draw : function() {
-            canvasContext.beginPath();
-            canvasContext.strokeStyle = this.color;
-            canvasContext.rect(this.padding,this.padding,this.width-this.padding*2,this.height-this.padding*2);
-            canvasContext.stroke();
+            gameContext.beginPath();
+            gameContext.strokeStyle = this.color;
+            gameContext.rect(this.padding,this.padding,this.width-this.padding*2,this.height-this.padding*2);
+            gameContext.stroke();
         },
 
         inBounds: function(object){
@@ -522,8 +541,8 @@ function resize(){
         backgroundColor:'#2a2a2a',
         width:500,
         height:90,
-        x: (canvas.width/2)-250,
-        y: canvas.height-90,
+        x: (gameCanvas.width/2)-250,
+        y: gameCanvas.height-90,
         textColor:"white",
         textStyle:"17px Verdana",
         textSize:17,
@@ -647,10 +666,10 @@ function checkForDamage(){
 
 function calcMousePos(evt){
     evt.preventDefault();
-    var rect = canvas.getBoundingClientRect();
+    var rect = gameCanvas.getBoundingClientRect();
     if(myShip != null){
-        mouseX = (((evt.pageX - rect.left)/newWidth)*canvas.width)+ myShip.x - camera.xOffset;
-        mouseY = (((evt.pageY - rect.top )/newHeight)*canvas.height) + myShip.y - camera.yOffset;
+        mouseX = (((evt.pageX - rect.left)/newWidth)*gameCanvas.width)+ myShip.x - camera.xOffset;
+        mouseY = (((evt.pageY - rect.top )/newHeight)*gameCanvas.height) + myShip.y - camera.yOffset;
         server.emit('mousemove',{x:mouseX,y:mouseY});
     }
 }
@@ -675,18 +694,18 @@ function fireGun(_x,_y){
 
 function onTouchStart(evt){
     evt.preventDefault();
-    var rect = canvas.getBoundingClientRect();
+    var rect = gameCanvas.getBoundingClientRect();
     var touch = evt.changedTouches[0];
-    var touchX = (((touch.pageX - rect.left)/newWidth)*canvas.width);
-    var touchY = (((touch.pageY - rect.top )/newHeight)*canvas.height);
+    var touchX = (((touch.pageX - rect.left)/newWidth)*gameCanvas.width);
+    var touchY = (((touch.pageY - rect.top )/newHeight)*gameCanvas.height);
 
-    if(touchX <= canvas.width/2){
+    if(touchX <= gameCanvas.width/2){
         if(joystickMovement.touchIdx == null){
             joystickMovement.touchIdx = touch.identifier;
             joystickMovement.onDown(touchX,touchY);
         }
     }
-    if(touchX >= canvas.width/2) {
+    if(touchX >= gameCanvas.width/2) {
         if(joystickCamera.touchIdx == null){
             joystickCamera.touchIdx = touch.identifier;
             joystickCamera.onDown(touchX,touchY);
@@ -713,13 +732,13 @@ function onTouchEnd(evt){
 function onTouchMove(evt){
     evt.preventDefault();
     var touchList = event.changedTouches;
-    var rect = canvas.getBoundingClientRect();
+    var rect = gameCanvas.getBoundingClientRect();
     var touch, touchX,touchY;
     for(var i=0;i<touchList.length;i++){
         if(touchList[i].identifier  == joystickCamera.touchIdx){
             touch = touchList[i];
-            touchX = (((touch.pageX - rect.left)/newWidth)*canvas.width);
-            touchY = (((touch.pageY - rect.top )/newHeight)*canvas.height);
+            touchX = (((touch.pageX - rect.left)/newWidth)*gameCanvas.width);
+            touchY = (((touch.pageY - rect.top )/newHeight)*gameCanvas.height);
             joystickCamera.onMove(touchX,touchY);
 
 
@@ -736,8 +755,8 @@ function onTouchMove(evt){
         }
         if(touchList[i].identifier  == joystickMovement.touchIdx){
             touch = touchList[i];
-            touchX = (((touch.pageX - rect.left)/newWidth)*canvas.width);
-            touchY = (((touch.pageY - rect.top )/newHeight)*canvas.height);
+            touchX = (((touch.pageX - rect.left)/newWidth)*gameCanvas.width);
+            touchY = (((touch.pageY - rect.top )/newHeight)*gameCanvas.height);
             joystickMovement.onMove(touchX,touchY);
             touchMovement();
         }
