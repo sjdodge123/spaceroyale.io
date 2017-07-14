@@ -576,9 +576,6 @@ function gameLoop(){
 function recenterCamera(){
     if(cameraBouncing){
         var currentTime = new Date();
-        if(myShip == null){
-            cameraCenterSeed = findAlivePlayerIndex();
-        }
         if(lastCameraSwap == null){
             lastCameraSwap = new Date(currentTime);
             lastCameraSwap.setTime(lastCameraSwap.getTime() + recenterCameraTimeout*1000);
@@ -587,13 +584,14 @@ function recenterCamera(){
             lastCameraSwap = new Date(currentTime);
             lastCameraSwap.setTime(lastCameraSwap.getTime() + recenterCameraTimeout*1000);
             cameraCenterSeed = findAlivePlayerIndex();
-            
             cameraBouncingFirstPass = false;
+            myID = cameraCenterSeed;
+            healthLastFrame = shipList[myID].health;
         }
         if(cameraBouncingFirstPass){
             return;
         }
-        myID = cameraCenterSeed;
+        
     }
     if(myID != null && shipList != null && shipList[myID] != null){
         myShip = shipList[myID];
