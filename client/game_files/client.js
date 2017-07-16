@@ -255,12 +255,11 @@ function clientConnect() {
 			showGameOverScreen("You died!");
 			return;
 		}
-		
+
 		if(camera.inBounds(shipList[id])){
 			playSound(shipDeath);
 		}
 	});
-
 	server.on('shipHealth',function(packet){
 		if(packet == null){
 			return;
@@ -275,6 +274,27 @@ function clientConnect() {
 			return;
 		}
 		shipList[packet.id].health = packet.health;
+	});
+
+	server.on('shipsRegenerating',function(packet){
+		if(packet == null){
+			return;
+		}
+		for (var i = 0; i < packet.length; i++){
+			var element  = packet[i];
+			var id = element[0];
+			var health = element[1];
+			if(id == null){
+				continue;
+			}
+			if(health == null){
+				continue;
+			}
+			if(shipList[id] == null){
+				continue;
+			}
+			shipList[id].health = health;
+		}
 	});
 
 	server.on("gameOver",function(id){

@@ -356,6 +356,7 @@ class GameBoard {
 		this.updateItems();
 	}
 	updateShips(active,dt){
+		var regeneratingShips = [];
 		for(var shipID in this.shipList){
 			var ship = this.shipList[shipID];
 			if(active){
@@ -365,7 +366,13 @@ class GameBoard {
 				this.spawnItem(ship.droppedItem);
 				ship.droppedItem = null;
 			}
+			if(ship.regenerating){
+				regeneratingShips.push([ship.id, ship.health]);
+			}
 			ship.update(dt);
+		}
+		if(regeneratingShips.length != 0){
+			messenger.messageRoomBySig(this.roomSig,"shipsRegenerating",regeneratingShips);
 		}
 	}
 	updateTradeShips(){
@@ -1032,6 +1039,10 @@ class Ship extends Circle{
 		this.roomSig = roomSig;
 		this.explosionRadius = c.playerExplosionRadius;
 		this.explosionMaxDamage = c.playerExplosionMaxDamage;
+		this.regenTimeout = c.playerHealthRegenTime;
+		this.regenTimer = null;
+		this.regenRate = c.playerHealthRegenRate;
+		this.regenerating = false;
 
 		if(c.playerSpawnWeapon == "Blaster"){
 			this.weapon = new Blaster(this.id);
@@ -1112,6 +1123,18 @@ class Ship extends Circle{
 		}
 
 	}
+	regenHealth(){
+		if(this.health < this.baseHealth){
+			this.regenerating = true;
+			this.health += this.regenRate;
+			if (this.health > this.baseHealth){
+				this.health == this.baseHealth;
+			}
+		}
+		else{
+			this.regenerating = false;
+		}
+	}
 	heal(amt){
 		if(this.health < this.baseHealth){
 			if(this.health+amt > this.baseHealth){
@@ -1138,7 +1161,7 @@ class Ship extends Circle{
 				break;
 			}
 		}
-		
+
 		this.boostList[type] = {exitMsg:exitMsg,duration:duration,applyDate:Date.now(),type:type};
 	}
 	removeBoost(type){
@@ -1196,11 +1219,13 @@ class Ship extends Circle{
 			if(this.health < 1){
 				this.iDied(object.owner);
 			}
-			messenger.messageUser(object.owner,"shotLanded");			
+			messenger.messageUser(object.owner,"shotLanded");
 		}
 	}
 
 	takeDamage(damage){
+		this.regenerating = false;
+		this.regenTimer = Date.now();
 		this.health -= Math.abs(damage);
 		messenger.messageRoomBySig(this.roomSig,"shipHealth",{health:this.health,id:this.id});
 		this.checkHP();
@@ -1212,6 +1237,10 @@ class Ship extends Circle{
 		this.alive = false;
 	}
 	checkHP(){
+		var timeElapsed = Date.now() - this.regenTimer;
+		if (timeElapsed > this.regenTimeout){
+			this.regenHealth();
+		}
 		if(this.health < 1){
 			this.alive = false;
 		}

@@ -83,7 +83,7 @@ canvas{
 	background: black;
 	position: absolute;
 	overflow: none;
-	
+
 	left: 0;
 	right: 0;
 	bottom: 0;
@@ -119,7 +119,7 @@ canvas{
 	width: 100%;
 	position: fixed;
 	bottom: 0;
-	opacity: 0.9;          
+	opacity: 0.9;
     filter:(opacity=90);
 }
 #footer-content-right{
@@ -198,6 +198,7 @@ canvas{
 }
 
 #gameOverMenu{
+	z-index: 5;
 	display: none;
 	width: 15%;
    	height: 20%;
@@ -230,6 +231,7 @@ canvas{
 }
 
 #howToPlayMenu{
+	z-index: 5;
 	display: none;
 	width: 400px;
 	height: 350px;
@@ -473,7 +475,7 @@ canvas{
 	.navbar-default{
 		margin-bottom: 15% !important;
 	}
-	
+
 }
 
 @media screen and (max-width: 1300px){
@@ -543,7 +545,7 @@ canvas{
 	}
 	#profileLoaded *{
 		font-size: 15px !important;
-		
+
 	}
 	#gameOverMenu{
 		margin-left: -15%;

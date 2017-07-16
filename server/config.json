@@ -79,6 +79,8 @@
     "playerBaseHealth":100,
     "playerDragCoeff": 0.045,
     "playerBrakeCoeff": 0.235,
+    "playerHealthRegenRate":0.5,
+    "playerHealthRegenTime":2000,
 
     "forceConstant": 500000,
 
