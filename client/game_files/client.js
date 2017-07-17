@@ -238,6 +238,10 @@ function clientConnect() {
 		var id = packet[0];
 		var killerId = packet[1];
 		var killerName = '';
+		if(camera.inBounds(shipList[id])){
+			playSound(shipDeath);
+		}
+		
 		if(killerId != null && shipList[killerId] != null){
 			shipList[killerId].kills += 1;
 			killerName = playerList[killerId] || shipList[killerId].AIName;
@@ -256,9 +260,7 @@ function clientConnect() {
 			return;
 		}
 
-		if(camera.inBounds(shipList[id])){
-			playSound(shipDeath);
-		}
+		
 	});
 	server.on('shipHealth',function(packet){
 		if(packet == null){
@@ -391,4 +393,8 @@ function clientSendReg(user,pass,gameName){
 
 function clientSendStart(myname,mycolor){
 	server.emit('enterLobby',{name:myname,color:mycolor});
+}
+
+function clientSendMessage(header,payload){
+	server.emit(header,payload);
 }

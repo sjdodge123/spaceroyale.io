@@ -64,7 +64,7 @@ class Room {
 			if(ship.alive == false){
 				var remaining = this.game.getShipCount()-1;
 				this.engine.explodeObject(ship.x, ship.y, ship.explosionMaxDamage, ship.explosionRadius);
-				this.game.gameBoard.spawnItem(ship.weapon.drop(ship.x,ship.y));
+				//this.game.gameBoard.spawnItem(ship.weapon.drop(ship.x,ship.y));
 				if(ship.killedBy != null && this.shipList[ship.killedBy] != null){
 					var murderer = this.shipList[ship.killedBy];
 					var victim = ship;
@@ -1063,12 +1063,32 @@ class Ship extends Circle{
 		this.checkKills();
 		this.move();
 	}
+	changeWeapon(name){
+		switch(name){
+			case "Blaster":{
+				this.weapon = new Blaster(this.id);
+				break;
+			}
+			case "PhotonCannon":{
+				this.weapon = new PhotonCannon(this.id);
+				break;
+			}
+			case "MassDriver":{
+				this.weapon = new MassDriver(this.id);
+				break;
+			}
+		}
+		this.weapon.equip();
+		var data = compressor.equipItem(this.weapon);
+		messenger.messageRoomBySig(this.roomSig,"equipItem",data);
+	}
+
 	equip(item){
 		if(item instanceof ShieldItem){
 			if(this.shield == null){
 				this.shield = new Shield(this.id);
 				this.shield.equip();
-				var data = compressor.equipItem(item,this.shield);
+				var data = compressor.equipItem(this.shield);
 				messenger.messageRoomBySig(this.roomSig,"equipItem",data);
 				return;
 			}
@@ -1086,10 +1106,10 @@ class Ship extends Circle{
 				messenger.messageRoomBySig(this.roomSig,"updateItem",data);
 				return;
 			}
-			this.droppedItem = this.weapon.drop(this.x,this.y,this.weapon.level);
+			//this.droppedItem = this.weapon.drop(this.x,this.y,this.weapon.level);
 			this.weapon = new Blaster(this.id,item.level);
 			this.weapon.equip();
-			var data = compressor.equipItem(item,this.weapon);
+			var data = compressor.equipItem(this.weapon);
 			messenger.messageRoomBySig(this.roomSig,"equipItem",data);
 			return;
 		}
@@ -1100,10 +1120,10 @@ class Ship extends Circle{
 				messenger.messageRoomBySig(this.roomSig,"updateItem",data);
 				return;
 			}
-			this.droppedItem = this.weapon.drop(this.x,this.y,this.weapon.level);
+			//this.droppedItem = this.weapon.drop(this.x,this.y,this.weapon.level);
 			this.weapon = new PhotonCannon(this.id,item.level);
 			this.weapon.equip();
-			var data = compressor.equipItem(item,this.weapon);
+			var data = compressor.equipItem(this.weapon);
 			messenger.messageRoomBySig(this.roomSig,"equipItem",data);
 			return;
 		}
@@ -1114,10 +1134,10 @@ class Ship extends Circle{
 				messenger.messageRoomBySig(this.roomSig,"updateItem",data);
 				return;
 			}
-			this.droppedItem = this.weapon.drop(this.x,this.y,this.weapon.level);
+			//this.droppedItem = this.weapon.drop(this.x,this.y,this.weapon.level);
 			this.weapon = new MassDriver(this.id,item.level);
 			this.weapon.equip();
-			var data = compressor.equipItem(item,this.weapon);
+			var data = compressor.equipItem(this.weapon);
 			messenger.messageRoomBySig(this.roomSig,"equipItem",data);
 			return;
 		}
@@ -1793,6 +1813,7 @@ class MassDriver extends Weapon{
 class Shield extends Circle{
 	constructor(owner){
 		super(0,0,c.shieldRadius,c.shield1Color);
+		this.name = 'Shield';
 		this.level = 1;
 		this.maxLevel = 3;
 		this.equipMessage = "Equiped Shield";

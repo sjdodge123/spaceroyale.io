@@ -64,9 +64,9 @@ canvas{
 	left:50%;
 	transform:translate(-50%,-50%);
 }
-#uiCanvas { z-index: 4 }
-#gameCanvas { z-index: 3 }
-#backgroundCanvas { z-index: 2 }
+#uiCanvas { z-index: 4;}
+#gameCanvas { z-index: 3;}
+#backgroundCanvas { z-index: 2;}
 #backgroundImage {
 	display: block;
 	cursor: crosshair;
@@ -77,6 +77,33 @@ canvas{
 	left:50%;
 	transform:translate(-50%,-50%);
 	background-image:url(img/background.jpg);
+}
+
+#weaponSelection{
+	margin: auto;
+	cursor: hand;
+	overflow: none;
+	position: relative;
+	pointer-events: all;
+	width: 300px;
+}
+#weapons *{
+	height: 150px;
+}
+
+#hud{
+	z-index: 5;
+	pointer-events: none;
+	display: block;
+	cursor: crosshair;
+	background-color: transparent;
+	overflow: none;
+	margin: 0 auto;
+	position: absolute;
+	top: 50%;
+	left:50%;
+	transform:translate(-50%,-50%);
+	
 }
 
 #main{
@@ -232,12 +259,11 @@ canvas{
 
 #howToPlayMenu{
 	z-index: 5;
-	display: none;
 	width: 400px;
 	height: 350px;
 	left: 70%;
    	top: 20%;
-	position: absolute;
+	position: relative;
    	background-color: #1a1a1a;
 	color:white;
 	overflow: none;

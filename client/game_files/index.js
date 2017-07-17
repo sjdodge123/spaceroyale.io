@@ -6,6 +6,8 @@ var server = null,
     gameContext = null,
     backgroundContext = null,
     backgroundImage = null,
+    hud = null,
+    weaponSelection = null,
     eventLog,
     camera,
     userRegex = null,
@@ -61,11 +63,18 @@ window.onload = function() {
 
 function setupPage(){
     $('#nameBox').attr("placeholder","Guest"+getRandomInt(0,999999));
+
+
     var skinArray = [];
     skinArray.push({image:'sprites/ship_magenta.svg',value:"#ff00bf"});
     skinArray.push({image:'sprites/ship_blue.svg',value:"#66b3ff"});
     skinArray.push({image:'sprites/ship_red.svg',value:"red"});
     skinArray.push({image:'sprites/ship_green.svg',value:"green"});
+
+    var weaponArray = [];
+    weaponArray.push({image:'sprites/photon_cannon.svg',value:"PhotonCannon"});
+    weaponArray.push({image:'sprites/blaster.svg',value:"Blaster"});
+    weaponArray.push({image:'sprites/mass_driver.svg',value:"MassDriver"});
 
     $('#guestSignIn').submit(function () {
         var name;
@@ -148,6 +157,29 @@ function setupPage(){
     });
 
 
+    //***************************Weapon Selection Box*************************************
+
+    $('#firstWeapon').click(function(){
+        var lastElement = weaponArray.splice(weaponArray.length-1,1)[0];
+        weaponArray.unshift(lastElement);
+        $("#firstWeapon").attr('src',weaponArray[0].image).attr('data-selected',weaponArray[0].value);
+        $("#secondWeapon").attr('src',weaponArray[1].image).attr('data-selected',weaponArray[1].value);
+        $("#thirdWeapon").attr('src',weaponArray[2].image).attr('data-selected',weaponArray[2].value);
+
+        clientSendMessage('changeWeapon',weaponArray[1].value);
+    });
+
+    $('#thirdWeapon').click(function(){
+        var firstElement = weaponArray.shift();
+        weaponArray.push(firstElement);
+        $("#firstWeapon").attr('src',weaponArray[0].image).attr('data-selected',weaponArray[0].value);
+        $("#secondWeapon").attr('src',weaponArray[1].image).attr('data-selected',weaponArray[1].value);
+        $("#thirdWeapon").attr('src',weaponArray[2].image).attr('data-selected',weaponArray[2].value);
+
+        clientSendMessage('changeWeapon',weaponArray[1].value);
+    });
+
+
     //*******************************************************************************************
 
 
@@ -211,6 +243,8 @@ function setupPage(){
     uiCanvas = document.getElementById('uiCanvas');
     backgroundCanvas = document.getElementById('backgroundCanvas');
     backgroundImage = document.getElementById('backgroundImage');
+    hud = document.getElementById('hud');
+    weaponSelection = document.getElementById('weaponSelection');
 
     gameContext = gameCanvas.getContext('2d');
     uiContext = uiCanvas.getContext('2d');
@@ -411,6 +445,7 @@ function resetGameVariables(){
     uiCanvas = document.getElementById('uiCanvas');
     backgroundCanvas = document.getElementById('backgroundCanvas');
     backgroundImage = document.getElementById('backgroundImage');
+    hud = document.getElementById('hud');
     
     gameContext = gameCanvas.getContext('2d');
 }
@@ -467,6 +502,8 @@ function resize(){
     gameCanvas.style.height = newHeight + "px";
     backgroundImage.style.width = newWidth + "px";
     backgroundImage.style.height = newHeight + "px";
+    hud.style.width = newWidth + "px";
+    hud.style.height = newHeight + "px";
 
     camera = {
         x : gameCanvas.width/2,
@@ -642,7 +679,7 @@ function cancelMovement(){
 function gameStart(){
     //stopSound(backgroundMusic);
     //playSound(gameStartMusic);
-    $('#howToPlayMenu').hide();
+    $('#lobbyUI').hide();
 }
 
 function gameOver(){
@@ -680,6 +717,7 @@ function handleClick(evt){
     }
     evt.preventDefault();
 }
+
 function handleUnClick(evt){
     if(iAmFiring){
         iAmFiring = false;

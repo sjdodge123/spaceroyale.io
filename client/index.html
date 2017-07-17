@@ -139,28 +139,54 @@
 	</div>
 
     <div id="gameWindow">
+    	
 		<canvas id="uiCanvas" width="1366" height="768"></canvas>
 		<canvas id="gameCanvas" width="1366" height="768"></canvas>
 		<canvas id="backgroundCanvas" width="1366" height="768"></canvas>
 		<div id="backgroundImage" width="1366" height="768"></div>
-		
-		
-		<!-- How to Play Menu -->
-		<div id="howToPlayMenu" tabIndex="-1">
-            <div id="howToPlayText" tabIndex="-1">
-                <p id="movementControls">Use <strong>WASD</strong> or the arrow keys to move<br/>
-                Use your mouse to aim and click to shoot
+		<div id="hud" width="1366" height="768">
+			<div id="lobbyUI">
+				<!-- Weapon Selection -->
+				<div id="weaponSelection">
+					<div id="weapons">
+						<div class="row">
+							<div class="col-4">
+								<img id="firstWeapon" src="sprites/photon_cannon.svg"></img>
+							</div>
+							<div class="col-4">
+								<img id="secondWeapon" src="sprites/blaster.svg"></img>
+							</div>
+							<div class="col-4">
+								<img id="thirdWeapon" src="sprites/mass_driver.svg"></img>
+							</div>
+						</div>
+					</div>
+				</div>
 
-                </p><strong>Be the last survivor to win</strong></br> </br>
-                <ul id="howToPlayBullets">
-                    <li>Stay <strong>inside of the blue</strong> circle to survive</li>
-                    <li>The <strong>white</strong> circle shows you where the blue circle is shrinking to next</li>
-                    <li>Pay attention to the <strong>shrink timer</strong> at the bottom of your screen</li>
-                    <li>Gather new items by shooting the asteroids to improve your chances of winning</li>
-                </ul>
-            </div>
+				<!-- How to Play Menu -->
+				<div id="howToPlayMenu" tabIndex="-1">
+		            <div id="howToPlayText" tabIndex="-1">
+		                <p id="movementControls">Use <strong>WASD</strong> or the arrow keys to move<br/>
+		                Use your mouse to aim and click to shoot
+
+		                </p><strong>Be the last survivor to win</strong></br> </br>
+		                <ul id="howToPlayBullets">
+		                    <li>Stay <strong>inside of the blue</strong> circle to survive</li>
+		                    <li>The <strong>white</strong> circle shows you where the blue circle is shrinking to next</li>
+		                    <li>Pay attention to the <strong>shrink timer</strong> at the bottom of your screen</li>
+		                    <li>Gather new items by shooting the asteroids to improve your chances of winning</li>
+		                </ul>
+		            </div>
+				</div>
+			</div>
+			
+
+			
+
+
+
 		</div>
-
+		
 		<!-- Game over menu -->
 		<div id="gameOverMenu">
             <div id ="gameOverTop">

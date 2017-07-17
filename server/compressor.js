@@ -96,10 +96,10 @@ exports.sendShipUpdates = function(shipList){
 	return packet;
 }
 
-exports.equipItem = function(item,equipedItem){
+exports.equipItem = function(equipedItem){
 	var packet = [];
 	packet[0] = equipedItem.owner;
-	packet[1] = item.name;
+	packet[1] = equipedItem.name;
 	packet[2] = equipedItem.level;
 	packet[3] = equipedItem.cooldown;
 	packet = JSON.stringify(packet);
@@ -109,7 +109,7 @@ exports.equipItem = function(item,equipedItem){
 exports.updateItem = function(item,equipedItem){
 	var packet = [];
 	packet[0] = equipedItem.owner;
-	packet[1] = item.name;
+	packet[1] = equipedItem.name;
 	packet[2] = equipedItem.level;
 	packet = JSON.stringify(packet);
 	return packet;

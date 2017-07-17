@@ -40,12 +40,9 @@
     "asteroidMaxSize":65,
 
     "asteroidLootTable":{
-      "ShieldItem":4,
-      "MassDriverItem":1,
-      "PhotonCannonItem":3,
-      "BlasterItem":5,
-      "HPItem":6,
-      "OverdriveItem":2
+      "ShieldItem":1,
+      "HPItem":2,
+      "OverdriveItem":3
     },
 
     "generatePlanets":true,

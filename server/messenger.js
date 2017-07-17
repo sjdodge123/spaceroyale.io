@@ -159,6 +159,18 @@ function checkForMail(client){
 	client.on('drip',function(){
   		client.emit('drop');
   	});
+
+  	client.on('changeWeapon',function(weaponName){
+  		var room = getRoomFromId(client.id);
+		if(room == undefined){
+			return;
+		}
+		if(room.game.active){
+			return;
+		}
+		var ship = room.shipList[client.id];
+		ship.changeWeapon(weaponName);
+  	});
 }
 
 function messageUser(id,header,payload){

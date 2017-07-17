@@ -271,26 +271,17 @@ function equipItem(packet){
 	var level = packet[2];
 	var cooldown = packet[3];
 
-	if(name == "ShieldItem"){
+	if(shipList[packet[0]] == null){
+		return;
+	}
+	if(name == "Shield"){
 		shipList[packet[0]].shield = {};
 		shipList[packet[0]].shield.level = level;
 		return;
 	}
-	if(name == "BlasterItem"){
-		shipList[packet[0]].weapon.name = "Blaster";
-		shipList[packet[0]].weapon.level = level;
-		shipList[packet[0]].weapon.cooldown = cooldown;
-	}
-	if(name == "PhotonCannonItem"){
-		shipList[packet[0]].weapon.name = "PhotonCannon";
-		shipList[packet[0]].weapon.level = level;
-		shipList[packet[0]].weapon.cooldown = cooldown;
-	}
-	if(name == "MassDriverItem"){
-		shipList[packet[0]].weapon.name = "MassDriver";
-		shipList[packet[0]].weapon.level = level;
-		shipList[packet[0]].weapon.cooldown = cooldown;
-	}
+	shipList[packet[0]].weapon.name = name;
+	shipList[packet[0]].weapon.level = level;
+	shipList[packet[0]].weapon.cooldown = cooldown;
 }
 
 function updateItem(packet){
@@ -298,7 +289,7 @@ function updateItem(packet){
 	var name = packet[1];
 	var level = packet[2];
 
-	if(name == "ShieldItem"){
+	if(name == "Shield"){
 		shipList[packet[0]].shield.level = level;
 		return;
 	}
