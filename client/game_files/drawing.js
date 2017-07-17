@@ -268,6 +268,7 @@ function drawHPCounter(){
 		drawTextF("Health",eventLog.x+(eventLog.width/4)-30,eventLog.y-15,"#ECF0F1","17px Georgia");
 	}
 }
+
 function drawWeaponCooldown(){
 	gameContext.save();
 	gameContext.fillStyle = myShip.color;
@@ -437,13 +438,28 @@ function drawShip(ship){
 	gameContext.restore();
 
 	drawWeapon(ship);
-	if(ship.isHiding == false){
-		if(ship.AIName != null || (playerList[ship.id] != null)){
-			var name = ship.AIName || playerList[ship.id]+ "";
-			drawTextF(name,ship.x-myShip.x+camera.xOffset-(name.length*3),ship.y-myShip.y+camera.yOffset-35,ship.color,"12px Helvetica");
-		}
+	if(ship.AIName != null || (playerList[ship.id] != null)){
+		var name = ship.AIName || playerList[ship.id]+ "";
+		drawTextF(name,ship.x-myShip.x+camera.xOffset-(name.length*3),ship.y-myShip.y+camera.yOffset-35,ship.color,"12px Helvetica");
 	}
+	if(ship != myShip){
+		drawHealthBar(ship);
+	}	
 }
+
+function drawHealthBar(ship){
+	gameContext.save();
+	if(ship.health > 70){
+		gameContext.fillStyle = "#1dba34";
+	}else if(ship.health > 30){
+		gameContext.fillStyle = "yellow";
+	} else {
+		gameContext.fillStyle = "tomato";
+	}
+	gameContext.fillRect(ship.x-myShip.x+camera.xOffset-25,ship.y-myShip.y+camera.yOffset-30,(ship.health/100)*50,5);
+	gameContext.restore();
+}
+
 function drawWeapon(ship){
 	var shipDim = ship.radius || ship.width/4; 
 	var svgscale = 2 * shipDim / shipRedSVG.width;
