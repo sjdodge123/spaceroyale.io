@@ -31,7 +31,7 @@ function init(){
 }
 
 function initObjects(){
-	mouseObj = new MouseObject(mouseX, mouseY, 25, 'green', 15);
+	mouseObj = new MouseObject(mouseX, mouseY, 25, 'green', 15, 'line');
 
 	//initialize other objects
 	//objectList.push(mouseObj);
@@ -88,7 +88,7 @@ class GameObject {
 		this.y = y;
 		this.radius = radius;
 		this.color = color;
-		
+
 	}
 	update(){
 
@@ -104,24 +104,56 @@ class GameObject {
 }
 
 class Trail {
-	constructor(initialPosition, length){
+	constructor(initialPosition, length, type){
 		this.vertices = [];
 		this.length = length;
 		for (var i = 0; i < this.length; i++){
 			this.vertices.push(initialPosition);
 		}
+		this.type = type;
 	}
 	draw(){
-		canvasContext.save();
-		canvasContext.beginPath();
-		canvasContext.moveTo(this.vertices[0].x,this.vertices[0].y);
-		for (var i = 1; i < this.length; i++){
-			var point = this.vertices[i];
-			canvasContext.lineTo(point.x, point.y);
+		switch(this.type){
+			case 'circle':{
+				var colorprefix = 'rgba(255,255,255, ';
+				for (var i = 0; i < this.length; i++){
+				//for (var i = this.length - 1; i >= 0; i--){
+					var point = this.vertices[i];
+					var alpha = Math.round(100 * (this.length - 1 - i) / (this.length - 1)) / 100; //note that there are this.length - 1 line segments. note, won't round up on .005
+					var nextColor = colorprefix + alpha.toString() + ')';
+					canvasContext.save();
+					canvasContext.beginPath();
+					canvasContext.arc(point.x, point.y, 25, 0, Math.PI * 2, true);
+					canvasContext.fillStyle = nextColor;
+					canvasContext.fill();
+					canvasContext.restore();
+				}
+				break;
+			}
+			case 'line':{
+				canvasContext.save();
+				canvasContext.beginPath();
+				canvasContext.lineWidth = 15;
+				canvasContext.moveTo(this.vertices[0].x,this.vertices[0].y);
+				var colorprefix = 'rgba(255,255,255, ';
+				var previousColor = 'rgba(255,255,255, 1)';
+				for (var i = 1; i < this.length; i++){
+					var lastPoint = this.vertices[i-1];
+					var point = this.vertices[i];
+					var gradient = canvasContext.createLinearGradient(lastPoint.x, lastPoint.y, point.x, point.y);
+					var alpha = Math.round(100 * (this.length - 1 - i) / (this.length - 1)) / 100; //note that there are this.length - 1 line segments. note, won't round up on .005
+					var nextColor = colorprefix + alpha.toString() + ')';
+					gradient.addColorStop(0, previousColor); //start color
+					gradient.addColorStop(1, nextColor); //end color
+					previousColor = nextColor;
+					canvasContext.strokeStyle = gradient;
+					canvasContext.lineTo(point.x, point.y);
+					canvasContext.stroke();
+				}
+				canvasContext.restore();
+				break;
+			}
 		}
-		canvasContext.strokeStyle = "red";
-		canvasContext.stroke();
-		canvasContext.restore();
 	}
 	update(currentPosition){
 		for (var i = this.length - 1; i > 0; i--){
@@ -131,9 +163,9 @@ class Trail {
 	}
 }
 class MouseObject extends GameObject {
-	constructor(x, y, radius, color, trailLength){
+	constructor(x, y, radius, color, trailLength, trailType){
 		super(x, y, radius, color);
-		this.trail = new Trail({x:this.x, y:this.y}, trailLength);
+		this.trail = new Trail({x:this.x, y:this.y}, trailLength, trailType);
 		this.attached = true;
 	}
 	update(){
