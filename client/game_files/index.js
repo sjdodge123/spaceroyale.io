@@ -20,6 +20,7 @@ var server = null,
     //Gamevars
     skipAuth = false,
     iAmFiring = false,
+    useGadget = false,
     gameRunning = false,
     lastFired = new Date(),
     cooldownRemaining = 0,
@@ -402,6 +403,7 @@ function resetGameVariables(){
     gameRunning = false;
     iAmAlive = true;
     iAmFiring = false;
+    useGadget = false;
     timeOutChecker = null;
     gameStarted = false;
     victory = false;
@@ -620,6 +622,9 @@ function gameLoop(){
     if(iAmFiring){
         fireGun(mouseX,mouseY);
     }
+    if(useGadget){
+        activateGadget(mouseX,mouseY);
+    }
     updateGameboard();
     drawFlashScreen();
     drawBackground();
@@ -712,21 +717,31 @@ function calcMousePos(evt){
 }
 
 function handleClick(evt){
-    if(!iAmFiring){
-        iAmFiring = true;
+    switch(event.which){
+        case 1:{
+            iAmFiring = true;
+            break;
+        }
+        case 3:{
+            useGadget = true;
+            break;
+        }
+
     }
     evt.preventDefault();
 }
 
 function handleUnClick(evt){
-    if(iAmFiring){
-        iAmFiring = false;
-    }
-}
+    switch(event.which){
+        case 1:{
+            iAmFiring = false;
+            break;
+        }
+        case 3:{
+            useGadget = false;
+            break;
+        }
 
-function fireGun(_x,_y){
-    if(iAmAlive){
-       server.emit("click",{x:_x,y:_y});
     }
 }
 

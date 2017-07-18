@@ -148,6 +148,22 @@ exports.weaponFired = function(ship,weapon,bullets){
 	bullet = null;
 	return packet;
 }
+
+exports.gadgetActivated = function(objects){
+	if(objects.length){
+
+		//Do some thing for multiple gadget objects
+		return;
+	}
+	var packet = [];
+	packet[0] = objects.sig;
+	packet[1] = objects.type;
+	packet[2] = objects.x;
+	packet[3] = objects.y;
+	packet = JSON.stringify(packet);
+	return packet;
+}
+
 exports.sendBulletUpdates = function(bulletList){
 	var packet = [];
 	for(prop in bulletList){

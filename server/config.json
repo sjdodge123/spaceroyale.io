@@ -66,8 +66,8 @@
     "tradeShipWeapon":"Blaster",
     "tradeShipWeaponLevel":3,
 
-    "playerMaxSpeed":350,
-    "playerBaseAcel":800,
+    "playerMaxSpeed":600,
+    "playerBaseAcel":500,
     "playerBaseRadius":25,
     "playerExplosionRadius":300,
     "playerExplosionMaxDamage":50,
@@ -77,23 +77,23 @@
     "playerDragCoeff": 0.045,
     "playerBrakeCoeff": 0.235,
     "playerHealthRegenRate":0.5,
-    "playerHealthRegenTime":2000,
+    "playerHealthRegenTime":3000,
 
-    "forceConstant": 500000,
+    "forceConstant": 500000000000,
 
-    "blasterCoolDown":0.7,
-    "bulletLifetime":0.75,
-    "blasterBulletSpeed":788,
-    "blasterBulletDamage":10,
+    "blasterCoolDown":0.2,
+    "bulletLifetime":0.5,
+    "blasterBulletSpeed":800,
+    "blasterBulletDamage":3,
 
     "photonCannonCoolDown":1.2,
     "birdshotLifetime":0.45,
     "birdshotDamage":15,
     "birdshotSpeed":800,
 
-    "massDriverCoolDown":1.2,
-    "massDriverBulletDamage":35,
-    "massDriverBulletSpeed":1200,
+    "massDriverCoolDown":1.0,
+    "massDriverBulletDamage":10,
+    "massDriverBulletSpeed":1800,
 
     "shieldRadius":35,
     "shield1Color":"Aqua",
@@ -103,6 +103,10 @@
     "shield2Protection":20,
     "shield3Protection":30,
     "shieldRestoreAmount":10,
+
+    "pulseDuration":500,
+    "pulseRadius":200,
+
 
     "quadTreeMaxCount": 70,
     "quadTreeMaxDepth": 2,

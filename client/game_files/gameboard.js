@@ -2,6 +2,7 @@ function updateGameboard(){
 	updateShips();
 	updateItems();
 	updateTradeShips();
+	updateGadgets();
 }
 
 function updateShips(){
@@ -60,6 +61,19 @@ function updateTradeShips(){
 	}
 }
 
+function updateGadgets(){
+	for(var sig in gadgetList){
+		var gadget = gadgetList[sig];
+		if(!gadget.activateDate){
+			continue;
+		}
+		var timeLeft = gadget.duration - (Date.now() - gadget.activateDate);
+		if(timeLeft < 0){
+			terminateGadget(sig);
+		}
+	}
+}
+
 function terminateBullet(sig){
 	if(bulletList[sig] != undefined){
 		delete bulletList[sig];
@@ -75,6 +89,12 @@ function terminateAsteroid(sig){
 function terminateItem(sig){
 	if(itemList[sig] != undefined){
 		delete itemList[sig];
+	}
+}
+
+function terminateGadget(sig){
+	if(gadgetList[sig] != undefined){
+		delete gadgetList[sig];
 	}
 }
 function terminateTradeShip(sig){
@@ -436,5 +456,22 @@ function weaponFired(payload){
     			playSound(massDriverShot1);
     		}
     	}
+	}
+}
+
+function gadgetActivated(packet){
+	packet = JSON.parse(packet);
+	if(gadgetList[packet[0]] == null){
+		gadgetList[packet[0]] = {};
+		gadgetList[packet[0]].sig = packet[0];
+		gadgetList[packet[0]].type = packet[1];
+		gadgetList[packet[0]].x = packet[2];
+		gadgetList[packet[0]].y = packet[3];
+
+		if(gadgetList[packet[0]].type == "Pulse"){
+			gadgetList[packet[0]].activateDate = Date.now();
+			gadgetList[packet[0]].duration = config.pulseDuration;
+			gadgetList[packet[0]].radius = config.pulseRadius;
+		}
 	}
 }

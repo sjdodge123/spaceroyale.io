@@ -1,6 +1,6 @@
 {
 	"override":true,
-	"minPlayers":2,
+	"minPlayers":1,
 	"maxPlayersInRoom":25,
 	"worldWidth": 5000,
 	"worldHeight": 5000,
@@ -17,15 +17,5 @@
 	"AISpawnPlayers":true,
 
 	"generateTradeShips":true,
-	"tradeShipSpeed":3,
-	"playerSpawnWeapon":"Blaster",
-	"playerSpawnWeaponLevel":1,
-	"playerBaseHealth":100,
-
-	"bulletLifetime":0.75,
-
-	"photonCannonCoolDown":1.2,
-    "birdshotLifetime":0.45,
-    "birdshotDamage":15,
-    "birdshotSpeed":800
+	"tradeShipSpeed":3
 }

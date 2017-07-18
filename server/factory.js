@@ -24,12 +24,13 @@ class Room {
 		this.itemList = {};
 		this.shipList = {};
 		this.AIList = {};
+		this.gadgetList = {};
 		this.killedShips = {};
 		this.clientCount = 0;
 		this.alive = true;
 		this.engine = _engine.getEngine(this.bulletList, this.shipList, this.world, this.asteroidList, this.planetList,this.nebulaList,this.tradeShipList);
 		this.world = new World(0,0,c.lobbyWidth,c.lobbyHeight,this.engine,this.sig);
-		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList,this.planetList,this.itemList,this.nebulaList,this.tradeShipList,this.engine,this.AIList,this.sig);
+		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList,this.planetList,this.itemList,this.nebulaList,this.tradeShipList,this.engine,this.AIList,this.gadgetList,this.sig);
 	}
 	join(clientID){
 		var client = messenger.getClient(clientID);
@@ -141,7 +142,7 @@ class Room {
 }
 
 class Game {
-	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,nebulaList,tradeShipList,engine,AIList,roomSig){
+	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,nebulaList,tradeShipList,engine,AIList,gadgetList,roomSig){
 		this.world = world;
 		this.clientList = clientList;
 		this.bulletList = bulletList;
@@ -151,6 +152,7 @@ class Game {
 		this.itemList = itemList;
 		this.nebulaList = nebulaList;
 		this.tradeShipList = tradeShipList;
+		this.gadgetList = gadgetList;
 		this.engine = engine;
 		this.AIList = AIList;
 		this.roomSig = roomSig;
@@ -178,7 +180,7 @@ class Game {
 		this.lobbyTimer = null;
 		this.lobbyTimeLeft = this.lobbyWaitTime;
 
-		this.gameBoard = new GameBoard(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,nebulaList,this.tradeShipList,this.AIList,engine,this.roomSig);
+		this.gameBoard = new GameBoard(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,nebulaList,this.tradeShipList,this.AIList,engine,this.gadgetList,this.roomSig);
 	}
 
 	start(){
@@ -253,12 +255,10 @@ class Game {
 	}
 
 	checkForWin(){
-		/*
 		if(this.getPlayerShipCount() == 0){
 			this.gameover();
 			return true;
 		}
-		*/
 		if(this.getShipCount() == 1){
 			this.gameover();
 			return true;
@@ -332,7 +332,7 @@ class Game {
 }
 
 class GameBoard {
-	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,nebulaList,tradeShipList,AIList,engine,roomSig){
+	constructor(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,nebulaList,tradeShipList,AIList,engine,gadgetList,roomSig){
 		this.world = world;
 		this.clientList = clientList;
 		this.bulletList = bulletList;
@@ -343,6 +343,7 @@ class GameBoard {
 		this.AIList = AIList;
 		this.nebulaList = nebulaList;
 		this.tradeShipList = tradeShipList;
+		this.gadgetList = gadgetList;
 		this.engine = engine;
 		this.roomSig = roomSig;
 	}
@@ -436,6 +437,21 @@ class GameBoard {
 			messenger.messageRoomBySig(this.roomSig,'terminateItems',deadSigs);
 		}
 	}
+	updateGadgets(){
+		var deadSigs = [];
+		for(var gadgetSig in this.gadgetList){
+			var gadget = this.gadgetList[gadgetSig];
+			if(gadget.alive == false){
+				deadSigs.push(gadgetSig);
+				this.terminateGadget(gadgetSig);
+				continue;
+			}
+			gadget.update();
+		}
+		if(deadSigs.length != 0){
+			messenger.messageRoomBySig(this.roomSig,'terminateGadgets',deadSigs);
+		}
+	}
 	spawnItem(item){
 		var sig = this.generateItemSig();
 		item.sig = sig;
@@ -506,6 +522,22 @@ class GameBoard {
 		var data = compressor.weaponFired(ship,ship.weapon,bullets);
 		messenger.messageRoomBySig(this.roomSig,'weaponFired',data);
 	}
+	activateGadget(ship){
+		var objects = ship.activateGadget();
+		if(objects == null){
+			return;
+		}
+		if(objects.length){
+			return;
+		}
+		var sig = this.generateGadgetSig();
+		this.gadgetList[sig] = objects;
+		this.gadgetList[sig].sig = sig;
+
+		var data = compressor.gadgetActivated(this.gadgetList[sig]);
+		messenger.messageRoomBySig(this.roomSig,'gadgetActivated',data);
+	}
+
 	terminateBullet(packet){
 		if(packet.bulletList[packet.sig] != undefined){
 			packet.bulletList[packet.sig].alive = false;;
@@ -519,6 +551,9 @@ class GameBoard {
 	}
 	terminateItem(itemSig){
 		delete this.itemList[itemSig];
+	}
+	terminateGadget(gadgetSig){
+		delete this.gadgetList[gadgetSig];
 	}
 	clean(){
 		//Remove all active bullets from the scene
@@ -544,6 +579,13 @@ class GameBoard {
 			return sig;
 		}
 		return this.generateAsteroidSig();
+	}
+	generateGadgetSig(){
+		var sig = utils.getRandomInt(0,99999);
+		if(this.gadgetList[sig] == null || this.gadgetList[sig] == undefined){
+			return sig;
+		}
+		return this.generateGadgetSig();
 	}
 	generateItemSig(){
 		var sig = utils.getRandomInt(0,99999);
@@ -975,7 +1017,7 @@ class World extends Rect{
 	}
 
 	spawnNewShip(id,color){
-		var ship = new Ship(0,0, 90, color, id,this.roomSig);
+		var ship = new Ship(0,0, 90, color, id,this.engine,this.roomSig);
 		var loc = this.findFreeLoc(ship);
 		ship.x = loc.x;
 		ship.y = loc.y;
@@ -1005,13 +1047,14 @@ class BlueBound extends Bound{
 }
 
 class Ship extends Circle{
-	constructor(x,y, angle, color, id, roomSig){
+	constructor(x,y, angle, color, id,engine, roomSig){
 		super(x, y, c.playerBaseRadius, color);
 		this.baseHealth = c.playerBaseHealth;
 		this.health = this.baseHealth;
 		this.baseColor = color;
 		this.glowColor = color;
 		this.angle = angle;
+		this.engine = engine;
 		this.isHit = false;
 		this.speedBoost = 0;
 		this.boostList = {};
@@ -1039,10 +1082,14 @@ class Ship extends Circle{
 		this.roomSig = roomSig;
 		this.explosionRadius = c.playerExplosionRadius;
 		this.explosionMaxDamage = c.playerExplosionMaxDamage;
+
+
 		this.regenTimeout = c.playerHealthRegenTime;
 		this.regenTimer = null;
 		this.regenRate = c.playerHealthRegenRate;
 		this.regenerating = false;
+
+		this.gadget = new PulseWave(this.engine);
 
 		if(c.playerSpawnWeapon == "Blaster"){
 			this.weapon = new Blaster(this.id);
@@ -1201,6 +1248,9 @@ class Ship extends Circle{
 		}
 		return _bullets;
 	}
+	activateGadget(){
+		return this.gadget.activate(this.x,this.y);
+	}
 	move(){
 		this.x = this.newX;
 		this.y = this.newY;
@@ -1287,6 +1337,50 @@ class Ship extends Circle{
 				this.removeBoost(boost.type);
 				delete this.boostList[sig];
 			}
+		}
+	}
+}
+
+class Gadget {
+	constructor(engine){
+		this.engine = engine;
+		this.cooldown = 5*1000;
+		this.cooldownTimer = Date.now();
+	}
+	activate(){
+		if(this.cooldown - (Date.now() - this.cooldownTimer) < 0){
+			this.cooldownTimer = Date.now();
+			return true;
+		}
+	}
+}
+
+class PulseWave extends Gadget{
+	constructor(engine){
+		super(engine);
+		this.pulseRadius = c.pulseRadius;
+		this.duration = 1*1000;
+	}
+	activate(x,y){
+		if(super.activate()){
+			var hitCircle = new Pulse(x,y,this.pulseRadius,"orange",this.duration);
+			this.engine.explodeObject(x, y, 0, this.pulseRadius);
+			return hitCircle;
+		}
+	}
+}
+
+class Pulse extends Circle{
+	constructor(x,y,radius,color,duration){
+		super(x,y,radius,color);
+		this.type = "Pulse";
+		this.alive = true;
+		this.spawnDate = Date.now();
+		this.duration = c.pulseDuration;
+	}
+	update(){
+		if(this.duration - (Date.now() - this.spawnDate) < 0){
+			this.alive = false;
 		}
 	}
 }
@@ -1601,7 +1695,7 @@ class Boost extends CircleItem {
 class OverdriveItem extends Boost{
 	constructor(x,y){
 		super(x,y);
-		this.boostAmt = 1500;
+		this.boostAmt = 200;
 		this.duration = 15;
 		this.boostMessage = "Engaged Overdrive";
 		this.refreshMessage = "Overdrive extended";

@@ -201,7 +201,7 @@ class Engine {
 		for (var shipSig in this.shipList){
 			var ship = this.shipList[shipSig];
 			var distance = utils.getMag(xLoc - ship.x, yLoc - ship.y);
-			if(distance  <= (radius + ship.height)){
+			if((distance  <= (radius + ship.radius)) && (distance != 0)){
 				var velContX = (forceConstant/Math.pow(distance,2))*(ship.x - xLoc)/distance;
 				var velContY = (forceConstant/Math.pow(distance,2))*(ship.y - yLoc)/distance;
 				ship.velX += velContX;

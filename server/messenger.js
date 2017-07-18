@@ -147,7 +147,7 @@ function checkForMail(client){
 		}
 	});
 
-	client.on('click',function(loc){
+	client.on('fireGun',function(loc){
 		var room = getRoomFromId(client.id);
 		if(room == undefined){
 			return;
@@ -155,6 +155,16 @@ function checkForMail(client){
 		var ship = room.shipList[client.id];
 		room.game.gameBoard.fireWeapon(ship);
 	});
+
+
+	client.on('activateGadget',function(loc){
+		var room = getRoomFromId(client.id);
+		if(room == undefined){
+			return;
+		}
+		var ship = room.shipList[client.id];
+		room.game.gameBoard.activateGadget(ship);
+	});	
 
 	client.on('drip',function(){
   		client.emit('drop');

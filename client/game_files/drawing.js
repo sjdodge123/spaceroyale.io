@@ -389,6 +389,7 @@ function drawRelativeObjects(){
 	drawShips();
 	drawAsteroids();
 	drawItems();
+	drawGadgets();
 	drawPlanets();
 	drawNebulas();
 	drawTradeShips();
@@ -575,6 +576,18 @@ function drawItem(item){
     gameContext.restore();
 }
 
+function drawGadget(gadget){
+	if(gadget.type == "Pulse"){
+		gameContext.save();
+		gameContext.beginPath();
+		gameContext.lineWidth = 3;
+		gameContext.strokeStyle = "red";
+		gameContext.arc(gadget.x-myShip.x+camera.xOffset,gadget.y-myShip.y+camera.yOffset,gadget.radius,0,Math.PI*2,true);
+		gameContext.stroke();
+		gameContext.restore();
+	}
+}
+
 function drawPlanet(planet){
 	gameContext.save();
 	planetSheet.move(planet.x-myShip.x+camera.xOffset,planet.y-myShip.y+camera.yOffset);
@@ -697,6 +710,17 @@ function drawItems(){
 			drawItem(itemList[sig]);
 		}
 
+	}
+}
+
+function drawGadgets(){
+	for(var sig in gadgetList){
+		if(gadgetList[sig] == null){
+			continue;
+		}
+		if(camera.inBounds(gadgetList[sig])){
+			drawGadget(gadgetList[sig]);
+		}
 	}
 }
 

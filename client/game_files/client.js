@@ -15,6 +15,7 @@ var myID = null,
 	playerList = {},
 	bulletList = {},
 	nebulaList = {},
+	gadgetList = {},
 	tradeShipList = {},
 	shipList = {};
 function clientConnect() {
@@ -128,6 +129,14 @@ function clientConnect() {
 		}
 		weaponFired(payload);
 	});
+
+	server.on("gadgetActivated",function(packet){
+		if(packet == null){
+			return;
+		}
+		gadgetActivated(packet);
+	});
+
 	server.on('terminateBullet',function(deadSigs){
 		for(var i=0;i<deadSigs.length;i++){
 			terminateBullet(deadSigs[i]);
@@ -381,6 +390,18 @@ function clearToast(){
 		delete toastQueue[0];
 		toastTimer = setTimeout(clearToast,1700);
 	}
+}
+
+function fireGun(_x,_y){
+    if(iAmAlive){
+       server.emit("fireGun",{x:_x,y:_y});
+    }
+}
+
+function activateGadget(_x,_y){
+	if(iAmAlive){
+       server.emit("activateGadget",{x:_x,y:_y});
+    }
 }
 
 function clientSendAuth(user,pass){
