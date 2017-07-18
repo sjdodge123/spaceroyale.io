@@ -245,7 +245,7 @@ function drawWeaponHUD(){
 		gameContext.restore();
 		drawText(myShip.weapon.name,eventLog.x + eventLog.width+80-((myShip.weapon.name.length*10)/2),eventLog.y+eventLog.height);
 	}
-	
+
 }
 
 function drawKillCounter(){
@@ -403,7 +403,7 @@ function drawShip(ship){
 	if(ship.shield != null){
 		drawShield(ship);
 	}
-	
+
 	gameContext.save();
 	gameContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
 	gameContext.rotate(ship.spriteAngle*Math.PI/180);
@@ -445,7 +445,7 @@ function drawShip(ship){
 	}
 	if(ship != myShip){
 		drawHealthBar(ship);
-	}	
+	}
 }
 
 function drawHealthBar(ship){
@@ -462,7 +462,7 @@ function drawHealthBar(ship){
 }
 
 function drawWeapon(ship){
-	var shipDim = ship.radius || ship.width/4; 
+	var shipDim = ship.radius || ship.width/4;
 	var svgscale = 2 * shipDim / shipRedSVG.width;
 	gameContext.save();
 	gameContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
@@ -481,7 +481,7 @@ function drawWeapon(ship){
 			break;
 		}
 	}
-	
+
 	gameContext.restore();
 
 }
@@ -514,18 +514,17 @@ function drawAsteroid(asteroid){
 	gameContext.rotate(asteroid.angle*Math.PI/180);
 	asteroidSheet.move(0,0);
 
-	if(asteroid.health == config.asteroidBaseHealth){
+	if(asteroid.health >= config.asteroidBaseHealth * 0.80){
 		asteroidSheet.changeFrame(0,asteroid.artType);
 	}
-	if(asteroid.health < config.asteroidBaseHealth*.80){
-		asteroidSheet.changeFrame(1,asteroid.artType);
-	}
-	if(asteroid.health < config.asteroidBaseHealth*.40){
+	else if(asteroid.health < config.asteroidBaseHealth*.40){
 		asteroidSheet.changeFrame(2,asteroid.artType);
 	}
-	
+	else{
+		asteroidSheet.changeFrame(1,asteroid.artType);
+	}
 	asteroidSheet.draw(asteroid.radius*2,asteroid.radius*2);
-	gameContext.restore();	
+	gameContext.restore();
 }
 
 function drawItem(item){
