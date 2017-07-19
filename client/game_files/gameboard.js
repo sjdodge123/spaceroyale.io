@@ -115,22 +115,7 @@ function connectSpawnShips(packet){
 	for(var i=0;i<packet.length;i++){
 		var ship = packet[i];
 		if(shipList[ship[0]] == null){
-			shipList[ship[0]] = {};
-			shipList[ship[0]].isHiding = false;
-			shipList[ship[0]].spriteAngle = 0;
-			shipList[ship[0]].rotationRate = 1;
-			shipList[ship[0]].kills = 0;
-			shipList[ship[0]].health = config.playerBaseHealth;
-			shipList[ship[0]].radius = config.playerBaseRadius;
-			shipList[ship[0]].id = ship[0];
-			shipList[ship[0]].x = ship[1];
-			shipList[ship[0]].y = ship[2];
-			shipList[ship[0]].color = ship[3];
-			shipList[ship[0]].weapon = {}
-			shipList[ship[0]].weapon.angle = ship[4];
-			shipList[ship[0]].weapon.name = ship[5];
-			shipList[ship[0]].weapon.level = ship[6];
-			shipList[ship[0]].weapon.cooldown = ship[7];
+			 createShip(ship);
 		}
 	}
 
@@ -143,22 +128,7 @@ function appendNewShip(packet){
 	packet = JSON.parse(packet);
 	var ship = packet;
 	if(shipList[ship[0]] == null){
-		shipList[ship[0]] = {};
-		shipList[ship[0]].isHiding = false;
-		shipList[ship[0]].spriteAngle = 0;
-		shipList[ship[0]].rotationRate = 1;
-		shipList[ship[0]].kills = 0;
-		shipList[ship[0]].health = config.playerBaseHealth;
-		shipList[ship[0]].radius = config.playerBaseRadius;
-		shipList[ship[0]].id = ship[0];
-		shipList[ship[0]].x = ship[1];
-		shipList[ship[0]].y = ship[2];
-		shipList[ship[0]].color = ship[3];
-		shipList[ship[0]].weapon = {}
-		shipList[ship[0]].weapon.angle = ship[4];
-		shipList[ship[0]].weapon.name = ship[5];
-		shipList[ship[0]].weapon.level = ship[6];
-		shipList[ship[0]].weapon.cooldown = ship[7];
+		createShip(ship);
 	}
 }
 
@@ -168,24 +138,33 @@ function spawnAIShips(payload){
 	for(var i=0;i<payload.length;i++){
 		var ship = payload[i];
 		if(shipList[ship[0]] == null){
-			shipList[ship[0]] = {};
-			shipList[ship[0]].isHiding = false;
-			shipList[ship[0]].spriteAngle = 0;
-			shipList[ship[0]].rotationRate = 1;
-			shipList[ship[0]].kills = 0;
-			shipList[ship[0]].health = config.playerBaseHealth;
-			shipList[ship[0]].radius = config.playerBaseRadius;
-			shipList[ship[0]].id = ship[0];
-			shipList[ship[0]].x = ship[1];
-			shipList[ship[0]].y = ship[2];
-			shipList[ship[0]].color = ship[3];
-			shipList[ship[0]].weapon = {}
-			shipList[ship[0]].weapon.angle = ship[4];
-			shipList[ship[0]].weapon.name = ship[5];
-			shipList[ship[0]].weapon.level = ship[6];
-			shipList[ship[0]].weapon.cooldown = ship[7];
-			shipList[ship[0]].AIName = ship[8];
+			createShip(ship,true);
 		}
+	}
+}
+
+
+function createShip(dataArray,isAI){
+	var index = dataArray[0];
+	shipList[index] = {};
+	shipList[index].isHiding = false;
+	shipList[index].spriteAngle = 0;
+	shipList[index].rotationRate = 1;
+	shipList[index].kills = 0;
+	shipList[index].power = config.playerBasePower;
+	shipList[index].health = config.playerBaseHealth;
+	shipList[index].radius = config.playerBaseRadius;
+	shipList[index].id = dataArray[0];
+	shipList[index].x = dataArray[1];
+	shipList[index].y = dataArray[2];
+	shipList[index].color = dataArray[3];
+	shipList[index].weapon = {}
+	shipList[index].weapon.angle = dataArray[4];
+	shipList[index].weapon.name = dataArray[5];
+	shipList[index].weapon.level = dataArray[6];
+	shipList[index].weapon.powerCost = dataArray[7];
+	if(isAI){
+		shipList[index].AIName = dataArray[8]
 	}
 }
 
@@ -289,7 +268,7 @@ function equipItem(packet){
 	packet = JSON.parse(packet);
 	var name = packet[1];
 	var level = packet[2];
-	var cooldown = packet[3];
+	var powerCost = packet[3];
 
 	if(shipList[packet[0]] == null){
 		return;
@@ -301,7 +280,7 @@ function equipItem(packet){
 	}
 	shipList[packet[0]].weapon.name = name;
 	shipList[packet[0]].weapon.level = level;
-	shipList[packet[0]].weapon.cooldown = cooldown;
+	shipList[packet[0]].weapon.powerCost = powerCost;
 }
 
 function updateItem(packet){
@@ -414,7 +393,7 @@ function blueBoundShrinking(payload){
 }
 
 function weaponFired(payload){
-	var id,ship,weaponName,weaponLevel,numBullets,i,bullet;
+	var id,ship,weaponName,weaponLevel,numBullets,i,bullet,powerCost=0;
 	payload = JSON.parse(payload);
 	id = payload[0];
 	ship = shipList[id];
@@ -439,17 +418,18 @@ function weaponFired(payload){
 			setTimeout(terminateBullet,config.bulletLifetime*1000 + 200,bullet[0]);
 		}
 	}
-	if(id == myID){
-		lastFired = Date.now();
-	}
+	
 	if(camera.inBounds(ship)){
 		if(weaponName == "Blaster"){
+			powerCost = config.blasterPowerCost;
         	playSound(blasterShot);
     	}
     	if(weaponName == "PhotonCannon"){
+    		powerCost = config.photonCannonPowerCost;
         	playSound(photonCannonShot);
     	}
     	if(weaponName == "MassDriver"){
+    		powerCost = config.massDriverPowerCost;
     		if(weaponLevel == 3){
     			playSound(massDriverShot2);
     		} else{
@@ -457,6 +437,7 @@ function weaponFired(payload){
     		}
     	}
 	}
+	shipList[id].power -= powerCost;
 }
 
 function gadgetActivated(packet){

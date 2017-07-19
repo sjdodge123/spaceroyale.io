@@ -22,9 +22,6 @@ var server = null,
     iAmFiring = false,
     useGadget = false,
     gameRunning = false,
-    lastFired = new Date(),
-    cooldownRemaining = 0,
-    currentWeaponCooldown = 0,
     iAmAlive = true,
     cameraBouncing = false,
     cameraCenterSeed = null,
@@ -448,7 +445,7 @@ function resetGameVariables(){
     backgroundCanvas = document.getElementById('backgroundCanvas');
     backgroundImage = document.getElementById('backgroundImage');
     hud = document.getElementById('hud');
-    
+    $('#lobbyUI').show();
     gameContext = gameCanvas.getContext('2d');
 }
 
@@ -630,7 +627,6 @@ function gameLoop(){
     drawBackground();
     drawRelativeObjects();
     drawHUD();
-    checkCooldown();
     checkForDamage()
 }
 
@@ -689,13 +685,6 @@ function gameStart(){
 
 function gameOver(){
     server.emit('movement',{turnLeft:false,moveForward:false,turnRight:false,moveBackward:false});
-}
-
-function checkCooldown(){
-    cooldownRemaining = currentWeaponCooldown - (Date.now() - lastFired);
-    if(cooldownRemaining <= 0){
-        cooldownRemaining = 0;
-    }
 }
 
 function checkForDamage(){

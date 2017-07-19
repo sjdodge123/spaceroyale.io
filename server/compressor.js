@@ -23,7 +23,7 @@ exports.shipSpawns = function(shipList){
 			ship.weapon.angle,
 			ship.weapon.name,
 			ship.weapon.level,
-			ship.weapon.cooldown,
+			ship.weapon.powerCost,
 		];
 		packet.push(listItem);
 	}
@@ -42,7 +42,7 @@ exports.appendShip = function(ship){
 	packet[4] = ship.weapon.angle;
 	packet[5] = ship.weapon.name;
 	packet[6] = ship.weapon.level;
-	packet[7] = ship.weapon.cooldown;
+	packet[7] = ship.weapon.powerCost;
 	packet = JSON.stringify(packet);
 	ship = null;
 	listItem = null;
@@ -65,7 +65,7 @@ exports.spawnAIShips = function(shipList){
 			ship.weapon.angle,
 			ship.weapon.name,
 			ship.weapon.level,
-			ship.weapon.cooldown,
+			ship.weapon.powerCost,
 			ship.AIName,
 		];
 		packet.push(listItem);
@@ -101,7 +101,7 @@ exports.equipItem = function(equipedItem){
 	packet[0] = equipedItem.owner;
 	packet[1] = equipedItem.name;
 	packet[2] = equipedItem.level;
-	packet[3] = equipedItem.cooldown;
+	packet[3] = equipedItem.powerCost;
 	packet = JSON.stringify(packet);
 	return packet;
 }

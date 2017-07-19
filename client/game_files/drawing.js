@@ -161,7 +161,7 @@ function drawHUD(){
     drawToast();
     drawPing();
     drawTotalPlayers();
-    drawWeaponCooldown();
+    drawPowerBar();
     drawEventLog();
 
     if(!camera.inBounds(world.whiteBound)){
@@ -253,7 +253,10 @@ function drawKillCounter(){
 }
 
 function drawHPCounter(){
-	if(myShip != null){
+	if(myShip == null){
+		return;
+	}
+	if(myShip.health > 0){
 		gameContext.save();
 		if(myShip.health > 70){
 			gameContext.fillStyle = "#1dba34";
@@ -265,15 +268,20 @@ function drawHPCounter(){
 
 		gameContext.fillRect(eventLog.x,eventLog.y-30,(myShip.health/100)*eventLog.width/2,20);
 		gameContext.restore();
-		drawTextF("Health",eventLog.x+(eventLog.width/4)-30,eventLog.y-15,"#ECF0F1","17px Georgia");
 	}
+	drawTextF("Health",eventLog.x+(eventLog.width/4)-30,eventLog.y-15,"#ECF0F1","17px Georgia");
 }
 
-function drawWeaponCooldown(){
-	gameContext.save();
-	gameContext.fillStyle = myShip.color;
-	gameContext.fillRect(eventLog.x+eventLog.width/2,eventLog.y-30,(1 - (cooldownRemaining/currentWeaponCooldown))*eventLog.width/2,20);
-	gameContext.restore();
+function drawPowerBar(){
+	if(myShip == null){
+		return;
+	}
+	if(myShip.power > 0){
+		gameContext.save();
+		gameContext.fillStyle = "skyblue";
+		gameContext.fillRect(eventLog.x+eventLog.width/2,eventLog.y-30,(myShip.power/config.playerBasePower)*eventLog.width/2,20);
+		gameContext.restore();
+	}
 	drawTextF("Power",eventLog.x+eventLog.width/2+(eventLog.width/4)-30,eventLog.y-15,"#ECF0F1","17px Georgia");
 }
 

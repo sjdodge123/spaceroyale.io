@@ -295,6 +295,7 @@ function clientConnect() {
 			var element  = packet[i];
 			var id = element[0];
 			var health = element[1];
+			var power = element[2];
 			if(id == null){
 				continue;
 			}
@@ -305,6 +306,7 @@ function clientConnect() {
 				continue;
 			}
 			shipList[id].health = health;
+			shipList[id].power = power;
 		}
 	});
 

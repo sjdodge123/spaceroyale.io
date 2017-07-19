@@ -190,6 +190,7 @@ class Game {
 		this.world.resize();
 		this.world.drawFirstBound();
 		this.gameBoard.populateWorld();
+		this.gameBoard.resetShips();
 		this.checkForAISpawn();
 		this.randomLocShips();
 		this.resetTimeUntilShrink();
@@ -367,8 +368,8 @@ class GameBoard {
 				this.spawnItem(ship.droppedItem);
 				ship.droppedItem = null;
 			}
-			if(ship.regenerating){
-				regeneratingShips.push([ship.id, ship.health]);
+			if(ship.regenerating || ship.powerRegen){
+				regeneratingShips.push([ship.id, ship.health,ship.power]);
 			}
 			ship.update(dt);
 		}
@@ -564,6 +565,13 @@ class GameBoard {
 		for(var id in this.shipList){
 			var ship = this.shipList[id];
 			ship.weapon.resetCoolDown();
+		}
+	}
+	resetShips(){
+		for(var shipID in this.shipList){
+			var ship = this.shipList[shipID];
+			ship.health = c.playerBaseHealth;
+			ship.power = c.playerBasePower;
 		}
 	}
 	generateBulletSig(){
@@ -1051,6 +1059,14 @@ class Ship extends Circle{
 		super(x, y, c.playerBaseRadius, color);
 		this.baseHealth = c.playerBaseHealth;
 		this.health = this.baseHealth;
+
+		this.basePower = c.playerBasePower;
+		this.power = this.basePower;
+		this.powerRegenAmt = c.playerPowerRegenAmt;
+		this.powerRegenRate = c.playerPowerRegenRate;
+		this.powerRegenTimer = Date.now() - this.powerRegenRate;
+		this.powerRegen = false;
+
 		this.baseColor = color;
 		this.glowColor = color;
 		this.angle = angle;
@@ -1106,6 +1122,7 @@ class Ship extends Circle{
 	update(dt){
 		this.dt = dt;
 		this.checkHP();
+		this.regenPower();
 		this.checkBoostList();
 		this.checkKills();
 		this.move();
@@ -1190,17 +1207,39 @@ class Ship extends Circle{
 		}
 
 	}
+	regenPower(){
+		if(this.powerRegenRate - (Date.now() - this.powerRegenTimer) > 0){	
+			return;
+		}
+		this.powerRegenTimer = Date.now();
+		if(this.power < this.basePower){
+			this.powerRegen = true;
+			this.power += this.powerRegenAmt;
+		} else{
+			this.powerRegen = false;
+		}
+		if(this.power > this.basePower){
+			this.power = this.basePower;
+		}
+	}
 	regenHealth(){
 		if(this.health < this.baseHealth){
 			this.regenerating = true;
 			this.health += this.regenRate;
-			if (this.health > this.baseHealth){
-				this.health == this.baseHealth;
-			}
 		}
 		else{
 			this.regenerating = false;
 		}
+		if(this.health > this.baseHealth){
+			this.health = this.baseHealth;
+		}
+	}
+	checkPower(amt){
+		if(this.power - amt < 0){
+			return false;
+		}
+		this.power -= amt;
+		return true;
 	}
 	heal(amt){
 		if(this.health < this.baseHealth){
@@ -1246,6 +1285,9 @@ class Ship extends Circle{
 		if(_bullets == null){
 			return;
 		}
+		if(!this.checkPower(this.weapon.powerCost)){
+			return;
+		}
 		return _bullets;
 	}
 	activateGadget(){
@@ -1271,7 +1313,7 @@ class Ship extends Circle{
 			//TODO Fix hiding messenger.messageRoomBySig(this.roomSig,"shipHiding",this.id);
 			//_engine.slowDown(this,this.dt,object.slowAmt);
 			return;
-		aw}
+		}
 		if(object.owner != this.id && object.alive && object.damage != null){
 
 			if(this.shield != null && this.shield.alive){
@@ -1345,7 +1387,7 @@ class Gadget {
 	constructor(engine){
 		this.engine = engine;
 		this.cooldown = 5*1000;
-		this.cooldownTimer = Date.now();
+		this.cooldownTimer = Date.now() - this.cooldown;
 	}
 	activate(){
 		if(this.cooldown - (Date.now() - this.cooldownTimer) < 0){
@@ -1757,10 +1799,11 @@ class Weapon {
 	constructor(owner){
 		this.name = "Unset";
 		this.owner = owner;
-		this.cooldown = 10;
+		this.cooldown = .1;
 		this.level = 1;
 		this.maxLevel = 3;
 		this.nextFire = 0;
+		this.powerCost = 20;
 		this.angle = 0;
 		this.maxLevelMessage = "Weapon already at max";
 		this.upgradeMessage = "No upgrade message set";
@@ -1801,7 +1844,7 @@ class Blaster extends Weapon{
 		super(owner);
 		this.level = level;
 		this.name = "Blaster";
-		this.cooldown = c.blasterCoolDown;
+		this.powerCost = c.blasterPowerCost;
 		this.equipMessage = "Equiped Blaster";
 		this.upgradeMessage ="Upgraded Blaster";
 		this.item = BlasterItem;
@@ -1835,7 +1878,6 @@ class PhotonCannon extends Weapon{
 		super(owner);
 		this.name = "PhotonCannon";
 		this.level = level;
-		this.cooldown = c.photonCannonCoolDown;
 		this.equipMessage = "Equiped Photon Cannon";
 		this.upgradeMessage ="Upgraded Photon Cannon";
 		this.item = PhotonCannonItem;
@@ -1877,8 +1919,8 @@ class MassDriver extends Weapon{
 	constructor(owner,level){
 		super(owner);
 		this.name = "MassDriver";
+		this.powerCost = c.massDriverPowerCost;
 		this.level = level;
-		this.cooldown = c.massDriverCoolDown;
 		this.equipMessage = "Equiped Mass Driver";
 		this.upgradeMessage = "Upgraded Mass Driver";
 		this.threeShot = false;
@@ -2009,7 +2051,6 @@ class Bullet extends Rect{
 		if(object.isItem){
 			return;
 		}
-		//this.killSelf();
 		return true;
 	}
 	killSelf(){
