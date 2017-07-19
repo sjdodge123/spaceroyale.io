@@ -14,6 +14,10 @@ exports.checkReg = function(creds){
 	checkReg(creds);
 }
 
+exports.trimName = function(name){
+    return trimName(name);
+}
+
 function checkAuth(creds){
 	if(invalid(creds.username,creds.password)){
 		messenger.messageUser(creds.id,"unsuccessfulAuth",{reason:"Invalid attempt"});
@@ -91,4 +95,10 @@ function regCallback(result,params){
 	}
 	database.addAuthedUser(params.id,result.insertId);
 	messenger.messageUser(params.id,'successfulReg',params.player);
+}
+
+function trimName(name){
+    if(name.length > 10){
+        return name.substring(0,10);
+    }
 }

@@ -69,10 +69,11 @@ function checkForMail(client){
 		//Find a room with space
 		var roomSig = hostess.findARoom(client.id);
 		var room = hostess.joinARoom(roomSig,client.id);
-		console.log(message.name + " joined Room"+roomSig);
+		var name = bouncer.trimName(message.name);
+		console.log(name + " joined Room"+roomSig);
 
 		//Add this player to the list of current clients in the room
-		room.clientList[client.id] = message.name;
+		room.clientList[client.id] = name;
 
 		//Spawn a ship for the new player
 		room.shipList[client.id] = room.world.spawnNewShip(client.id,message.color);
@@ -92,7 +93,7 @@ function checkForMail(client){
 		//Update all existing players with the new player's info
 		var appendShipData = compressor.appendShip(room.shipList[client.id]);
 		var appendPlayerList = {
-			name:message.name,
+			name:name,
 			id:client.id,
 			ship:appendShipData
 		};
