@@ -85,10 +85,10 @@ canvas{
 	overflow: none;
 	position: relative;
 	pointer-events: all;
-	width: 300px;
+	width: 15vw;
 }
 #weapons *{
-	height: 150px;
+	height: 10vw;
 }
 
 #hud{
@@ -259,12 +259,12 @@ canvas{
 
 #howToPlayMenu{
 	z-index: 5;
-	width: 400px;
-	height: 350px;
-	left: 70%;
-   	top: 20%;
-	position: relative;
-   	background-color: #1a1a1a;
+	position: absolute;
+	width: 25%;
+	height: 20vw;
+	top: 10%;
+	right: 5%;
+   	background-color: transparent;
 	color:white;
 	overflow: none;
 	border: 1px solid #333333;
@@ -275,14 +275,12 @@ canvas{
 }
 
 #howToPlayText{
-	top: 10%;
+	margin-top: 10px;
 	height: 100%;
 	text-align: center;
 	position: relative;
 	vertical-align: middle;
-}
-#howToPlayHide{
-	margin-bottom 30px;
+	font-size: 1vw;
 }
 
 #howToPlayBullets{
@@ -442,11 +440,6 @@ canvas{
 	top :100%;
 }
 @media screen and (orientation:portrait){
-	#howToPlayMenu{
-		left: 50%;
-		margin-left: -25%;
-   		top: 0%;
-	}
 	#gameOverMenu{
 		width: 20%;
 		height: 10%;
@@ -489,19 +482,12 @@ canvas{
 		margin-left: -15%;
 		width: 30%;
 	}
-
-	#howToPlayMenu{
-		left: 50%;
-		margin-left: -25%;
-   		top: 0%;
-	}
 	#footer-content-right {
 		margin: 10 7 2;
 	}
 	.navbar-default{
 		margin-bottom: 15% !important;
 	}
-
 }
 
 @media screen and (max-width: 1300px){
@@ -577,18 +563,6 @@ canvas{
 		margin-left: -15%;
 		width: 30%;
 	}
-	#howToPlayMenu{
-		left: 0;
-		height: 150px;
-		width: 75%;
-		margin: 0% 10% auto;
-   		top: 0%;
-	}
-	#howToPlayText *{
-		margin: none;
-		font-size: 15px !important;
-		width: 100%;
-	}
 	#movementControls{
 		display: none;
 	}
@@ -625,5 +599,4 @@ canvas{
 	.navbar-default{
 		margin-bottom: 10% !important;
 	}
-
 }
