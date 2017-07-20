@@ -1298,7 +1298,12 @@ class Ship extends Circle{
 	fire(){
 		var x = this.x + this.radius * Math.cos((this.weapon.angle + 90) * Math.PI/180);
 		var y = this.y + this.radius * Math.sin((this.weapon.angle + 90) * Math.PI/180);
-		var _bullets = this.weapon.fire(x,y,this.weapon.angle, this.baseColor,this.id);
+		var _bullets;
+		if(this.weapon.name == "PhotonCannon"){
+			_bullets = this.weapon.fire(x,y,this.weapon.angle, this.baseColor,this.id,this.power);
+		} else{
+			_bullets = this.weapon.fire(x,y,this.weapon.angle, this.baseColor,this.id);
+		}
 		if(_bullets == null){
 			return;
 		}
@@ -1916,16 +1921,20 @@ class PhotonCannon extends Weapon{
 		this.equipMessage = "Equiped Photon Cannon";
 		this.upgradeMessage ="Upgraded Photon Cannon";
 		this.item = PhotonCannonItem;
+		this.reset = false;
 		this.powerCost = c.photonCannonPowerCost;
 		this.chargeCost = c.photonCannonChargeCost;
 		this.chargeTime = c.photonCannonChargeTime;
-		//this.chargeAutoRelease = c.photonCannonChargeAutoRelease;
 		this.chargeTimer = Date.now() - this.chargeTime;
 		this.chargeLevel = 0;
 	}
-	fire(x,y,angle,color,id){
-		this.powerCost = c.photonCannonPowerCost;
-		if(this.checkForCharge()){
+	fire(x,y,angle,color,id,powerLevel){
+		if(this.reset){
+			this.powerCost = c.photonCannonPowerCost;
+			this.chargeLevel = 0;
+			this.reset = false;
+		}
+		if(this.checkForCharge(powerLevel)){
 			this.charge();
 		}
 	}
@@ -1943,12 +1952,19 @@ class PhotonCannon extends Weapon{
 			_bullets.push(new Birdshot(x,y,4,10, angle+10, color, id));
 			powerCost += this.chargeCost;
 		}
-		this.chargeLevel = 0;
 		this.powerCost = powerCost;
+		this.reset = true;
 		return _bullets;
 	}
-	checkForCharge(){
+	checkForCharge(powerLevel){
 		if(this.chargeTime - (Date.now() - this.chargeTimer) < 0){
+			var currentCost = c.photonCannonPowerCost;
+			if(this.chargeLevel >= 1){
+				currentCost += this.chargeCost*this.chargeLevel;
+			}
+			if(currentCost > powerLevel){
+				return false;
+			}
 			this.chargeTimer = Date.now();
 			return true;
 		}
@@ -1958,6 +1974,7 @@ class PhotonCannon extends Weapon{
 	charge(){
 		if(this.chargeLevel < 3){
 			this.chargeLevel++;
+			messenger.messageUser(this.owner,'weaponCharge',this.chargeLevel);
 		}
 	}
 

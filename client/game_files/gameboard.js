@@ -430,7 +430,7 @@ function weaponFired(payload){
     		if(numBullets >= 3){
     			powerCost += config.photonCannonChargeCost;
     		}
-    		if(numBullets >= 5){
+    		if(numBullets == 5){
     			powerCost += config.photonCannonChargeCost;
     		}
         	playSound(photonCannonShot);
@@ -462,21 +462,4 @@ function gadgetActivated(packet){
 			gadgetList[packet[0]].radius = config.pulseRadius;
 		}
 	}
-}
-
-var chargeTimer = null;
-function chargeWeapon(){
-	if(chargeTimer == null){
-		chargeTimer = Date.now() - config.photonCannonChargeTime;
-	}
-	if(myShip.weapon.chargeLevel == 3){
-		return;
-	}
-	if(config.photonCannonChargeTime - (Date.now() - chargeTimer) < 0){
-		chargeTimer = Date.now();
-		myShip.weapon.chargeLevel += 1;
-	}
-}
-function dischargeWeapon(){
-	myShip.weapon.chargeLevel = 0;
 }

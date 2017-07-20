@@ -130,6 +130,13 @@ function clientConnect() {
 		weaponFired(payload);
 	});
 
+	server.on("weaponCharge",function(level){
+		if(myShip == null){
+			return;
+		}
+		myShip.weapon.chargeLevel = level;
+	});
+
 	server.on("gadgetActivated",function(packet){
 		if(packet == null){
 			return;
@@ -397,16 +404,13 @@ function clearToast(){
 function fireGun(_x,_y){
     if(iAmAlive){
     	server.emit("fireGun",{x:_x,y:_y});
-		if(myShip.weapon.name == "PhotonCannon"){
-			chargeWeapon();
-		}
     }
 }
 
 function stopFiring(){
 	server.emit("stopGun");
 	if(myShip.weapon.name == "PhotonCannon"){
-		dischargeWeapon();
+		myShip.weapon.chargeLevel = 0;
 	}
 }
 
