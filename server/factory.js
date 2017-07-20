@@ -1296,6 +1296,9 @@ class Ship extends Circle{
 		}
 	}
 	fire(){
+		if(!this.alive){
+			return;
+		}
 		var x = this.x + this.radius * Math.cos((this.weapon.angle + 90) * Math.PI/180);
 		var y = this.y + this.radius * Math.sin((this.weapon.angle + 90) * Math.PI/180);
 		var _bullets;
@@ -1313,6 +1316,9 @@ class Ship extends Circle{
 		return _bullets;
 	}
 	stopFire(){
+		if(!this.alive){
+			return;
+		}
 		if(this.weapon.name != "PhotonCannon"){
 			return;
 		}

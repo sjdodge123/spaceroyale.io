@@ -1,6 +1,6 @@
 {
 	"override":true,
-	"minPlayers":3,
+	"minPlayers":1,
 	"maxPlayersInRoom":25,
 	"worldWidth": 5000,
 	"worldHeight": 5000,

@@ -402,6 +402,10 @@ function weaponFired(payload){
 	weaponLevel = payload[2];
 	numBullets = payload[3];
 
+	if(shipList[id] == null){
+		ship = tradeShipList[id];
+	}
+
 	for(i=4;i<numBullets+4;i++){
 		bullet = payload[i];
 		if(bulletList[bullet[0]] == null){
@@ -444,7 +448,7 @@ function weaponFired(payload){
     		}
     	}
 	}
-	shipList[id].power -= powerCost;
+	ship.power -= powerCost;
 }
 
 function gadgetActivated(packet){

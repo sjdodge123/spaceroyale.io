@@ -47,6 +47,8 @@ var server = null,
     moveForward = false,
     moveBackward = false,
     turnLeft = false,
+    weaponArray = [];
+    skinArray = [];
     turnRight = false;
 
 var then = Date.now(),
@@ -62,14 +64,11 @@ window.onload = function() {
 function setupPage(){
     $('#nameBox').attr("placeholder","Guest"+getRandomInt(0,999999));
 
-
-    var skinArray = [];
     skinArray.push({image:'sprites/ship_magenta.svg',value:"#ff00bf"});
     skinArray.push({image:'sprites/ship_blue.svg',value:"#66b3ff"});
     skinArray.push({image:'sprites/ship_red.svg',value:"red"});
     skinArray.push({image:'sprites/ship_green.svg',value:"green"});
 
-    var weaponArray = [];
     weaponArray.push({image:'sprites/photon_cannon.svg',value:"PhotonCannon"});
     weaponArray.push({image:'sprites/blaster.svg',value:"Blaster"});
     weaponArray.push({image:'sprites/mass_driver.svg',value:"MassDriver"});

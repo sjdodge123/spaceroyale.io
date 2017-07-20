@@ -74,7 +74,7 @@ function clientConnect() {
 		if(shipList[myID] != null){
 			myShip = shipList[myID];
 		}
-
+		clientSendMessage('changeWeapon',weaponArray[1].value);
 	});
 
 	server.on("playerJoin", function(appendPlayerList){

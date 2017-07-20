@@ -124,8 +124,12 @@ exports.updateShield = function(shield){
 }
 
 exports.weaponFired = function(ship,weapon,bullets){
+	var id = ship.id;
+	if(id == null){
+		id = ship.sig;
+	}
 	var packet = [];
-	packet.push(ship.id || ship.sig);
+	packet.push(id);
 	packet.push(weapon.name);
 	packet.push(weapon.level);
 	packet.push(bullets.length);
