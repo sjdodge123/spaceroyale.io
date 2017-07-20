@@ -92,9 +92,11 @@
     "blasterBulletDamage":3,
 
     "birdshotLifetime":0.45,
-    "birdshotDamage":15,
+    "birdshotDamage":10,
     "birdshotSpeed":800,
-    "photonCannonPowerCost": 10,
+    "photonCannonPowerCost": 40,
+    "photonCannonChargeCost":20,
+    "photonCannonChargeTime":1000,
 
     "massDriverPowerCost": 65,
     "massDriverBulletDamage":25,

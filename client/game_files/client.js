@@ -396,14 +396,27 @@ function clearToast(){
 
 function fireGun(_x,_y){
     if(iAmAlive){
-       server.emit("fireGun",{x:_x,y:_y});
+    	server.emit("fireGun",{x:_x,y:_y});
+		if(myShip.weapon.name == "PhotonCannon"){
+			chargeWeapon();
+		}
     }
+}
+
+function stopFiring(){
+	server.emit("stopGun");
+	if(myShip.weapon.name == "PhotonCannon"){
+		dischargeWeapon();
+	}
 }
 
 function activateGadget(_x,_y){
 	if(iAmAlive){
        server.emit("activateGadget",{x:_x,y:_y});
     }
+}
+function stopGadget(){
+	server.emit("stopGadget");
 }
 
 function clientSendAuth(user,pass){

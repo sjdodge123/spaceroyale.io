@@ -287,7 +287,7 @@ function drawPowerBar(){
 
 function drawToast(){
 	if(toastMessage != null){
-		drawText(toastMessage,gameCanvas.width/2-(toastMessage.length*5),gameCanvas.height/2+50);
+		drawText(toastMessage,gameCanvas.width/2-(toastMessage.length*5),gameCanvas.height/2+70);
 	}
 }
 function drawTotalPlayers(){
@@ -491,6 +491,18 @@ function drawWeapon(ship){
 	}
 
 	gameContext.restore();
+
+	if(ship.weapon.chargeLevel > 0){
+
+		gameContext.save();
+		for(var i=0;i<ship.weapon.chargeLevel;i++){
+				gameContext.beginPath();
+				gameContext.fillStyle = ship.color;
+				gameContext.arc((i * 15) + ship.x-myShip.x+camera.xOffset - 15,ship.y-myShip.y+camera.yOffset+35,5,0,Math.PI*2,true);
+				gameContext.fill();
+		}
+		gameContext.restore();
+	}
 
 }
 function drawShield(ship){

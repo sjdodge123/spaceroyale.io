@@ -157,6 +157,15 @@ function checkForMail(client){
 		room.game.gameBoard.fireWeapon(ship);
 	});
 
+	client.on('stopGun',function(){
+		var room = getRoomFromId(client.id);
+		if(room == undefined){
+			return;
+		}
+		var ship = room.shipList[client.id];
+		room.game.gameBoard.stopWeapon(ship);
+	});
+
 
 	client.on('activateGadget',function(loc){
 		var room = getRoomFromId(client.id);
@@ -165,7 +174,16 @@ function checkForMail(client){
 		}
 		var ship = room.shipList[client.id];
 		room.game.gameBoard.activateGadget(ship);
-	});	
+	});
+
+	client.on('stopGadget',function(){
+		var room = getRoomFromId(client.id);
+		if(room == undefined){
+			return;
+		}
+		var ship = room.shipList[client.id];
+		room.game.gameBoard.stopGadget(ship);
+	});
 
 	client.on('drip',function(){
   		client.emit('drop');

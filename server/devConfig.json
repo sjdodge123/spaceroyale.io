@@ -1,6 +1,6 @@
 {
 	"override":true,
-	"minPlayers":1,
+	"minPlayers":3,
 	"maxPlayersInRoom":25,
 	"worldWidth": 5000,
 	"worldHeight": 5000,
@@ -12,7 +12,7 @@
     "nebulaMaxSize":250,
 
 	"asteroidDropRate":30,
-	"lobbyWaitTime":5,
+	"lobbyWaitTime":10,
 
 	"AISpawnPlayers":true,
 

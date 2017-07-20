@@ -724,10 +724,12 @@ function handleUnClick(evt){
     switch(event.which){
         case 1:{
             iAmFiring = false;
+            stopFiring();
             break;
         }
         case 3:{
             useGadget = false;
+            stopGadget();
             break;
         }
 

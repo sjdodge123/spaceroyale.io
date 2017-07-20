@@ -523,6 +523,20 @@ class GameBoard {
 		var data = compressor.weaponFired(ship,ship.weapon,bullets);
 		messenger.messageRoomBySig(this.roomSig,'weaponFired',data);
 	}
+	stopWeapon(ship){
+		var bullets = ship.stopFire();
+		if(bullets == null){
+			return;
+		}
+		for(var i=0;i<bullets.length;i++){
+			var bullet = bullets[i];
+			bullet.sig = this.generateBulletSig();
+			this.bulletList[bullet.sig] = bullet;
+			setTimeout(this.terminateBullet,bullet.lifetime*1000,{sig:bullet.sig,bulletList:this.bulletList});
+		}
+		var data = compressor.weaponFired(ship,ship.weapon,bullets);
+		messenger.messageRoomBySig(this.roomSig,'weaponFired',data);
+	}
 	activateGadget(ship){
 		var objects = ship.activateGadget();
 		if(objects == null){
@@ -537,6 +551,9 @@ class GameBoard {
 
 		var data = compressor.gadgetActivated(this.gadgetList[sig]);
 		messenger.messageRoomBySig(this.roomSig,'gadgetActivated',data);
+	}
+	stopGadget(ship){
+
 	}
 
 	terminateBullet(packet){
@@ -1290,8 +1307,26 @@ class Ship extends Circle{
 		}
 		return _bullets;
 	}
+	stopFire(){
+		if(this.weapon.name != "PhotonCannon"){
+			return;
+		}
+		var x = this.x + this.radius * Math.cos((this.weapon.angle + 90) * Math.PI/180);
+		var y = this.y + this.radius * Math.sin((this.weapon.angle + 90) * Math.PI/180);
+		var _bullets = this.weapon.stopFire(x,y,this.weapon.angle, this.baseColor,this.id);
+		if(_bullets == null){
+			return;
+		}
+		if(!this.checkPower(this.weapon.powerCost)){
+			return;
+		}
+		return _bullets;
+	}
 	activateGadget(){
 		return this.gadget.activate(this.x,this.y);
+	}
+	stopGadget(){
+
 	}
 	move(){
 		this.x = this.newX;
@@ -1876,37 +1911,56 @@ class Blaster extends Weapon{
 class PhotonCannon extends Weapon{
 	constructor(owner,level){
 		super(owner);
-		this.name = "PhotonCannon";
 		this.level = level;
+		this.name = "PhotonCannon";
 		this.equipMessage = "Equiped Photon Cannon";
 		this.upgradeMessage ="Upgraded Photon Cannon";
 		this.item = PhotonCannonItem;
+		this.powerCost = c.photonCannonPowerCost;
+		this.chargeCost = c.photonCannonChargeCost;
+		this.chargeTime = c.photonCannonChargeTime;
+		//this.chargeAutoRelease = c.photonCannonChargeAutoRelease;
+		this.chargeTimer = Date.now() - this.chargeTime;
+		this.chargeLevel = 0;
+	}
+	fire(x,y,angle,color,id){
+		this.powerCost = c.photonCannonPowerCost;
+		if(this.checkForCharge()){
+			this.charge();
+		}
+	}
+	stopFire(x,y,angle,color,id){
+		var _bullets = [], powerCost;
+		powerCost = c.photonCannonPowerCost;
+		_bullets.push(new Birdshot(x,y,4,10, angle, color, id));
+		if(this.chargeLevel >= 2){
+			_bullets.push(new Birdshot(x,y,4,10, angle-5, color, id));
+			_bullets.push(new Birdshot(x,y,4,10, angle+5, color, id));
+			powerCost += this.chargeCost;
+		}
+		if(this.chargeLevel == 3){
+			_bullets.push(new Birdshot(x,y,4,10,angle-10, color,id));
+			_bullets.push(new Birdshot(x,y,4,10, angle+10, color, id));
+			powerCost += this.chargeCost;
+		}
+		this.chargeLevel = 0;
+		this.powerCost = powerCost;
+		return _bullets;
+	}
+	checkForCharge(){
+		if(this.chargeTime - (Date.now() - this.chargeTimer) < 0){
+			this.chargeTimer = Date.now();
+			return true;
+		}
+		return false;
 	}
 
-	fire(x,y,angle,color,id){
-		if(this.onCoolDown()){
-			return;
+	charge(){
+		if(this.chargeLevel < 3){
+			this.chargeLevel++;
 		}
-		var bullets = [];
-		if(this.level > 1){
-			var shot1 = new Birdshot(x,y,4,10, angle-5, color, id);
-			var shot2 = new Birdshot(x,y,4,10, angle+5, color, id);
-			bullets.push(shot1,shot2);
-		}
-		if(this.level > 2){
-			var shot1 = new Birdshot(x,y,4,10, angle-7.5, color,id);
-			shot1.speed -= 4;
-			var shot2 = new Birdshot(x,y,4,10, angle+7.5, color, id);
-			shot2.speed -= 4;
-			bullets.push(shot1,shot2);
-		}
-		bullets.push(new Birdshot(x,y,4,10,angle-20, color,id));
-		bullets.push(new Birdshot(x,y,4,10, angle-10, color, id));
-		bullets.push(new Birdshot(x,y,4,10, angle, color, id));
-		bullets.push(new Birdshot(x,y,4,10, angle+10, color, id));
-		bullets.push(new Birdshot(x,y,4,10, angle+20, color, id));
-		return bullets;
 	}
+
 	upgrade(){
 		super.upgrade();
 		if(this.level == 3){

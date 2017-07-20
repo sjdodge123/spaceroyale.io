@@ -159,6 +159,7 @@ function createShip(dataArray,isAI){
 	shipList[index].y = dataArray[2];
 	shipList[index].color = dataArray[3];
 	shipList[index].weapon = {}
+	shipList[index].weapon.chargeLevel = 0;
 	shipList[index].weapon.angle = dataArray[4];
 	shipList[index].weapon.name = dataArray[5];
 	shipList[index].weapon.level = dataArray[6];
@@ -426,6 +427,12 @@ function weaponFired(payload){
     	}
     	if(weaponName == "PhotonCannon"){
     		powerCost = config.photonCannonPowerCost;
+    		if(numBullets >= 3){
+    			powerCost += config.photonCannonChargeCost;
+    		}
+    		if(numBullets >= 5){
+    			powerCost += config.photonCannonChargeCost;
+    		}
         	playSound(photonCannonShot);
     	}
     	if(weaponName == "MassDriver"){
@@ -455,4 +462,21 @@ function gadgetActivated(packet){
 			gadgetList[packet[0]].radius = config.pulseRadius;
 		}
 	}
+}
+
+var chargeTimer = null;
+function chargeWeapon(){
+	if(chargeTimer == null){
+		chargeTimer = Date.now() - config.photonCannonChargeTime;
+	}
+	if(myShip.weapon.chargeLevel == 3){
+		return;
+	}
+	if(config.photonCannonChargeTime - (Date.now() - chargeTimer) < 0){
+		chargeTimer = Date.now();
+		myShip.weapon.chargeLevel += 1;
+	}
+}
+function dischargeWeapon(){
+	myShip.weapon.chargeLevel = 0;
 }
