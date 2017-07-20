@@ -396,6 +396,7 @@ function resetGameVariables(){
     //stopSound(gameStartMusic);
     //playSound(backgroundMusic);
     skipAuth = false;
+    cameraBouncing = false;
     gameRunning = false;
     iAmAlive = true;
     iAmFiring = false;

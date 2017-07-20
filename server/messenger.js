@@ -154,6 +154,9 @@ function checkForMail(client){
 			return;
 		}
 		var ship = room.shipList[client.id];
+		if(ship == null){
+			return;
+		}
 		room.game.gameBoard.fireWeapon(ship);
 	});
 
@@ -163,6 +166,9 @@ function checkForMail(client){
 			return;
 		}
 		var ship = room.shipList[client.id];
+		if(ship == null){
+			return;
+		}
 		room.game.gameBoard.stopWeapon(ship);
 	});
 
@@ -173,6 +179,9 @@ function checkForMail(client){
 			return;
 		}
 		var ship = room.shipList[client.id];
+		if(ship == null){
+			return;
+		}
 		room.game.gameBoard.activateGadget(ship);
 	});
 
@@ -182,6 +191,9 @@ function checkForMail(client){
 			return;
 		}
 		var ship = room.shipList[client.id];
+		if(ship == null){
+			return;
+		}
 		room.game.gameBoard.stopGadget(ship);
 	});
 
