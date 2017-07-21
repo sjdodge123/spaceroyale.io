@@ -43,6 +43,9 @@ class Engine {
 	updateBullets(){
 		for (var bulletSig in this.bulletList){
 			var bullet = this.bulletList[bulletSig];
+			if(bullet.isBeam){
+				continue;
+			}
 			bullet.velX = Math.cos((bullet.angle+90)*(Math.PI/180))*bullet.speed;
 			bullet.velY = Math.sin((bullet.angle+90)*(Math.PI/180))*bullet.speed;
 			bullet.newX += bullet.velX * this.dt;
@@ -163,7 +166,7 @@ class Engine {
 				}
     		}
 		}
-
+		
 		for (var j=0; j<dyingBulletList.length;j++){
 			dyingBulletList[j].killSelf();
 		}

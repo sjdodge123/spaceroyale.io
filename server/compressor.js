@@ -175,7 +175,9 @@ exports.sendBulletUpdates = function(bulletList){
 		listItem = [
 			bullet.sig,
 			bullet.x,
-			bullet.y
+			bullet.y,
+			bullet.angle,
+			bullet.height
 		];
 		packet.push(listItem);
 	}
@@ -281,7 +283,6 @@ exports.sendTradeShipUpdates = function(tradeShipList){
 			trailItem.push(trail.y);
 			trailItem.push(trail.radius);
 			trailItem.push(trail.color);
-
 			trailList.push(trailItem);
 		}
 

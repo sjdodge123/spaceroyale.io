@@ -511,18 +511,25 @@ class GameBoard {
 	}
 	fireWeapon(ship){
 		var bullets = ship.fire();
+		var newBullets = [];
 		if(bullets == null){
 			return;
 		}
 		for(var i=0;i<bullets.length;i++){
 			var bullet = bullets[i];
-			bullet.sig = this.generateBulletSig();
+			if(bullet.sig == null){
+				bullet.sig = this.generateBulletSig();
+				newBullets.push(bullets[i]);
+				setTimeout(this.terminateBullet,bullet.lifetime*1000,{sig:bullet.sig,bulletList:this.bulletList});
+			}
 			this.bulletList[bullet.sig] = bullet;
-			setTimeout(this.terminateBullet,bullet.lifetime*1000,{sig:bullet.sig,bulletList:this.bulletList});
 		}
-		var data = compressor.weaponFired(ship,ship.weapon,bullets);
-		messenger.messageRoomBySig(this.roomSig,'weaponFired',data);
+		if(newBullets.length > 0){
+			var data = compressor.weaponFired(ship,ship.weapon,newBullets);
+			messenger.messageRoomBySig(this.roomSig,'weaponFired',data);
+		}
 	}
+		
 	stopWeapon(ship){
 		var bullets = ship.stopFire();
 		if(bullets == null){
@@ -558,7 +565,10 @@ class GameBoard {
 
 	terminateBullet(packet){
 		if(packet.bulletList[packet.sig] != undefined){
-			packet.bulletList[packet.sig].alive = false;;
+			if(packet.bulletList[packet.sig].isBeam){
+				return;
+			}
+			packet.bulletList[packet.sig].alive = false;
 		}
 	}
 	terminateAsteroid(asteroid){
@@ -1158,6 +1168,14 @@ class Ship extends Circle{
 				this.weapon = new MassDriver(this.id);
 				break;
 			}
+			case "ParticleBeam":{
+				this.weapon = new ParticleBeam(this.id);
+				break;
+			}
+			default:{
+				this.weapon = new Blaster(this.id);
+				break;
+			}
 		}
 		this.weapon.equip();
 		var data = compressor.equipItem(this.weapon);
@@ -1299,10 +1317,11 @@ class Ship extends Circle{
 		if(!this.alive){
 			return;
 		}
-		var x = this.x + this.radius * Math.cos((this.weapon.angle + 90) * Math.PI/180);
-		var y = this.y + this.radius * Math.sin((this.weapon.angle + 90) * Math.PI/180);
+		var x = this.x + (this.weapon.xOffset + this.radius* Math.cos((this.weapon.angle + 90) * Math.PI/180));
+		var y = this.y + (this.weapon.yOffset + this.radius* Math.sin((this.weapon.angle + 90) * Math.PI/180));
+
 		var _bullets;
-		if(this.weapon.name == "PhotonCannon"){
+		if(this.weapon.name == "PhotonCannon" || this.weapon.name == "ParticleBeam"){
 			_bullets = this.weapon.fire(x,y,this.weapon.angle, this.baseColor,this.id,this.power);
 		} else{
 			_bullets = this.weapon.fire(x,y,this.weapon.angle, this.baseColor,this.id);
@@ -1319,19 +1338,21 @@ class Ship extends Circle{
 		if(!this.alive){
 			return;
 		}
-		if(this.weapon.name != "PhotonCannon"){
-			return;
+		if(this.weapon.name == "PhotonCannon"){
+			var x = this.x + this.radius * Math.cos((this.weapon.angle + 90) * Math.PI/180);
+			var y = this.y + this.radius * Math.sin((this.weapon.angle + 90) * Math.PI/180);
+			var _bullets = this.weapon.stopFire(x,y,this.weapon.angle, this.baseColor,this.id);
+			if(_bullets == null){
+				return;
+			}
+			if(!this.checkPower(this.weapon.powerCost)){
+				return;
+			}
+			return _bullets;
 		}
-		var x = this.x + this.radius * Math.cos((this.weapon.angle + 90) * Math.PI/180);
-		var y = this.y + this.radius * Math.sin((this.weapon.angle + 90) * Math.PI/180);
-		var _bullets = this.weapon.stopFire(x,y,this.weapon.angle, this.baseColor,this.id);
-		if(_bullets == null){
-			return;
+		if(this.weapon.name == "ParticleBeam"){
+			this.weapon.stopFire();
 		}
-		if(!this.checkPower(this.weapon.powerCost)){
-			return;
-		}
-		return _bullets;
 	}
 	activateGadget(){
 		return this.gadget.activate(this.x,this.y);
@@ -1851,6 +1872,8 @@ class Weapon {
 		this.nextFire = 0;
 		this.powerCost = 20;
 		this.angle = 0;
+		this.xOffset = 0;
+		this.yOffset = 0;
 		this.maxLevelMessage = "Weapon already at max";
 		this.upgradeMessage = "No upgrade message set";
 		this.equipMessage = "No equip message set";
@@ -1919,6 +1942,77 @@ class Blaster extends Weapon{
 	}
 }
 
+class ParticleBeam extends Weapon{
+	constructor(owner){
+		super(owner);
+		this.name = "ParticleBeam";
+		this.equipMessage = "Equiped Particle Beam";
+		this.powerCost = c.particleBeamPowerCost;
+		this.chargeCost = c.particleBeamPowerCostGrowthRate;
+		this.chargeTime = c.particleBeamChargeTime;
+		this.chargeTimer = Date.now() - this.chargeTime;
+		this.chargeLevel = 0;
+		this.currentBeam = null;
+	}
+	fire(x,y,angle,color,id,powerLevel){
+		if(this.checkForCharge(powerLevel)){
+			this.charge();
+		}
+		if(this.chargeLevel > 0){
+			if(this.currentBeam == null){
+				this.currentBeam = new Beam(x,y,c.particleBeamWidth,c.particleBeamHeight,angle,color,id);
+			}
+		}
+		if(this.currentBeam != null){
+			this.currentBeam.height = c.particleBeamHeight + ((this.chargeLevel-1)*c.particleBeamHeightGrowthPerCharge);
+			this.currentBeam.x = x;
+			this.currentBeam.y = y;
+			this.currentBeam.angle = angle;
+			this.currentBeam.vertices = this.currentBeam.getVertices();
+			//this.yOffset = this.currentBeam.height/2;
+			//this.xOffset = this.currentBeam.height/2;
+			return [this.currentBeam];
+		}
+	}
+	stopFire(){
+		this.chargeLevel = 0;
+		this.currentBeam.alive = false;
+		this.currentBeam = null;
+		messenger.messageUser(this.owner,'weaponCharge',this.chargeLevel);
+	}
+
+	checkForCharge(powerLevel){
+		if(this.chargeTime - (Date.now() - this.chargeTimer) < 0){
+			var currentCost = c.particleBeamPowerCost;
+			if(this.chargeLevel >= 1){
+				currentCost += this.chargeCost*this.chargeLevel;
+			}
+			if(currentCost > powerLevel){
+				this.discharge();
+				return false;
+			}
+			this.chargeTimer = Date.now();
+			return true;
+		}
+		return false;
+	}
+
+	charge(){
+		if(this.chargeLevel < 7){
+			this.chargeLevel++;
+			messenger.messageUser(this.owner,'weaponCharge',this.chargeLevel);
+		}
+	}
+	discharge(){
+		if(this.chargeLevel > 0){
+			this.chargeLevel--;
+			messenger.messageUser(this.owner,'weaponCharge',this.chargeLevel);
+		}
+	}
+
+}
+
+
 class PhotonCannon extends Weapon{
 	constructor(owner,level){
 		super(owner);
@@ -1939,6 +2033,7 @@ class PhotonCannon extends Weapon{
 			this.powerCost = c.photonCannonPowerCost;
 			this.chargeLevel = 0;
 			this.reset = false;
+			messenger.messageUser(this.owner,'weaponCharge',this.chargeLevel);
 		}
 		if(this.checkForCharge(powerLevel)){
 			this.charge();
@@ -2087,6 +2182,8 @@ class Shield extends Circle{
 	}
 }
 
+
+
 class Bullet extends Rect{
 	constructor(x,y,width,height, angle, color, owner){
 		super(x,y,width,height, angle, color);
@@ -2133,6 +2230,21 @@ class Bullet extends Rect{
 	killSelf(){
 		this.alive = false;
 	}
+}
+
+class Beam extends Bullet{
+	constructor(x,y,width,height, angle, color, owner){
+		super(x,y,width,height, angle, color, owner);
+		this.isBeam = true;
+		this.damage = c.particleBeamDamage;
+	}
+	move(){
+
+	}
+	handleHit(object){
+		
+	}
+
 }
 
 class Birdshot extends Bullet{

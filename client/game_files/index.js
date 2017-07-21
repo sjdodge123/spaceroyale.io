@@ -72,6 +72,7 @@ function setupPage(){
     weaponArray.push({image:'sprites/photon_cannon.svg',value:"PhotonCannon"});
     weaponArray.push({image:'sprites/blaster.svg',value:"Blaster"});
     weaponArray.push({image:'sprites/mass_driver.svg',value:"MassDriver"});
+    weaponArray.push({image:'sprites/ship_white.svg',value:"ParticleBeam"});
 
     $('#guestSignIn').submit(function () {
         var name;

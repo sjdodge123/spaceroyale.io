@@ -84,7 +84,7 @@
     "playerHealthRegenRate":0.5,
     "playerHealthRegenTime":3000,
 
-    "forceConstant": 500000000000,
+    "forceConstant": 5000000,
 
     "bulletLifetime":0.5,
     "blasterPowerCost": 5,
@@ -92,15 +92,24 @@
     "blasterBulletDamage":3,
 
     "birdshotLifetime":0.45,
-    "birdshotDamage":10,
-    "birdshotSpeed":800,
-    "photonCannonPowerCost": 40,
+    "birdshotDamage":12,
+    "birdshotSpeed":1100,
+    "photonCannonPowerCost": 35,
     "photonCannonChargeCost":20,
-    "photonCannonChargeTime":1000,
+    "photonCannonChargeTime":500,
 
     "massDriverPowerCost": 65,
-    "massDriverBulletDamage":25,
-    "massDriverBulletSpeed":1800,
+    "massDriverBulletDamage":27,
+    "massDriverBulletSpeed":2200,
+
+    "particleBeamPowerCost":0.75,
+    "particleBeamPowerCostGrowthRate":1.2,
+    "particleBeamChargeTime":100,
+    "particleBeamWidth":10,
+    "particleBeamHeight":50,
+    "particleBeamHeightGrowthPerCharge":50,
+    "particleBeamDamage":0.5,
+
 
     "shieldRadius":35,
     "shield1Color":"Aqua",
