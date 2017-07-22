@@ -15,6 +15,10 @@ footer a:link{
 	color: blue;
 }
 
+.center-text{
+	text-align: center;
+}
+
 .input-group .form-control{
 	z-index: 0 !important;
 }
@@ -79,18 +83,6 @@ canvas{
 	background-image:url(img/background.jpg);
 }
 
-#weaponSelection{
-	margin: auto;
-	cursor: hand;
-	overflow: none;
-	position: relative;
-	pointer-events: all;
-	width: 15vw;
-}
-#weapons *{
-	height: 10vw;
-}
-
 #hud{
 	z-index: 5;
 	pointer-events: none;
@@ -105,6 +97,76 @@ canvas{
 	transform:translate(-50%,-50%);
 	
 }
+
+#shipBuild{
+	top:10%;
+	left:5%;
+	width: 25%;
+	height: auto;
+	position: absolute;
+	background-color: transparent;
+	color:white;
+	overflow: none;
+	border: 1px solid #333333;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    border-top-left-radius:30px;
+    border-top-right-radius: 30px;
+}
+#shipBuild p{
+	margin-top: 10px;
+	position: relative;
+	vertical-align: middle;
+	font-size: 1.5vw;
+}
+
+#weaponSelection{
+	margin: auto;
+	cursor: hand;
+	overflow: none;
+	position: relative;
+	pointer-events: all;
+	width: 23vw;
+}
+#weapons div{
+	margin: 0 1.6999vw auto;
+	display: inline-block;
+	width: 4vw;
+}
+#gadgets div{
+	margin: 0 1.6999vw auto;
+	display: inline-block;
+	width: 4vw;
+}
+#weaponTitle{
+	margin-top: -3vw;
+}
+#weaponTitle *{
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+}
+#weaponInfo{
+	border: 1px solid #333333;
+	border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-top-left-radius:5px;
+    border-top-right-radius: 5px;
+	height: 5vw;
+}
+#gadgetTitle{
+	margin-top: -3vw;
+}
+#gadgetTitle *{
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+}
+#gadgetInfo{
+	height: 5vw;
+}
+#gadgetInfo p{
+	font-size: 1vw;
+}
+
 
 #main{
 	background: black;

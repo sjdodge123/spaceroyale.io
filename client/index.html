@@ -151,23 +151,49 @@
 		<div id="hud" width="1366" height="768">
 			<div id="lobbyUI">
 
+				<!-- Ship selection box -->
+				<div id="shipBuild">
 
-				<!-- Weapon Selection -->
-				<div id="weaponSelection">
-					<div id="weapons">
-						<div class="row">
-							<div class="col-4">
-								<img id="firstWeapon" src="sprites/photon_cannon.svg"></img>
+					<!-- Weapon Selection -->
+					<div id="weaponSelection">
+						<p class="center-text">Weapon (Left click)</p>
+						<div id="weapons">
+							<div>
+								<img id="firstWeapon" class="img-fluid" src="sprites/photon_cannon.svg"></img>
 							</div>
-							<div class="col-4">
-								<img id="secondWeapon" src="sprites/blaster.svg"></img>
+							<div>
+								<img id="secondWeapon" class="img-fluid" src="sprites/blaster.svg"></img>
 							</div>
-							<div class="col-4">
-								<img id="thirdWeapon" src="sprites/mass_driver.svg"></img>
+							<div>
+								<img id="thirdWeapon" class="img-fluid" src="sprites/mass_driver.svg"></img>
 							</div>
 						</div>
+						<div id="weaponTitle">
+							<p class="center-text"><strong>Blaster</strong></p>
+						</div>
+						<div id="weaponInfo"></div>
+						<p class="center-text">Gadget (Right click)</p>
+						<div id="gadgets">
+							<div>
+								<img id="firstGadget" class="img-fluid" src="sprites/photon_cannon.svg"></img>
+							</div>
+							<div>
+								<img id="secondGadget" class="img-fluid" src="sprites/blaster.svg"></img>
+							</div>
+							<div>
+								<img id="thirdGadget" class="img-fluid" src="sprites/mass_driver.svg"></img>
+							</div>
+						</div>
+						<div id="gadgetTitle">
+							<p class="center-text"><strong>PulseWave</strong></p>
+						</div>
+						<div id="gadgetInfo">
+							<p>Activate to create a large wave of energy to push enemies away and reflect incoming projectiles</p>
+						</div>
 					</div>
+
 				</div>
+				
 
 				<!-- How to Play Menu -->
 				<div id="howToPlayMenu" tabIndex="-1">
