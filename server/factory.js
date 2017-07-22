@@ -2242,7 +2242,19 @@ class Beam extends Bullet{
 
 	}
 	handleHit(object){
-		
+		if(!this.alive){
+			return;
+		}
+		if(object.id == this.owner){
+			return;
+		}
+		if(object.sig == this.owner){
+			return;
+		}
+		var dist2 = utils.getMagSq(this.x,this.y,object.x,object.y);
+		if(dist2 < this.height*this.height){
+			this.height = Math.sqrt(dist2);
+		}
 	}
 
 }
