@@ -122,18 +122,20 @@ canvas{
 
 #weaponSelection{
 	margin: auto;
-	cursor: hand;
 	overflow: none;
 	position: relative;
-	pointer-events: all;
 	width: 23vw;
 }
 #weapons div{
+	cursor: hand;
+	pointer-events: all;
 	margin: 0 1.6999vw auto;
 	display: inline-block;
 	width: 4vw;
 }
 #gadgets div{
+	cursor: hand;
+	pointer-events: all;
 	margin: 0 1.6999vw auto;
 	display: inline-block;
 	width: 4vw;
