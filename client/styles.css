@@ -141,7 +141,8 @@ canvas{
 #weaponTitle{
 	margin-top: -3vw;
 }
-#weaponTitle *{
+#weaponTitle p{
+	font-weight: bold;
 	margin-top: 0 !important;
 	margin-bottom: 0 !important;
 }
@@ -156,7 +157,8 @@ canvas{
 #gadgetTitle{
 	margin-top: -3vw;
 }
-#gadgetTitle *{
+#gadgetTitle p{
+	font-weight: bold;
 	margin-top: 0 !important;
 	margin-bottom: 0 !important;
 }

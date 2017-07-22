@@ -36,6 +36,9 @@ photonCannonSVG.src = 'sprites/photon_cannon.svg';
 var massDriverSVG = new Image(200,600);
 massDriverSVG.src = 'sprites/mass_driver.svg';
 
+var particleBeamSVG = new Image(200,600);
+particleBeamSVG.src = 'sprites/particle_beam.svg';
+
 var blasterItemSVG = new Image();
 blasterItemSVG.src = "sprites/items/blaster_item.svg";
 
@@ -239,6 +242,10 @@ function drawWeaponHUD(){
 			}
 			case "MassDriver":{
 				gameContext.drawImage(massDriverSVG, - massDriverSVG.width * svgscale / 2, -  massDriverSVG.height * svgscale / 2, massDriverSVG.width * svgscale, massDriverSVG.height * svgscale);
+				break;
+			}
+			case "ParticleBeam":{
+				gameContext.drawImage(particleBeamSVG, - particleBeamSVG.width * svgscale / 2, -  particleBeamSVG.height * svgscale / 2, particleBeamSVG.width * svgscale, particleBeamSVG.height * svgscale);
 				break;
 			}
 		}
@@ -486,6 +493,10 @@ function drawWeapon(ship){
 		}
 		case "MassDriver":{
 			gameContext.drawImage(massDriverSVG, - massDriverSVG.width * svgscale / 2, -  massDriverSVG.height * svgscale / 2, massDriverSVG.width * svgscale, massDriverSVG.height * svgscale);
+			break;
+		}
+		case "ParticleBeam":{
+			gameContext.drawImage(particleBeamSVG, - particleBeamSVG.width * svgscale / 2, -  particleBeamSVG.height * svgscale / 2, particleBeamSVG.width * svgscale, particleBeamSVG.height * svgscale);
 			break;
 		}
 	}

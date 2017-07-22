@@ -2033,7 +2033,6 @@ class PhotonCannon extends Weapon{
 			this.powerCost = c.photonCannonPowerCost;
 			this.chargeLevel = 0;
 			this.reset = false;
-			messenger.messageUser(this.owner,'weaponCharge',this.chargeLevel);
 		}
 		if(this.checkForCharge(powerLevel)){
 			this.charge();
@@ -2055,6 +2054,7 @@ class PhotonCannon extends Weapon{
 		}
 		this.powerCost = powerCost;
 		this.reset = true;
+		messenger.messageUser(this.owner,'weaponCharge',0);
 		return _bullets;
 	}
 	checkForCharge(powerLevel){

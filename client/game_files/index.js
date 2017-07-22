@@ -72,7 +72,7 @@ function setupPage(){
     weaponArray.push({image:'sprites/photon_cannon.svg',value:"PhotonCannon"});
     weaponArray.push({image:'sprites/blaster.svg',value:"Blaster"});
     weaponArray.push({image:'sprites/mass_driver.svg',value:"MassDriver"});
-    weaponArray.push({image:'sprites/ship_white.svg',value:"ParticleBeam"});
+    weaponArray.push({image:'sprites/particle_beam.svg',value:"ParticleBeam"});
 
     $('#guestSignIn').submit(function () {
         var name;
@@ -164,6 +164,7 @@ function setupPage(){
         $("#secondWeapon").attr('src',weaponArray[1].image).attr('data-selected',weaponArray[1].value);
         $("#thirdWeapon").attr('src',weaponArray[2].image).attr('data-selected',weaponArray[2].value);
 
+        $("#weaponTitle p").html(weaponArray[1].value);
         clientSendMessage('changeWeapon',weaponArray[1].value);
     });
 
@@ -174,6 +175,7 @@ function setupPage(){
         $("#secondWeapon").attr('src',weaponArray[1].image).attr('data-selected',weaponArray[1].value);
         $("#thirdWeapon").attr('src',weaponArray[2].image).attr('data-selected',weaponArray[2].value);
 
+        $("#weaponTitle p").html(weaponArray[1].value);
         clientSendMessage('changeWeapon',weaponArray[1].value);
     });
 
@@ -477,6 +479,8 @@ function init(){
     }, false);
 
     $(window).blur(function(){
+        stopFiring();
+        stopGadget();
         cancelMovement();
     });
 
@@ -724,12 +728,10 @@ function handleClick(evt){
 function handleUnClick(evt){
     switch(event.which){
         case 1:{
-            iAmFiring = false;
             stopFiring();
             break;
         }
         case 3:{
-            useGadget = false;
             stopGadget();
             break;
         }

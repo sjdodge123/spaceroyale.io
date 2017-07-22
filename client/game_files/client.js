@@ -408,15 +408,16 @@ function fireGun(_x,_y){
 }
 
 function stopFiring(){
-	server.emit("stopGun");
-	if(myShip.weapon.name == "PhotonCannon"){
-		myShip.weapon.chargeLevel = 0;
+	iAmFiring = false;
+	if(iAmAlive){
+		server.emit("stopGun");
 	}
 }
 
 function activateGadget(_x,_y){
+	useGadget = false;
 	if(iAmAlive){
-       server.emit("activateGadget",{x:_x,y:_y});
+       	server.emit("activateGadget",{x:_x,y:_y});
     }
 }
 function stopGadget(){
