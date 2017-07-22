@@ -158,14 +158,18 @@
 					<div id="weaponSelection">
 						<p class="center-text">Weapon (Left click)</p>
 						<div id="weapons">
-							<div>
-								<img id="firstWeapon" class="img-fluid" src="sprites/photon_cannon.svg"></img>
-							</div>
-							<div>
-								<img id="secondWeapon" class="img-fluid" src="sprites/blaster.svg"></img>
-							</div>
-							<div>
-								<img id="thirdWeapon" class="img-fluid" src="sprites/mass_driver.svg"></img>
+							<div class="container">
+								<div class="row">
+									<div class="col-4">
+										<img id="firstWeapon" class="img-fluid" src="sprites/photon_cannon.svg"></img>
+									</div>
+									<div class="col-4">
+										<img id="secondWeapon" class="img-fluid" src="sprites/blaster.svg"></img>
+									</div>
+									<div class="col-4">
+										<img id="thirdWeapon" class="img-fluid" src="sprites/mass_driver.svg"></img>
+									</div>
+								</div>
 							</div>
 						</div>
 						<div id="weaponTitle">
@@ -174,27 +178,49 @@
 						<div id="weaponInfo"></div>
 					</div>
 
-					<!-- Weapon Selection -->
+					<!-- Gadget Selection -->
 					<div id="gadgetSelection">
 						<p class="center-text">Gadget (Right click)</p>
 						<div id="gadgets">
-							<div>
-								<img id="firstGadget" class="img-fluid" src="sprites/photon_cannon.svg"></img>
-							</div>
-							<div>
-								<img id="secondGadget" class="img-fluid" src="sprites/blaster.svg"></img>
-							</div>
-							<div>
-								<img id="thirdGadget" class="img-fluid" src="sprites/mass_driver.svg"></img>
+							<div class="container">
+								<div class="row">
+									<div class="col-4">
+										<img id="firstGadget" class="img-fluid" src="sprites/items/overdrive_item.svg"></img>
+									</div>
+									<div class="col-4">
+										<img id="secondGadget" class="img-fluid" src="sprites/items/overdrive_item.svg"></img>
+									</div>
+									<div class="col-4">
+										<img id="thirdGadget" class="img-fluid" src="sprites/items/overdrive_item.svg"></img>
+									</div>
+								</div>
 							</div>
 						</div>
 						<div id="gadgetTitle">
 							<p class="center-text">PulseWave</p>
 						</div>
-						<div id="gadgetInfo">
+						<div id="gadgetInfo" hidden>
 							<p>Activate to create a large wave of energy to push enemies away and reflect incoming projectiles</p>
 						</div>
 					</div>
+
+					<!-- Passive Selection -->
+					<div id="passiveSelection">
+						<p class="center-text">Passives</p>
+						<div class="container">
+							<div class="row">
+								<div class="col-3"></div>
+								<div class="col-3">
+									<img id="firstPassive" class="img-fluid passive" src="sprites/items/blaster_item.svg"></img>
+								</div>
+								<div class="col-3">
+									<img id="secondPassive" class="img-fluid passive" src="sprites/items/blaster_item.svg"></img>
+								</div>
+								<div class="col-3"></div>
+							</div>
+						</div>
+					</div>
+
 
 				</div>
 				
