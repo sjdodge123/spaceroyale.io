@@ -140,6 +140,13 @@ canvas{
 	position: relative;
 	width: 23vw;
 }
+#passiveCollapsable{
+	margin-top: 5px;
+	position: relative;
+	height: auto;
+	background-color: #333333;
+	border: 1px solid #333333;
+}
 
 #weapons{
 	margin: auto;
@@ -199,9 +206,20 @@ canvas{
 }
 
 .passive{
+	margin-top: 2px;
 	cursor: hand;
 	pointer-events: all;
 	border: 1px solid white;
+	border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-top-left-radius:5px;
+    border-top-right-radius: 5px;
+}
+.selected-passive{
+	margin-top: 2px;
+	cursor: hand;
+	pointer-events: all;
+	border: 1px solid blue;
 	border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     border-top-left-radius:5px;

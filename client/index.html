@@ -156,7 +156,7 @@
 
 					<!-- Weapon Selection -->
 					<div id="weaponSelection">
-						<p class="center-text">Weapon (Left click)</p>
+						<p class="center-text">Weapon</p>
 						<div id="weapons">
 							<div class="container">
 								<div class="row">
@@ -180,7 +180,7 @@
 
 					<!-- Gadget Selection -->
 					<div id="gadgetSelection">
-						<p class="center-text">Gadget (Right click)</p>
+						<p class="center-text">Gadget</p>
 						<div id="gadgets">
 							<div class="container">
 								<div class="row">
@@ -209,19 +209,29 @@
 						<p class="center-text">Passives</p>
 						<div class="container">
 							<div class="row">
-								<div class="col-3"></div>
 								<div class="col-3">
-									<img id="firstPassive" class="img-fluid passive" src="sprites/items/blaster_item.svg"></img>
+									
 								</div>
 								<div class="col-3">
-									<img id="secondPassive" class="img-fluid passive" src="sprites/items/blaster_item.svg"></img>
+									<a href="#passiveCollapsable" data-toggle="collapse" aria-expanded="false" aria-controls="collapseExample">
+										<img id="firstPassive" class="img-fluid selected-passive" src="sprites/items/health_item.svg" data-selected="HPBoost" title="HPBoost - Health Stat increase"></img>
+									</a>
+								</div>
+								<div class="col-3">
+									<a href="#passiveCollapsable" data-toggle="collapse" aria-expanded="false" aria-controls="collapseExample">
+										<img id="secondPassive" class="img-fluid selected-passive" src="sprites/items/blaster_item.svg" data-selected="DMGBoost" title="DMGBoost - Damage Stat increase"></img>
+									</a>
 								</div>
 								<div class="col-3"></div>
 							</div>
 						</div>
+						<div id="passiveCollapsable" class="collapse passive-div">
+							<div class="container">
+								<div id="passive-list" class="row">
+								</div>
+							</div>
+						</div>
 					</div>
-
-
 				</div>
 				
 

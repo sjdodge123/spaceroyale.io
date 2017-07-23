@@ -49,13 +49,20 @@ var server = null,
     turnLeft = false,
     weaponArray = [];
     skinArray = [];
+    passiveArray = [];
     turnRight = false;
 
 var then = Date.now(),
     dt;
 
+var firstPassiveSelected,
+    secondPassiveSelected,
+    clickedPassive;
 
 window.onload = function() {
+
+    firstPassiveSelected
+
     server = clientConnect();
     pingServer();
     setupPage();
@@ -73,6 +80,16 @@ function setupPage(){
     weaponArray.push({image:'sprites/blaster.svg',value:"Blaster"});
     weaponArray.push({image:'sprites/mass_driver.svg',value:"MassDriver"});
     weaponArray.push({image:'sprites/particle_beam.svg',value:"ParticleBeam"});
+
+    buildPassiveList();
+
+    $('#firstPassive').click(function(e){
+        clickedPassive = $(e.target);
+    });
+
+    $('#secondPassive').click(function(e){
+        clickedPassive = $(e.target);
+    });
 
     $('#guestSignIn').submit(function () {
         var name;
@@ -450,6 +467,50 @@ function resetGameVariables(){
     hud = document.getElementById('hud');
     $('#lobbyUI').show();
     gameContext = gameCanvas.getContext('2d');
+}
+
+function buildPassiveList(){
+    passiveArray = [];
+    firstPassiveSelected = $('#firstPassive').attr('data-selected');
+    secondPassiveSelected = $('#secondPassive').attr('data-selected');
+    passiveArray.push({image:'sprites/items/health_item.svg',value:"HPBoost",title:"HPBoost - Health Stat increase"});
+    passiveArray.push({image:'sprites/items/blaster_item.svg',value:"DMGBoost",title:"DMGBoost - Damage Stat increase"});
+    passiveArray.push({image:'sprites/items/mass_driver_item.svg',value:"LuckBoost",title:"LuckBoost - Looting % Stat increase"});
+    passiveArray.push({image:'sprites/items/photon_cannon_item.svg',value:"RegenBoost",title:"RegenBoost - Regen Stat increase"});
+    var passiveList = document.getElementById("passive-list");
+    var elements = $('#passive-list').children();
+    $(elements).each(function(){
+        console.log()
+        $(this).remove();
+    });
+    for(var i=0;i<passiveArray.length;i++){
+        if(firstPassiveSelected == passiveArray[i].value ||
+           secondPassiveSelected == passiveArray[i].value){
+            continue;
+        }
+        var div = document.createElement("DIV");
+        var innnerDiv = document.createElement("DIV");
+        var img = document.createElement("IMG");
+        img.src = passiveArray[i].image;
+        var a = document.createElement("A");
+        a.href = "#passiveCollapsable";
+        $(a).attr('data-toggle',"collapse");
+        $(img).attr('data-selected',passiveArray[i].value);
+        $(img).attr('title',passiveArray[i].title);
+        $(img).addClass('img-fluid');
+        $(innnerDiv).addClass('passive');
+        $(img).click(function(e){
+            var newEquip = $(e.target);
+            clickedPassive.attr('src',newEquip.attr('src'));
+            clickedPassive.attr('data-selected',newEquip.attr('data-selected'));
+            buildPassiveList();
+        });
+        $(div).addClass('col-3');
+        a.appendChild(img);
+        innnerDiv.appendChild(a);
+        div.appendChild(innnerDiv);
+        passiveList.appendChild(div);
+    }
 }
 
 function enterLobby(name,color){
