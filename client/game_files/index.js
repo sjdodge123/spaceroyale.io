@@ -76,10 +76,10 @@ function setupPage(){
     skinArray.push({image:'sprites/ship_red.svg',value:"red"});
     skinArray.push({image:'sprites/ship_green.svg',value:"green"});
 
-    weaponArray.push({image:'sprites/photon_cannon.svg',value:"PhotonCannon"});
-    weaponArray.push({image:'sprites/blaster.svg',value:"Blaster"});
-    weaponArray.push({image:'sprites/mass_driver.svg',value:"MassDriver"});
-    weaponArray.push({image:'sprites/particle_beam.svg',value:"ParticleBeam"});
+    weaponArray.push({image:'sprites/photon_cannon.svg',value:"PhotonCannon",title:"Photon Cannon"});
+    weaponArray.push({image:'sprites/blaster.svg',value:"Blaster",title:"Blaster"});
+    weaponArray.push({image:'sprites/mass_driver.svg',value:"MassDriver",title:"Mass Driver"});
+    weaponArray.push({image:'sprites/particle_beam.svg',value:"ParticleBeam",title:"Particle Beam"});
 
     buildPassiveList();
 
@@ -177,22 +177,18 @@ function setupPage(){
     $('#firstWeapon').click(function(){
         var lastElement = weaponArray.splice(weaponArray.length-1,1)[0];
         weaponArray.unshift(lastElement);
-        $("#firstWeapon").attr('src',weaponArray[0].image).attr('data-selected',weaponArray[0].value);
-        $("#secondWeapon").attr('src',weaponArray[1].image).attr('data-selected',weaponArray[1].value);
-        $("#thirdWeapon").attr('src',weaponArray[2].image).attr('data-selected',weaponArray[2].value);
-
-        $("#weaponTitle p").html(weaponArray[1].value);
+        $("#firstWeapon").attr('src',weaponArray[0].image).attr('data-selected',weaponArray[0].value).attr('title',weaponArray[0].title);
+        $("#secondWeapon").attr('src',weaponArray[1].image).attr('data-selected',weaponArray[1].value).attr('title',weaponArray[1].title);
+        $("#thirdWeapon").attr('src',weaponArray[2].image).attr('data-selected',weaponArray[2].value).attr('title',weaponArray[2].title);
         clientSendMessage('changeWeapon',weaponArray[1].value);
     });
 
     $('#thirdWeapon').click(function(){
         var firstElement = weaponArray.shift();
         weaponArray.push(firstElement);
-        $("#firstWeapon").attr('src',weaponArray[0].image).attr('data-selected',weaponArray[0].value);
-        $("#secondWeapon").attr('src',weaponArray[1].image).attr('data-selected',weaponArray[1].value);
-        $("#thirdWeapon").attr('src',weaponArray[2].image).attr('data-selected',weaponArray[2].value);
-
-        $("#weaponTitle p").html(weaponArray[1].value);
+        $("#firstWeapon").attr('src',weaponArray[0].image).attr('data-selected',weaponArray[0].value).attr('title',weaponArray[0].title);
+        $("#secondWeapon").attr('src',weaponArray[1].image).attr('data-selected',weaponArray[1].value).attr('title',weaponArray[1].title);
+        $("#thirdWeapon").attr('src',weaponArray[2].image).attr('data-selected',weaponArray[2].value).attr('title',weaponArray[2].title);
         clientSendMessage('changeWeapon',weaponArray[1].value);
     });
 
