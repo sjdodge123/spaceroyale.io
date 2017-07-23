@@ -480,7 +480,6 @@ function buildPassiveList(){
     var passiveList = document.getElementById("passive-list");
     var elements = $('#passive-list').children();
     $(elements).each(function(){
-        console.log()
         $(this).remove();
     });
     for(var i=0;i<passiveArray.length;i++){

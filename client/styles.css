@@ -144,7 +144,7 @@ canvas{
 	margin-top: 5px;
 	position: relative;
 	height: auto;
-	background-color: #333333;
+	background-color: transparent;
 	border: 1px solid #333333;
 }
 
@@ -210,16 +210,6 @@ canvas{
 	cursor: hand;
 	pointer-events: all;
 	border: 1px solid white;
-	border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-    border-top-left-radius:5px;
-    border-top-right-radius: 5px;
-}
-.selected-passive{
-	margin-top: 2px;
-	cursor: hand;
-	pointer-events: all;
-	border: 1px solid blue;
 	border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     border-top-left-radius:5px;
