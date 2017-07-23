@@ -408,15 +408,15 @@ function fireGun(_x,_y){
 }
 
 function stopFiring(){
-	iAmFiring = false;
-	if(iAmAlive){
+	if(iAmAlive && iAmFiring){
+		iAmFiring = false;
 		server.emit("stopGun");
 	}
 }
 
 function activateGadget(_x,_y){
-	useGadget = false;
-	if(iAmAlive){
+	if(iAmAlive && useGadget){
+		useGadget = false;
        	server.emit("activateGadget",{x:_x,y:_y});
     }
 }
