@@ -1330,6 +1330,7 @@ class Ship extends Circle{
 			return;
 		}
 		if(!this.checkPower(this.weapon.powerCost)){
+			this.stopFire();
 			return;
 		}
 		return _bullets;
@@ -1945,8 +1946,9 @@ class ParticleBeam extends Weapon{
 		super(owner);
 		this.name = "ParticleBeam";
 		this.equipMessage = "Equiped Particle Beam";
-		this.powerCost = c.particleBeamPowerCost;
-		this.chargeCost = c.particleBeamPowerCostGrowthRate;
+		this.powerCost = 0;
+		this.chargeCost = c.particleBeamChargeCost;
+		this.damagePerCharge = c.particleBeamDamageGrowthRate;
 		this.chargeTime = c.particleBeamChargeTime;
 		this.chargeTimer = Date.now() - this.chargeTime;
 		this.chargeLevel = 0;
@@ -1956,33 +1958,42 @@ class ParticleBeam extends Weapon{
 		if(this.checkForCharge(powerLevel)){
 			this.charge();
 		}
+		this.powerCost = c.particleBeamBasePowerCost;
 		if(this.chargeLevel > 0){
 			if(this.currentBeam == null){
 				this.currentBeam = new Beam(x,y,c.particleBeamWidth,c.particleBeamHeight,angle,color,id);
+				this.powerCost += c.particleBeamChargeCost * this.chargeLevel;
+			} else{
+				this.powerCost = c.particleBeamChargeCost * this.chargeLevel;
 			}
-		}
-		if(this.currentBeam != null){
-			this.currentBeam.height = c.particleBeamHeight + ((this.chargeLevel-1)*c.particleBeamHeightGrowthPerCharge);
-			this.currentBeam.x = x + (this.currentBeam.height/2) * Math.cos((this.angle+90) * Math.PI/180);
-			this.currentBeam.y = y + (this.currentBeam.height/2) * Math.sin((this.angle+90) * Math.PI/180);
+			this.currentBeam.width = c.particleBeamWidth + ((this.chargeLevel-1)*c.particleBeamWidthGrowthPerCharge);
+			this.currentBeam.damage = c.particleBeamBaseDamage + (this.damagePerCharge * this.chargeLevel);
 			this.currentBeam.angle = angle;
 			this.currentBeam.vertices = this.currentBeam.getVertices();
+			this.currentBeam.x = x + (this.currentBeam.height/2) * Math.cos((this.angle+90) * Math.PI/180);
+			this.currentBeam.y = y + (this.currentBeam.height/2) * Math.sin((this.angle+90) * Math.PI/180);
 			return [this.currentBeam];
 		}
+		
 	}
 	stopFire(){
 		this.chargeLevel = 0;
-		this.currentBeam.alive = false;
-		this.currentBeam = null;
 		messenger.messageUser(this.owner,'weaponCharge',this.chargeLevel);
+		if(this.currentBeam != null){
+			this.currentBeam.alive = false;
+			this.currentBeam = null;
+		}
 	}
 
 	checkForCharge(powerLevel){
 		if(this.chargeTime - (Date.now() - this.chargeTimer) < 0){
-			var currentCost = c.particleBeamPowerCost;
-			if(this.chargeLevel >= 1){
-				currentCost += this.chargeCost*this.chargeLevel;
+			var currentCost;
+			if(this.chargeLevel == 1){
+				currentCost = c.particleBeamBasePowerCost;
+			} else{
+				currentCost = this.chargeCost*this.chargeLevel;
 			}
+
 			if(currentCost > powerLevel){
 				this.discharge();
 				return false;
@@ -1994,7 +2005,7 @@ class ParticleBeam extends Weapon{
 	}
 
 	charge(){
-		if(this.chargeLevel < 7){
+		if(this.chargeLevel < 5){
 			this.chargeLevel++;
 			messenger.messageUser(this.owner,'weaponCharge',this.chargeLevel);
 		}
@@ -2004,6 +2015,7 @@ class ParticleBeam extends Weapon{
 			this.chargeLevel--;
 			messenger.messageUser(this.owner,'weaponCharge',this.chargeLevel);
 		}
+
 	}
 
 }
@@ -2029,7 +2041,6 @@ class PhotonCannon extends Weapon{
 			this.powerCost = c.photonCannonPowerCost;
 			this.chargeLevel = 0;
 			this.reset = false;
-			messenger.messageUser(this.owner,'weaponCharge',this.chargeLevel);
 		}
 		if(this.checkForCharge(powerLevel)){
 			this.charge();
@@ -2051,6 +2062,7 @@ class PhotonCannon extends Weapon{
 		}
 		this.powerCost = powerCost;
 		this.reset = true;
+		messenger.messageUser(this.owner,'weaponCharge',0);
 		return _bullets;
 	}
 	checkForCharge(powerLevel){
@@ -2206,6 +2218,9 @@ class Bullet extends Rect{
 		if(!this.alive){
 			return
 		}
+		if(object.isBullet){
+			return;
+		}
 		if(object.owner == this.owner){
 			return;
 		}
@@ -2232,7 +2247,7 @@ class Beam extends Bullet{
 	constructor(x,y,width,height, angle, color, owner){
 		super(x,y,width,height, angle, color, owner);
 		this.isBeam = true;
-		this.damage = c.particleBeamDamage;
+		this.damage = c.particleBeamBaseDamage;
 	}
 	move(){
 

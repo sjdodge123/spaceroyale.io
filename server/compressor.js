@@ -177,7 +177,7 @@ exports.sendBulletUpdates = function(bulletList){
 			bullet.x,
 			bullet.y,
 			bullet.angle,
-			bullet.height
+			bullet.width
 		];
 		packet.push(listItem);
 	}

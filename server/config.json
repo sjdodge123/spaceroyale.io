@@ -92,23 +92,24 @@
     "blasterBulletDamage":3,
 
     "birdshotLifetime":0.45,
-    "birdshotDamage":12,
+    "birdshotDamage":8,
     "birdshotSpeed":1100,
     "photonCannonPowerCost": 35,
     "photonCannonChargeCost":20,
-    "photonCannonChargeTime":500,
+    "photonCannonChargeTime":200,
 
     "massDriverPowerCost": 65,
     "massDriverBulletDamage":27,
     "massDriverBulletSpeed":2200,
 
-    "particleBeamPowerCost":0.75,
-    "particleBeamPowerCostGrowthRate":1.2,
-    "particleBeamChargeTime":100,
-    "particleBeamWidth":10,
-    "particleBeamHeight":50,
-    "particleBeamHeightGrowthPerCharge":50,
-    "particleBeamDamage":0.5,
+    "particleBeamBasePowerCost":15,
+    "particleBeamChargeCost":0.15,
+    "particleBeamChargeTime":500,
+    "particleBeamWidth":5,
+    "particleBeamHeight":600,
+    "particleBeamWidthGrowthPerCharge":2,
+    "particleBeamBaseDamage":0.1,
+    "particleBeamDamageGrowthRate":0.15,
 
 
     "shieldRadius":35,
