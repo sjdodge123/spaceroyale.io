@@ -496,8 +496,8 @@ class GameBoard {
 			for(var nebulaSig in this.nebulaList){
 				objectArray.push(this.nebulaList[nebulaSig]);
 			}
-			for(var sig in this.bulletList){
-				objectArray.push(this.bulletList[sig]);
+			for(var bulletSig in this.bulletList){
+				objectArray.push(this.bulletList[bulletSig]);
 			}
 
 			this.engine.broadBase(objectArray);
@@ -529,7 +529,7 @@ class GameBoard {
 			messenger.messageRoomBySig(this.roomSig,'weaponFired',data);
 		}
 	}
-		
+
 	stopWeapon(ship){
 		var bullets = ship.stopFire();
 		if(bullets == null){
@@ -1243,7 +1243,7 @@ class Ship extends Circle{
 
 	}
 	regenPower(){
-		if(this.powerRegenRate - (Date.now() - this.powerRegenTimer) > 0){	
+		if(this.powerRegenRate - (Date.now() - this.powerRegenTimer) > 0){
 			return;
 		}
 		this.powerRegenTimer = Date.now();
@@ -1317,8 +1317,8 @@ class Ship extends Circle{
 		if(!this.alive){
 			return;
 		}
-		var x = this.x + (this.weapon.xOffset + this.radius* Math.cos((this.weapon.angle + 90) * Math.PI/180));
-		var y = this.y + (this.weapon.yOffset + this.radius* Math.sin((this.weapon.angle + 90) * Math.PI/180));
+		var x = this.x + (this.radius * Math.cos((this.weapon.angle + 90) * Math.PI/180));
+		var y = this.y + (this.radius * Math.sin((this.weapon.angle + 90) * Math.PI/180));
 
 		var _bullets;
 		if(this.weapon.name == "PhotonCannon" || this.weapon.name == "ParticleBeam"){
@@ -1872,8 +1872,6 @@ class Weapon {
 		this.nextFire = 0;
 		this.powerCost = 20;
 		this.angle = 0;
-		this.xOffset = 0;
-		this.yOffset = 0;
 		this.maxLevelMessage = "Weapon already at max";
 		this.upgradeMessage = "No upgrade message set";
 		this.equipMessage = "No equip message set";
@@ -1965,12 +1963,10 @@ class ParticleBeam extends Weapon{
 		}
 		if(this.currentBeam != null){
 			this.currentBeam.height = c.particleBeamHeight + ((this.chargeLevel-1)*c.particleBeamHeightGrowthPerCharge);
-			this.currentBeam.x = x;
-			this.currentBeam.y = y;
+			this.currentBeam.x = x + (this.currentBeam.height/2) * Math.cos((this.angle+90) * Math.PI/180);
+			this.currentBeam.y = y + (this.currentBeam.height/2) * Math.sin((this.angle+90) * Math.PI/180);
 			this.currentBeam.angle = angle;
 			this.currentBeam.vertices = this.currentBeam.getVertices();
-			//this.yOffset = this.currentBeam.height/2;
-			//this.xOffset = this.currentBeam.height/2;
 			return [this.currentBeam];
 		}
 	}
@@ -2033,6 +2029,7 @@ class PhotonCannon extends Weapon{
 			this.powerCost = c.photonCannonPowerCost;
 			this.chargeLevel = 0;
 			this.reset = false;
+			messenger.messageUser(this.owner,'weaponCharge',this.chargeLevel);
 		}
 		if(this.checkForCharge(powerLevel)){
 			this.charge();
@@ -2054,7 +2051,6 @@ class PhotonCannon extends Weapon{
 		}
 		this.powerCost = powerCost;
 		this.reset = true;
-		messenger.messageUser(this.owner,'weaponCharge',0);
 		return _bullets;
 	}
 	checkForCharge(powerLevel){
@@ -2242,19 +2238,7 @@ class Beam extends Bullet{
 
 	}
 	handleHit(object){
-		if(!this.alive){
-			return;
-		}
-		if(object.id == this.owner){
-			return;
-		}
-		if(object.sig == this.owner){
-			return;
-		}
-		var dist2 = utils.getMagSq(this.x,this.y,object.x,object.y);
-		if(dist2 < this.height*this.height){
-			this.height = Math.sqrt(dist2);
-		}
+
 	}
 
 }
