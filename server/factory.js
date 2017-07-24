@@ -364,6 +364,7 @@ class GameBoard {
 			if(active){
 				this.world.checkForMapDamage(ship);
 			}
+			ship.update(dt);
 			if(ship.droppedItem != null){
 				this.spawnItem(ship.droppedItem);
 				ship.droppedItem = null;
@@ -371,6 +372,7 @@ class GameBoard {
 			if(ship.regenerating || ship.powerRegen){
 				regeneratingShips.push([ship.id, ship.health,ship.power]);
 			}
+
 			if(ship.firedBullets.length != 0){
 				this.generateBullets(ship.id,ship.weapon,ship.firedBullets);
 				ship.firedBullets = [];
@@ -379,7 +381,6 @@ class GameBoard {
 				this.generateGadgets(ship.newGadgets);
 				ship.newGadgets = [];
 			}
-			ship.update(dt);
 		}
 		if(regeneratingShips.length != 0){
 			messenger.messageRoomBySig(this.roomSig,"shipsRegenerating",regeneratingShips);
@@ -1165,12 +1166,12 @@ class Ship extends Circle{
 			return;
 		}
 		this.dt = dt;
+		this.move();
 		this.checkHP();
 		this.regenPower();
 		this.checkFireState();	
 		this.checkBoostList();
 		this.checkKills();
-		this.move();
 	}
 	changeWeapon(name){
 		switch(name){
@@ -1405,12 +1406,6 @@ class Ship extends Circle{
 	move(){
 		this.x = this.newX;
 		this.y = this.newY;
-		if(this.newX != this.x || this.newY != this.y){
-			if(this.isHiding){
-				//this.isHiding = false;
-				//TODO Fix hiding messenger.messageRoomBySig(this.roomSig,"shipNotHiding",this.id);
-			}
-		}
 	}
 	handleHit(object){
 		if(object.isWall){
