@@ -119,10 +119,12 @@ function checkForMail(client){
 		}
 		var ship = room.shipList[client.id];
 		if(ship != null){
-			ship.moveForward = packet.moveForward;
-			ship.moveBackward = packet.moveBackward;
-			ship.turnLeft = packet.turnLeft;
-			ship.turnRight = packet.turnRight;
+			if(ship.enabled){
+				ship.moveForward = packet.moveForward;
+				ship.moveBackward = packet.moveBackward;
+				ship.turnLeft = packet.turnLeft;
+				ship.turnRight = packet.turnRight;
+			}
 		}
 	});
 
@@ -133,7 +135,9 @@ function checkForMail(client){
 		}
 		var ship = room.shipList[client.id];
 		if(ship != null && ship != undefined){
-			ship.weapon.angle = (180/Math.PI)*Math.atan2(loc.y-ship.y,loc.x-ship.x)-90;
+			if(ship.enabled){
+				ship.weapon.angle = (180/Math.PI)*Math.atan2(loc.y-ship.y,loc.x-ship.x)-90;
+			}
 		}
 	});
 

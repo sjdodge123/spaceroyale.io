@@ -8,6 +8,9 @@ exports.setAIController = function(ship,world,gameBoard){
 exports.setAITradeShipController = function(ts,world,gameBoard){
 	return new AITradeShipController(ts,world,gameBoard);
 };
+exports.setAIDroneController = function(drone,world,gameBoard){
+	return new AIDroneController(drone,world,gameBoard);
+}
 
 
 class AIController{
@@ -71,14 +74,6 @@ class AIController{
 			return;
 		}
 	}
-	updateRotation(){
-		if(this.ship.weapon.angle < this.targetAngle){
-			this.ship.weapon.angle += this.rotationSpeed;
-		}
-		if(this.ship.weapon.angle > this.targetAngle){
-			this.ship.weapon.angle -= this.rotationSpeed;
-		}
-	}
 
 	gameLoop(){
 		if(this.desiredWeapon == ''){
@@ -91,7 +86,6 @@ class AIController{
 
 		var moveToTarget = this.determineMoveTarget();
 		this.moveToTarget(moveToTarget);
-
 		var fireTarget = this.determineFireTarget();
 		if(fireTarget){
 			this.faceTarget(fireTarget);
@@ -383,10 +377,16 @@ class AIController{
 	}
 
 	faceTarget(target){
+		if(!this.ship.enabled){
+			return;
+		}
 		this.targetAngle = (180/Math.PI)*Math.atan2(target.y-this.ship.y,target.x-this.ship.x)-90;
 		this.ship.weapon.angle = this.targetAngle;
 	}
 	moveToTarget(target){
+		if(!this.ship.enabled){
+			return;
+		}
 		this.targetAngle = (180/Math.PI)*Math.atan2(target.y-this.ship.y,target.x-this.ship.x)-90;
 		this.targetDirX = Math.cos((this.targetAngle + 90) * Math.PI/180);
 		this.targetDirY = Math.sin((this.targetAngle + 90) * Math.PI/180);
@@ -462,12 +462,6 @@ class AITradeShipController{
 		var lastDist2 = Infinity;
 		for(var i in this.gameBoard.shipList){
 			var currentShip = this.gameBoard.shipList[i];
-			if(currentShip == this.ship){
-				continue;
-			}
-			if(currentShip.isHiding){
-				continue;
-			}
 			var dist2 = utils.getMagSq(this.tradeShip.x,this.tradeShip.y,currentShip.x,currentShip.y);
 
 			if(dist2 > this.aggroRangeSq){
@@ -483,3 +477,66 @@ class AITradeShipController{
 
 	}
  }
+
+ class AIDroneController{
+	constructor(drone,world,gameBoard){
+		this.drone = drone;
+		this.world = world;
+		this.gameBoard = gameBoard;
+		this.aggroRange = 800;
+		this.aggroRangeSq = this.aggroRange * this.aggroRange;
+
+		this.hackDistance = 50;
+		this.hackDistanceSq = this.hackDistance * this.hackDistance;
+
+		this.closestPlayerShip = null;
+		this.targetAngle = 0;
+	}
+	update(active){
+		if(this.drone.alive){
+			if(this.closestPlayerShip == null || !this.closestPlayerShip.alive || this.checkOutOfRange(this.closestPlayerShip)){
+				this.findClosestPlayerShip();
+			} else{
+				this.faceTarget(this.closestPlayerShip);
+			}
+		}
+	}
+
+	findClosestPlayerShip(){
+		var playerShip = null;
+		var lastDist2 = Infinity;
+		for(var i in this.gameBoard.shipList){
+			var currentShip = this.gameBoard.shipList[i];
+			if(this.drone.owner == currentShip.id){
+				continue;
+			}
+			var dist2 = utils.getMagSq(this.drone.x,this.drone.y,currentShip.x,currentShip.y);
+			if(dist2 > this.aggroRangeSq){
+				continue;
+			}
+			if(dist2 < lastDist2){
+				playerShip = currentShip;
+				lastDist2 = dist2;
+			}
+		}
+		this.closestPlayerShip = playerShip;
+	}
+
+	faceTarget(target){
+		this.targetAngle = (180/Math.PI)*Math.atan2(target.y-this.drone.y,target.x-this.drone.x)-90;
+		this.drone.angle = this.targetAngle;
+	}
+	checkOutOfRange(object){
+		var dist2 = utils.getMagSq(this.drone.x,this.drone.y,object.x,object.y);
+
+		if(dist2 < this.hackDistanceSq){
+			this.drone.hack(object);
+			return false;
+		}
+
+		if(dist2 > this.aggroRangeSq){
+			return true;
+		}
+	}
+
+}

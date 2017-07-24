@@ -464,6 +464,15 @@ class GameBoard {
 				continue;
 			}
 			gadget.update();
+			if(gadget.hasAI){
+				if(gadget.AIControlled && gadget.AICreated == false){
+					if(gadget.type == "Drone"){
+						gadget.AICreated = true;
+						this.AIList[gadget.sig] = AI.setAIDroneController(gadget,this.world,this);
+					}
+				}
+			}
+
 		}
 		if(deadSigs.length != 0){
 			messenger.messageRoomBySig(this.roomSig,'terminateGadgets',deadSigs);
@@ -1076,6 +1085,7 @@ class Ship extends Circle{
 		super(x, y, c.playerBaseRadius, color);
 		this.baseHealth = c.playerBaseHealth;
 		this.health = this.baseHealth;
+		this.enabled = true;
 
 		this.basePower = c.playerBasePower;
 		this.power = this.basePower;
@@ -1129,7 +1139,7 @@ class Ship extends Circle{
 		this.regenRate = c.playerHealthRegenRate;
 		this.regenerating = false;
 
-		this.gadget = new PulseWave(this.engine);
+		this.gadget = new HackingDrone(this.engine,this.id);
 
 		if(c.playerSpawnWeapon == "Blaster"){
 			this.weapon = new Blaster(this.id);
@@ -1357,7 +1367,7 @@ class Ship extends Circle{
 		}
 	}
 	activateGadget(){
-		var objects = this.gadget.activate(this.x,this.y);
+		var objects = this.gadget.activate(this.x,this.y,this.weapon.angle);
 		if(objects == null){
 			return;
 		}
@@ -1443,6 +1453,9 @@ class Ship extends Circle{
 		}
 	}
 	checkFireState(){
+		if(!this.enabled){
+			return;
+		}
 		if(this.fireWeapon){
 			this.fire();
 		}
@@ -1480,6 +1493,16 @@ class Ship extends Circle{
 			}
 		}
 	}
+	enable(){
+		if(this.enabled == false){
+			this.enabled = true;
+		}
+	}
+	disable(){
+		if(this.enabled){
+			this.enabled = false;
+		}
+	}
 }
 
 class Gadget {
@@ -1515,14 +1538,15 @@ class PulseWave extends Gadget{
 }
 
 class HackingDrone extends Gadget{
-	constructor(engine){
+	constructor(engine,owner){
 		super(engine);
+		this.owner = owner;
 		this.cooldown = 1000;
-		this.duration = 1*1000;
+		this.duration = 200;
 	}
-	activate(x,y){
+	activate(x,y,angle){
 		if(super.activate()){
-			var drone = new Drone(x,y,c.droneRadius,"orange",this.duration);
+			var drone = new Drone(x,y,c.droneRadius,"orange",this.duration,angle,this.owner);
 			return drone;
 		}
 	}
@@ -1533,7 +1557,7 @@ class GadgetObject extends Circle{
 		super(x,y,radius,color);
 		this.type = "Unset";
 		this.alive = true;
-		this.angle = 0; //TODO fix this
+		this.angle = 0;
 		this.velX = 0;
 		this.velY = 0;
 		this.newX = this.x;
@@ -1554,17 +1578,54 @@ class GadgetObject extends Circle{
 }
 
 class Drone extends GadgetObject{
-	constructor(x,y,radius,color,duration){
+	constructor(x,y,radius,color,duration,angle,owner){
 		super(x,y,radius,color);
 		this.type = "Drone";
+		this.owner = owner;
+		this.angle = angle;
 		this.isStatic = false;
 		this.spawnDate = Date.now();
+		this.speed = 1000;
 		this.duration = duration;
+		this.hackDuration = 3000;
+		this.hacking = false;
+		this.hackStarted = null;
+		this.targetShip = null;
+		this.hasAI = true;
+		this.AICreated = false;
+		this.AIControlled = false;
 	}
 	update(){
 		super.update();
+		if(this.hacking){
+			this.x = this.targetShip.x;
+			this.y = this.targetShip.y;
+			this.targetShip.disable();
+			this.targetShip.moveForward = true;
+
+			if(this.hackDuration - (Date.now() - this.hackStarted) < 0){
+				this.targetShip.enable();
+				this.alive = false;
+			}
+			return;
+		}
 		if(this.duration - (Date.now() - this.spawnDate) < 0){
-			this.alive = false;
+			if(this.AIControlled == false){
+				this.spawnDate = Date.now();
+				this.duration = 500;
+				this.speed = 5;
+				this.AIControlled = true;
+				return;
+			}	
+			this.duration = 5000;
+			this.speed = 800;
+		}
+	}	
+	hack(ship){
+		if(this.hacking == false){
+			this.targetShip = ship;
+			this.hacking = true;
+			this.hackStarted = Date.now();
 		}
 	}
 }
