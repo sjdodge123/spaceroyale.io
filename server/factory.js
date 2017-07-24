@@ -395,6 +395,10 @@ class GameBoard {
 				delete this.tradeShipList[sig];
 				continue;
 			}
+			if(tradeShip.firedBullets.length != 0){
+				this.generateBullets(tradeShip.sig,tradeShip.weapon,tradeShip.firedBullets);
+				tradeShip.firedBullets = [];
+			}
 			tradeShip.update();
 		}
 		if(deadSigs.length != 0){
@@ -1672,6 +1676,10 @@ class TradeShip extends Rect{
 		this.sig = null;
 		this.roomSig = roomSig;
 
+		this.fireWeapon = false;
+		this.stopWeapon = false;
+		this.firedBullets = [];
+
 		if(c.tradeShipAIEnabled){
 			if(c.tradeShipWeapon == "Blaster"){
 				this.weapon = new Blaster(this.sig);
@@ -1682,8 +1690,7 @@ class TradeShip extends Rect{
 			if(c.tradeShipWeapon == "MassDriver"){
 				this.weapon = new MassDriver(this.sig);
 			}
-
-		this.weapon.level = c.tradeShipWeaponLevel;
+			this.weapon.level = c.tradeShipWeaponLevel;
 		}
 
 
@@ -1698,6 +1705,7 @@ class TradeShip extends Rect{
 				this.drawTrail();
 				this.move();
 				this.updateTrails();
+				this.checkFireState();
 			} else{
 				this.alive = false;
 			}
@@ -1715,11 +1723,14 @@ class TradeShip extends Rect{
 	}
 	fire(){
 		var bullets = this.weapon.fire(this.x, this.y, this.weapon.angle, '#808080',this.sig);
-		if(bullets != null){
-			var data = compressor.weaponFired(this,this.weapon,bullets);
-			messenger.messageRoomBySig(this.roomSig,'weaponFired',data);
+		if(bullets == null){
+			return;
 		}
-		return bullets;
+		for(var i=0;i<bullets.length;i++){
+			this.firedBullets.push(bullets[i]);
+		}
+		var data = compressor.weaponFired(this,this.weapon,bullets);
+		messenger.messageRoomBySig(this.roomSig,'weaponFired',data);
 	}
 	startMove(ts){
 		ts.readyToMove = true;
@@ -1751,6 +1762,14 @@ class TradeShip extends Rect{
 			return sig;
 		}
 		return this.generateTrailSig();
+	}
+	checkFireState(){
+		if(this.fireWeapon){
+			this.fire();
+		}
+		if(this.stopWeapon){
+			this.stopFire();
+		}
 	}
 
 	handleHit(object){

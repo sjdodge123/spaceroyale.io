@@ -378,7 +378,7 @@ class AIController{
 	}
 	fireWeapon(){
 		if(this.ship.alive){
-			this.gameBoard.fireWeapon(this.ship);
+			this.ship.fireWeapon = true;
 		}
 	}
 
@@ -442,7 +442,7 @@ class AITradeShipController{
 	}
 
 	fireWeapon(){
-		this.gameBoard.fireWeapon(this.tradeShip);
+		this.tradeShip.fireWeapon = true;
 	}
 
 	faceTarget(target){

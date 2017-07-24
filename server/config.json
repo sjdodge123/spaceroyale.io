@@ -103,7 +103,7 @@
     "massDriverBulletSpeed":2200,
 
     "particleBeamBasePowerCost":15,
-    "particleBeamChargeCost":0.15,
+    "particleBeamChargeCost":0.5,
     "particleBeamChargeTime":500,
     "particleBeamWidth":5,
     "particleBeamHeight":600,
