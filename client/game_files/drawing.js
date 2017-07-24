@@ -607,15 +607,34 @@ function drawItem(item){
 }
 
 function drawGadget(gadget){
-	if(gadget.type == "Pulse"){
-		gameContext.save();
-		gameContext.beginPath();
-		gameContext.lineWidth = 3;
-		gameContext.strokeStyle = "red";
-		gameContext.arc(gadget.x-myShip.x+camera.xOffset,gadget.y-myShip.y+camera.yOffset,gadget.radius,0,Math.PI*2,true);
-		gameContext.stroke();
-		gameContext.restore();
+	gameContext.save();
+	switch(gadget.type){
+		case "Pulse":{
+			gameContext.beginPath();
+			gameContext.lineWidth = 3;
+			gameContext.strokeStyle = "red";
+			gameContext.arc(gadget.x-myShip.x+camera.xOffset,gadget.y-myShip.y+camera.yOffset,gadget.radius,0,Math.PI*2,true);
+			gameContext.stroke();
+			break;
+		}
+		case "Drone":{
+			gameContext.beginPath();
+			gameContext.lineWidth = 1;
+			gameContext.fillStyle = "orange";
+			gameContext.arc(gadget.x-myShip.x+camera.xOffset,gadget.y-myShip.y+camera.yOffset,gadget.radius,0,Math.PI*2,true);
+			gameContext.fill();
+			break;
+		}
+		default:{
+			gameContext.beginPath();
+			gameContext.lineWidth = 3;
+			gameContext.strokeStyle = "red";
+			gameContext.arc(gadget.x-myShip.x+camera.xOffset,gadget.y-myShip.y+camera.yOffset,50,0,Math.PI*2,true);
+			gameContext.stroke();
+			break;
+		}
 	}
+	gameContext.restore();
 }
 
 function drawPlanet(planet){

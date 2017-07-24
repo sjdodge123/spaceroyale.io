@@ -144,6 +144,12 @@ function clientConnect() {
 		gadgetActivated(packet);
 	});
 
+	server.on("terminateGadgets",function(deadSigs){
+		for(var i=0;i<deadSigs.length;i++){
+			terminateGadget(deadSigs[i]);
+		}
+	});
+
 	server.on('terminateBullet',function(deadSigs){
 		for(var i=0;i<deadSigs.length;i++){
 			terminateBullet(deadSigs[i]);
@@ -338,6 +344,7 @@ function clientConnect() {
 		updateShipList(updatePacket.shipList);
 		updateTradeShipList(updatePacket.tradeShipList);
 		updateBulletList(updatePacket.bulletList);
+		updateGadgetList(updatePacket.gadgetList);
 		gameStarted = updatePacket.state;
 		lobbyTimeLeft = updatePacket.lobbyTimeLeft;
 		shrinkTimeLeft = updatePacket.shrinkTimeLeft;

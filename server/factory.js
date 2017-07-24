@@ -28,7 +28,7 @@ class Room {
 		this.killedShips = {};
 		this.clientCount = 0;
 		this.alive = true;
-		this.engine = _engine.getEngine(this.bulletList, this.shipList, this.world, this.asteroidList, this.planetList,this.nebulaList,this.tradeShipList);
+		this.engine = _engine.getEngine(this.bulletList, this.shipList, this.asteroidList, this.planetList,this.nebulaList,this.tradeShipList,this.gadgetList);
 		this.world = new World(0,0,c.lobbyWidth,c.lobbyHeight,this.engine,this.sig);
 		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList,this.planetList,this.itemList,this.nebulaList,this.tradeShipList,this.engine,this.AIList,this.gadgetList,this.sig);
 	}
@@ -111,10 +111,12 @@ class Room {
 		var shipData = compressor.sendShipUpdates(this.shipList);
 		var tradeShipData = compressor.sendTradeShipUpdates(this.tradeShipList);
 		var bulletData = compressor.sendBulletUpdates(this.bulletList);
+		var gadgetData = compressor.sendGadgetUpdates(this.gadgetList);
 		messenger.messageRoomBySig(this.sig,"gameUpdates",{
 			shipList:shipData,
 			tradeShipList:tradeShipData,
 			bulletList:bulletData,
+			gadgetList:gadgetData,
 			state:this.game.active,
 			lobbyTimeLeft:this.game.lobbyTimeLeft,
 			totalPlayers:messenger.getTotalPlayers(),
@@ -356,6 +358,7 @@ class GameBoard {
 		this.updateBullets(dt);
 		this.updateAsteroids();
 		this.updateItems();
+		this.updateGadgets();
 	}
 	updateShips(active,dt){
 		var regeneratingShips = [];
@@ -456,8 +459,8 @@ class GameBoard {
 		for(var gadgetSig in this.gadgetList){
 			var gadget = this.gadgetList[gadgetSig];
 			if(gadget.alive == false){
-				deadSigs.push(gadgetSig);
 				this.terminateGadget(gadgetSig);
+				deadSigs.push(gadgetSig);
 				continue;
 			}
 			gadget.update();
@@ -549,27 +552,6 @@ class GameBoard {
 			messenger.messageRoomBySig(this.roomSig,'gadgetActivated',data);
 		}
 	}
-
-	/*
-	activateGadget(ship){
-		var objects = ship.activateGadget();
-		if(objects == null){
-			return;
-		}
-		if(objects.length){
-			return;
-		}
-		var sig = this.generateGadgetSig();
-		this.gadgetList[sig] = objects;
-		this.gadgetList[sig].sig = sig;
-
-		var data = compressor.gadgetActivated(this.gadgetList[sig]);
-		messenger.messageRoomBySig(this.roomSig,'gadgetActivated',data);
-	}
-	stopGadget(ship){
-
-	}
-	*/
 
 	terminateBullet(packet){
 		if(packet.bulletList[packet.sig] != undefined){
@@ -1532,20 +1514,77 @@ class PulseWave extends Gadget{
 	}
 }
 
-class Pulse extends Circle{
-	constructor(x,y,radius,color,duration){
+class HackingDrone extends Gadget{
+	constructor(engine){
+		super(engine);
+		this.cooldown = 1000;
+		this.duration = 1*1000;
+	}
+	activate(x,y){
+		if(super.activate()){
+			var drone = new Drone(x,y,c.droneRadius,"orange",this.duration);
+			return drone;
+		}
+	}
+}
+
+class GadgetObject extends Circle{
+	constructor(x,y,radius,color){
 		super(x,y,radius,color);
-		this.type = "Pulse";
+		this.type = "Unset";
 		this.alive = true;
-		this.spawnDate = Date.now();
-		this.duration = c.pulseDuration;
+		this.angle = 0; //TODO fix this
+		this.velX = 0;
+		this.velY = 0;
+		this.newX = this.x;
+		this.newY = this.y;
+		this.speed = 5;
+		this.isStatic = true;
+		
 	}
 	update(){
+		if(!this.isStatic){
+			this.move();
+		}
+	}
+	move(){
+		this.x = this.newX;
+		this.y = this.newY;
+	}
+}
+
+class Drone extends GadgetObject{
+	constructor(x,y,radius,color,duration){
+		super(x,y,radius,color);
+		this.type = "Drone";
+		this.isStatic = false;
+		this.spawnDate = Date.now();
+		this.duration = duration;
+	}
+	update(){
+		super.update();
 		if(this.duration - (Date.now() - this.spawnDate) < 0){
 			this.alive = false;
 		}
 	}
 }
+
+class Pulse extends GadgetObject{
+	constructor(x,y,radius,color,duration){
+		super(x,y,radius,color);
+		this.type = "Pulse";
+		this.spawnDate = Date.now();
+		this.duration = c.pulseDuration;
+	}
+	update(){
+		super.update();
+		if(this.duration - (Date.now() - this.spawnDate) < 0){
+			this.alive = false;
+		}
+	}
+}
+
+
 
 
 class Asteroid extends Circle{

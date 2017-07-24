@@ -64,13 +64,6 @@ function updateTradeShips(){
 function updateGadgets(){
 	for(var sig in gadgetList){
 		var gadget = gadgetList[sig];
-		if(!gadget.activateDate){
-			continue;
-		}
-		var timeLeft = gadget.duration - (Date.now() - gadget.activateDate);
-		if(timeLeft < 0){
-			terminateGadget(sig);
-		}
 	}
 }
 
@@ -267,6 +260,24 @@ function updateBulletList(packet){
 
 }
 
+function updateGadgetList(packet){
+	if(packet == null){
+		return;
+	}
+	packet = JSON.parse(packet);
+	for(var i=0;i<packet.length;i++){
+		var gadget = packet[i];
+		if(gadgetList[gadget[0]] != null){
+			gadgetList[gadget[0]].id = gadget[0];
+			gadgetList[gadget[0]].x = gadget[1];
+			gadgetList[gadget[0]].y = gadget[2];
+			gadgetList[gadget[0]].angle = gadget[3];
+		}
+	}
+
+}
+
+
 function equipItem(packet){
 	packet = JSON.parse(packet);
 	var name = packet[1];
@@ -461,9 +472,10 @@ function gadgetActivated(packet){
 		gadgetList[packet[0]].y = packet[3];
 
 		if(gadgetList[packet[0]].type == "Pulse"){
-			gadgetList[packet[0]].activateDate = Date.now();
-			gadgetList[packet[0]].duration = config.pulseDuration;
 			gadgetList[packet[0]].radius = config.pulseRadius;
+		}
+		if(gadgetList[packet[0]].type == "Drone"){
+			gadgetList[packet[0]].radius = config.droneRadius;
 		}
 	}
 }

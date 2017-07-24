@@ -4,6 +4,7 @@ var c = utils.loadConfig();
 
 var listItem = null;
 var bullet = null;
+var gadget = null;
 var ship = null;
 var tradeShip = null;
 var nebula = null;
@@ -152,7 +153,7 @@ exports.weaponFired = function(id,weapon,bullets){
 exports.gadgetActivated = function(objects){
 	if(objects.length){
 
-		//Do some thing for multiple gadget objects
+		//TODO Do some thing for multiple gadget objects
 		return;
 	}
 	var packet = [];
@@ -183,6 +184,26 @@ exports.sendBulletUpdates = function(bulletList){
 	prop = null;
 	return packet;
 }
+exports.sendGadgetUpdates = function(gadgetList){
+	var packet = [];
+	for(prop in gadgetList){
+		gadget = gadgetList[prop];
+		listItem = [
+			gadget.sig,
+			gadget.x,
+			gadget.y,
+			gadget.angle,
+		];
+		packet.push(listItem);
+	}
+	packet = JSON.stringify(packet);
+	gadget = null;
+	listItem = null;
+	prop = null;
+	return packet;
+}
+
+
 exports.spawnPlanets = function(planetList){
 	var packet = [];
 	for(prop in planetList){

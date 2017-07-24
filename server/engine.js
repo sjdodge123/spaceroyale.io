@@ -4,8 +4,8 @@ var c = utils.loadConfig();
 
 var forceConstant = c.forceConstant;
 
-exports.getEngine = function(bulletList,shipList,asteroidList,planetList,nebulaList,tradeShipList){
-	return new Engine(bulletList,shipList,asteroidList,planetList,nebulaList,tradeShipList);
+exports.getEngine = function(bulletList,shipList,asteroidList,planetList,nebulaList,tradeShipList,gadgetList){
+	return new Engine(bulletList,shipList,asteroidList,planetList,nebulaList,tradeShipList,gadgetList);
 }
 exports.slowDown = function(obj,dt,amt){
 	slowDown(obj,dt,amt);
@@ -21,13 +21,14 @@ exports.checkDistance = function(obj1, obj2){
 	return checkDistance(obj1, obj2);
 }
 class Engine {
-	constructor(bulletList,shipList,asteroidList,planetList,nebulaList,tradeShipList){
+	constructor(bulletList,shipList,asteroidList,planetList,nebulaList,tradeShipList,gadgetList){
 		this.bulletList = bulletList;
 		this.shipList = shipList;
 		this.asteroidList = asteroidList;
 		this.planetList = planetList;
 		this.nebulaList = nebulaList;
 		this.tradeShipList = tradeShipList;
+		this.gadgetList = gadgetList;
 		this.dt = 0;
 		this.worldWidth = 0;
 		this.worldHeight = 0;
@@ -37,6 +38,7 @@ class Engine {
 	update(dt){
 		this.dt = dt;
 		this.updateBullets();
+		this.updateGadgets();
 		this.updateShips();
 	}
 
@@ -56,6 +58,18 @@ class Engine {
 				bullet.vertices[i].y += bullet.velY * this.dt;
 			}
 
+		}
+	}
+	updateGadgets(){
+		for (var gadgetSig in this.gadgetList){
+			var gadget = this.gadgetList[gadgetSig];
+			if(gadget.isStatic){
+				continue;
+			}
+			gadget.velX = Math.cos((gadget.angle+90)*(Math.PI/180))*gadget.speed;
+			gadget.velY = Math.sin((gadget.angle+90)*(Math.PI/180))*gadget.speed;
+			gadget.newX += gadget.velX * this.dt;
+			gadget.newY += gadget.velY * this.dt;
 		}
 	}
 

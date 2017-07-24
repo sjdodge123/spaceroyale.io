@@ -124,6 +124,8 @@
     "pulseDuration":500,
     "pulseRadius":200,
 
+    "droneRadius":10,
+
 
     "quadTreeMaxCount": 70,
     "quadTreeMaxDepth": 2,
