@@ -157,7 +157,7 @@ function checkForMail(client){
 		if(ship == null){
 			return;
 		}
-		room.game.gameBoard.fireWeapon(ship);
+		ship.fireWeapon = true;
 	});
 
 	client.on('stopGun',function(){
@@ -169,7 +169,7 @@ function checkForMail(client){
 		if(ship == null){
 			return;
 		}
-		room.game.gameBoard.stopWeapon(ship);
+		ship.stopWeapon = true;
 	});
 
 
@@ -182,7 +182,7 @@ function checkForMail(client){
 		if(ship == null){
 			return;
 		}
-		room.game.gameBoard.activateGadget(ship);
+		ship.useGadget = true;
 	});
 
 	client.on('stopGadget',function(){
@@ -194,7 +194,7 @@ function checkForMail(client){
 		if(ship == null){
 			return;
 		}
-		room.game.gameBoard.stopGadget(ship);
+		ship.stopGadget = true;
 	});
 
 	client.on('drip',function(){

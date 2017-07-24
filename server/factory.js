@@ -371,6 +371,14 @@ class GameBoard {
 			if(ship.regenerating || ship.powerRegen){
 				regeneratingShips.push([ship.id, ship.health,ship.power]);
 			}
+			if(ship.firedBullets.length != 0){
+				this.generateBullets(ship.id,ship.weapon,ship.firedBullets);
+				ship.firedBullets = [];
+			}
+			if(ship.newGadgets.length != 0){
+				this.generateGadgets(ship.newGadgets);
+				ship.newGadgets = [];
+			}
 			ship.update(dt);
 		}
 		if(regeneratingShips.length != 0){
@@ -509,12 +517,8 @@ class GameBoard {
 			}
 		}
 	}
-	fireWeapon(ship){
-		var bullets = ship.fire();
+	generateBullets(id,weapon,bullets){
 		var newBullets = [];
-		if(bullets == null){
-			return;
-		}
 		for(var i=0;i<bullets.length;i++){
 			var bullet = bullets[i];
 			if(bullet.sig == null){
@@ -525,25 +529,23 @@ class GameBoard {
 			this.bulletList[bullet.sig] = bullet;
 		}
 		if(newBullets.length > 0){
-			var data = compressor.weaponFired(ship,ship.weapon,newBullets);
+			var data = compressor.weaponFired(id,weapon,newBullets);
 			messenger.messageRoomBySig(this.roomSig,'weaponFired',data);
 		}
 	}
+	generateGadgets(objects){
+		for(var i=0;i<objects.length;i++){
+			var sig = this.generateGadgetSig();
+			this.gadgetList[sig] = objects[i];
+			this.gadgetList[sig].sig = sig;
 
-	stopWeapon(ship){
-		var bullets = ship.stopFire();
-		if(bullets == null){
-			return;
+			//TODO: this is inefficient and should be done outside of the loop when more than one gadget is added
+			var data = compressor.gadgetActivated(this.gadgetList[sig]);
+			messenger.messageRoomBySig(this.roomSig,'gadgetActivated',data);
 		}
-		for(var i=0;i<bullets.length;i++){
-			var bullet = bullets[i];
-			bullet.sig = this.generateBulletSig();
-			this.bulletList[bullet.sig] = bullet;
-			setTimeout(this.terminateBullet,bullet.lifetime*1000,{sig:bullet.sig,bulletList:this.bulletList});
-		}
-		var data = compressor.weaponFired(ship,ship.weapon,bullets);
-		messenger.messageRoomBySig(this.roomSig,'weaponFired',data);
 	}
+
+	/*
 	activateGadget(ship){
 		var objects = ship.activateGadget();
 		if(objects == null){
@@ -562,6 +564,7 @@ class GameBoard {
 	stopGadget(ship){
 
 	}
+	*/
 
 	terminateBullet(packet){
 		if(packet.bulletList[packet.sig] != undefined){
@@ -1094,6 +1097,13 @@ class Ship extends Circle{
 		this.powerRegenTimer = Date.now() - this.powerRegenRate;
 		this.powerRegen = false;
 
+		this.fireWeapon = false;
+		this.stopWeapon = false;
+		this.firedBullets = [];
+		this.useGadget = false;
+		this.stopGadget = false;
+		this.newGadgets = [];
+
 		this.baseColor = color;
 		this.glowColor = color;
 		this.angle = angle;
@@ -1147,9 +1157,13 @@ class Ship extends Circle{
 		this.weapon.level = c.playerSpawnWeaponLevel;
 	}
 	update(dt){
+		if(!this.alive){
+			return;
+		}
 		this.dt = dt;
 		this.checkHP();
 		this.regenPower();
+		this.checkFireState();	
 		this.checkBoostList();
 		this.checkKills();
 		this.move();
@@ -1314,9 +1328,6 @@ class Ship extends Circle{
 		}
 	}
 	fire(){
-		if(!this.alive){
-			return;
-		}
 		var x = this.x + (this.radius * Math.cos((this.weapon.angle + 90) * Math.PI/180));
 		var y = this.y + (this.radius * Math.sin((this.weapon.angle + 90) * Math.PI/180));
 
@@ -1333,12 +1344,13 @@ class Ship extends Circle{
 			this.stopFire();
 			return;
 		}
-		return _bullets;
+		for(var i=0;i<_bullets.length;i++){
+			this.firedBullets.push(_bullets[i]);
+		}
 	}
 	stopFire(){
-		if(!this.alive){
-			return;
-		}
+		this.fireWeapon = false;
+		this.stopWeapon = false;
 		if(this.weapon.name == "PhotonCannon"){
 			var x = this.x + this.radius * Math.cos((this.weapon.angle + 90) * Math.PI/180);
 			var y = this.y + this.radius * Math.sin((this.weapon.angle + 90) * Math.PI/180);
@@ -1349,17 +1361,42 @@ class Ship extends Circle{
 			if(!this.checkPower(this.weapon.powerCost)){
 				return;
 			}
-			return _bullets;
+			for(var i=0;i<_bullets.length;i++){
+				this.firedBullets.push(_bullets[i]);
+			}
 		}
 		if(this.weapon.name == "ParticleBeam"){
 			this.weapon.stopFire();
 		}
 	}
 	activateGadget(){
-		return this.gadget.activate(this.x,this.y);
+		var objects = this.gadget.activate(this.x,this.y);
+		if(objects == null){
+			return;
+		}
+		if(objects.length){
+			for(var i=0;i<objects.length;i++){
+				this.newGadgets.push(objects[i]);
+			}
+		} else{
+			this.newGadgets.push(objects);
+		}
 	}
-	stopGadget(){
+	deactivateGadget(){
+		this.useGadget = false;
+		this.stopGadget = false;
 
+		var objects = this.gadget.deactivate(this.x,this.y);
+		if(objects == null){
+			return;
+		}
+		if(objects.length){
+			for(var i=0;i<objects.length;i++){
+				this.newGadgets.push(objects[i]);
+			}
+		} else{
+			this.newGadgets.push(objects);
+		}
 	}
 	move(){
 		this.x = this.newX;
@@ -1383,7 +1420,6 @@ class Ship extends Circle{
 			return;
 		}
 		if(object.owner != this.id && object.alive && object.damage != null){
-
 			if(this.shield != null && this.shield.alive){
 				this.shield.handleHit(object);
 				if(this.shield.alive){
@@ -1425,6 +1461,20 @@ class Ship extends Circle{
 			this.alive = false;
 		}
 	}
+	checkFireState(){
+		if(this.fireWeapon){
+			this.fire();
+		}
+		if(this.stopWeapon){
+			this.stopFire();
+		}
+		if(this.useGadget){
+			this.activateGadget();
+		}
+		if(this.stopGadget){
+			this.deactivateGadget();
+		}
+	}
 	checkKills(){
 		if(this.killList.length >= 1){
 			this.color = "#ffb84d";
@@ -1462,6 +1512,9 @@ class Gadget {
 			this.cooldownTimer = Date.now();
 			return true;
 		}
+	}
+	deactivate(){
+		
 	}
 }
 

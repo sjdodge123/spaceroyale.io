@@ -415,13 +415,15 @@ function stopFiring(){
 }
 
 function activateGadget(_x,_y){
-	if(iAmAlive && useGadget){
-		useGadget = false;
+	if(iAmAlive){
        	server.emit("activateGadget",{x:_x,y:_y});
     }
 }
 function stopGadget(){
-	server.emit("stopGadget");
+	if(iAmAlive && useGadget){
+		useGadget = false;
+		server.emit("stopGadget");
+	}
 }
 
 function clientSendAuth(user,pass){

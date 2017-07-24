@@ -123,11 +123,7 @@ exports.updateShield = function(shield){
 	return packet;
 }
 
-exports.weaponFired = function(ship,weapon,bullets){
-	var id = ship.id;
-	if(id == null){
-		id = ship.sig;
-	}
+exports.weaponFired = function(id,weapon,bullets){
 	var packet = [];
 	packet.push(id);
 	packet.push(weapon.name);
