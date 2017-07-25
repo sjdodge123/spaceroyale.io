@@ -294,7 +294,12 @@ class Game {
 	}
 	updateAI(active){
 		for(var sig in this.AIList){
-			this.AIList[sig].update(active);
+			var aiUser = this.AIList[sig];
+			aiUser.update(active);
+			if(aiUser.agent.alive == false){
+				delete this.AIList[sig];
+			}
+			
 		}
 	}
 	cancelGameStart(){
@@ -1553,7 +1558,8 @@ class HackingDrone extends Gadget{
 	constructor(engine,owner){
 		super(engine);
 		this.owner = owner;
-		this.cooldown = 1000;
+		this.cooldown = c.droneCooldown;
+		this.cooldownTimer = Date.now() - this.cooldown;
 		this.duration = 200;
 	}
 	activate(x,y,angle){
@@ -1605,6 +1611,7 @@ class Drone extends GadgetObject{
 		this.health = 30;
 		this.duration = duration;
 		this.hacking = false;
+		this.searching = false;
 		this.stopHacking = false;
 		this.hackStarted = null;
 		this.targetShip = null;
@@ -1650,10 +1657,19 @@ class Drone extends GadgetObject{
 				this.duration = c.dronePauseDuration;
 				this.speed = 5;
 				this.AIControlled = true;
+				this.searching = true;
 				return;
-			}	
-			this.duration = 5000;
-			this.speed = 800;
+			}
+			if(this.searching){
+				this.spawnDate = Date.now();
+				this.duration = c.droneSearchDuration;
+				this.speed = c.droneSearchSpeed;
+				this.searching = false;
+				return;
+			}
+			if(!this.hacking){
+				this.alive = false;
+			}
 		}
 	}	
 	hack(ship){

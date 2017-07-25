@@ -125,8 +125,11 @@
     "pulseRadius":200,
 
     "droneRadius":10,
+    "droneCooldown":10000,
     "droneFireSpeed":1500,
     "dronePauseDuration":500,
+    "droneSearchDuration":2000,
+    "droneSearchSpeed":500,
     "droneHackDuration":3000,
     "droneHackStopChance":2,
 

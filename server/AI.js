@@ -15,6 +15,7 @@ exports.setAIDroneController = function(drone,world,gameBoard){
 
 class AIController{
 	constructor(ship,world,gameBoard){
+		this.agent = ship;
 		this.ship = ship;
 		this.world = world;
 		this.gameBoard = gameBoard;
@@ -422,6 +423,7 @@ class AIController{
 
 class AITradeShipController{
 	constructor(ts,world,gameBoard){
+		this.agent = ts;
 		this.tradeShip = ts;
 		this.world = world;
 		this.gameBoard = gameBoard;
@@ -480,6 +482,7 @@ class AITradeShipController{
 
  class AIDroneController{
 	constructor(drone,world,gameBoard){
+		this.agent = drone;
 		this.drone = drone;
 		this.world = world;
 		this.gameBoard = gameBoard;
