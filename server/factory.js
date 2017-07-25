@@ -521,9 +521,13 @@ class GameBoard {
 			for(var nebulaSig in this.nebulaList){
 				objectArray.push(this.nebulaList[nebulaSig]);
 			}
+			for(var gadgetSig in this.gadgetList){
+				objectArray.push(this.gadgetList[gadgetSig]);
+			}
 			for(var bulletSig in this.bulletList){
 				objectArray.push(this.bulletList[bulletSig]);
 			}
+
 
 			this.engine.broadBase(objectArray);
 		}
@@ -1085,7 +1089,11 @@ class Ship extends Circle{
 		super(x, y, c.playerBaseRadius, color);
 		this.baseHealth = c.playerBaseHealth;
 		this.health = this.baseHealth;
+
 		this.enabled = true;
+		this.isShip = true;
+
+		this.hacker = null;
 
 		this.basePower = c.playerBasePower;
 		this.power = this.basePower;
@@ -1129,6 +1137,7 @@ class Ship extends Circle{
 		this.velY = 0;
 		this.droppedItem = null;
 		this.dt = 0;
+
 		this.roomSig = roomSig;
 		this.explosionRadius = c.playerExplosionRadius;
 		this.explosionMaxDamage = c.playerExplosionMaxDamage;
@@ -1411,6 +1420,9 @@ class Ship extends Circle{
 			return;
 		}
 		if(object.owner != this.id && object.alive && object.damage != null){
+			if(this.hacker != null && this.hacker.alive){
+				this.hacker.checkBreakDisable();
+			}
 			if(this.shield != null && this.shield.alive){
 				this.shield.handleHit(object);
 				if(this.shield.alive){
@@ -1575,6 +1587,9 @@ class GadgetObject extends Circle{
 		this.x = this.newX;
 		this.y = this.newY;
 	}
+	handleHit(){
+
+	}
 }
 
 class Drone extends GadgetObject{
@@ -1585,26 +1600,46 @@ class Drone extends GadgetObject{
 		this.angle = angle;
 		this.isStatic = false;
 		this.spawnDate = Date.now();
-		this.speed = 1000;
+		this.speed = c.droneFireSpeed;
+		this.hackDuration = c.droneHackDuration;
+		this.health = 30;
 		this.duration = duration;
-		this.hackDuration = 3000;
 		this.hacking = false;
+		this.stopHacking = false;
 		this.hackStarted = null;
 		this.targetShip = null;
 		this.hasAI = true;
 		this.AICreated = false;
 		this.AIControlled = false;
+		this.hackDirection = utils.getRandomInt(0,6);
 	}
 	update(){
 		super.update();
 		if(this.hacking){
 			this.x = this.targetShip.x;
 			this.y = this.targetShip.y;
-			this.targetShip.disable();
-			this.targetShip.moveForward = true;
-
-			if(this.hackDuration - (Date.now() - this.hackStarted) < 0){
+			if(this.targetShip.enabled){
+				this.targetShip.disable();
+				this.targetShip.hacker = this;
+				switch(this.hackDirection){
+					case 0:{this.targetShip.moveForward = true; break;}
+					case 1:{this.targetShip.moveBackward = true; break;}
+					case 2:{this.targetShip.turnLeft = true; break;}
+					case 3:{this.targetShip.turnRight = true; break;}
+					case 4:{this.targetShip.moveForward = true; this.targetShip.turnLeft = true; break;}
+					case 5:{this.targetShip.moveForward = true; this.targetShip.turnRight = true; break;}
+					case 4:{this.targetShip.moveBackward = true; this.targetShip.turnLeft = true; break;}
+					case 6:{this.targetShip.moveBackward = true; this.targetShip.turnRight = true; break;}
+				}
+				
+			}
+			if((this.hackDuration - (Date.now() - this.hackStarted) < 0) || this.stopHacking) {
 				this.targetShip.enable();
+				this.hacking = false;
+				this.targetShip.moveForward = false;
+				this.targetShip.moveBackward = false; 
+				this.targetShip.turnLeft = false;
+				this.targetShip.turnRight = false;
 				this.alive = false;
 			}
 			return;
@@ -1612,7 +1647,7 @@ class Drone extends GadgetObject{
 		if(this.duration - (Date.now() - this.spawnDate) < 0){
 			if(this.AIControlled == false){
 				this.spawnDate = Date.now();
-				this.duration = 500;
+				this.duration = c.dronePauseDuration;
 				this.speed = 5;
 				this.AIControlled = true;
 				return;
@@ -1626,6 +1661,42 @@ class Drone extends GadgetObject{
 			this.targetShip = ship;
 			this.hacking = true;
 			this.hackStarted = Date.now();
+		}
+	}
+	handleHit(object){
+		if(!this.alive){
+			return;
+		}
+		if(this.hacking){
+			return;
+		}
+		if(object.isNebula){
+			return;
+		}
+		if(object.owner == this.owner){
+			return;
+		}
+		if(object.id == this.owner){
+			return;
+		}
+		if(object.damage != null){
+			object.health -= object.damage;
+			if(object.health < 0){
+				this.alive = false;
+			}
+			return;
+		}
+		if(object.isShip){
+			this.hack(object);
+			return;
+		}
+		this.alive = false;
+	}
+	checkBreakDisable(){
+		if(this.hacking){
+			if(utils.getRandomInt(0,c.droneHackStopChance) == 0){
+				this.stopHacking = true;
+			}
 		}
 	}
 }

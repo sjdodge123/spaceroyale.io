@@ -483,10 +483,10 @@ class AITradeShipController{
 		this.drone = drone;
 		this.world = world;
 		this.gameBoard = gameBoard;
-		this.aggroRange = 800;
+		this.aggroRange = 300;
 		this.aggroRangeSq = this.aggroRange * this.aggroRange;
 
-		this.hackDistance = 50;
+		this.hackDistance = 75;
 		this.hackDistanceSq = this.hackDistance * this.hackDistance;
 
 		this.closestPlayerShip = null;
