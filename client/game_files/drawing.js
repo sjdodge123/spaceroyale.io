@@ -264,16 +264,28 @@ function drawHPCounter(){
 		return;
 	}
 	if(myShip.health > 0){
-		gameContext.save();
-		if(myShip.health > 70){
-			gameContext.fillStyle = "#1dba34";
-		}else if(myShip.health > 30){
-			gameContext.fillStyle = "yellow";
-		} else {
-			gameContext.fillStyle = "tomato";
+		var color, boost = 0;
+		if(myShip.health > config.playerBaseHealth){
+			boost = myShip.health-config.playerBaseHealth;
 		}
-
-		gameContext.fillRect(eventLog.x,eventLog.y-30,(myShip.health/100)*eventLog.width/2,20);
+		if(myShip.health > config.playerBaseHealth*.7){
+			color = "#1dba34";
+		} else if(myShip.health > config.playerBaseHealth*.3){
+			color = "yellow";
+		} else{
+			color = "tomato";
+		}
+		var totalLength = eventLog.width/2;
+		var healthPercent = ((myShip.health-boost*2)/config.playerBaseHealth);
+		var healthlength = healthPercent*totalLength;
+		gameContext.save();
+		gameContext.fillStyle = color;
+		gameContext.fillRect(eventLog.x,eventLog.y-30,healthlength,20);
+		if(boost > 0){
+			var boostLength = (1-healthPercent)*totalLength;
+			gameContext.fillStyle = "gold";
+			gameContext.fillRect(eventLog.x+healthlength,eventLog.y-30,boostLength,20);
+		}
 		gameContext.restore();
 	}
 	drawTextF("Health",eventLog.x+(eventLog.width/4)-30,eventLog.y-15,"#ECF0F1","17px Georgia");
@@ -283,10 +295,22 @@ function drawPowerBar(){
 	if(myShip == null){
 		return;
 	}
+	var boost = 0;
 	if(myShip.power > 0){
+		if(myShip.power > config.playerBasePower){
+			boost = myShip.power-config.playerBasePower;
+		} 
+		var totalLength = eventLog.width/2;
+		var powerPercent = ((myShip.power-boost*2)/config.playerBasePower);
+		var powerlength = powerPercent*totalLength;
 		gameContext.save();
 		gameContext.fillStyle = "skyblue";
-		gameContext.fillRect(eventLog.x+eventLog.width/2,eventLog.y-30,(myShip.power/config.playerBasePower)*eventLog.width/2,20);
+		gameContext.fillRect(eventLog.x+eventLog.width/2,eventLog.y-30,powerlength,20);
+		if(boost > 0){
+			var boostLength = (1-powerPercent)*totalLength;
+			gameContext.fillStyle = "gold";
+			gameContext.fillRect(eventLog.x+eventLog.width/2+powerlength,eventLog.y-30,boostLength,20);
+		}
 		gameContext.restore();
 	}
 	drawTextF("Power",eventLog.x+eventLog.width/2+(eventLog.width/4)-30,eventLog.y-15,"#ECF0F1","17px Georgia");

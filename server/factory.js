@@ -1089,12 +1089,15 @@ class BlueBound extends Bound{
 	}
 }
 
+
+
 class Ship extends Circle{
 	constructor(x,y, angle, color, id,engine, roomSig){
 		super(x, y, c.playerBaseRadius, color);
 		this.baseHealth = c.playerBaseHealth;
 		this.health = this.baseHealth;
 
+		this.passives = [];
 		this.enabled = true;
 		this.isShip = true;
 
@@ -1205,6 +1208,75 @@ class Ship extends Circle{
 		this.weapon.equip();
 		var data = compressor.equipItem(this.weapon);
 		messenger.messageRoomBySig(this.roomSig,"equipItem",data);
+	}
+	applyPassive(passiveInt){
+		if(this.passives[passiveInt] == c.passivesEnum.HealthBoost){
+			this.baseHealth = c.playerBaseHealth + 15;
+			this.health = this.baseHealth;
+			messenger.messageRoomBySig(this.roomSig,"shipHealth",{health:this.health,id:this.id});
+		}
+		if(this.passives[passiveInt] == c.passivesEnum.PowerBoost){
+			this.basePower = c.playerBasePower + 15;
+			this.power = this.basePower;
+			messenger.messageRoomBySig(this.roomSig,"shipPower",{power:this.power,id:this.id});
+		}
+	}
+	removePassive(passiveInt){
+		if(this.passives[passiveInt] == c.passivesEnum.HealthBoost){
+			this.baseHealth = c.playerBaseHealth
+			this.health = this.baseHealth;
+			messenger.messageRoomBySig(this.roomSig,"shipHealth",{health:this.health,id:this.id});
+		}
+		if(this.passives[passiveInt] == c.passivesEnum.PowerBoost){
+			this.basePower = c.playerBasePower;
+			this.power = this.basePower;
+			messenger.messageRoomBySig(this.roomSig,"shipPower",{power:this.power,id:this.id});
+		}
+	}
+
+	equipPassive(newPassive,oldPassive){
+		if(this.passives.length == 2){
+			this.swapPassive(newPassive,oldPassive);
+			return;
+		}
+		var newEquip;
+		for(var pass in c.passivesEnum){
+			if(newPassive == c.passivesEnum[pass]){
+				newEquip = newPassive;
+			}
+		}
+		if(newEquip == null){
+			console.log("Error: Tried to equip a passive that is not in enum");
+			return;
+		}
+		this.passives.push(newEquip);
+		this.applyPassive(newEquip);
+
+	}
+	isPassiveEquiped(passiveInt){
+		for(var i=0;i<2;i++){
+			if(this.passives[i] == passiveInt){
+				return true;
+			}
+		}
+		return false;
+	}
+	swapPassive(newPassive,oldPassive){
+		if(oldPassive == null){
+			return;
+		}
+		if(this.isPassiveEquiped(newPassive)){
+			console.log("Error: Tried to equip a passive that is already equiped");
+			return;
+		};
+		if(!this.isPassiveEquiped(oldPassive)){
+			console.log("Error: Tried to swap a passive that isn't currently equiped");
+			return;
+		}
+		var index = this.passives.indexOf(oldPassive);
+		this.removePassive(index);
+		this.passives[index] = newPassive;
+		this.applyPassive(index);
 	}
 
 	equip(item){

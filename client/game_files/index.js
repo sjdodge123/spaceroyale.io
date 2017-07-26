@@ -37,7 +37,7 @@ var server = null,
     toastMessage = null,
     totalPlayers = null,
     myShip = null,
-    healthLastFrame = 100,
+    healthLastFrame = 0,
     newWidth = 0,
     newHeight = 0,
     joystickMovement = null,
@@ -60,9 +60,6 @@ var firstPassiveSelected,
     clickedPassive;
 
 window.onload = function() {
-
-    firstPassiveSelected
-
     server = clientConnect();
     pingServer();
     setupPage();
@@ -80,8 +77,6 @@ function setupPage(){
     weaponArray.push({image:'sprites/blaster.svg',value:"Blaster",title:"Blaster"});
     weaponArray.push({image:'sprites/mass_driver.svg',value:"MassDriver",title:"Mass Driver"});
     weaponArray.push({image:'sprites/particle_beam.svg',value:"ParticleBeam",title:"Particle Beam"});
-
-    buildPassiveList();
 
     $('#firstPassive').click(function(e){
         clickedPassive = $(e.target);
@@ -469,10 +464,11 @@ function buildPassiveList(){
     passiveArray = [];
     firstPassiveSelected = $('#firstPassive').attr('data-selected');
     secondPassiveSelected = $('#secondPassive').attr('data-selected');
-    passiveArray.push({image:'sprites/items/health_item.svg',value:"HPBoost",title:"HPBoost - Health Stat increase"});
-    passiveArray.push({image:'sprites/items/blaster_item.svg',value:"DMGBoost",title:"DMGBoost - Damage Stat increase"});
-    passiveArray.push({image:'sprites/items/mass_driver_item.svg',value:"LuckBoost",title:"LuckBoost - Looting % Stat increase"});
-    passiveArray.push({image:'sprites/items/photon_cannon_item.svg',value:"RegenBoost",title:"RegenBoost - Regen Stat increase"});
+
+    passiveArray.push({image:'sprites/items/health_item.svg',value:"0",title:"Health Boost +15 Base Health"});
+    passiveArray.push({image:'sprites/items/shield_item.svg',value:"1",title:"Power Boost +15 Base Power"});
+    passiveArray.push({image:'sprites/items/mass_driver_item.svg',value:"2",title:"Glass Cannon -15 BaseHealth,+15% Damage"});
+    passiveArray.push({image:'sprites/items/photon_cannon_item.svg',value:"3",title:"Running Riot +1% Damage for every killing blow"});
     var passiveList = document.getElementById("passive-list");
     var elements = $('#passive-list').children();
     $(elements).each(function(){
@@ -496,8 +492,11 @@ function buildPassiveList(){
         $(innnerDiv).addClass('passive');
         $(img).click(function(e){
             var newEquip = $(e.target);
+            var oldPassive = clickedPassive.attr('data-selected');
             clickedPassive.attr('src',newEquip.attr('src'));
             clickedPassive.attr('data-selected',newEquip.attr('data-selected'));
+            clickedPassive.attr('title',newEquip.attr('title'));
+            clientSendMessage('passiveChanged',{newPassive:newEquip.attr('data-selected'),oldPassive:oldPassive});
             buildPassiveList();
         });
         $(div).addClass('col-3');
@@ -519,6 +518,9 @@ function enterLobby(name,color){
 }
 
 function init(){
+    buildPassiveList();
+    clientSendMessage('passiveChanged',{newPassive:$('#firstPassive').attr('data-selected'),oldPassive:null});
+    clientSendMessage('passiveChanged',{newPassive:$('#secondPassive').attr('data-selected'),oldPassive:null});
     timeOutChecker = setInterval(checkForTimeout,1000);
     animloop();
     uiCanvas.addEventListener("mousemove", calcMousePos, false);

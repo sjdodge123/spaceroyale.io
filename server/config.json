@@ -74,8 +74,8 @@
     "playerSpawnWeapon":"Blaster",
     "playerSpawnWeaponLevel":1,
 
-    "playerBaseHealth":100,
-    "playerBasePower":100,
+    "playerBaseHealth":85,
+    "playerBasePower":85,
     "playerPowerRegenRate":500,
     "playerPowerRegenAmt":10,
 
@@ -136,6 +136,14 @@
 
     "quadTreeMaxCount": 70,
     "quadTreeMaxDepth": 2,
+
+
+    "passivesEnum":{
+        "HealthBoost":0,
+        "PowerBoost":1,
+        "GlassCannon":2,
+        "RunningRiot":3
+    },
 
     "sqlinfo":{
       "connectionLimit": 100,

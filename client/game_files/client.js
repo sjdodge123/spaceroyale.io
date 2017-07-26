@@ -300,6 +300,22 @@ function clientConnect() {
 		shipList[packet.id].health = packet.health;
 	});
 
+	server.on('shipPower',function(packet){
+		if(packet == null){
+			return;
+		}
+		if(packet.id == null){
+			return;
+		}
+		if(packet.power == null){
+			return;
+		}
+		if(shipList[packet.id] == null){
+			return;
+		}
+		shipList[packet.id].power = packet.power;
+	});
+
 	server.on('shipsRegenerating',function(packet){
 		if(packet == null){
 			return;

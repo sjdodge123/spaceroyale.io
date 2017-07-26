@@ -201,6 +201,24 @@ function checkForMail(client){
 		ship.stopGadget = true;
 	});
 
+	client.on('passiveChanged',function(packet){
+		if(packet == null){
+			return;
+		}
+		if(packet.newPassive == null){
+			return;
+		}
+		var room = getRoomFromId(client.id);
+		if(room == undefined){
+			return;
+		}
+		var ship = room.shipList[client.id];
+		if(ship == null){
+			return;
+		}
+		ship.equipPassive(packet.newPassive,packet.oldPassive);
+	});
+
 	client.on('drip',function(){
   		client.emit('drop');
   	});
