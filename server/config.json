@@ -133,7 +133,13 @@
     "droneHackDuration":3000,
     "droneHackStopChance":2,
 
-
+    "forceShieldDrawRadius":30,
+    "forceShieldRadius": 25,
+    "forceShieldHeight": 5,
+    "forceShieldOrbitR": 55,
+    "forceShieldHealth": 40,
+    "forceShieldRegenRate": 3,
+    
     "quadTreeMaxCount": 70,
     "quadTreeMaxDepth": 2,
 

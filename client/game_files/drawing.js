@@ -631,7 +631,14 @@ function drawItem(item){
 }
 
 function drawGadget(gadget){
+	var color;
 	gameContext.save();
+	if(shipList[gadget.owner] == null){
+		color = '#C0C0C0';
+	} else{
+		color = shipList[gadget.owner].color;
+	}
+
 	switch(gadget.type){
 		case "Pulse":{
 			gameContext.beginPath();
@@ -647,6 +654,14 @@ function drawGadget(gadget){
 			gameContext.fillStyle = "orange";
 			gameContext.arc(gadget.x-myShip.x+camera.xOffset,gadget.y-myShip.y+camera.yOffset,gadget.radius,0,Math.PI*2,true);
 			gameContext.fill();
+			break;
+		}
+		case "ForceShield":{
+			gameContext.beginPath();
+			gameContext.lineWidth = 5;
+			gameContext.strokeStyle = color;
+			gameContext.arc(gadget.x-myShip.x+camera.xOffset,gadget.y-myShip.y+camera.yOffset,config.forceShieldDrawRadius,((gadget.angle + 90)*Math.PI/180) + Math.PI/4,((gadget.angle + 90)*Math.PI/180) - Math.PI/4,true);
+			gameContext.stroke();
 			break;
 		}
 		default:{

@@ -161,6 +161,7 @@ exports.gadgetActivated = function(objects){
 	packet[1] = objects.type;
 	packet[2] = objects.x;
 	packet[3] = objects.y;
+	packet[4] = objects.owner;
 	packet = JSON.stringify(packet);
 	return packet;
 }

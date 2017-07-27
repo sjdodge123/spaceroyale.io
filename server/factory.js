@@ -1156,7 +1156,7 @@ class Ship extends Circle{
 		this.regenRate = c.playerHealthRegenRate;
 		this.regenerating = false;
 
-		this.gadget = new HackingDrone(this.engine,this.id);
+		this.gadget = new DirectionalShield(this.engine,this.id);
 
 		if(c.playerSpawnWeapon == "Blaster"){
 			this.weapon = new Blaster(this.id);
@@ -1595,8 +1595,9 @@ class Ship extends Circle{
 }
 
 class Gadget {
-	constructor(engine){
+	constructor(engine, owner){
 		this.engine = engine;
+		this.owner = owner;
 		this.cooldown = 5*1000;
 		this.cooldownTimer = Date.now() - this.cooldown;
 	}
@@ -1611,9 +1612,33 @@ class Gadget {
 	}
 }
 
+class DirectionalShield extends Gadget{
+	constructor(engine, owner){
+		super(engine, owner);
+		this.shieldOrbitR = c.forceShieldOrbitR;
+		this.shieldHealth = c.forceShieldHealth;
+		this.shieldRegenR = c.forceShieldRegenRate;
+		this.shieldRadius  = c.forceShieldRadius;
+
+		this.activeShield = null;
+		this.cooldown = 1*1000;
+	}
+	activate(x,y,angle){
+		if(super.activate()){
+			this.activeShield = new ForceShield(x,y,this.shieldRadius,this.shieldOrbitR,"blue",this.shieldHealth,angle,this.owner);
+			return this.activeShield;
+		}
+	}
+	deactivate(x,y){
+		if(super.activate()){
+			this.activeShield.alive = false;
+		}
+	}
+}
+
 class PulseWave extends Gadget{
-	constructor(engine){
-		super(engine);
+	constructor(engine, owner){
+		super(engine, owner);
 		this.pulseRadius = c.pulseRadius;
 		this.duration = 1*1000;
 	}
@@ -1628,8 +1653,7 @@ class PulseWave extends Gadget{
 
 class HackingDrone extends Gadget{
 	constructor(engine,owner){
-		super(engine);
-		this.owner = owner;
+		super(engine, owner);
 		this.cooldown = c.droneCooldown;
 		this.cooldownTimer = Date.now() - this.cooldown;
 		this.duration = 200;
@@ -1643,7 +1667,7 @@ class HackingDrone extends Gadget{
 }
 
 class GadgetObject extends Circle{
-	constructor(x,y,radius,color){
+	constructor(x,y,radius,color, owner){
 		super(x,y,radius,color);
 		this.type = "Unset";
 		this.alive = true;
@@ -1654,6 +1678,7 @@ class GadgetObject extends Circle{
 		this.newY = this.y;
 		this.speed = 5;
 		this.isStatic = true;
+		this.owner = owner;
 		
 	}
 	update(){
@@ -1670,11 +1695,70 @@ class GadgetObject extends Circle{
 	}
 }
 
+class ForceShield extends GadgetObject{
+	constructor(x,y,radius,orbit,color,health,angle,owner){
+		var shieldX = x + (orbit/2) * Math.cos((angle + 90) * Math.PI/180);
+		var shieldY = y + (orbit/2) * Math.sin((angle + 90) * Math.PI/180);
+		super(shieldX,shieldY,radius,color, owner);
+		this.type = "ForceShield";
+		this.orbit = orbit;
+		this.spawnDate = Date.now();
+		this.health = health;
+		this.angle = angle;
+		this.isStatic = false;
+		this.attached = true;
+		this.newX = x;
+		this.newY = y;
+	}
+	update(){
+		this.x = this.newX + (this.orbit/2) * Math.cos((this.angle + 90) * Math.PI/180);
+		this.y = this.newY + (this.orbit/2) * Math.sin((this.angle + 90) * Math.PI/180);
+	}
+
+	checkHP(){
+		/*
+		var timeElapsed = Date.now() - this.regenTimer;
+		if (timeElapsed > this.regenTimeout){
+			this.regenHealth();
+		}
+		*/
+		if(this.health < 1){
+			this.alive = false;
+		}
+	}
+
+	handleHit(object){
+		if(!this.alive){
+			return;
+		}
+		if(object.isNebula){
+			return;
+		}
+		if(object.owner == this.owner){
+			return;
+		}
+		if(object.id == this.owner){
+			return;
+		}
+		if(object.alive && object.damage != null){
+			this.takeDamage(object.damage);
+		}
+	}
+	takeDamage(damage){
+		/*
+		this.regenerating = false;
+		this.regenTimer = Date.now();
+		*/
+		this.health -= Math.abs(damage);
+		this.checkHP();
+	}
+}
+
+
 class Drone extends GadgetObject{
 	constructor(x,y,radius,color,duration,angle,owner){
-		super(x,y,radius,color);
+		super(x,y,radius,color, owner);
 		this.type = "Drone";
-		this.owner = owner;
 		this.angle = angle;
 		this.isStatic = false;
 		this.spawnDate = Date.now();
@@ -1790,8 +1874,8 @@ class Drone extends GadgetObject{
 }
 
 class Pulse extends GadgetObject{
-	constructor(x,y,radius,color,duration){
-		super(x,y,radius,color);
+	constructor(x,y,radius,color,duration, owner){
+		super(x,y,radius,color, owner);
 		this.type = "Pulse";
 		this.spawnDate = Date.now();
 		this.duration = c.pulseDuration;

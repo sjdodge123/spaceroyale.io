@@ -38,8 +38,8 @@ class Engine {
 	update(dt){
 		this.dt = dt;
 		this.updateBullets();
-		this.updateGadgets();
 		this.updateShips();
+		this.updateGadgets();
 	}
 
 	updateBullets(){
@@ -66,6 +66,15 @@ class Engine {
 			if(gadget.isStatic){
 				continue;
 			}
+
+			if(gadget.attached){
+				var ship = this.shipList[gadget.owner];
+				gadget.newX = ship.newX;
+				gadget.newY = ship.newY;
+				gadget.angle = ship.weapon.angle;
+				continue;
+			}
+
 			gadget.velX = Math.cos((gadget.angle+90)*(Math.PI/180))*gadget.speed;
 			gadget.velY = Math.sin((gadget.angle+90)*(Math.PI/180))*gadget.speed;
 			gadget.newX += gadget.velX * this.dt;

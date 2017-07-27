@@ -470,12 +470,16 @@ function gadgetActivated(packet){
 		gadgetList[packet[0]].type = packet[1];
 		gadgetList[packet[0]].x = packet[2];
 		gadgetList[packet[0]].y = packet[3];
+		gadgetList[packet[0]].owner = packet[4];
 
 		if(gadgetList[packet[0]].type == "Pulse"){
 			gadgetList[packet[0]].radius = config.pulseRadius;
 		}
 		if(gadgetList[packet[0]].type == "Drone"){
 			gadgetList[packet[0]].radius = config.droneRadius;
+		}
+		if(gadgetList[packet[0]].type == "ForceShield"){
+			gadgetList[packet[0]].radius = config.forceShieldRadius;
 		}
 	}
 }
