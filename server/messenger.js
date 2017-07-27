@@ -70,7 +70,7 @@ function checkForMail(client){
 		var roomSig = hostess.findARoom(client.id);
 		var room = hostess.joinARoom(roomSig,client.id);
 		var name = bouncer.trimName(message.name);
-		console.log(name + " joined Room"+roomSig);
+		console.log(name + " joined Room "+roomSig);
 
 		//Add this player to the list of current clients in the room
 		room.clientList[client.id] = name;
@@ -98,7 +98,7 @@ function checkForMail(client){
 			ship:appendShipData
 		};
 		client.broadcast.to(roomSig).emit("playerJoin",appendPlayerList);
-		toastPlayer(client.id,"Joined Room" +  roomSig);
+		toastPlayer(client.id,"Joined Room " +  roomSig);
 	});
 
 	client.on('playerLeaveRoom',function(){

@@ -39,7 +39,7 @@ class Room {
 		this.clientCount++;
 	}
 	leave(clientID){
-		console.log(this.clientList[clientID] + ' left Room' + this.sig);
+		console.log(this.clientList[clientID] + ' left Room ' + this.sig);
 		if(this.shipList[clientID] != undefined){
 			database.recordShip(clientID,this.shipList[clientID]);
 		} else{
