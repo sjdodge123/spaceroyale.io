@@ -147,10 +147,6 @@
 
     "sqlinfo":{
       "connectionLimit": 100,
-      "host": "spdbdev.cj1qbrqikxsw.us-east-1.rds.amazonaws.com",
-      "user": "blackbeard",
-      "password": "kLl77d&m",
-      "database": "queenanne",
       "debug": false
     }
 }

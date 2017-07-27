@@ -3,6 +3,19 @@ var fs = require('fs');
 var lastFrame = new Date();
 var c = require('./config.json');
 
+if(process.env.SRIO_ENV == "DEV"){
+    var d = require('./devConfig.json');
+    if(d.override == true){
+        for(var setting in c){
+            if(d[setting] != null){
+                c[setting] = d[setting];
+            }
+        }
+    }
+}
+loadDBInfo();
+
+
 exports.getRandomInt = function(min,max){
 		min = Math.ceil(min);
 		max = Math.floor(max);
@@ -40,17 +53,30 @@ exports.getDT = function(){
 	return dt/1000;
 }
 exports.loadConfig = function(){
-    if(process.env.SRIO_ENV == "DEV"){
-        var d = require('./devConfig.json');
-        if(d.override == true){
-            for(var setting in c){
-                if(d[setting] != null){
-                    c[setting] = d[setting];
-                }
-            }
-        }
-    }
     return c;
+}
+
+function loadDBInfo(){
+    if(process.env.SRIO_DB_HOST == null){
+        console.log("Could not connect to database. SRIO_DB_HOST not set.");
+        return;
+    }
+    if(process.env.SRIO_DB_NAME == null){
+        console.log("Could not connect to database. SRIO_DB_NAME not set.");
+        return;
+    }
+    if(process.env.SRIO_DB_USER == null){
+        console.log("Could not connect to database. SRIO_DB_USER not set.");
+        return;
+    }
+    if(process.env.SRIO_DB_PASS == null){
+        console.log("Could not connect to database. SRIO_DB_PASS not set.");
+        return;
+    }
+    c.sqlinfo.host = process.env.SRIO_DB_HOST;
+    c.sqlinfo.database = process.env.SRIO_DB_NAME;
+    c.sqlinfo.user = process.env.SRIO_DB_USER;
+    c.sqlinfo.password = process.env.SRIO_DB_PASS;
 }
 
 class Timer {
