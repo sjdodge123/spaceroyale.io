@@ -60,10 +60,9 @@ overdriveItemSVG.src = "sprites/items/overdrive_item.svg";
 var bulletSVG = new Image();
 bulletSVG.src = "sprites/bullet_sheet.svg";
 
-/*
 var beamSVG = new Image();
 beamSVG.src = "sprites/beam_sheet.svg";
-*/
+
 class SpriteSheet {
 	constructor(image,x,y,frameWidth,frameHeight,rows,columns){
 		this.image = image;
@@ -104,7 +103,7 @@ var asteroidSheet = new SpriteSheet(asteroidSVG,0,0,500,500,3,3);
 var nebulaSheet = new SpriteSheet(nebulaSVG,0,0,500,500,1,1);
 var tradeShipSheet = new SpriteSheet(tradeShipSVG,0,0,200,600,1,1);
 var bulletSheet = new SpriteSheet(bulletSVG,0,0,26,62,1,5);
-//var beamSheet = new SpriteSheet(beamSVG,0,0,26,62,1,1);
+var beamSheet = new SpriteSheet(beamSVG,0,0,26,62,1,5);
 
 var lastLobbyTime = null;
 
@@ -732,42 +731,81 @@ function drawBullet(bullet){
 		color = shipList[bullet.owner].color;
 	}
 
+	switch(bullet.weaponName){
+		default:{
+			drawTrail(bullet.trail);
 
-	drawTrail(bullet.trail);
+			switch(color){
+				default: {
+					bulletSheet.changeFrame(0,4);
+					break;
+				}
+				case 'red':{
+					bulletSheet.changeFrame(0,1);
+					break;
+				}
+				case 'green':{
+					bulletSheet.changeFrame(0,2);
+					break;
+				}
+				case '#ff00bf':{
+					bulletSheet.changeFrame(0,3);
+					break;
+				}
+				case '#66b3ff':{
+					bulletSheet.changeFrame(0,0);
+					break;
+				}
+			}
 
-	switch(color){
-		default: {
-			bulletSheet.changeFrame(0,4);
+			gameContext.save();
+			gameContext.translate(bullet.x-myShip.x+camera.xOffset,bullet.y-myShip.y+camera.yOffset);
+			gameContext.rotate(bullet.angle*Math.PI/180);
+			bulletSheet.move(0,0);
+			bulletSheet.draw(2*bullet.width, 2*bullet.height);
+			/*
+			gameContext.fillStyle = color;
+			gameContext.fillRect(-bullet.width/2,-bullet.height/2,bullet.width,bullet.height);
+			*/
+			gameContext.restore();
 			break;
-		}
-		case 'red':{
-			bulletSheet.changeFrame(0,1);
-			break;
-		}
-		case 'green':{
-			bulletSheet.changeFrame(0,2);
-			break;
-		}
-		case '#ff00bf':{
-			bulletSheet.changeFrame(0,3);
-			break;
-		}
-		case '#66b3ff':{
-			bulletSheet.changeFrame(0,0);
+			}
+
+		case "ParticleBeam":{
+			switch(color){
+				default: {
+					beamSheet.changeFrame(0,4);
+					break;
+				}
+				case 'red':{
+					beamSheet.changeFrame(0,1);
+					break;
+				}
+				case 'green':{
+					beamSheet.changeFrame(0,2);
+					break;
+				}
+				case '#ff00bf':{
+					beamSheet.changeFrame(0,3);
+					break;
+				}
+				case '#66b3ff':{
+					beamSheet.changeFrame(0,0);
+					break;
+				}
+			}
+
+			gameContext.save();
+			gameContext.translate(bullet.x-myShip.x+camera.xOffset,bullet.y-myShip.y+camera.yOffset);
+			gameContext.rotate(bullet.angle*Math.PI/180);
+			beamSheet.move(0,0);
+			beamSheet.draw(bullet.width, bullet.height);
+
+			gameContext.restore();
 			break;
 		}
 	}
-
-	gameContext.save();
-	gameContext.translate(bullet.x-myShip.x+camera.xOffset,bullet.y-myShip.y+camera.yOffset);
-	gameContext.rotate(bullet.angle*Math.PI/180);
-	bulletSheet.move(0,0);
-	bulletSheet.draw(2*bullet.width, 2*bullet.height);
-	/*
-	gameContext.fillStyle = color;
-	gameContext.fillRect(-bullet.width/2,-bullet.height/2,bullet.width,bullet.height);
-	*/
-	gameContext.restore();
+	
 }
 function drawTrail(trail){
 	

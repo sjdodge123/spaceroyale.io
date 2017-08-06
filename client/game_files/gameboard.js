@@ -22,6 +22,9 @@ function updateShips(){
 function updateBullets(){
 	for(var sig in bulletList){
 		var bullet = bulletList[sig];
+		if (bullet.weaponName == "ParticleBeam"){
+			continue;
+		}
 		bullet.trail.update({x:bullet.x, y:bullet.y});
 	}
 }
@@ -441,6 +444,7 @@ function weaponFired(payload){
 		bullet = payload[i];
 		if(bulletList[bullet[0]] == null){
 			bulletList[bullet[0]] = {};
+			bulletList[bullet[0]].weaponName = weaponName;
 			bulletList[bullet[0]].velX = 0;
 			bulletList[bullet[0]].velY = 0;
 			bulletList[bullet[0]].owner = id;
