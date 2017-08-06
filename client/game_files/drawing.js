@@ -63,6 +63,9 @@ bulletSVG.src = "sprites/bullet_sheet.svg";
 var beamSVG = new Image();
 beamSVG.src = "sprites/beam_sheet.svg";
 
+var beamDotSVG = new Image();
+beamDotSVG.src = "sprites/beamDot_sheet.svg";
+
 class SpriteSheet {
 	constructor(image,x,y,frameWidth,frameHeight,rows,columns){
 		this.image = image;
@@ -104,6 +107,7 @@ var nebulaSheet = new SpriteSheet(nebulaSVG,0,0,500,500,1,1);
 var tradeShipSheet = new SpriteSheet(tradeShipSVG,0,0,200,600,1,1);
 var bulletSheet = new SpriteSheet(bulletSVG,0,0,26,62,1,5);
 var beamSheet = new SpriteSheet(beamSVG,0,0,26,62,1,5);
+var beamDotSheet = new SpriteSheet(beamDotSVG,0,0,47,47,1,5);
 
 var lastLobbyTime = null;
 
@@ -775,22 +779,27 @@ function drawBullet(bullet){
 			switch(color){
 				default: {
 					beamSheet.changeFrame(0,4);
+					beamDotSheet.changeFrame(0,4);
 					break;
 				}
 				case 'red':{
 					beamSheet.changeFrame(0,1);
+					beamDotSheet.changeFrame(0,1);
 					break;
 				}
 				case 'green':{
 					beamSheet.changeFrame(0,2);
+					beamDotSheet.changeFrame(0,2);
 					break;
 				}
 				case '#ff00bf':{
 					beamSheet.changeFrame(0,3);
+					beamDotSheet.changeFrame(0,3);
 					break;
 				}
 				case '#66b3ff':{
 					beamSheet.changeFrame(0,0);
+					beamDotSheet.changeFrame(0,0);
 					break;
 				}
 			}
@@ -801,6 +810,9 @@ function drawBullet(bullet){
 			beamSheet.move(0,0);
 			beamSheet.draw(bullet.width, bullet.height);
 
+			gameContext.translate(0,bullet.height/2);
+			beamDotSheet.move(0,0);
+			beamDotSheet.draw(bullet.width*2, bullet.width*2);
 			gameContext.restore();
 			break;
 		}
