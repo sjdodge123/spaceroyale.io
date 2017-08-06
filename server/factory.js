@@ -2336,11 +2336,13 @@ class Blaster extends Weapon{
 		}
 		var bullets = [];
 		if(this.level > 1){
-			var bull1 = new Bullet(x,y,this.bulletWidth,this.bulletHeight, angle, color, id);
+			var sprayAngle = utils.getRandomInt(-5,5);
+			var bull1 = new Bullet(x,y,this.bulletWidth,this.bulletHeight, angle + sprayAngle, color, id);
 			bull1.speed -= bull1.speed * .15;
 			bullets.push(bull1);
 		}
-		bullets.push(new Bullet(x,y,this.bulletWidth,this.bulletHeight, angle, color, id));
+		var sprayAngle = utils.getRandomInt(-5,5);
+		bullets.push(new Bullet(x,y,this.bulletWidth,this.bulletHeight, angle + sprayAngle, color, id));
 		return bullets;
 	}
 	upgrade(){

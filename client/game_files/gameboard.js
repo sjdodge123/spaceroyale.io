@@ -1,5 +1,6 @@
 function updateGameboard(){
 	updateShips();
+	updateBullets();
 	updateItems();
 	updateTradeShips();
 	updateGadgets();
@@ -14,6 +15,14 @@ function updateShips(){
 		else{
 			ship.spriteAngle = 0;
 		}
+		ship.trail.update({x:ship.x, y:ship.y});
+	}
+}
+
+function updateBullets(){
+	for(var sig in bulletList){
+		var bullet = bulletList[sig];
+		bullet.trail.update({x:bullet.x, y:bullet.y});
 	}
 }
 
@@ -148,9 +157,14 @@ function createShip(dataArray,isAI){
 	shipList[index].health = config.playerBaseHealth;
 	shipList[index].radius = config.playerBaseRadius;
 	shipList[index].id = dataArray[0];
-	shipList[index].x = dataArray[1];
-	shipList[index].y = dataArray[2];
-	shipList[index].color = dataArray[3];
+	var shipX, shipY, shipColor;
+	shipX = dataArray[1];
+	shipY = dataArray[2];
+	shipColor = dataArray[3];
+
+	shipList[index].x = shipX;
+	shipList[index].y = shipY;
+	shipList[index].color = shipColor;
 	shipList[index].weapon = {}
 	shipList[index].weapon.chargeLevel = 0;
 	shipList[index].weapon.angle = dataArray[4];
@@ -160,6 +174,7 @@ function createShip(dataArray,isAI){
 	if(isAI){
 		shipList[index].AIName = dataArray[8]
 	}
+	shipList[index].trail = new Trail({x:shipX, y:shipY}, 10, 20, shipColor, 0.35, 'circle');
 }
 
 function updateShipList(packet){
@@ -418,6 +433,9 @@ function weaponFired(payload){
 	if(shipList[id] == null){
 		ship = tradeShipList[id];
 	}
+	if (ship == null){
+		return;
+	}
 
 	for(i=4;i<numBullets+4;i++){
 		bullet = payload[i];
@@ -426,12 +444,19 @@ function weaponFired(payload){
 			bulletList[bullet[0]].velX = 0;
 			bulletList[bullet[0]].velY = 0;
 			bulletList[bullet[0]].owner = id;
-			bulletList[bullet[0]].x = bullet[1];
-			bulletList[bullet[0]].y = bullet[2];
+			
+			var bulletX, bulletY, bulletWidth;
+			bulletX     = bullet[1];
+			bulletY     = bullet[2];
+			bulletWidth = bullet[5];
+			bulletList[bullet[0]].x = bulletX;
+			bulletList[bullet[0]].y = bulletY;
+			bulletList[bullet[0]].width = bulletWidth;
+
 			bulletList[bullet[0]].angle = bullet[3];
 			bulletList[bullet[0]].speed = bullet[4];
-			bulletList[bullet[0]].width = bullet[5];
 			bulletList[bullet[0]].height = bullet[6];
+			bulletList[bullet[0]].trail = new Trail({x:bulletX, y:bulletY}, 10, bulletWidth, ship.color, 0.4, 'line');
 		}
 	}
 	
@@ -483,3 +508,95 @@ function gadgetActivated(packet){
 		}
 	}
 }
+
+class Trail {
+	constructor(initialPosition, length, lineWidth, color, alphaStart, type){
+		this.vertices = [];
+		this.length = length;
+		for (var i = 0; i < this.length; i++){
+			this.vertices.push(initialPosition);
+		}
+		this.lineWidth = lineWidth;
+		this.alphaStart = alphaStart;
+		this.colorPrefix  = null;
+		this.initialColor = null;
+		this.colorToRGBA(color);
+		this.type = type;
+	}
+	update(currentPosition){
+		for (var i = this.length - 1; i > 0; i--){
+			this.vertices[i] = this.vertices[i-1];
+		}
+		this.vertices[0] = currentPosition;
+	}
+	colorToRGBA(color){
+		switch(color){
+			default: {
+				this.colorPrefix  = 'rgba(167,167,167, ';
+				break;
+			}
+			case 'red':{
+				this.colorPrefix  = 'rgba(255,0,0, ';
+				break;
+			}
+			case 'green':{
+				this.colorPrefix  = 'rgba(0,255,0, ';
+				break;
+			}
+			case '#ff00bf':{
+				this.colorPrefix  = 'rgba(255,0,191, ';
+				break;
+			}
+			case '#66b3ff':{
+				this.colorPrefix  = 'rgba(102,179,255, ';
+				break;
+			}
+		}
+		this.initialColor = this.colorPrefix + this.alphaStart.toString() + ')';
+	}
+}
+	/*
+	draw(){
+		switch(this.type){
+			case 'circle':{
+				var colorprefix = 'rgba(255,255,255, ';
+				for (var i = 0; i < this.length; i++){
+				//for (var i = this.length - 1; i >= 0; i--){
+					var point = this.vertices[i];
+					var alpha = Math.round(100 * (this.length - 1 - i) / (this.length - 1)) / 100; //note that there are this.length - 1 line segments. note, won't round up on .005
+					var nextColor = colorprefix + alpha.toString() + ')';
+					canvasContext.save();
+					canvasContext.beginPath();
+					canvasContext.arc(point.x, point.y, 25, 0, Math.PI * 2, true);
+					canvasContext.fillStyle = nextColor;
+					canvasContext.fill();
+					canvasContext.restore();
+				}
+				break;
+			}
+			case 'line':{
+				canvasContext.save();
+				canvasContext.beginPath();
+				canvasContext.lineWidth = 15;
+				canvasContext.moveTo(this.vertices[0].x,this.vertices[0].y);
+				var colorprefix = 'rgba(255,255,255, ';
+				var previousColor = 'rgba(255,255,255, 1)';
+				for (var i = 1; i < this.length; i++){
+					var lastPoint = this.vertices[i-1];
+					var point = this.vertices[i];
+					var gradient = canvasContext.createLinearGradient(lastPoint.x, lastPoint.y, point.x, point.y);
+					var alpha = Math.round(100 * (this.length - 1 - i) / (this.length - 1)) / 100; //note that there are this.length - 1 line segments. note, won't round up on .005
+					var nextColor = colorprefix + alpha.toString() + ')';
+					gradient.addColorStop(0, previousColor); //start color
+					gradient.addColorStop(1, nextColor); //end color
+					previousColor = nextColor;
+					canvasContext.strokeStyle = gradient;
+					canvasContext.lineTo(point.x, point.y);
+					canvasContext.stroke();
+				}
+				canvasContext.restore();
+				break;
+			}
+		}
+	}
+	*/

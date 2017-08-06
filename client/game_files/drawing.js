@@ -57,7 +57,13 @@ healthItemSVG.src = "sprites/items/health_item.svg";
 var overdriveItemSVG = new Image();
 overdriveItemSVG.src = "sprites/items/overdrive_item.svg";
 
+var bulletSVG = new Image();
+bulletSVG.src = "sprites/bullet_sheet.svg";
 
+/*
+var beamSVG = new Image();
+beamSVG.src = "sprites/beam_sheet.svg";
+*/
 class SpriteSheet {
 	constructor(image,x,y,frameWidth,frameHeight,rows,columns){
 		this.image = image;
@@ -97,6 +103,8 @@ var planetSheet = new SpriteSheet(planetSVG,0,0,500,500,1,2);
 var asteroidSheet = new SpriteSheet(asteroidSVG,0,0,500,500,3,3);
 var nebulaSheet = new SpriteSheet(nebulaSVG,0,0,500,500,1,1);
 var tradeShipSheet = new SpriteSheet(tradeShipSVG,0,0,200,600,1,1);
+var bulletSheet = new SpriteSheet(bulletSVG,0,0,26,62,1,5);
+//var beamSheet = new SpriteSheet(beamSVG,0,0,26,62,1,1);
 
 var lastLobbyTime = null;
 
@@ -443,6 +451,8 @@ function drawShip(ship){
 		drawShield(ship);
 	}
 
+	drawTrail(ship.trail);
+	
 	gameContext.save();
 	gameContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
 	gameContext.rotate(ship.spriteAngle*Math.PI/180);
@@ -660,6 +670,7 @@ function drawGadget(gadget){
 			gameContext.beginPath();
 			gameContext.lineWidth = 5;
 			gameContext.strokeStyle = color;
+			//gameContext.arc(gadget.x-myShip.x+camera.xOffset,gadget.y-myShip.y+camera.yOffset,config.forceShieldRadius,0, Math.PI*2,true);
 			gameContext.arc(gadget.x-myShip.x+camera.xOffset,gadget.y-myShip.y+camera.yOffset,config.forceShieldDrawRadius,((gadget.angle + 90)*Math.PI/180) + Math.PI/4,((gadget.angle + 90)*Math.PI/180) - Math.PI/4,true);
 			gameContext.stroke();
 			break;
@@ -720,12 +731,88 @@ function drawBullet(bullet){
 	} else{
 		color = shipList[bullet.owner].color;
 	}
+
+
+	drawTrail(bullet.trail);
+
+	switch(color){
+		default: {
+			bulletSheet.changeFrame(0,4);
+			break;
+		}
+		case 'red':{
+			bulletSheet.changeFrame(0,1);
+			break;
+		}
+		case 'green':{
+			bulletSheet.changeFrame(0,2);
+			break;
+		}
+		case '#ff00bf':{
+			bulletSheet.changeFrame(0,3);
+			break;
+		}
+		case '#66b3ff':{
+			bulletSheet.changeFrame(0,0);
+			break;
+		}
+	}
+
 	gameContext.save();
 	gameContext.translate(bullet.x-myShip.x+camera.xOffset,bullet.y-myShip.y+camera.yOffset);
 	gameContext.rotate(bullet.angle*Math.PI/180);
+	bulletSheet.move(0,0);
+	bulletSheet.draw(2*bullet.width, 2*bullet.height);
+	/*
 	gameContext.fillStyle = color;
 	gameContext.fillRect(-bullet.width/2,-bullet.height/2,bullet.width,bullet.height);
+	*/
 	gameContext.restore();
+}
+function drawTrail(trail){
+	
+	switch(trail.type){
+		case 'circle':{
+			var minRadius = 0.5 * trail.lineWidth;
+			var rDiff = trail.lineWidth -  minRadius;
+			for (var i = 0; i < trail.length; i++){
+				var point = trail.vertices[i];
+				var alpha = Math.round(trail.alphaStart * 100 * (trail.length - 1 - i) / (trail.length - 1)) / 100; //note that there are trail.length - 1 line segments. note, won't round up on .005
+				var nextColor = trail.colorPrefix + alpha.toString() + ')';
+				var circleRadius = minRadius + rDiff * (trail.length - 1 - i) / (trail.length - 1);
+				gameContext.save();
+				gameContext.beginPath();
+				gameContext.arc(point.x - myShip.x + camera.xOffset, point.y - myShip.y + camera.yOffset, circleRadius, 0, Math.PI * 2, true);
+				gameContext.fillStyle = nextColor;
+				gameContext.fill();
+				gameContext.restore();
+			}
+			break;
+		}
+		case 'line':{
+			gameContext.save();
+			gameContext.beginPath();
+			gameContext.lineWidth = trail.lineWidth;
+			gameContext.moveTo(trail.vertices[0].x - myShip.x + camera.xOffset,trail.vertices[0].y - myShip.y + camera.yOffset);
+			var previousColor = trail.initialColor;
+			for (var i = 1; i < trail.length; i++){
+				var lastPoint = trail.vertices[i-1];
+				var point = trail.vertices[i];
+				var gradient = gameContext.createLinearGradient(lastPoint.x - myShip.x + camera.xOffset, lastPoint.y - myShip.y + camera.yOffset, point.x - myShip.x + camera.xOffset, point.y - myShip.y + camera.yOffset);
+				var alpha = Math.round(trail.alphaStart * 100 * (trail.length - 1 - i) / (trail.length - 1)) / 100; //note that there are trail.length - 1 line segments. note, won't round up on .005 
+				var nextColor = trail.colorPrefix + alpha.toString() + ')';
+				gradient.addColorStop(0, previousColor); //start color
+				gradient.addColorStop(1, nextColor); //end color
+				previousColor = nextColor;
+				gameContext.strokeStyle = gradient;
+				gameContext.lineTo(point.x - myShip.x + camera.xOffset, point.y - myShip.y + camera.yOffset);
+				gameContext.stroke();
+			}
+			gameContext.restore();
+			break;
+		}
+	}
+	
 }
 
 function drawWorld(){
