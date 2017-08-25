@@ -1,7 +1,7 @@
 {
 	"override":true,
 	"minPlayers":1,
-	"maxPlayersInRoom":25,
+	"maxPlayersInRoom":2,
 	"worldWidth": 5000,
 	"worldHeight": 5000,
 	"asteroidAmt":160,
@@ -12,9 +12,13 @@
     "nebulaMaxSize":250,
 
 	"asteroidDropRate":30,
-	"lobbyWaitTime":10,
+	"lobbyWaitTime":5,
 
 	"AISpawnPlayers":true,
+
+	"particleBeamBaseDamage":0,
+    "particleBeamDamageGrowthRate":0,
+    "particleBeamBasePowerCost":0,
 
 	"generateTradeShips":true,
 	"tradeShipSpeed":3

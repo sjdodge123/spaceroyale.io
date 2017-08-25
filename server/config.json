@@ -90,6 +90,7 @@
     "blasterPowerCost": 5,
     "blasterBulletSpeed":800,
     "blasterBulletDamage":3,
+    "blasterSpray":5,
 
     "birdshotLifetime":0.45,
     "birdshotDamage":8,

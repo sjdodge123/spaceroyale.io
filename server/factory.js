@@ -356,6 +356,7 @@ class GameBoard {
 		this.roomSig = roomSig;
 	}
 	update(active, dt){
+		//console.log('FRAME');
 		this.engine.update(dt);
 		this.checkCollisions(active);
 		this.updateShips(active,dt);
@@ -1542,6 +1543,7 @@ class Ship extends Circle{
 		}
 	}
 	checkFireState(){
+
 		if(!this.enabled){
 			return;
 		}
@@ -1621,18 +1623,17 @@ class DirectionalShield extends Gadget{
 		this.shieldRadius  = c.forceShieldRadius;
 
 		this.activeShield = null;
-		this.cooldown = 1*1000;
+		this.cooldown = 5*1000;
+		this.duration = 3*1000;
 	}
 	activate(x,y,angle){
 		if(super.activate()){
-			this.activeShield = new ForceShield(x,y,this.shieldRadius,this.shieldOrbitR,"blue",this.shieldHealth,angle,this.owner);
+			this.activeShield = new ForceShield(x,y,this.shieldRadius,this.shieldOrbitR,"blue",this.shieldHealth, this.duration, angle,this.owner);
 			return this.activeShield;
 		}
 	}
 	deactivate(x,y){
-		if(super.activate()){
-			this.activeShield.alive = false;
-		}
+		
 	}
 }
 
@@ -1696,7 +1697,7 @@ class GadgetObject extends Circle{
 }
 
 class ForceShield extends GadgetObject{
-	constructor(x,y,radius,orbit,color,health,angle,owner){
+	constructor(x,y,radius,orbit,color,health, duration, angle,owner){
 		var shieldX = x + (orbit/2) * Math.cos((angle + 90) * Math.PI/180);
 		var shieldY = y + (orbit/2) * Math.sin((angle + 90) * Math.PI/180);
 		super(shieldX,shieldY,radius,color, owner);
@@ -1704,6 +1705,7 @@ class ForceShield extends GadgetObject{
 		this.orbit = orbit;
 		this.spawnDate = Date.now();
 		this.health = health;
+		this.duration = duration;
 		this.angle = angle;
 		this.isStatic = false;
 		this.attached = true;
@@ -1711,6 +1713,7 @@ class ForceShield extends GadgetObject{
 		this.newY = y;
 	}
 	update(){
+		this.checkLifetime();
 		this.x = this.newX + (this.orbit/2) * Math.cos((this.angle + 90) * Math.PI/180);
 		this.y = this.newY + (this.orbit/2) * Math.sin((this.angle + 90) * Math.PI/180);
 	}
@@ -1723,6 +1726,11 @@ class ForceShield extends GadgetObject{
 		}
 		*/
 		if(this.health < 1){
+			this.alive = false;
+		}
+	}
+	checkLifetime(){
+		if (Date.now() - this.spawnDate > this.duration){
 			this.alive = false;
 		}
 	}
@@ -2336,7 +2344,7 @@ class Blaster extends Weapon{
 		}
 		var bullets = [];
 		if(this.level > 1){
-			var sprayAngle = utils.getRandomInt(-5,5);
+			var sprayAngle = utils.getRandomInt(-c.blasterSpray,c.blasterSpray);
 			var bull1 = new Bullet(x,y,this.bulletWidth,this.bulletHeight, angle + sprayAngle, color, id);
 			bull1.speed -= bull1.speed * .15;
 			bullets.push(bull1);
@@ -2378,12 +2386,23 @@ class ParticleBeam extends Weapon{
 			} else{
 				this.powerCost = c.particleBeamChargeCost * this.chargeLevel;
 			}
+			if (this.currentBeam.isColliding){
+				this.currentBeam.height = this.currentBeam.collisionDistance;
+				this.currentBeam.vertices = this.currentBeam.getVertices();
+			}
+			else{
+				this.currentBeam.height = c.particleBeamHeight;
+			}
+
 			this.currentBeam.width = c.particleBeamWidth + ((this.chargeLevel-1)*c.particleBeamWidthGrowthPerCharge);
 			this.currentBeam.damage = c.particleBeamBaseDamage + (this.damagePerCharge * this.chargeLevel);
 			this.currentBeam.angle = angle;
 			this.currentBeam.vertices = this.currentBeam.getVertices();
 			this.currentBeam.x = x + (this.currentBeam.height/2) * Math.cos((this.angle+90) * Math.PI/180);
 			this.currentBeam.y = y + (this.currentBeam.height/2) * Math.sin((this.angle+90) * Math.PI/180);
+
+
+			this.currentBeam.isColliding = false;
 			return [this.currentBeam];
 		}
 		
@@ -2628,7 +2647,7 @@ class Bullet extends Rect{
 	}
 	handleHit(object){
 		if(!this.alive){
-			return
+			return;
 		}
 		if(object.isBullet){
 			return;
@@ -2660,12 +2679,36 @@ class Beam extends Bullet{
 		super(x,y,width,height, angle, color, owner);
 		this.isBeam = true;
 		this.damage = c.particleBeamBaseDamage;
+		this.isColliding = false;
+		this.collisionDistance = null;
+		this.hitList = [];
 	}
 	move(){
 
 	}
 	handleHit(object){
-
+		if(!this.alive){
+			return;
+		}
+		if(object.isBullet){
+			return;
+		}
+		if(object.owner == this.owner){
+			return;
+		}
+		if(object.id == this.owner){
+			return;
+		}
+		if(object.sig == this.owner){
+			return;
+		}
+		if(object.isNebula){
+			return;
+		}
+		if(object.isItem){
+			return;
+		}
+		return true;
 	}
 
 }

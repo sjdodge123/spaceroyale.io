@@ -273,6 +273,7 @@ function updateBulletList(packet){
 			bulletList[bullet[0]].y = bullet[2];
 			bulletList[bullet[0]].angle = bullet[3];
 			bulletList[bullet[0]].width = bullet[4];
+			bulletList[bullet[0]].height = bullet[5];
 		}
 	}
 
