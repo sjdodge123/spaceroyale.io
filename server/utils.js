@@ -4,6 +4,7 @@ var lastFrame = new Date();
 var c = require('./config.json');
 
 if(process.env.SRIO_ENV == "DEV"){
+    console.log("Detected DEV environment");
     var d = require('./devConfig.json');
     if(d.override == true){
         for(var setting in c){

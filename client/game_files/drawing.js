@@ -212,12 +212,14 @@ function drawJoysticks(){
 		gameContext.arc(joystickCamera.baseX,joystickCamera.baseY,joystickCamera.baseRadius,0,Math.PI*2,true);
 		gameContext.fill();
 
+		/* TODO: Fix touch cooldown display
 		if( 1 - (cooldownRemaining/currentWeaponCooldown) >= 1){
 			gameContext.strokeStyle = "red";
 			gameContext.beginPath();
 			gameContext.arc(joystickCamera.baseX,joystickCamera.baseY,joystickCamera.fireradius,0,Math.PI*2,true);
 			gameContext.stroke();
 		}
+		*/
 		gameContext.strokeStyle = "red";
 		gameContext.beginPath();
 		gameContext.arc(joystickCamera.stickX,joystickCamera.stickY,joystickCamera.stickRadius,0,Math.PI*2,true);
@@ -310,7 +312,7 @@ function drawPowerBar(){
 	if(myShip.power > 0){
 		if(myShip.power > config.playerBasePower){
 			boost = myShip.power-config.playerBasePower;
-		} 
+		}
 		var totalLength = eventLog.width/2;
 		var powerPercent = ((myShip.power-boost*2)/config.playerBasePower);
 		var powerlength = powerPercent*totalLength;
@@ -455,7 +457,7 @@ function drawShip(ship){
 	}
 
 	drawTrail(ship.trail);
-	
+
 	gameContext.save();
 	gameContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
 	gameContext.rotate(ship.spriteAngle*Math.PI/180);
@@ -817,10 +819,10 @@ function drawBullet(bullet){
 			break;
 		}
 	}
-	
+
 }
 function drawTrail(trail){
-	
+
 	switch(trail.type){
 		case 'circle':{
 			var minRadius = 0.5 * trail.lineWidth;
@@ -849,7 +851,7 @@ function drawTrail(trail){
 				var lastPoint = trail.vertices[i-1];
 				var point = trail.vertices[i];
 				var gradient = gameContext.createLinearGradient(lastPoint.x - myShip.x + camera.xOffset, lastPoint.y - myShip.y + camera.yOffset, point.x - myShip.x + camera.xOffset, point.y - myShip.y + camera.yOffset);
-				var alpha = Math.round(trail.alphaStart * 100 * (trail.length - 1 - i) / (trail.length - 1)) / 100; //note that there are trail.length - 1 line segments. note, won't round up on .005 
+				var alpha = Math.round(trail.alphaStart * 100 * (trail.length - 1 - i) / (trail.length - 1)) / 100; //note that there are trail.length - 1 line segments. note, won't round up on .005
 				var nextColor = trail.colorPrefix + alpha.toString() + ')';
 				gradient.addColorStop(0, previousColor); //start color
 				gradient.addColorStop(1, nextColor); //end color
@@ -862,7 +864,7 @@ function drawTrail(trail){
 			break;
 		}
 	}
-	
+
 }
 
 function drawWorld(){

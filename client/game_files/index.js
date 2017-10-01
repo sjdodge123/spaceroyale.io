@@ -48,6 +48,7 @@ var server = null,
     moveBackward = false,
     turnLeft = false,
     weaponArray = [];
+    gadgetArray = [];
     skinArray = [];
     passiveArray = [];
     turnRight = false;
@@ -77,6 +78,12 @@ function setupPage(){
     weaponArray.push({image:'sprites/blaster.svg',value:"Blaster",title:"Blaster"});
     weaponArray.push({image:'sprites/mass_driver.svg',value:"MassDriver",title:"Mass Driver"});
     weaponArray.push({image:'sprites/particle_beam.svg',value:"ParticleBeam",title:"Particle Beam"});
+
+    gadgetArray.push({image:"sprites/items/blaster_item.svg",value:"DirectionalShield",title:"Directional Shield"});
+    gadgetArray.push({image:"sprites/items/overdrive_item.svg",value:"PulseWave",title:"Pulse Wave"});
+    gadgetArray.push({image:"sprites/items/health_item.svg",value:"HackingDrone",title:"Hacking Drone"});
+
+
 
     $('#firstPassive').click(function(e){
         clickedPassive = $(e.target);
@@ -185,6 +192,30 @@ function setupPage(){
         $("#secondWeapon").attr('src',weaponArray[1].image).attr('data-selected',weaponArray[1].value).attr('title',weaponArray[1].title);
         $("#thirdWeapon").attr('src',weaponArray[2].image).attr('data-selected',weaponArray[2].value).attr('title',weaponArray[2].title);
         clientSendMessage('changeWeapon',weaponArray[1].value);
+    });
+
+
+    //*******************************************************************************************
+
+
+    //***************************Weapon Selection Box*************************************
+
+    $('#firstGadget').click(function(){
+        var lastElement = gadgetArray.splice(gadgetArray.length-1,1)[0];
+        gadgetArray.unshift(lastElement);
+        $("#firstGadget").attr('src',gadgetArray[0].image).attr('data-selected',gadgetArray[0].value).attr('title',gadgetArray[0].title);
+        $("#secondGadget").attr('src',gadgetArray[1].image).attr('data-selected',gadgetArray[1].value).attr('title',gadgetArray[1].title);
+        $("#thirdGadget").attr('src',gadgetArray[2].image).attr('data-selected',gadgetArray[2].value).attr('title',gadgetArray[2].title);
+        clientSendMessage('changeGadget',gadgetArray[1].value);
+    });
+
+    $('#thirdGadget').click(function(){
+        var firstElement = gadgetArray.shift();
+        gadgetArray.push(firstElement);
+        $("#firstGadget").attr('src',gadgetArray[0].image).attr('data-selected',gadgetArray[0].value).attr('title',gadgetArray[0].title);
+        $("#secondGadget").attr('src',gadgetArray[1].image).attr('data-selected',gadgetArray[1].value).attr('title',gadgetArray[1].title);
+        $("#thirdGadget").attr('src',gadgetArray[2].image).attr('data-selected',gadgetArray[2].value).attr('title',gadgetArray[2].title);
+        clientSendMessage('changeGadget',gadgetArray[1].value);
     });
 
 
@@ -711,7 +742,7 @@ function recenterCamera(){
         if(cameraBouncingFirstPass){
             return;
         }
-        
+
     }
     if(myID != null && shipList != null && shipList[myID] != null){
         myShip = shipList[myID];

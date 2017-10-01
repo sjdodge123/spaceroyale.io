@@ -299,7 +299,7 @@ class Game {
 			if(aiUser.agent.alive == false){
 				delete this.AIList[sig];
 			}
-			
+
 		}
 	}
 	cancelGameStart(){
@@ -1157,7 +1157,7 @@ class Ship extends Circle{
 		this.regenRate = c.playerHealthRegenRate;
 		this.regenerating = false;
 
-		this.gadget = new DirectionalShield(this.engine,this.id);
+		this.gadget = new PulseWave(this.engine,this.id);
 
 		if(c.playerSpawnWeapon == "Blaster"){
 			this.weapon = new Blaster(this.id);
@@ -1179,7 +1179,7 @@ class Ship extends Circle{
 		this.move();
 		this.checkHP();
 		this.regenPower();
-		this.checkFireState();	
+		this.checkFireState();
 		this.checkBoostList();
 		this.checkKills();
 	}
@@ -1210,6 +1210,31 @@ class Ship extends Circle{
 		var data = compressor.equipItem(this.weapon);
 		messenger.messageRoomBySig(this.roomSig,"equipItem",data);
 	}
+	changeGadget(name){
+		switch(name){
+			case "DirectionalShield":{
+				this.deactivateGadget();
+				this.gadget = new DirectionalShield(this.engine,this.id);
+				break;
+			}
+			case "HackingDrone":{
+				this.deactivateGadget();
+				this.gadget = new HackingDrone(this.engine,this.id);
+				break;
+			}
+			case "PulseWave":{
+				this.deactivateGadget();
+			 	this.gadget = new PulseWave(this.engine,this.id);
+				break;
+			}
+			default:{
+				this.deactivateGadget();
+				this.gadget = new DirectionalShield(this.engine,this.id);
+				break;
+			}
+		}
+	}
+
 	applyPassive(passiveInt){
 		if(this.passives[passiveInt] == c.passivesEnum.HealthBoost){
 			this.baseHealth = c.playerBaseHealth + 15;
@@ -1610,7 +1635,7 @@ class Gadget {
 		}
 	}
 	deactivate(){
-		
+
 	}
 }
 
@@ -1633,7 +1658,7 @@ class DirectionalShield extends Gadget{
 		}
 	}
 	deactivate(x,y){
-		
+
 	}
 }
 
@@ -1680,7 +1705,7 @@ class GadgetObject extends Circle{
 		this.speed = 5;
 		this.isStatic = true;
 		this.owner = owner;
-		
+
 	}
 	update(){
 		if(!this.isStatic){
@@ -1802,13 +1827,13 @@ class Drone extends GadgetObject{
 					case 4:{this.targetShip.moveBackward = true; this.targetShip.turnLeft = true; break;}
 					case 6:{this.targetShip.moveBackward = true; this.targetShip.turnRight = true; break;}
 				}
-				
+
 			}
 			if((this.hackDuration - (Date.now() - this.hackStarted) < 0) || this.stopHacking) {
 				this.targetShip.enable();
 				this.hacking = false;
 				this.targetShip.moveForward = false;
-				this.targetShip.moveBackward = false; 
+				this.targetShip.moveBackward = false;
 				this.targetShip.turnLeft = false;
 				this.targetShip.turnRight = false;
 				this.alive = false;
@@ -1835,7 +1860,7 @@ class Drone extends GadgetObject{
 				this.alive = false;
 			}
 		}
-	}	
+	}
 	hack(ship){
 		if(this.hacking == false){
 			this.targetShip = ship;
@@ -2405,7 +2430,7 @@ class ParticleBeam extends Weapon{
 			this.currentBeam.isColliding = false;
 			return [this.currentBeam];
 		}
-		
+
 	}
 	stopFire(){
 		this.chargeLevel = 0;

@@ -234,6 +234,19 @@ function checkForMail(client){
 		var ship = room.shipList[client.id];
 		ship.changeWeapon(weaponName);
   	});
+
+	client.on("changeGadget",function(gadgetName){
+		var room = getRoomFromId(client.id);
+		if(room == undefined){
+			return;
+		}
+		if(room.game.active){
+			return;
+		}
+		var ship = room.shipList[client.id];
+		ship.changeGadget(gadgetName);
+	});
+
 }
 
 function messageUser(id,header,payload){
