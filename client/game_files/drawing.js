@@ -111,6 +111,50 @@ var beamDotSheet = new SpriteSheet(beamDotSVG,0,0,47,47,1,5);
 
 var lastLobbyTime = null;
 
+class FloatingText {
+	constructor(font,color,acelX,acelY,duration){
+		this.font = font || "bold 25px Verdana";
+		this.color = color || "Red";
+		this.verticalIncrease = acelX || -5;
+		this.horizontalIncrease = acelY || -1;
+		this.duration = duration || 600;
+		this.textList = [];
+	}
+	add(text,x,y){
+		var fto = {};
+		fto.text = text;
+		fto.x = x;
+		fto.y = y;
+		fto.start = Date.now();
+		this.textList.push(fto);
+	}
+	update(){
+		var len = this.textList.length;
+		var deleteList = [];
+		var currentDate = Date.now();
+		for(var i=0;i<len;i++){
+			if(this.duration - (currentDate - this.textList[i].start) <= 0){
+				deleteList.push(i);
+				continue;
+			}
+			this.textList[i].x += this.horizontalIncrease;
+			this.textList[i].y += this.verticalIncrease;
+			drawTextF(this.textList[i].text,this.textList[i].x - myShip.x +  camera.xOffset,this.textList[i].y - myShip.y +  camera.yOffset,this.color,this.font);
+		}
+
+		for(var j=0;j<deleteList.length;j++){
+			var index = deleteList[j];
+			this.textList.splice(index,1);
+		}
+	}
+}
+
+var combatText = new FloatingText();
+
+function addCombatText(text,x,y){
+	combatText.add(text,x,y);
+}
+
 function drawBackground() {
 	gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 }
@@ -449,6 +493,9 @@ function drawRelativeObjects(){
 	drawBounds();
 	if (quadTree != null){
 		drawQuadTree(quadTree);
+	}
+	if(combatText != null){
+		combatText.update();
 	}
 }
 function drawShip(ship){

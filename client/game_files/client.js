@@ -163,8 +163,15 @@ function clientConnect() {
 		}
 	});
 
-	server.on("shotLanded",function(){
+	server.on("shotLanded",function(payload){
 		playSound(shotPlayer);
+		var ship = shipList[payload.id] || tradeShipList[payload.id];
+		if(ship == null){
+			return;
+		}
+		if(camera.inBounds(ship)){
+			addCombatText("-" +payload.damage,ship.x-50,ship.y-50);
+		}
 	});
 
 	server.on("spawnItem",function(packet){

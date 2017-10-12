@@ -1560,7 +1560,7 @@ class Ship extends Circle{
 			if(this.health < 1){
 				this.iDied(object.owner);
 			}
-			messenger.messageUser(object.owner,"shotLanded");
+			messenger.messageUser(object.owner,"shotLanded",{id:this.id,damage:object.damage});
 		}
 	}
 
@@ -2175,7 +2175,7 @@ class TradeShip extends Rect{
 				return;
 			}
 			this.health -= object.damage;
-			messenger.messageUser(object.owner,"shotLanded");
+			messenger.messageUser(object.owner,"shotLanded",{id:this.sig,damage:object.damage});
 			if(this.health < 1){
 				messenger.toastPlayer(object.owner,"You killed a TradeShip!");
 				this.alive = false;

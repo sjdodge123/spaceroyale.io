@@ -7,7 +7,7 @@
     "maxPlayersInRoom":25,
     "randomizePlayersLocations":true,
     "roomKickTimeout":90,
-    "lobbyWaitTime":90,
+    "lobbyWaitTime":30,
 
 
     "baseTimeUntilShrink":30,
@@ -83,8 +83,8 @@
 
     "playerDragCoeff": 0.045,
     "playerBrakeCoeff": 0.235,
-    "playerHealthRegenRate":0.5,
-    "playerHealthRegenTime":3000,
+    "playerHealthRegenRate":0.25,
+    "playerHealthRegenTime":5000,
 
     "forceConstant": 5000000,
 
