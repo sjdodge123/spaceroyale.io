@@ -633,7 +633,7 @@ function drawItem(item){
 			gameContext.drawImage(massDriverItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
 			break;
 		}
-		case "HPItem":{
+		case "HealthAttribute":{
 			gameContext.drawImage(healthItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
 			break;
 		}

@@ -1157,6 +1157,14 @@ class Ship extends Circle{
 		this.regenRate = c.playerHealthRegenRate;
 		this.regenerating = false;
 
+		this.appliedAttributes = {
+			health : 0,
+			power: 0,
+			speed : 0,
+			bulletSize : 0,
+			precision: 0
+		};
+
 		this.gadget = new PulseWave(this.engine,this.id);
 
 		if(c.playerSpawnWeapon == "Blaster"){
@@ -1306,6 +1314,17 @@ class Ship extends Circle{
 	}
 
 	equip(item){
+		if(item instanceof AttributeItem){
+			if(item instanceof HealthAttribute){
+				this.appliedAttributes.health += 1;
+				this.baseHealth += item.attributeAmount;
+				this.heal(item.attributeAmount);
+				console.log(this.baseHealth);
+				messenger.messageRoomBySig(this.roomSig,"attributeApplied","health");
+				return;
+			}
+		}
+
 		if(item instanceof ShieldItem){
 			if(this.shield == null){
 				this.shield = new Shield(this.id);
@@ -1979,10 +1998,17 @@ class Asteroid extends Circle{
 	dropItem(itemName){
 		var item;
 		switch(itemName){
+			case "HealthAttribute":{
+				item = new HealthAttribute(this.x,this.y);
+				break;
+			}
+			/*
+			---Deprecated--
 			case "HPItem":{
 				item = new HPItem(this.x,this.y);
 				break;
 			}
+			*/
 			case "OverdriveItem":{
 				item = new OverdriveItem(this.x,this.y);
 				break;
@@ -2202,6 +2228,9 @@ class CircleItem extends Circle{
 		}
 	}
 }
+/*
+
+---Deprecated---
 
 class HPItem extends CircleItem {
 	constructor(x,y){
@@ -2221,6 +2250,7 @@ class HPItem extends CircleItem {
 		}
 	}
 }
+*/
 
 
 class Boost extends CircleItem {
@@ -2270,13 +2300,29 @@ class EquipableItem extends CircleItem{
 		if(!this.alive){
 			return;
 		}
-		if(Date.now()-this.dropDate < this.pickUpCooldown*1000){
-			return;
-		}
 		if(object instanceof Ship){
+			if(Date.now()-this.dropDate < this.pickUpCooldown*1000){
+				return;
+			}
 			object.equip(this);
 			this.alive = false;
 		}
+	}
+}
+
+class AttributeItem extends EquipableItem{
+	constructor(x,y){
+		super(x,y,"Blue",1);
+		this.name = 'base';
+		this.attributeAmount = 10;
+	}
+}
+
+class HealthAttribute extends AttributeItem {
+	constructor(x,y){
+		super(x,y);
+		this.name = "HealthAttribute";
+		this.attributeAmount = c.attributeAmountHealth;
 	}
 }
 

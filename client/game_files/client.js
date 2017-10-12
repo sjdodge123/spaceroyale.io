@@ -123,6 +123,13 @@ function clientConnect() {
 		spawnAIShips(payload);
 	});
 
+	server.on("attributeApplied",function(payload){
+		if(payload == null){
+			return;
+		}
+		console.log(payload);
+	});
+
 	server.on("weaponFired",function(payload){
 		if(payload == null){
 			return;
@@ -263,7 +270,7 @@ function clientConnect() {
 		if(camera.inBounds(shipList[id])){
 			playSound(shipDeath);
 		}
-		
+
 		if(killerId != null && shipList[killerId] != null){
 			shipList[killerId].kills += 1;
 			killerName = playerList[killerId] || shipList[killerId].AIName;
@@ -282,7 +289,7 @@ function clientConnect() {
 			return;
 		}
 
-		
+
 	});
 	server.on('shipHealth',function(packet){
 		if(packet == null){

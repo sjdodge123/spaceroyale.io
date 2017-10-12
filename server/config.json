@@ -41,9 +41,11 @@
 
     "asteroidLootTable":{
       "ShieldItem":1,
-      "HPItem":2,
+      "HealthAttribute":2,
       "OverdriveItem":3
     },
+
+    "attributeAmountHealth":5,
 
     "generatePlanets":true,
     "planetAmt":30,
@@ -140,7 +142,7 @@
     "forceShieldOrbitR": 55,
     "forceShieldHealth": 40,
     "forceShieldRegenRate": 3,
-    
+
     "quadTreeMaxCount": 70,
     "quadTreeMaxDepth": 2,
 
