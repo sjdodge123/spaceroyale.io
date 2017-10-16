@@ -112,9 +112,8 @@ var beamDotSheet = new SpriteSheet(beamDotSVG,0,0,47,47,1,5);
 var lastLobbyTime = null;
 
 class FloatingText {
-	constructor(font,color,acelX,acelY,duration){
+	constructor(font,acelX,acelY,duration){
 		this.font = font || "bold 25px Verdana";
-		this.color = color || "Red";
 		this.verticalIncrease = acelX || -5;
 		this.horizontalIncrease = acelY || -1;
 		this.duration = duration || 600;
@@ -122,7 +121,7 @@ class FloatingText {
 	}
 	add(text,x,y){
 		var fto = {};
-		fto.text = text;
+		fto.text = parseFloat(text).toFixed(1);
 		fto.x = x;
 		fto.y = y;
 		fto.start = Date.now();
@@ -133,13 +132,15 @@ class FloatingText {
 		var deleteList = [];
 		var currentDate = Date.now();
 		for(var i=0;i<len;i++){
-			if(this.duration - (currentDate - this.textList[i].start) <= 0){
+			var timeLeft = (currentDate - this.textList[i].start);
+			if(this.duration - timeLeft <= 0){
 				deleteList.push(i);
 				continue;
 			}
+			var alpha = 1-(timeLeft/this.duration);
 			this.textList[i].x += this.horizontalIncrease;
 			this.textList[i].y += this.verticalIncrease;
-			drawTextF(this.textList[i].text,this.textList[i].x - myShip.x +  camera.xOffset,this.textList[i].y - myShip.y +  camera.yOffset,this.color,this.font);
+			drawTextF(this.textList[i].text,this.textList[i].x - myShip.x +  camera.xOffset,this.textList[i].y - myShip.y +  camera.yOffset,"rgba(234, 55, 18, " + alpha + ")",this.font);
 		}
 
 		for(var j=0;j<deleteList.length;j++){
@@ -376,13 +377,15 @@ function drawPowerBar(){
 function drawToast(){
 	var removeArray = [];
 	var len = trailingToasts.length;
+	var currentDate = Date.now();
 	for(var i=0;i<len;i++){
 		var toastMessage = trailingToasts[i];
-		if(toastDuration - (Date.now() - toastMessage.received) <= 0){
+		var timeLeft = (currentDate - toastMessage.received);
+		if(toastDuration - timeLeft <= 0){
 			removeArray.push(i);
 			continue;
 		}
-		var alpha = 1 - ((Date.now() - toastMessage.received)/toastDuration);
+		var alpha = 1 - (timeLeft/toastDuration);
 		drawTextF(toastMessage.text,gameCanvas.width/2-(toastMessage.text.length*5),(gameCanvas.height/2+70)+(i*20),"rgba(255, 255, 255, " + alpha + ")","20px Georgia");
 	}
 	for(var j=0;j<removeArray.length;j++){
