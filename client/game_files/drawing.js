@@ -236,6 +236,15 @@ function drawHUD(){
 }
 
 function drawJoysticks(){
+	if(joysticksFaded){
+		return;
+	}
+	var currentTime = Date.now();
+	var timeLeft = currentTime - joystickLastTouch;
+	if(jotstickFadeDuration - timeLeft <= 0){
+		joysticksFaded = true;
+		return;
+	}
 	if(joystickMovement != null && isTouchScreen){
 		gameContext.save();
 		gameContext.beginPath();

@@ -41,6 +41,9 @@ var server = null,
     newHeight = 0,
     joystickMovement = null,
     joystickCamera = null,
+    jotstickFadeDuration = 5000,
+    joysticksFaded = true,
+    joystickLastTouch = Date.now(),
     mousex,
     mousey,
     moveForward = false,
@@ -826,6 +829,8 @@ function handleUnClick(evt){
 }
 
 function onTouchStart(evt){
+    joysticksFaded = false;
+    joystickLastTouch = Date.now();
     evt.preventDefault();
     var rect = gameCanvas.getBoundingClientRect();
     var touch = evt.changedTouches[0];
@@ -863,6 +868,8 @@ function onTouchEnd(evt){
     }
 }
 function onTouchMove(evt){
+    joysticksFaded = false;
+    joystickLastTouch = Date.now();
     evt.preventDefault();
     var touchList = event.changedTouches;
     var rect = gameCanvas.getBoundingClientRect();
@@ -873,7 +880,6 @@ function onTouchMove(evt){
             touchX = (((touch.pageX - rect.left)/newWidth)*gameCanvas.width);
             touchY = (((touch.pageY - rect.top )/newHeight)*gameCanvas.height);
             joystickCamera.onMove(touchX,touchY);
-
 
             if(joystickCamera.checkForFire()){
                 fireGun(joystickCamera.stickX + myShip.x - camera.xOffset,joystickCamera.stickY+ myShip.y - camera.yOffset);
