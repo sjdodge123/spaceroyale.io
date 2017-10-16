@@ -374,8 +374,19 @@ function drawPowerBar(){
 }
 
 function drawToast(){
-	if(toastMessage != null){
-		drawText(toastMessage,gameCanvas.width/2-(toastMessage.length*5),gameCanvas.height/2+70);
+	var removeArray = [];
+	var len = trailingToasts.length;
+	for(var i=0;i<len;i++){
+		var toastMessage = trailingToasts[i];
+		if(toastDuration - (Date.now() - toastMessage.received) <= 0){
+			removeArray.push(i);
+			continue;
+		}
+		var alpha = 1 - ((Date.now() - toastMessage.received)/toastDuration);
+		drawTextF(toastMessage.text,gameCanvas.width/2-(toastMessage.text.length*5),(gameCanvas.height/2+70)+(i*20),"rgba(255, 255, 255, " + alpha + ")","20px Georgia");
+	}
+	for(var j=0;j<removeArray.length;j++){
+		trailingToasts.pop();
 	}
 }
 function drawTotalPlayers(){

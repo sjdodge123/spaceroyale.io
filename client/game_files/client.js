@@ -8,7 +8,7 @@ var myID = null,
 	world,
 	quadTree,
 	config,
-	toastQueue = [],
+	trailingToasts = [],
 	asteroidList = {},
 	itemList = {},
 	planetList = {},
@@ -387,13 +387,7 @@ function clientConnect() {
 	});
 
 	server.on("toast",function(message){
-		if(toastMessage == null){
-			toastMessage = message;
-			toastTimer = setTimeout(clearToast,1700);
-		} else{
-			toastQueue.push(message);
-		}
-
+		trailingToasts.unshift({text:message,received:Date.now()});
 	});
 
 	server.on("eventMessage",function(message){
@@ -425,16 +419,6 @@ function checkForTimeout(){
     	serverShutdownReason = "Server timed out";
 		server.disconnect();
 		window.parent.location.reload();
-	}
-}
-
-function clearToast(){
-	clearTimeout(toastTimer);
-	toastMessage = null;
-	if(toastQueue.length != 0){
-		toastMessage = toastQueue[0];
-		delete toastQueue[0];
-		toastTimer = setTimeout(clearToast,1700);
 	}
 }
 
