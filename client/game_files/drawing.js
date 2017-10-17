@@ -113,10 +113,14 @@ var lastLobbyTime = null;
 
 class FloatingText {
 	constructor(font,acelX,acelY,duration){
-		this.font = font || "bold 25px Verdana";
+		this.font = "bold 25px Verdana";
+		this.critFont = "bold 35px Verdana";
 		this.verticalIncrease = acelX || -5;
 		this.horizontalIncrease = acelY || -1;
 		this.duration = duration || 600;
+		this.critDuration = this.duration + this.duration*.75;
+		this.critVerticalIncrease = this.verticalIncrease - this.verticalIncrease*.5;
+		this.critHorizontalIncrease = this.horizontalIncrease + this.horizontalIncrease*2;
 		this.textList = [];
 	}
 	add(text,x,y){
@@ -124,8 +128,19 @@ class FloatingText {
 		fto.text = text;
 		fto.x = x;
 		fto.y = y;
+		fto.font = this.font;
 		fto.start = Date.now();
-		this.textList.push(fto);
+		this.textList.unshift(fto);
+	}
+	addCrit(text,x,y){
+		var fto = {};
+		fto.text = text;
+		fto.x = x;
+		fto.y = y;
+		fto.isCrit = true;
+		fto.font = this.critFont;
+		fto.start = Date.now();
+		this.textList.unshift(fto);
 	}
 	update(){
 		var len = this.textList.length;
@@ -137,10 +152,18 @@ class FloatingText {
 				deleteList.push(i);
 				continue;
 			}
-			var alpha = 1-(timeLeft/this.duration);
-			this.textList[i].x += this.horizontalIncrease;
-			this.textList[i].y += this.verticalIncrease;
-			drawTextF(this.textList[i].text,this.textList[i].x - myShip.x +  camera.xOffset,this.textList[i].y - myShip.y +  camera.yOffset,"rgba(234, 55, 18, " + alpha + ")",this.font);
+			var alpha = 0;
+			if(this.textList[i].isCrit){
+				alpha = 1-(timeLeft/this.critDuration);
+				this.textList[i].x += this.critHorizontalIncrease;
+				this.textList[i].y += this.critVerticalIncrease;
+			} else {
+				alpha = 1-(timeLeft/this.duration);
+				this.textList[i].x += 15*(i/len);
+				this.textList[i].x += this.horizontalIncrease;
+				this.textList[i].y += this.verticalIncrease;
+			}
+			drawTextF(this.textList[i].text,this.textList[i].x - myShip.x +  camera.xOffset,this.textList[i].y - myShip.y +  camera.yOffset,"rgba(234, 55, 18, " + alpha + ")",this.textList[i].font);
 		}
 
 		for(var j=0;j<deleteList.length;j++){
@@ -154,6 +177,9 @@ var combatText = new FloatingText();
 
 function addCombatText(text,x,y){
 	combatText.add(text,x,y);
+}
+function addCombatTextCrit(text,x,y){
+	combatText.addCrit(text,x,y);
 }
 
 function drawBackground() {
