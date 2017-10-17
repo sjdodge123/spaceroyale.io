@@ -88,11 +88,14 @@
 
     "forceConstant": 5000000,
 
+    "blasterCritChance":15,
+    "blasterCritIncreasePercent":150,
     "bulletLifetime":0.5,
     "blasterPowerCost": 5,
     "blasterBulletSpeed":800,
     "blasterBulletDamage":3,
     "blasterSpray":5,
+
 
     "birdshotLifetime":0.45,
     "birdshotDamage":8,
@@ -100,10 +103,14 @@
     "photonCannonPowerCost": 35,
     "photonCannonChargeCost":20,
     "photonCannonChargeTime":200,
+    "photonCannonCritChance":20,
+    "photonCannonCritIncreasePercent":75,
 
     "massDriverPowerCost": 65,
     "massDriverBulletDamage":27,
     "massDriverBulletSpeed":2200,
+    "massDriverCritChance":20,
+    "massDriverCritIncreasePercent":50,
 
     "particleBeamBasePowerCost":15,
     "particleBeamChargeCost":0.5,
@@ -113,6 +120,8 @@
     "particleBeamWidthGrowthPerCharge":2,
     "particleBeamBaseDamage":0.1,
     "particleBeamDamageGrowthRate":0.15,
+    "particleBeamCritChance":15,
+    "particleBeamCritIncreasePercent":200,
 
 
     "shieldRadius":35,

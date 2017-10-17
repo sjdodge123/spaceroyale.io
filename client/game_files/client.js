@@ -173,7 +173,23 @@ function clientConnect() {
 			return;
 		}
 		if(camera.inBounds(ship)){
-			addCombatText("-" +payload.damage,ship.x-50,ship.y-50);
+
+			if(payload.crit == true){
+				var textChoice = getRandomInt(0,3);
+				var critText = '';
+				if(textChoice == 0){
+					critText = "CRIT!";
+				} else if (textChoice == 1) {
+					critText = "Wow!";
+				} else if (textChoice == 2) {
+					critText = "#REKT";
+				} else if (textChoice == 3) {
+					critText = "EZ"
+				}
+
+				addCombatText(critText + " -" + parseFloat(payload.damage).toFixed(1),ship.x-50,ship.y-50);
+			}
+			addCombatText("-" +parseFloat(payload.damage).toFixed(1),ship.x-50,ship.y-50);
 		}
 	});
 

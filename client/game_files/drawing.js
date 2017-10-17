@@ -121,7 +121,7 @@ class FloatingText {
 	}
 	add(text,x,y){
 		var fto = {};
-		fto.text = parseFloat(text).toFixed(1);
+		fto.text = text;
 		fto.x = x;
 		fto.y = y;
 		fto.start = Date.now();
