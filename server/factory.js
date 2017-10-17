@@ -1159,10 +1159,8 @@ class Ship extends Circle{
 
 		this.appliedAttributes = {
 			health : 0,
-			power: 0,
 			speed : 0,
-			bulletSize : 0,
-			precision: 0
+			weapon: 0
 		};
 
 		this.gadget = new PulseWave(this.engine,this.id);
@@ -1317,10 +1315,19 @@ class Ship extends Circle{
 		if(item instanceof AttributeItem){
 			if(item instanceof HealthAttribute){
 				this.appliedAttributes.health += 1;
-				this.baseHealth += item.attributeAmount;
-				this.heal(item.attributeAmount);
-				console.log(this.baseHealth);
-				messenger.messageRoomBySig(this.roomSig,"attributeApplied","health");
+				this.baseHealth += c.attributeAmountHealth;
+				this.heal(c.attributeAmountHealth);
+				messenger.messageRoomBySig(this.roomSig,"attributeApplied",{id:this.id,type:"health"});
+				return;
+			}
+			if(item instanceof SpeedAttribute){
+				this.appliedAttributes.speed += 1;
+				messenger.messageRoomBySig(this.roomSig,"attributeApplied",{id:this.id,type:"speed"});
+				return;
+			}
+			if(item instanceof WeaponAttribute){
+				this.appliedAttributes.weapon += 1;
+				messenger.messageRoomBySig(this.roomSig,"attributeApplied",{id:this.id,type:"weapon"});
 				return;
 			}
 		}
@@ -2002,17 +2009,29 @@ class Asteroid extends Circle{
 				item = new HealthAttribute(this.x,this.y);
 				break;
 			}
+			case "SpeedAttribute":{
+				item = new SpeedAttribute(this.x,this.y);
+				break;
+			}
+			case "WeaponAttribute":{
+				item = new WeaponAttribute(this.x,this.y);
+				break;
+			}
 			/*
 			---Deprecated--
 			case "HPItem":{
 				item = new HPItem(this.x,this.y);
 				break;
 			}
-			*/
+			case "ShieldItem": {
+				item = new ShieldItem(this.x,this.y);
+				break;
+			}
 			case "OverdriveItem":{
 				item = new OverdriveItem(this.x,this.y);
 				break;
 			}
+			*/
 			case "BlasterItem": {
 				item = new BlasterItem(this.x,this.y);
 				break;
@@ -2023,10 +2042,6 @@ class Asteroid extends Circle{
 			}
 			case "MassDriverItem": {
 				item = new MassDriverItem(this.x,this.y);
-				break;
-			}
-			case "ShieldItem": {
-				item = new ShieldItem(this.x,this.y);
 				break;
 			}
 		}
@@ -2314,7 +2329,6 @@ class AttributeItem extends EquipableItem{
 	constructor(x,y){
 		super(x,y,"Blue",1);
 		this.name = 'base';
-		this.attributeAmount = 10;
 	}
 }
 
@@ -2322,7 +2336,19 @@ class HealthAttribute extends AttributeItem {
 	constructor(x,y){
 		super(x,y);
 		this.name = "HealthAttribute";
-		this.attributeAmount = c.attributeAmountHealth;
+	}
+}
+
+class SpeedAttribute extends AttributeItem {
+	constructor(x,y){
+		super(x,y);
+		this.name = "SpeedAttribute";
+	}
+}
+class WeaponAttribute extends AttributeItem {
+	constructor(x,y){
+		super(x,y);
+		this.name = "WeaponAttribute";
 	}
 }
 

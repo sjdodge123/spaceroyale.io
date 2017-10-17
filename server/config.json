@@ -40,9 +40,9 @@
     "asteroidMaxSize":65,
 
     "asteroidLootTable":{
-      "ShieldItem":1,
-      "HealthAttribute":2,
-      "OverdriveItem":3
+      "HealthAttribute":1,
+      "SpeedAttribute":2,
+      "WeaponAttribute":3
     },
 
     "attributeAmountHealth":5,

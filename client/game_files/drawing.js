@@ -48,14 +48,14 @@ photonCannonItemSVG.src = "sprites/items/photon_cannon_item.svg";
 var massDriverItemSVG = new Image();
 massDriverItemSVG.src = "sprites/items/mass_driver_item.svg";
 
-var shieldItemSVG = new Image();
-shieldItemSVG.src = "sprites/items/shield_item.svg";
+var weaponAttributeSVG = new Image();
+weaponAttributeSVG.src = "sprites/items/shield_item.svg";
 
-var healthItemSVG = new Image();
-healthItemSVG.src = "sprites/items/health_item.svg";
+var healthAttributeSVG = new Image();
+healthAttributeSVG.src = "sprites/items/health_item.svg";
 
-var overdriveItemSVG = new Image();
-overdriveItemSVG.src = "sprites/items/overdrive_item.svg";
+var speedAttributeSVG = new Image();
+speedAttributeSVG.src = "sprites/items/overdrive_item.svg";
 
 var bulletSVG = new Image();
 bulletSVG.src = "sprites/bullet_sheet.svg";
@@ -686,11 +686,6 @@ function drawItem(item){
 		    gameContext.stroke();
 			break;
 		}
-		case "OverdriveItem":{
-			gameContext.drawImage(overdriveItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
-			break;
-		}
-
 		case "BlasterItem":{
 			gameContext.drawImage(blasterItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
 			break;
@@ -704,13 +699,18 @@ function drawItem(item){
 			break;
 		}
 		case "HealthAttribute":{
-			gameContext.drawImage(healthItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
+			gameContext.drawImage(healthAttributeSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
 			break;
 		}
-		case "ShieldItem":{
-			gameContext.drawImage(shieldItemSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
+		case "WeaponAttribute":{
+			gameContext.drawImage(weaponAttributeSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
 			break;
 		}
+		case "SpeedAttribute":{
+			gameContext.drawImage(speedAttributeSVG,item.x-item.radius-myShip.x+camera.xOffset,item.y-item.radius-myShip.y+camera.yOffset,item.radius*2,item.radius*2);
+			break;
+		}
+
 	}
     gameContext.restore();
 }

@@ -127,7 +127,10 @@ function clientConnect() {
 		if(payload == null){
 			return;
 		}
-		console.log(payload);
+		if(shipList[payload.id] == null){
+			return;
+		}
+		console.log(payload.type);
 	});
 
 	server.on("weaponFired",function(payload){
