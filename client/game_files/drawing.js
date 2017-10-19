@@ -182,6 +182,92 @@ function addCombatTextCrit(text,x,y){
 	combatText.addCrit(text,x,y);
 }
 
+class Dot{
+	constructor(x,y,radius,lineColor,fillColor){
+		this.x = x;
+		this.y = y;
+		this.radius = radius;
+		this.lineColor = lineColor || "white";
+		this.fillColor = fillColor || "white";
+		this.fillDot = false;
+	}
+	fill(color){
+		if(color != undefined && color != ''){
+			this.fillColor = color;
+		}
+		this.fillDot = true;
+	}
+	update(){
+		gameContext.save();
+		gameContext.beginPath();
+		gameContext.arc(this.x,this.y,this.radius,0,Math.PI*2,true);
+		if(this.fillDot){
+			gameContext.fillStyle = this.fillColor;
+			gameContext.fill();
+		}
+		gameContext.strokeStyle = this.lineColor;
+		gameContext.lineWidth = 2;
+		gameContext.stroke();
+		gameContext.restore();
+	}
+}
+
+class DotLine{
+	constructor(title,x,y,length,lineColor,fillColor){
+		this.title = title || "title";
+		this.x = x;
+		this.y = y;
+		this.length = length;
+		this.lineColor = lineColor || "white";
+		this.fillColor = fillColor || "white";
+		this.dotList = [];
+		this.spacing = 25;
+		for(var i=0;i<this.length;i++){
+			this.dotList.push(new Dot(90 + this.x +(i*this.spacing),this.y-6,10,this.lineColor,this.fillColor));
+		}
+	}
+	update(){
+		drawText(this.title,this.x,this.y);
+		for(var i=0;i<this.length;i++){
+			this.dotList[i].update();
+		}
+	}
+	fill(amt){
+		if(amt == undefined || amt == '' || amt == 0){
+			return;
+		}
+		if(amt > this.length){
+			amt = this.length;
+		}
+		for(var i=0;i<amt;i++){
+			this.dotList[i].fill(this.color);
+		}
+	}
+}
+
+class AttributeGraph{
+	constructor(x,y){
+		this.x = x;
+		this.y = y;
+		this.title = "Total Attributes";
+		this.healthBar = new DotLine("Health",this.x,this.y+30,config.attributeMaxAmount,"orange","red");
+		this.speedBar = new DotLine("Speed",this.x,this.y+60,config.attributeMaxAmount,"orange","blue");
+		this.weaponBar = new DotLine("Weapon",this.x,this.y+90,config.attributeMaxAmount,"orange","green");
+	}
+	update(){
+		drawText(this.title,this.x+150,this.y);
+
+		this.healthBar.fill(myShip.healthAttribute);
+		this.speedBar.fill(myShip.speedAttribute);
+		this.weaponBar.fill(myShip.weaponAttribute);
+
+		this.healthBar.update();
+		this.speedBar.update();
+		this.weaponBar.update();
+	}
+}
+
+
 function drawBackground() {
 	gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 }
@@ -252,7 +338,11 @@ function drawHUD(){
     if(!camera.inBounds(world.whiteBound)){
 		drawBoundArrow();
 	}
-
+	if(myGraph == null){
+		myGraph = new AttributeGraph(eventLog.x-350,eventLog.y-25);
+	} else {
+		myGraph.update();
+	}
     if(gameStarted){
     	drawShrinkTimer();
     } else{

@@ -41,11 +41,12 @@
 
     "asteroidLootTable":{
       "HealthAttribute":1,
-      "SpeedAttribute":2,
-      "WeaponAttribute":3
+      "SpeedAttribute":1,
+      "WeaponAttribute":1
     },
 
     "attributeAmountHealth":5,
+    "attributeMaxAmount":10,
 
     "generatePlanets":true,
     "planetAmt":30,

@@ -130,7 +130,18 @@ function clientConnect() {
 		if(shipList[payload.id] == null){
 			return;
 		}
-		console.log(payload.type);
+		if(payload.type == "health"){
+			shipList[payload.id].healthAttribute += 1;
+			return;
+		}
+		if(payload.type == "weapon"){
+			shipList[payload.id].weaponAttribute += 1;
+			return;
+		}
+		if(payload.type == "speed"){
+			shipList[payload.id].speedAttribute += 1;
+			return;
+		}
 	});
 
 	server.on("weaponFired",function(payload){

@@ -1314,20 +1314,26 @@ class Ship extends Circle{
 	equip(item){
 		if(item instanceof AttributeItem){
 			if(item instanceof HealthAttribute){
-				this.appliedAttributes.health += 1;
-				this.baseHealth += c.attributeAmountHealth;
-				this.heal(c.attributeAmountHealth);
-				messenger.messageRoomBySig(this.roomSig,"attributeApplied",{id:this.id,type:"health"});
+				if(this.appliedAttributes.health < c.attributeMaxAmount){
+					this.appliedAttributes.health += 1;
+					this.baseHealth += c.attributeAmountHealth;
+					this.heal(c.attributeAmountHealth);
+					messenger.messageRoomBySig(this.roomSig,"attributeApplied",{id:this.id,type:"health"});
+				}
 				return;
 			}
 			if(item instanceof SpeedAttribute){
-				this.appliedAttributes.speed += 1;
-				messenger.messageRoomBySig(this.roomSig,"attributeApplied",{id:this.id,type:"speed"});
+				if(this.appliedAttributes.speed < c.attributeMaxAmount){
+					this.appliedAttributes.speed += 1;
+					messenger.messageRoomBySig(this.roomSig,"attributeApplied",{id:this.id,type:"speed"});
+				}
 				return;
 			}
 			if(item instanceof WeaponAttribute){
-				this.appliedAttributes.weapon += 1;
-				messenger.messageRoomBySig(this.roomSig,"attributeApplied",{id:this.id,type:"weapon"});
+				if(this.appliedAttributes.weapon < c.attributeMaxAmount){
+					this.appliedAttributes.weapon += 1;
+					messenger.messageRoomBySig(this.roomSig,"attributeApplied",{id:this.id,type:"weapon"});
+				}
 				return;
 			}
 		}

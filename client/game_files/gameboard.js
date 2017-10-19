@@ -159,6 +159,9 @@ function createShip(dataArray,isAI){
 	shipList[index].power = config.playerBasePower;
 	shipList[index].health = config.playerBaseHealth;
 	shipList[index].radius = config.playerBaseRadius;
+	shipList[index].healthAttribute = 0;
+	shipList[index].speedAttribute = 0;
+	shipList[index].weaponAttribute = 0;
 	shipList[index].id = dataArray[0];
 	var shipX, shipY, shipColor;
 	shipX = dataArray[1];
@@ -449,7 +452,7 @@ function weaponFired(payload){
 			bulletList[bullet[0]].velX = 0;
 			bulletList[bullet[0]].velY = 0;
 			bulletList[bullet[0]].owner = id;
-			
+
 			var bulletX, bulletY, bulletWidth;
 			bulletX     = bullet[1];
 			bulletY     = bullet[2];
@@ -464,7 +467,7 @@ function weaponFired(payload){
 			bulletList[bullet[0]].trail = new Trail({x:bulletX, y:bulletY}, 10, bulletWidth, ship.color, 0.4, 'line');
 		}
 	}
-	
+
 	if(camera.inBounds(ship)){
 		if(weaponName == "Blaster"){
 			powerCost = config.blasterPowerCost;
