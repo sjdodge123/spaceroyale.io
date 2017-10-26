@@ -454,6 +454,7 @@ function resetGameVariables(){
     lobbyTimeLeft = 0;
     totalPlayers = null;
     myShip = null;
+    myGraph = null;
     healthLastFrame = 100;
     moveForward = false;
     moveBackward = false;
