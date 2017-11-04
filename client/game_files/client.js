@@ -192,9 +192,9 @@ function clientConnect() {
 		}
 	});
 
-	server.on("spawnItem",function(packet){
+	server.on("spawnItems",function(packet){
 		if(packet != null){
-			spawnItem(packet);
+			spawnItems(packet);
 		}
 	})
 

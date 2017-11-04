@@ -46,6 +46,7 @@
     },
 
     "attributeAmountHealth":5,
+    "attributeShipDropAmount":5,
     "attributeMaxAmount":10,
 
     "generatePlanets":true,

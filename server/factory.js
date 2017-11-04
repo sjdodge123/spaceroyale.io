@@ -65,7 +65,6 @@ class Room {
 			if(ship.alive == false){
 				var remaining = this.game.getShipCount()-1;
 				this.engine.explodeObject(ship.x, ship.y, ship.explosionMaxDamage, ship.explosionRadius);
-				//this.game.gameBoard.spawnItem(ship.weapon.drop(ship.x,ship.y));
 				if(ship.killedBy != null && this.shipList[ship.killedBy] != null){
 					var murderer = this.shipList[ship.killedBy];
 					var victim = ship;
@@ -356,7 +355,6 @@ class GameBoard {
 		this.roomSig = roomSig;
 	}
 	update(active, dt){
-		//console.log('FRAME');
 		this.engine.update(dt);
 		this.checkCollisions(active);
 		this.updateShips(active,dt);
@@ -374,9 +372,9 @@ class GameBoard {
 				this.world.checkForMapDamage(ship);
 			}
 			ship.update(dt);
-			if(ship.droppedItem != null){
-				this.spawnItem(ship.droppedItem);
-				ship.droppedItem = null;
+			if(ship.droppedItems.length > 0){
+				this.spawnItems(ship.droppedItems);
+				ship.droppedItems = [];
 			}
 			if(ship.regenerating || ship.powerRegen){
 				regeneratingShips.push([ship.id, ship.health,ship.power]);
@@ -400,7 +398,7 @@ class GameBoard {
 		for(var sig in this.tradeShipList){
 			var tradeShip = this.tradeShipList[sig];
 			if(tradeShip.alive == false){
-				this.spawnItem(tradeShip.dropItem());
+				this.spawnItems(tradeShip.dropItems());
 				deadSigs.push(sig);
 				delete this.tradeShipList[sig];
 				continue;
@@ -484,11 +482,13 @@ class GameBoard {
 			messenger.messageRoomBySig(this.roomSig,'terminateGadgets',deadSigs);
 		}
 	}
-	spawnItem(item){
-		var sig = this.generateItemSig();
-		item.sig = sig;
-		this.itemList[sig] = item;
-		messenger.messageRoomBySig(this.roomSig,'spawnItem',compressor.spawnItem(item));
+	spawnItems(items){
+		for(var i=0;i<items.length;i++){
+			var sig = this.generateItemSig();
+			items[i].sig = sig;
+			this.itemList[sig] = items[i];
+		}
+		messenger.messageRoomBySig(this.roomSig,'spawnItems',compressor.spawnItems(items));
 	}
 	spawnTradeShip(){
 		if(c.generateTradeShips){
@@ -581,8 +581,8 @@ class GameBoard {
 		}
 	}
 	terminateAsteroid(asteroid){
-		if(asteroid.item != null){
-			this.spawnItem(asteroid.item);
+		if(asteroid.items.length > 0){
+			this.spawnItems(asteroid.items);
 		}
 		delete this.asteroidList[asteroid.sig];
 	}
@@ -1144,7 +1144,7 @@ class Ship extends Circle{
 		this.brakeCoeff = c.playerBrakeCoeff;
 		this.velX = 0;
 		this.velY = 0;
-		this.droppedItem = null;
+		this.droppedItems = [];
 		this.dt = 0;
 
 		this.roomSig = roomSig;
@@ -1589,6 +1589,36 @@ class Ship extends Circle{
 			this.killedBy = killerID;
 		}
 		this.alive = false;
+		this.dropAttributes();
+	}
+	dropAttributes(){
+		var maxPossible = c.attributeMaxAmount*3;
+		var scaleFactor = maxPossible/c.attributeShipDropAmount;
+		var health = 0;
+
+		if(this.appliedAttributes.health > 0){
+			health = Math.ceil((this.appliedAttributes.health / maxPossible) * scaleFactor);
+		}
+
+		var speed = 0;
+		if(this.appliedAttributes.speed > 0){
+			speed =  Math.ceil((this.appliedAttributes.speed / maxPossible) * scaleFactor);
+		}
+
+		var weapon = 0;
+		if(this.appliedAttributes.weapon > 0){
+			weapon =  Math.ceil((this.appliedAttributes.weapon / maxPossible) * scaleFactor);
+		}
+
+		for(var i=0;i<health;i++){
+			this.droppedItems.push(new HealthAttribute(this.x,this.y));
+		}
+		for(var i=0;i<speed;i++){
+			this.droppedItems.push(new SpeedAttribute(this.x,this.y));
+		}
+		for(var i=0;i<weapon;i++){
+			this.droppedItems.push(new WeaponAttribute(this.x,this.y));
+		}
 	}
 	checkHP(){
 		var timeElapsed = Date.now() - this.regenTimer;
@@ -1961,7 +1991,7 @@ class Asteroid extends Circle{
 		super(x,y,radius,"orange");
 		this.sig = sig;
 		this.isWall = true;
-		this.item = null;
+		this.items = [];
 		this.roomSig = roomSig;
 		this.artType = utils.getRandomInt(0,2);
 		this.dropRate = c.asteroidDropRate;
@@ -2009,18 +2039,17 @@ class Asteroid extends Circle{
 		}
 	}
 	dropItem(itemName){
-		var item;
 		switch(itemName){
 			case "HealthAttribute":{
-				item = new HealthAttribute(this.x,this.y);
+				this.items.push(new HealthAttribute(this.x,this.y));
 				break;
 			}
 			case "SpeedAttribute":{
-				item = new SpeedAttribute(this.x,this.y);
+				this.items.push(new SpeedAttribute(this.x,this.y));
 				break;
 			}
 			case "WeaponAttribute":{
-				item = new WeaponAttribute(this.x,this.y);
+				this.items.push(new WeaponAttribute(this.x,this.y));
 				break;
 			}
 			/*
@@ -2037,7 +2066,7 @@ class Asteroid extends Circle{
 				item = new OverdriveItem(this.x,this.y);
 				break;
 			}
-			*/
+			
 			case "BlasterItem": {
 				item = new BlasterItem(this.x,this.y);
 				break;
@@ -2050,8 +2079,8 @@ class Asteroid extends Circle{
 				item = new MassDriverItem(this.x,this.y);
 				break;
 			}
+			*/
 		}
-		this.item = item;
 	}
 }
 
@@ -2153,9 +2182,9 @@ class TradeShip extends Rect{
 	startMove(ts){
 		ts.readyToMove = true;
 	}
-	dropItem(){
+	dropItems(){
 		var item = new this.item(this.x+this.width/2,this.y+this.height/2,1);
-		return item;
+		return [item];
 	}
 	move(){
 		this.x += this.speed * Math.cos(this.angle * (Math.PI/180));

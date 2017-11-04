@@ -199,16 +199,22 @@ function updateShipList(packet){
 	}
 }
 
-function spawnItem(packet){
+function spawnItems(packet){
 	packet = JSON.parse(packet);
-	itemList[packet[0]] = {};
-	itemList[packet[0]].radius = config.baseItemRadius;
-	itemList[packet[0]].dropDate = Date.now();
-	itemList[packet[0]].flash = false;
-	itemList[packet[0]].sig = packet[0];
-	itemList[packet[0]].x = packet[1];
-	itemList[packet[0]].y = packet[2];
-	itemList[packet[0]].name = packet[3];
+	for(var i=0;i<packet.length;i++){
+		var item = packet[i];
+		if(itemList[item[0]] == null){
+			itemList[item[0]] = {};
+			itemList[item[0]].radius = config.baseItemRadius;
+			itemList[item[0]].dropDate = Date.now();
+			itemList[item[0]].flash = false;
+			itemList[item[0]].sig = item[0];
+			itemList[item[0]].x = item[1];
+			itemList[item[0]].y = item[2];
+			itemList[item[0]].name = item[3];
+		}
+	}
+	
 }
 
 function spawnTradeShip(packet){

@@ -247,13 +247,19 @@ exports.spawnAsteroids = function(asteroidList){
 	return packet;
 }
 
-exports.spawnItem = function(item){
+exports.spawnItems = function(items){
 	var packet = [];
-	packet[0] = item.sig;
-	packet[1] = item.x;
-	packet[2] = item.y;
-	packet[3] = item.name;
+	for(var i=0;i<items.length;i++){
+		listItem = [
+			items[i].sig,
+			items[i].x,
+			items[i].y,
+			items[i].name,
+		];
+		packet.push(listItem);
+	}
 	packet = JSON.stringify(packet);
+	listItem = null;
 	return packet;
 }
 
