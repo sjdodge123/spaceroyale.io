@@ -1158,9 +1158,9 @@ class Ship extends Circle{
 		this.regenerating = false;
 
 		this.appliedAttributes = {
-			health : 0,
-			speed : 0,
-			weapon: 0
+			health : c.attributeHealthStart,
+			speed : c.attributeSpeedStart,
+			weapon: c.attributeWeaponStart
 		};
 
 		this.gadget = new PulseWave(this.engine,this.id);
@@ -1331,6 +1331,8 @@ class Ship extends Circle{
 			}
 			if(item instanceof WeaponAttribute){
 				if(this.appliedAttributes.weapon < c.attributeMaxAmount){
+					this.currentCritBonus += c.attributeWeaponCritBonusAmount;
+					this.weapon.powerCost -= c.attributeWeaponPowerCostReduction;
 					this.appliedAttributes.weapon += 1;
 					messenger.messageRoomBySig(this.roomSig,"attributeApplied",{id:this.id,type:"weapon"});
 				}
@@ -1360,7 +1362,7 @@ class Ship extends Circle{
 				messenger.messageRoomBySig(this.roomSig,"updateItem",data);
 				return;
 			}
-			//this.droppedItem = this.weapon.drop(this.x,this.y,this.weapon.level);
+			//this.droppedItems.push(this.weapon.drop(this.x,this.y,this.weapon.level));
 			this.weapon = new Blaster(this.id,item.level);
 			this.weapon.equip();
 			var data = compressor.equipItem(this.weapon);
@@ -1374,7 +1376,7 @@ class Ship extends Circle{
 				messenger.messageRoomBySig(this.roomSig,"updateItem",data);
 				return;
 			}
-			//this.droppedItem = this.weapon.drop(this.x,this.y,this.weapon.level);
+			//this.droppedItems.push(this.weapon.drop(this.x,this.y,this.weapon.level));
 			this.weapon = new PhotonCannon(this.id,item.level);
 			this.weapon.equip();
 			var data = compressor.equipItem(this.weapon);
@@ -1388,7 +1390,7 @@ class Ship extends Circle{
 				messenger.messageRoomBySig(this.roomSig,"updateItem",data);
 				return;
 			}
-			//this.droppedItem = this.weapon.drop(this.x,this.y,this.weapon.level);
+			//this.droppedItems.push(this.weapon.drop(this.x,this.y,this.weapon.level));
 			this.weapon = new MassDriver(this.id,item.level);
 			this.weapon.equip();
 			var data = compressor.equipItem(this.weapon);
@@ -1438,9 +1440,6 @@ class Ship extends Circle{
 			} else{
 				this.health += amt;
 			}
-			messenger.toastPlayer(this.id,"Healed " + amt);
-		} else{
-			messenger.toastPlayer(this.id,"Full health");
 		}
 		messenger.messageRoomBySig(this.roomSig,"shipHealth",{health:this.health,id:this.id});
 	}
@@ -1680,6 +1679,12 @@ class Ship extends Circle{
 		if(this.enabled){
 			this.enabled = false;
 		}
+	}
+	getSpeedBonus(){
+		if(this.appliedAttributes.speed == 0){
+			return 0;
+		}
+		return c.attributeMoveSpeedBonus*this.appliedAttributes.speed;
 	}
 }
 
@@ -2066,7 +2071,7 @@ class Asteroid extends Circle{
 				item = new OverdriveItem(this.x,this.y);
 				break;
 			}
-			
+
 			case "BlasterItem": {
 				item = new BlasterItem(this.x,this.y);
 				break;

@@ -131,8 +131,8 @@ class Engine {
 				}
 			}
 			var newVelX, newVelY, newVel, newDirX, newDirY;
-			newVelX = ship.velX + (ship.acel + ship.speedBoost) * dirX  * this.dt;
-			newVelY = ship.velY + (ship.acel + ship.speedBoost) * dirY  * this.dt;
+			newVelX = ship.velX + (ship.acel + ship.getSpeedBonus()) * dirX  * this.dt;
+			newVelY = ship.velY + (ship.acel + ship.getSpeedBonus()) * dirY  * this.dt;
 
 			if(braking){
 				newVelX -= ship.brakeCoeff * ship.velX;
@@ -212,31 +212,31 @@ class Engine {
   							obj1.hitList.push(obj2);
   						}
 						if (!this.containsItem(collidingBeams,obj1)){
-							collidingBeams.push(obj1);	
+							collidingBeams.push(obj1);
 						}
-  						
+
   					}
   					else{
-  						dyingBulletList.push(obj1);	
+  						dyingBulletList.push(obj1);
   					}
 				}
   				if(obj2.handleHit(obj1)){
   					if(obj2.isBeam){
   						if (!this.containsItem(obj2.hitList, obj1)){
-  							obj2.hitList.push(obj1);	
+  							obj2.hitList.push(obj1);
   						}
 						if (!this.containsItem(collidingBeams, obj2)){
-							collidingBeams.push(obj2);	
+							collidingBeams.push(obj2);
 						}
   					}
   					else{
-  						dyingBulletList.push(obj2);	
+  						dyingBulletList.push(obj2);
   					}
-					
+
 				}
     		}
 		}
-		
+
 		for (var j=0; j<dyingBulletList.length;j++){
 			dyingBulletList[j].killSelf();
 		}

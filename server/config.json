@@ -45,7 +45,16 @@
       "WeaponAttribute":1
     },
 
+    "attributeSpeedStart":0,
+    "attributeWeaponStart":0,
+    "attributeHealthStart":0,
+
     "attributeAmountHealth":5,
+    "attributeMoveSpeedBonus":25,
+
+    "attributeWeaponCritBonusAmount":0.25,
+    "attributeWeaponPowerCostReduction":1,
+
     "attributeShipDropAmount":5,
     "attributeMaxAmount":10,
 

@@ -131,14 +131,23 @@ function clientConnect() {
 			return;
 		}
 		if(payload.type == "health"){
+			if(myShip.id == payload.id){
+				toastMsg("Health Enhanced");
+			}
 			shipList[payload.id].healthAttribute += 1;
 			return;
 		}
 		if(payload.type == "weapon"){
+			if(myShip.id == payload.id){
+				toastMsg("Weapon Enhanced");
+			}
 			shipList[payload.id].weaponAttribute += 1;
 			return;
 		}
 		if(payload.type == "speed"){
+			if(myShip.id == payload.id){
+				toastMsg("Speed Enhanced");
+			}
 			shipList[payload.id].speedAttribute += 1;
 			return;
 		}
@@ -405,7 +414,7 @@ function clientConnect() {
 	});
 
 	server.on("toast",function(message){
-		trailingToasts.unshift({text:message,received:Date.now()});
+		toastMsg(message);
 	});
 
 	server.on("eventMessage",function(message){
@@ -417,6 +426,10 @@ function clientConnect() {
 		updateProfile(player);
 	});
    	return server;
+}
+
+function toastMsg(message){
+	trailingToasts.unshift({text:message,received:Date.now()});
 }
 
 function pingServer(){
