@@ -182,18 +182,18 @@ function setupPage(){
     $('#firstWeapon').click(function(){
         var lastElement = weaponArray.splice(weaponArray.length-1,1)[0];
         weaponArray.unshift(lastElement);
-        $("#firstWeapon").attr('src',weaponArray[0].image).attr('data-selected',weaponArray[0].value).attr('title',weaponArray[0].title);
+        //$("#firstWeapon").attr('src',weaponArray[0].image).attr('data-selected',weaponArray[0].value).attr('title',weaponArray[0].title);
         $("#secondWeapon").attr('src',weaponArray[1].image).attr('data-selected',weaponArray[1].value).attr('title',weaponArray[1].title);
-        $("#thirdWeapon").attr('src',weaponArray[2].image).attr('data-selected',weaponArray[2].value).attr('title',weaponArray[2].title);
+        //$("#thirdWeapon").attr('src',weaponArray[2].image).attr('data-selected',weaponArray[2].value).attr('title',weaponArray[2].title);
         clientSendMessage('changeWeapon',weaponArray[1].value);
     });
 
     $('#thirdWeapon').click(function(){
         var firstElement = weaponArray.shift();
         weaponArray.push(firstElement);
-        $("#firstWeapon").attr('src',weaponArray[0].image).attr('data-selected',weaponArray[0].value).attr('title',weaponArray[0].title);
+        //$("#firstWeapon").attr('src',weaponArray[0].image).attr('data-selected',weaponArray[0].value).attr('title',weaponArray[0].title);
         $("#secondWeapon").attr('src',weaponArray[1].image).attr('data-selected',weaponArray[1].value).attr('title',weaponArray[1].title);
-        $("#thirdWeapon").attr('src',weaponArray[2].image).attr('data-selected',weaponArray[2].value).attr('title',weaponArray[2].title);
+        //$("#thirdWeapon").attr('src',weaponArray[2].image).attr('data-selected',weaponArray[2].value).attr('title',weaponArray[2].title);
         clientSendMessage('changeWeapon',weaponArray[1].value);
     });
 
@@ -206,18 +206,18 @@ function setupPage(){
     $('#firstGadget').click(function(){
         var lastElement = gadgetArray.splice(gadgetArray.length-1,1)[0];
         gadgetArray.unshift(lastElement);
-        $("#firstGadget").attr('src',gadgetArray[0].image).attr('data-selected',gadgetArray[0].value).attr('title',gadgetArray[0].title);
+        //$("#firstGadget").attr('src',gadgetArray[0].image).attr('data-selected',gadgetArray[0].value).attr('title',gadgetArray[0].title);
         $("#secondGadget").attr('src',gadgetArray[1].image).attr('data-selected',gadgetArray[1].value).attr('title',gadgetArray[1].title);
-        $("#thirdGadget").attr('src',gadgetArray[2].image).attr('data-selected',gadgetArray[2].value).attr('title',gadgetArray[2].title);
+        //$("#thirdGadget").attr('src',gadgetArray[2].image).attr('data-selected',gadgetArray[2].value).attr('title',gadgetArray[2].title);
         clientSendMessage('changeGadget',gadgetArray[1].value);
     });
 
     $('#thirdGadget').click(function(){
         var firstElement = gadgetArray.shift();
         gadgetArray.push(firstElement);
-        $("#firstGadget").attr('src',gadgetArray[0].image).attr('data-selected',gadgetArray[0].value).attr('title',gadgetArray[0].title);
+        //$("#firstGadget").attr('src',gadgetArray[0].image).attr('data-selected',gadgetArray[0].value).attr('title',gadgetArray[0].title);
         $("#secondGadget").attr('src',gadgetArray[1].image).attr('data-selected',gadgetArray[1].value).attr('title',gadgetArray[1].title);
-        $("#thirdGadget").attr('src',gadgetArray[2].image).attr('data-selected',gadgetArray[2].value).attr('title',gadgetArray[2].title);
+        //$("#thirdGadget").attr('src',gadgetArray[2].image).attr('data-selected',gadgetArray[2].value).attr('title',gadgetArray[2].title);
         clientSendMessage('changeGadget',gadgetArray[1].value);
     });
 
