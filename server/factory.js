@@ -366,6 +366,7 @@ class GameBoard {
 	}
 	updateShips(active,dt){
 		var regeneratingShips = [];
+		var gadgetsOnCooldown = [];
 		for(var shipID in this.shipList){
 			var ship = this.shipList[shipID];
 			if(active){
@@ -379,7 +380,9 @@ class GameBoard {
 			if(ship.regenerating || ship.powerRegen){
 				regeneratingShips.push([ship.id, ship.health,ship.power]);
 			}
-
+			if(ship.gadget.coolingDown){
+				gadgetsOnCooldown.push({id:ship.id,percent:ship.gadget.cooldownPercent});
+			}
 			if(ship.firedBullets.length != 0){
 				this.generateBullets(ship.id,ship.weapon,ship.firedBullets);
 				ship.firedBullets = [];
@@ -388,6 +391,9 @@ class GameBoard {
 				this.generateGadgets(ship.newGadgets);
 				ship.newGadgets = [];
 			}
+		}
+		if(gadgetsOnCooldown.length != 0){
+			messenger.messageRoomBySig(this.roomSig,"gadgetCooldownUpdate",gadgetsOnCooldown);
 		}
 		if(regeneratingShips.length != 0){
 			messenger.messageRoomBySig(this.roomSig,"shipsRegenerating",regeneratingShips);
@@ -1188,6 +1194,7 @@ class Ship extends Circle{
 		this.checkFireState();
 		this.checkBoostList();
 		this.checkKills();
+		this.gadget.update();
 	}
 	changeWeapon(name){
 		switch(name){
@@ -1239,6 +1246,8 @@ class Ship extends Circle{
 				break;
 			}
 		}
+		messenger.messageRoomBySig(this.roomSig,"changeGadget",{id:this.id,name:name});
+		messenger.messageRoomBySig(this.roomSig,"gadgetCooldownStop",{id:this.id});
 	}
 
 	applyPassive(passiveInt){
@@ -1521,6 +1530,7 @@ class Ship extends Circle{
 		} else{
 			this.newGadgets.push(objects);
 		}
+		messenger.messageRoomBySig(this.roomSig,"gadgetCooldownStart",{id:this.id});
 	}
 	deactivateGadget(){
 		this.useGadget = false;
@@ -1692,11 +1702,25 @@ class Gadget {
 	constructor(engine, owner){
 		this.engine = engine;
 		this.owner = owner;
+		this.coolingDown = false;
+		this.cooldownPercent = 0;
 		this.cooldown = 5*1000;
 		this.cooldownTimer = Date.now() - this.cooldown;
 	}
+	update(){
+		var timeLeft = this.cooldown - (Date.now() - this.cooldownTimer);
+		if(timeLeft < 0){
+			this.coolingDown = false;
+		} else{
+			this.cooldownPercent = 0;
+			this.coolingDown = true;
+		}
+		if(this.cooldownPercent < 101){
+			this.cooldownPercent = Math.floor((1-(timeLeft/this.cooldown))*100);
+		}
+	}
 	activate(){
-		if(this.cooldown - (Date.now() - this.cooldownTimer) < 0){
+		if(this.coolingDown == false){
 			this.cooldownTimer = Date.now();
 			return true;
 		}
@@ -1772,7 +1796,6 @@ class GadgetObject extends Circle{
 		this.speed = 5;
 		this.isStatic = true;
 		this.owner = owner;
-
 	}
 	update(){
 		if(!this.isStatic){

@@ -163,6 +163,8 @@ function createShip(dataArray,isAI){
 	shipList[index].speedAttribute = 0;
 	shipList[index].weaponAttribute = 0;
 	shipList[index].id = dataArray[0];
+	shipList[index].gadget = "PulseWave";
+	shipList[index].gadgetCooldown = 100;
 	var shipX, shipY, shipColor;
 	shipX = dataArray[1];
 	shipY = dataArray[2];
@@ -214,7 +216,7 @@ function spawnItems(packet){
 			itemList[item[0]].name = item[3];
 		}
 	}
-	
+
 }
 
 function spawnTradeShip(packet){

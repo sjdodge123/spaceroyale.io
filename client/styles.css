@@ -95,9 +95,38 @@ canvas{
 	top: 50%;
 	left:50%;
 	transform:translate(-50%,-50%);
-	
-}
 
+}
+#gameUI{
+	width: 100%;
+	height: 100%;
+	position: relative;
+	background-color: transparent;
+	color:white;
+	overflow: none;
+	border: 1px solid #333333;
+}
+#bottomPanel{
+	bottom: 0;
+	width: 100%;
+	height: 200px;
+	position: absolute;
+	overflow: none;
+}
+#leftClickPanel{
+	display: inline-block;
+	width: 100%;
+	height: 100%;
+	color:white;
+	overflow: none;
+}
+#rightClickPanel{
+	display: inline-block;
+	width: 100%;
+	height: 100%;
+	color:white;
+	overflow: none;
+}
 #shipBuild{
 	top:5%;
 	left:5%;

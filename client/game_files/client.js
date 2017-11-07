@@ -167,11 +167,66 @@ function clientConnect() {
 		myShip.weapon.chargeLevel = level;
 	});
 
+	server.on("changeGadget",function(packet){
+		if(packet == null){
+			return;
+		}
+		if(shipList[packet.id] != null){
+			shipList[packet.id].gadget = packet.name;
+		}
+		if(packet.id != myShip.id){
+			return;
+		}
+		changeGadgetHUD(packet.name);
+	});
+
 	server.on("gadgetActivated",function(packet){
 		if(packet == null){
 			return;
 		}
 		gadgetActivated(packet);
+	});
+
+	server.on('gadgetCooldownStart',function(packet){
+		if(packet == null){
+			return;
+		}
+		if(shipList[packet.id] != null){
+			shipList[packet.id].gadgetCooldown = 0;
+		}
+		if(packet.id != myShip.id){
+			return;
+		}
+		__showProgress(0,'gadget-cooldown');
+	});
+
+	server.on('gadgetCooldownUpdate',function(packet){
+		if(packet == null){
+			return;
+		}
+		for(var i=0;i<packet.length;i++){
+			var object = packet[i];
+			if(shipList[object.id] != null){
+				shipList[object.id].gadgetCooldown = object.percent;
+			}
+			if(object.id != myShip.id){
+				continue;
+			}
+			__showProgress(object.percent,'gadget-cooldown');
+		}
+	});
+
+	server.on('gadgetCooldownStop',function(packet){
+		if(packet == null){
+			return;
+		}
+		if(shipList[packet.id] != null){
+			shipList[packet.id].gadgetCooldown = 100;
+		}
+		if(packet.id != myShip.id){
+			return;
+		}
+		__showProgress(100,'gadget-cooldown');
 	});
 
 	server.on("terminateGadgets",function(deadSigs){

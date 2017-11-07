@@ -1192,3 +1192,13 @@ function drawBullets(){
 		}
 	}
 }
+
+function changeGadgetHUD(name){
+	for(var i=0;i<gadgetArray.length;i++){
+		if(gadgetArray[i].value == name){
+			$('#currentGadget').attr('xlink:href',gadgetArray[i].image);
+			break;
+		}
+	}
+	__showProgress(myShip.gadgetCooldown,'gadget-cooldown');
+}

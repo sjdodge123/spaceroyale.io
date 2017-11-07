@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Circular Progress Bar
+        </title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="angular.min.js"></script>
+        <script src="circular-progress-angular.js"></script>
+    </head>
+    <body>
+        <div ng-app="myProgressBarApp" ng-controller="myCtrl">
+            <svg height="200" width="200">
+                <circle id="_cir_P_x" cx="100" cy="100" r="60" stroke="#004C70" stroke-width="20" fill="#E0CC97"></circle>
+                <circle id="_cir_P_y" cx="100" cy="100" r="60" stroke="#E0A025" stroke-width="20"  stroke-dasharray="0,1000" fill="none"></circle>
+                <text x="50%" y="50%" text-anchor="middle" stroke="none" stroke-width="1px" dy=".3em" id="_cir_Per" ng-model="percentage">{{percentage}}</text>
+            </svg>
+            <button ng-click="__showProgress(90)">Show 90%</button>
+        </div>
+    </body>
+</html>

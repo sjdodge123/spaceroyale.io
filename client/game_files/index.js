@@ -220,8 +220,6 @@ function setupPage(){
         //$("#thirdGadget").attr('src',gadgetArray[2].image).attr('data-selected',gadgetArray[2].value).attr('title',gadgetArray[2].title);
         clientSendMessage('changeGadget',gadgetArray[1].value);
     });
-
-
     //*******************************************************************************************
 
 
@@ -299,6 +297,7 @@ function setupPage(){
     userRegex = new RegExp('^[a-zA-Z0-9_-]{3,15}$');
     passRegex = new RegExp('^[a-zA-Z0-9_-]{6,20}$');
     gameNameRegex = new RegExp('^[a-zA-Z0-9_-]{3,10}$');
+    __showProgress(100,'gadget-cooldown');
 }
 
 function auth(user,pass){
@@ -491,6 +490,7 @@ function resetGameVariables(){
     hud = document.getElementById('hud');
     $('#lobbyUI').show();
     gameContext = gameCanvas.getContext('2d');
+    __showProgress(100,'gadget-cooldown');
 }
 
 function buildPassiveList(){
@@ -739,6 +739,7 @@ function recenterCamera(){
             cameraCenterSeed = findAlivePlayerIndex();
             cameraBouncingFirstPass = false;
             myID = cameraCenterSeed;
+            changeGadgetHUD(shipList[myID].gadget);
             healthLastFrame = shipList[myID].health;
         }
         if(cameraBouncingFirstPass){
