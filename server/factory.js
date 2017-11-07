@@ -614,6 +614,8 @@ class GameBoard {
 			var ship = this.shipList[shipID];
 			ship.health = c.playerBaseHealth;
 			ship.power = c.playerBasePower;
+			ship.gadget.reset();
+			messenger.messageRoomBySig(this.roomSig,"gadgetCooldownStop",{id:ship.id});
 		}
 	}
 	generateBulletSig(){
@@ -1727,6 +1729,11 @@ class Gadget {
 	}
 	deactivate(){
 
+	}
+	reset(){
+		this.coolingDown = false;
+		this.cooldownPercent = 0;
+		this.cooldownTimer = Date.now() - this.cooldown;
 	}
 }
 
