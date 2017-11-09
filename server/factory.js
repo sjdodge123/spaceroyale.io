@@ -363,7 +363,7 @@ class GameBoard {
 		this.updateTradeShips();
 		this.updateBullets(dt);
 		this.updateAsteroids();
-		this.updateItems();
+		this.updateItems(dt);
 		this.updateGadgets();
 	}
 	updateShips(active,dt){
@@ -451,7 +451,7 @@ class GameBoard {
 			messenger.messageRoomBySig(this.roomSig,'terminateAsteroids',deadSigs);
 		}
 	}
-	updateItems(){
+	updateItems(dt){
 		var deadSigs = [];
 		for(var itemSig in this.itemList){
 			var item = this.itemList[itemSig];
@@ -460,7 +460,7 @@ class GameBoard {
 				this.terminateItem(itemSig);
 				continue;
 			}
-			item.update();
+			item.update(dt);
 		}
 		if(deadSigs.length != 0){
 			messenger.messageRoomBySig(this.roomSig,'terminateItems',deadSigs);
@@ -541,8 +541,6 @@ class GameBoard {
 			for(var bulletSig in this.bulletList){
 				objectArray.push(this.bulletList[bulletSig]);
 			}
-
-
 			this.engine.broadBase(objectArray);
 		}
 		// In lobby state
@@ -2302,19 +2300,21 @@ class CircleItem extends Circle{
 	constructor(x,y,color){
 		super(x,y,c.baseItemRadius,color);
 		this.isItem = true;
-		this.shouldMove = false;
+		this.shouldMove = true;
 		this.itemDecayRate = c.baseItemDecayRate*1000;
 		this.dropDate = Date.now();
 		this.sig = null;
 		this.alive = true;
-		this.speed = 0;
-		this.velX = 0;
+		this.speed = 100;
 		this.velY = 0;
+		this.velX = 0;
 		this.newX = this.x;
 		this.newY = this.y;
-		this.angle = 0;
+		this.angle = 180;
+		this.dt = 0;
 	}
-	update(){
+	update(dt){
+		this.dt = dt;
 		if(this.itemDecayRate != null){
 			if(Date.now()-this.dropDate > this.itemDecayRate){
 				this.alive = false;
@@ -2327,6 +2327,18 @@ class CircleItem extends Circle{
 	move(){
 		this.x = this.newX;
 		this.y = this.newY;
+	}
+	handleHit(object){
+		if(!this.alive){
+			return;
+		}
+		if(!object.alive){
+			return;
+		}
+		if(object.isWall){
+			_engine.preventMovement(this,object,this.dt);
+			return;
+		}
 	}
 }
 /*
@@ -2366,9 +2378,7 @@ class Boost extends CircleItem {
 		this.name = 'Unset';
 	}
 	handleHit(object){
-		if(!this.alive){
-			return;
-		}
+		super.handleHit(object);
 		if(object instanceof Ship){
 			object.applyBoost(this.type,this.boostAmt,this.duration,this.boostMessage,this.exitMessage,this.refreshMessage);
 			this.alive = false;
@@ -2398,9 +2408,7 @@ class EquipableItem extends CircleItem{
 		this.name = '';
 	}
 	handleHit(object){
-		if(!this.alive){
-			return;
-		}
+		super.handleHit(object);
 		if(object instanceof Ship){
 			if(Date.now()-this.dropDate < this.pickUpCooldown*1000){
 				return;

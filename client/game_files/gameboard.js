@@ -313,7 +313,7 @@ function updateItemList(packet){
 	packet = JSON.parse(packet);
 	for(var i=0;i<packet.length;i++){
 		var item = packet[i];
-		if(itemList[item[0]] != null && itemList[item[0]].shouldMove){
+		if(itemList[item[0]] != null){
 			itemList[item[0]].sig = item[0];
 			itemList[item[0]].x = item[1];
 			itemList[item[0]].y = item[2];

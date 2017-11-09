@@ -191,12 +191,14 @@ exports.sendItemUpdates = function(itemList){
 	var packet = [];
 	for(prop in itemList){
 		item = itemList[prop];
-		listItem = [
-			item.sig,
-			item.x,
-			item.y,
-		];
-		packet.push(listItem);
+		if(item.shouldMove){
+			listItem = [
+				item.sig,
+				item.x,
+				item.y,
+			];
+			packet.push(listItem);
+		}
 	}
 	packet = JSON.stringify(packet);
 	item = null;
