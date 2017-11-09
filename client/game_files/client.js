@@ -197,7 +197,7 @@ function clientConnect() {
 		if(packet.id != myShip.id){
 			return;
 		}
-		__showProgress(0,'gadget-cooldown');
+		__showProgress(100,'gadget-cooldown');
 	});
 
 	server.on('gadgetCooldownUpdate',function(packet){
@@ -226,7 +226,7 @@ function clientConnect() {
 		if(packet.id != myShip.id){
 			return;
 		}
-		__showProgress(100,'gadget-cooldown');
+		__showProgress(0,'gadget-cooldown');
 	});
 
 	server.on("terminateGadgets",function(deadSigs){

@@ -325,6 +325,9 @@ function equipItem(packet){
 	shipList[packet[0]].weapon.name = name;
 	shipList[packet[0]].weapon.level = level;
 	shipList[packet[0]].weapon.powerCost = powerCost;
+	if(packet[0] == myShip.id){
+		changeWeaponHUD(name);
+	}
 }
 
 function updateItem(packet){

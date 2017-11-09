@@ -326,7 +326,6 @@ function drawFlashingText(text,x,y,color,font,flashColor,timeLeft,playTick){
 function drawHUD(){
 	drawJoysticks();
 	drawAliveCounter();
-	drawWeaponHUD();
 	drawKillCounter();
     drawHPCounter();
     drawToast();
@@ -458,7 +457,7 @@ function drawHPCounter(){
 		} else{
 			color = "tomato";
 		}
-		var totalLength = eventLog.width/2;
+		var totalLength = eventLog.width;
 		var healthPercent = ((myShip.health-boost*2)/config.playerBaseHealth);
 		var healthlength = healthPercent*totalLength;
 		gameContext.save();
@@ -471,7 +470,7 @@ function drawHPCounter(){
 		}
 		gameContext.restore();
 	}
-	drawTextF("Health",eventLog.x+(eventLog.width/4)-30,eventLog.y-15,"#ECF0F1","17px Georgia");
+	drawTextF("Health",eventLog.x+(eventLog.width/2)-30,eventLog.y-15,"#ECF0F1","17px Georgia");
 }
 
 function drawPowerBar(){
@@ -484,19 +483,9 @@ function drawPowerBar(){
 			boost = myShip.power-config.playerBasePower;
 		}
 		var totalLength = eventLog.width/2;
-		var powerPercent = ((myShip.power-boost*2)/config.playerBasePower);
-		var powerlength = powerPercent*totalLength;
-		gameContext.save();
-		gameContext.fillStyle = "skyblue";
-		gameContext.fillRect(eventLog.x+eventLog.width/2,eventLog.y-30,powerlength,20);
-		if(boost > 0){
-			var boostLength = (1-powerPercent)*totalLength;
-			gameContext.fillStyle = "gold";
-			gameContext.fillRect(eventLog.x+eventLog.width/2+powerlength,eventLog.y-30,boostLength,20);
-		}
-		gameContext.restore();
+		var powerPercent = Math.floor((myShip.power/config.playerBasePower)*100);
+		__showProgress(powerPercent,'weapon-power',boost);
 	}
-	drawTextF("Power",eventLog.x+eventLog.width/2+(eventLog.width/4)-30,eventLog.y-15,"#ECF0F1","17px Georgia");
 }
 
 function drawToast(){
@@ -1201,4 +1190,12 @@ function changeGadgetHUD(name){
 		}
 	}
 	__showProgress(myShip.gadgetCooldown,'gadget-cooldown');
+}
+function changeWeaponHUD(name){
+	for(var i=0;i<weaponArray.length;i++){
+		if(weaponArray[i].value == name){
+			$('#currentWeapon').attr('xlink:href',weaponArray[i].image);
+			break;
+		}
+	}
 }

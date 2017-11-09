@@ -1718,7 +1718,7 @@ class Gadget {
 			this.coolingDown = true;
 		}
 		if(this.cooldownPercent < 101){
-			this.cooldownPercent = Math.floor((1-(timeLeft/this.cooldown))*100);
+			this.cooldownPercent = Math.floor((timeLeft/this.cooldown)*100);
 		}
 	}
 	activate(){
