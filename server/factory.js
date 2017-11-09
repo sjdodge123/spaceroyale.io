@@ -2379,6 +2379,9 @@ class Boost extends CircleItem {
 	}
 	handleHit(object){
 		super.handleHit(object);
+		if(!this.alive){
+			return;
+		}
 		if(object instanceof Ship){
 			object.applyBoost(this.type,this.boostAmt,this.duration,this.boostMessage,this.exitMessage,this.refreshMessage);
 			this.alive = false;
@@ -2409,6 +2412,9 @@ class EquipableItem extends CircleItem{
 	}
 	handleHit(object){
 		super.handleHit(object);
+		if(!this.alive){
+			return;
+		}
 		if(object instanceof Ship){
 			if(Date.now()-this.dropDate < this.pickUpCooldown*1000){
 				return;
