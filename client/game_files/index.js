@@ -700,14 +700,14 @@ function animloop(){
     if(gameRunning){
         var now = Date.now();
     	dt = now - then;
-        gameLoop();
+        gameLoop(dt);
 
     	then = now;
     	requestAnimFrame(animloop);
     }
 }
 
-function gameLoop(){
+function gameLoop(dt){
     recenterCamera();
     if(myShip == null){
         return;
@@ -721,7 +721,7 @@ function gameLoop(){
     updateGameboard();
     drawFlashScreen();
     drawBackground();
-    drawRelativeObjects();
+    drawRelativeObjects(dt);
     drawHUD();
     checkForDamage()
 }

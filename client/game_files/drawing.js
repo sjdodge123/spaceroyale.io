@@ -15,6 +15,9 @@ shipMagentaSVG.src = 'sprites/ship_magenta.svg';
 var shipBlueSVG = new Image(500,500);
 shipBlueSVG.src = 'sprites/ship_blue.svg';
 
+var shipSVG = new Image(150,1200);
+shipSVG.src = 'sprites/ship.svg';
+
 var tradeShipSVG = new Image();
 tradeShipSVG.src ="sprites/trade_ship.svg";
 
@@ -77,6 +80,11 @@ class SpriteSheet {
 		this.rows = rows;
 		this.columns = columns;
 
+		this.frameRate = 60;
+		this.ticksPerFrame = 1 / this.frameRate;
+		this.ticks = 0;
+		this.loopAnimation = true;
+
 		for(var i=0;i<rows;i++){
 			this.frameIndex[i] = [];
 			for(var j=0;j<columns;j++){
@@ -95,7 +103,18 @@ class SpriteSheet {
 		this.XframeIndex = x;
 		this.YframeIndex = y;
 	}
-
+	update(dt){
+		this.ticks += dt/1000;
+		if (this.ticks > this.ticksPerFrame){
+			if (this.YframeIndex < this.columns - 1){
+				this.YframeIndex += 1;
+			}
+			else if (this.loopAnimation){
+				this.YframeIndex = 0;
+			}
+			this.ticks = 0;
+		}
+	}
 	draw(width,height){
 		gameContext.drawImage(this.image,this.frameIndex[this.XframeIndex][this.YframeIndex].sx,this.frameIndex[this.XframeIndex][this.YframeIndex].sy,this.frameWidth,this.frameHeight,this.x-(width/2),this.y-(height/2),width,height);
 	}
@@ -108,6 +127,7 @@ var tradeShipSheet = new SpriteSheet(tradeShipSVG,0,0,200,600,1,1);
 var bulletSheet = new SpriteSheet(bulletSVG,0,0,26,62,1,5);
 var beamSheet = new SpriteSheet(beamSVG,0,0,26,62,1,5);
 var beamDotSheet = new SpriteSheet(beamDotSVG,0,0,47,47,1,5);
+var shipSheet = new SpriteSheet(shipSVG, 0, 0, 150, 150, 1, 8);
 
 var lastLobbyTime = null;
 
@@ -619,9 +639,9 @@ function drawLobbyTimer(){
 
 
 //DRAWING OBJECTS RELATIVE TO CAMERA
-function drawRelativeObjects(){
+function drawRelativeObjects(dt){
 	drawBullets();
-	drawShips();
+	drawShips(dt);
 	drawAsteroids();
 	drawItems();
 	drawGadgets();
@@ -637,6 +657,33 @@ function drawRelativeObjects(){
 		combatText.update();
 	}
 }
+function drawMyShip(ship, dt){
+	if(ship.shield != null){
+			drawShield(ship);
+	}
+
+	drawTrail(ship.trail);
+
+	gameContext.save();
+	gameContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
+	//gameContext.rotate(asteroid.angle*Math.PI/180);
+	shipSheet.move(0,0);
+	shipSheet.update(dt);
+	/*
+	if(asteroid.health >= config.asteroidBaseHealth * 0.80){
+		asteroidSheet.changeFrame(0,asteroid.artType);
+	}
+	else if(asteroid.health < config.asteroidBaseHealth*.40){
+		asteroidSheet.changeFrame(2,asteroid.artType);
+	}
+	else{
+		asteroidSheet.changeFrame(1,asteroid.artType);
+	}
+	*/
+	shipSheet.draw(ship.radius*2,ship.radius*2);
+	gameContext.restore();
+}
+
 function drawShip(ship){
 	if(ship.shield != null){
 		drawShield(ship);
@@ -1086,14 +1133,14 @@ function drawBounds(){
 }
 
 
-function drawShips(){
+function drawShips(dt){
 	for(var shipKey in shipList){
 		var ship = shipList[shipKey];
 		if(ship == null){
 			continue;
 		}
 		if(shipKey == myID){
-			drawShip(ship);
+			drawMyShip(ship, dt);
 			continue;
 		}
 		if(camera.inBounds(ship)){
