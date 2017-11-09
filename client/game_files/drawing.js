@@ -1189,7 +1189,7 @@ function changeGadgetHUD(name){
 			break;
 		}
 	}
-	__showProgress(myShip.gadgetCooldown,'gadget-cooldown');
+	__showProgress(shipList[myID].gadgetCooldown,'gadget-cooldown');
 }
 function changeWeaponHUD(name){
 	for(var i=0;i<weaponArray.length;i++){

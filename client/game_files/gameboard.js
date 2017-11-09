@@ -164,7 +164,7 @@ function createShip(dataArray,isAI){
 	shipList[index].weaponAttribute = 0;
 	shipList[index].id = dataArray[0];
 	shipList[index].gadget = "PulseWave";
-	shipList[index].gadgetCooldown = 100;
+	shipList[index].gadgetCooldown = 0;
 	var shipX, shipY, shipColor;
 	shipX = dataArray[1];
 	shipY = dataArray[2];
