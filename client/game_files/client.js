@@ -457,6 +457,7 @@ function clientConnect() {
 		updateTradeShipList(updatePacket.tradeShipList);
 		updateBulletList(updatePacket.bulletList);
 		updateGadgetList(updatePacket.gadgetList);
+		updateItemList(updatePacket.itemList);
 		gameStarted = updatePacket.state;
 		lobbyTimeLeft = updatePacket.lobbyTimeLeft;
 		shrinkTimeLeft = updatePacket.shrinkTimeLeft;

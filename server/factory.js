@@ -28,7 +28,7 @@ class Room {
 		this.killedShips = {};
 		this.clientCount = 0;
 		this.alive = true;
-		this.engine = _engine.getEngine(this.bulletList, this.shipList, this.asteroidList, this.planetList,this.nebulaList,this.tradeShipList,this.gadgetList);
+		this.engine = _engine.getEngine(this.bulletList, this.shipList, this.asteroidList, this.planetList,this.nebulaList,this.tradeShipList,this.gadgetList,this.itemList);
 		this.world = new World(0,0,c.lobbyWidth,c.lobbyHeight,this.engine,this.sig);
 		this.game = new Game(this.world,this.clientList,this.bulletList,this.shipList,this.asteroidList,this.planetList,this.itemList,this.nebulaList,this.tradeShipList,this.engine,this.AIList,this.gadgetList,this.sig);
 	}
@@ -111,11 +111,13 @@ class Room {
 		var tradeShipData = compressor.sendTradeShipUpdates(this.tradeShipList);
 		var bulletData = compressor.sendBulletUpdates(this.bulletList);
 		var gadgetData = compressor.sendGadgetUpdates(this.gadgetList);
+		var itemData = compressor.sendItemUpdates(this.itemList);
 		messenger.messageRoomBySig(this.sig,"gameUpdates",{
 			shipList:shipData,
 			tradeShipList:tradeShipData,
 			bulletList:bulletData,
 			gadgetList:gadgetData,
+			itemList:itemData,
 			state:this.game.active,
 			lobbyTimeLeft:this.game.lobbyTimeLeft,
 			totalPlayers:messenger.getTotalPlayers(),
@@ -2300,10 +2302,17 @@ class CircleItem extends Circle{
 	constructor(x,y,color){
 		super(x,y,c.baseItemRadius,color);
 		this.isItem = true;
+		this.shouldMove = false;
 		this.itemDecayRate = c.baseItemDecayRate*1000;
 		this.dropDate = Date.now();
 		this.sig = null;
 		this.alive = true;
+		this.speed = 0;
+		this.velX = 0;
+		this.velY = 0;
+		this.newX = this.x;
+		this.newY = this.y;
+		this.angle = 0;
 	}
 	update(){
 		if(this.itemDecayRate != null){
@@ -2311,6 +2320,13 @@ class CircleItem extends Circle{
 				this.alive = false;
 			}
 		}
+		if(this.shouldMove){
+			this.move();
+		}
+	}
+	move(){
+		this.x = this.newX;
+		this.y = this.newY;
 	}
 }
 /*
@@ -2824,8 +2840,8 @@ class Bullet extends Rect{
 		this.sig = null;
 		this.isBullet = true;
 		this.lifetime = c.bulletLifetime;
-		this.speed = c.blasterBulletSpeed;
 		this.damage = c.blasterBulletDamage;
+		this.speed = c.blasterBulletSpeed;
 		this.velX = 0;
 		this.velY = 0;
 		this.newX = this.x;

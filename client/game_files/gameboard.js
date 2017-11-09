@@ -304,7 +304,21 @@ function updateGadgetList(packet){
 			gadgetList[gadget[0]].angle = gadget[3];
 		}
 	}
+}
 
+function updateItemList(packet){
+	if(packet == null){
+		return;
+	}
+	packet = JSON.parse(packet);
+	for(var i=0;i<packet.length;i++){
+		var item = packet[i];
+		if(itemList[item[0]] != null && itemList[item[0]].shouldMove){
+			itemList[item[0]].sig = item[0];
+			itemList[item[0]].x = item[1];
+			itemList[item[0]].y = item[2];
+		}
+	}
 }
 
 
