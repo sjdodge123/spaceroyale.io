@@ -68,8 +68,8 @@ class Engine {
 			if(item.shouldMove == false){
 				continue;
 			}
-			item.velX = Math.cos(item.angle+135*(Math.PI/180))*item.speed;
-			item.velY = Math.sin(item.angle+135*(Math.PI/180))*item.speed;
+			item.velX -= item.dragCoeff*item.velX;
+			item.velY -= item.dragCoeff*item.velY;
 			item.newX += item.velX * this.dt;
 			item.newY += item.velY * this.dt;
 		}

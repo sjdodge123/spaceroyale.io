@@ -58,6 +58,10 @@
     "attributeShipDropAmount":5,
     "attributeMaxAmount":10,
 
+    "itemDragCoeff":0.045,
+    "itemMinSpeed":65,
+    "itemMaxSpeed":150,
+
     "generatePlanets":true,
     "planetAmt":30,
     "planetMinSize":100,

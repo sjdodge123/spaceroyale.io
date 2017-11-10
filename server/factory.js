@@ -1622,13 +1622,13 @@ class Ship extends Circle{
 		}
 
 		for(var i=0;i<health;i++){
-			this.droppedItems.push(new HealthAttribute(this.x,this.y));
+			this.droppedItems.push(new HealthAttribute(this.x,this.y, utils.getRandomInt(0, 359), this.velX, this.velY, utils.getRandomInt(c.itemMinSpeed,c.itemMaxSpeed)));
 		}
 		for(var i=0;i<speed;i++){
-			this.droppedItems.push(new SpeedAttribute(this.x,this.y));
+			this.droppedItems.push(new SpeedAttribute(this.x,this.y, utils.getRandomInt(0, 359), this.velX, this.velY, utils.getRandomInt(c.itemMinSpeed,c.itemMaxSpeed)));
 		}
 		for(var i=0;i<weapon;i++){
-			this.droppedItems.push(new WeaponAttribute(this.x,this.y));
+			this.droppedItems.push(new WeaponAttribute(this.x,this.y, utils.getRandomInt(0, 359), this.velX, this.velY, utils.getRandomInt(c.itemMinSpeed,c.itemMaxSpeed)));
 		}
 	}
 	checkHP(){
@@ -2305,7 +2305,8 @@ class CircleItem extends Circle{
 		this.dropDate = Date.now();
 		this.sig = null;
 		this.alive = true;
-		this.speed = 100;
+		this.speed = c.itemBaseSpeed;
+		this.dragCoeff = c.itemDragCoeff;
 		this.velY = 0;
 		this.velX = 0;
 		this.newX = this.x;
@@ -2433,22 +2434,34 @@ class AttributeItem extends EquipableItem{
 }
 
 class HealthAttribute extends AttributeItem {
-	constructor(x,y){
+	constructor(x,y, angle, velX, velY, speed){
 		super(x,y);
 		this.name = "HealthAttribute";
+		this.angle = angle;
+		this.speed = speed;
+		this.velX = velX + Math.cos(this.angle*(Math.PI/180))*this.speed;
+		this.velY = velY + Math.sin(this.angle*(Math.PI/180))*this.speed;
 	}
 }
 
 class SpeedAttribute extends AttributeItem {
-	constructor(x,y){
+	constructor(x,y, angle, velX, velY, speed){
 		super(x,y);
 		this.name = "SpeedAttribute";
+		this.angle = angle;
+		this.speed = speed;
+		this.velX = velX + Math.cos(this.angle*(Math.PI/180))*this.speed;
+		this.velY = velY + Math.sin(this.angle*(Math.PI/180))*this.speed;
 	}
 }
 class WeaponAttribute extends AttributeItem {
-	constructor(x,y){
+	constructor(x,y, angle, velX, velY, speed){
 		super(x,y);
 		this.name = "WeaponAttribute";
+		this.angle = angle;
+		this.speed = speed;
+		this.velX = velX + Math.cos(this.angle*(Math.PI/180))*this.speed;
+		this.velY = velY + Math.sin(this.angle*(Math.PI/180))*this.speed;
 	}
 }
 
