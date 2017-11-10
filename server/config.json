@@ -4,19 +4,18 @@
     "serverTickSpeed": 33.33,
 
     "minPlayers":1,
-    "maxPlayersInRoom":25,
+    "maxPlayersInRoom":50,
     "randomizePlayersLocations":true,
     "roomKickTimeout":90,
     "lobbyWaitTime":30,
 
 
-    "baseTimeUntilShrink":30,
+    "baseTimeUntilShrink":10,
     "timeUntilShrinkSpeedup":0.75,
     "baseShrinkingDuration": 40,
     "shrinkingDurationSpeedup":0.75,
 
-    "baseItemRadius":25,
-    "baseItemDecayRate":15,
+    
 
     "AISpawnPlayers":true,
     "AIAggroRangeMin":250,
@@ -30,12 +29,12 @@
     "lobbyWidth": 750,
     "lobbyHeight": 750,
 
-    "worldWidth": 5000,
-    "worldHeight": 5000,
+    "worldWidth": 8500,
+    "worldHeight": 8500,
     "generateAsteroids":true,
-    "asteroidAmt":80,
+    "asteroidAmt":350,
     "asteroidBaseHealth":40,
-    "asteroidDropRate":30,
+    "asteroidDropRate":50,
     "asteroidMinSize":45,
     "asteroidMaxSize":65,
 
@@ -58,17 +57,20 @@
     "attributeShipDropAmount":5,
     "attributeMaxAmount":10,
 
+    "baseItemRadius":25,
     "itemDragCoeff":0.045,
     "itemMinSpeed":175,
-    "itemMaxSpeed":250,
+    "itemMaxSpeed":600,
+    "itemMinDecayRate":8,
+    "itemMaxDecayRate":17,
 
     "generatePlanets":true,
-    "planetAmt":30,
+    "planetAmt":80,
     "planetMinSize":100,
     "planetMaxSize":200,
 
     "generateNebulas":true,
-    "nebulaAmt":40,
+    "nebulaAmt":60,
     "nebulaSlowAmt":0,
     "nebulaMinSize":130,
     "nebulaMaxSize":250,
@@ -101,7 +103,7 @@
     "playerHealthRegenRate":0.25,
     "playerHealthRegenTime":5000,
 
-    "forceConstant": 5000000,
+    "forceConstant": 500000,
 
     "blasterCritChance":15,
     "blasterCritIncreasePercent":150,

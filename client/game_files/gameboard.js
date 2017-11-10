@@ -36,9 +36,9 @@ function updateItems(){
 		if(item.name == "HPItem"){
 			continue;
 		}
-		var timeLeft = config.baseItemDecayRate-((Date.now()-item.dropDate)/1000);
+		var timeLeft = item.itemDecayRate-((Date.now()-item.dropDate)/1000);
 		timeLeft = timeLeft.toFixed(1);
-		if(timeLeft <= config.baseItemDecayRate*.33){
+		if(timeLeft <= item.itemDecayRate*.33){
 			if(timeLeft % 0.5 == 0){
 				item.flash = true;
 			} else {
@@ -47,7 +47,7 @@ function updateItems(){
 			continue;
 		}
 
-		if(timeLeft <= config.baseItemDecayRate*.66){
+		if(timeLeft <= item.itemDecayRate*.66){
 			if(timeLeft % 1 == 0){
 				item.flash = true;
 			} else{
@@ -214,6 +214,7 @@ function spawnItems(packet){
 			itemList[item[0]].x = item[1];
 			itemList[item[0]].y = item[2];
 			itemList[item[0]].name = item[3];
+			itemList[item[0]].itemDecayRate = item[4]/1000;
 		}
 	}
 

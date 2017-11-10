@@ -275,6 +275,7 @@ exports.spawnItems = function(items){
 			items[i].x,
 			items[i].y,
 			items[i].name,
+			items[i].itemDecayRate,
 		];
 		packet.push(listItem);
 	}

@@ -2301,7 +2301,7 @@ class CircleItem extends Circle{
 		super(x,y,c.baseItemRadius,color);
 		this.isItem = true;
 		this.shouldMove = true;
-		this.itemDecayRate = c.baseItemDecayRate*1000;
+		this.itemDecayRate = utils.getRandomInt(c.itemMinDecayRate,c.itemMaxDecayRate)*1000;
 		this.dropDate = Date.now();
 		this.sig = null;
 		this.alive = true;
@@ -2331,14 +2331,11 @@ class CircleItem extends Circle{
 	}
 	handleHit(object){
 		if(!this.alive){
-			return;
-		}
-		if(!object.alive){
-			return;
+			return false;
 		}
 		if(object.isWall){
 			_engine.preventMovement(this,object,this.dt);
-			return;
+			return false;
 		}
 	}
 }
@@ -2379,8 +2376,7 @@ class Boost extends CircleItem {
 		this.name = 'Unset';
 	}
 	handleHit(object){
-		super.handleHit(object);
-		if(!this.alive){
+		if(super.handleHit(object) == false){
 			return;
 		}
 		if(object instanceof Ship){
@@ -2412,8 +2408,7 @@ class EquipableItem extends CircleItem{
 		this.name = '';
 	}
 	handleHit(object){
-		super.handleHit(object);
-		if(!this.alive){
+		if(super.handleHit(object) == false){
 			return;
 		}
 		if(object instanceof Ship){
@@ -2437,10 +2432,10 @@ class HealthAttribute extends AttributeItem {
 	constructor(x,y, angle, velX, velY, speed){
 		super(x,y);
 		this.name = "HealthAttribute";
-		this.angle = angle;
-		this.speed = speed;
-		this.velX = velX + Math.cos(this.angle*(Math.PI/180))*this.speed;
-		this.velY = velY + Math.sin(this.angle*(Math.PI/180))*this.speed;
+		this.angle = angle || 0;
+		this.speed = speed || 0;
+		this.velX = velX + Math.cos(this.angle*(Math.PI/180))*this.speed || 0;
+		this.velY = velY + Math.sin(this.angle*(Math.PI/180))*this.speed || 0;
 	}
 }
 
@@ -2448,20 +2443,20 @@ class SpeedAttribute extends AttributeItem {
 	constructor(x,y, angle, velX, velY, speed){
 		super(x,y);
 		this.name = "SpeedAttribute";
-		this.angle = angle;
-		this.speed = speed;
-		this.velX = velX + Math.cos(this.angle*(Math.PI/180))*this.speed;
-		this.velY = velY + Math.sin(this.angle*(Math.PI/180))*this.speed;
+		this.angle = angle || 0;
+		this.speed = speed || 0;
+		this.velX = velX + Math.cos(this.angle*(Math.PI/180))*this.speed || 0;
+		this.velY = velY + Math.sin(this.angle*(Math.PI/180))*this.speed || 0;
 	}
 }
 class WeaponAttribute extends AttributeItem {
 	constructor(x,y, angle, velX, velY, speed){
 		super(x,y);
 		this.name = "WeaponAttribute";
-		this.angle = angle;
-		this.speed = speed;
-		this.velX = velX + Math.cos(this.angle*(Math.PI/180))*this.speed;
-		this.velY = velY + Math.sin(this.angle*(Math.PI/180))*this.speed;
+		this.angle = angle || 0;
+		this.speed = speed || 0;
+		this.velX = velX + Math.cos(this.angle*(Math.PI/180))*this.speed || 0;
+		this.velY = velY + Math.sin(this.angle*(Math.PI/180))*this.speed || 0;
 	}
 }
 
