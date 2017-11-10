@@ -59,8 +59,8 @@
     "attributeMaxAmount":10,
 
     "itemDragCoeff":0.045,
-    "itemMinSpeed":65,
-    "itemMaxSpeed":150,
+    "itemMinSpeed":175,
+    "itemMaxSpeed":250,
 
     "generatePlanets":true,
     "planetAmt":30,
