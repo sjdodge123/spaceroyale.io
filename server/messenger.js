@@ -101,6 +101,14 @@ function checkForMail(client){
 		toastPlayer(client.id,"Joined Room " +  roomSig);
 	});
 
+	client.on('singlePlayerStart',function(){
+		var room = getRoomFromId(client.id);
+		if(room == undefined){
+			return;
+		}
+		room.game.playNowPressed = true;
+	});
+
 	client.on('playerLeaveRoom',function(){
 		hostess.kickFromRoom(client.id);
 	});

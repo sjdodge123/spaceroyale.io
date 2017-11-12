@@ -180,8 +180,12 @@ class Game {
 		this.firstPass = true;
 		this.winner = null;
 		this.active = false;
+
 		this.lobbyTimer = null;
 		this.lobbyTimeLeft = this.lobbyWaitTime;
+		this.playNowPressed = false;
+		this.readyButtonVisible = false;
+		this.playerCount = 0;
 
 		this.gameBoard = new GameBoard(world,clientList,bulletList,shipList,asteroidList,planetList,itemList,nebulaList,this.tradeShipList,this.AIList,engine,this.gadgetList,this.roomSig);
 	}
@@ -271,15 +275,50 @@ class Game {
 	}
 
 	checkForGameStart(){
-		if(this.getPlayerShipCount() >= this.minPlayers){
-			if(this.lobbyTimer == null){
-				var game = this;
-				this.lobbyTimer = utils.getTimer(function(){game.start();},this.lobbyWaitTime*1000);
-			} else{
-				this.lobbyTimeLeft = this.lobbyTimer.getTimeLeft().toFixed(1);
-			}
-		} else{
+		if(this.playNowPressed){
+			this.start();
+			return;
+		}
+		this.getPlayerShipCount();
+		var timerRunning = (this.playerCount >= this.minPlayers);
+		if(!timerRunning){
 			this.cancelGameStart();
+			return;
+		}
+		this.checkForSinglePlayer();
+		this.startLobbyTimer();
+	}
+	startLobbyTimer(){
+		if(this.lobbyTimer != null && this.readyButtonVisible == false){
+			this.lobbyTimeLeft = ((this.lobbyWaitTime*1000 - (Date.now() - this.lobbyTimer))/(1000)).toFixed(1);
+			if(this.lobbyTimeLeft > 0){
+				return;
+			}
+			if(this.singlePlayer){
+				if(this.readyButtonVisible == false){
+					this.readyButtonVisible = true;
+					messenger.messageRoomBySig(this.roomSig,"showReady");
+				}
+				this.cancelGameStart();
+				return;
+			}
+			this.start();
+			return;
+		}
+		this.lobbyTimer = Date.now();
+	}
+	checkForSinglePlayer(){
+		if(this.playerCount == 1){
+			this.singlePlayer = true;
+			return;
+		}
+		if(this.playerCount >= this.minPlayers){
+			if(this.readyButtonVisible == true){
+				this.readyButtonVisible = false;
+				messenger.messageRoomBySig(this.roomSig,"hideReady");
+			}
+			this.singlePlayer = false;
+			return;
 		}
 	}
 	checkForAISpawn(){
@@ -305,7 +344,6 @@ class Game {
 	}
 	cancelGameStart(){
 		if(this.lobbyTimer != null){
-			this.lobbyTimer.reset();
 			this.lobbyTimer = null;
 			this.lobbyTimeLeft = this.lobbyWaitTime;
 		}
@@ -326,6 +364,7 @@ class Game {
 				shipCount++;
 			}
 		}
+		this.playerCount = shipCount;
 		return shipCount;
 	}
 	randomLocShips(){
@@ -359,12 +398,14 @@ class GameBoard {
 	update(active, dt){
 		this.engine.update(dt);
 		this.checkCollisions(active);
+		if(active){
+			this.updateTradeShips();
+			this.updateAsteroids();
+			this.updateItems(dt);
+		}
 		this.updateShips(active,dt);
-		this.updateTradeShips();
-		this.updateBullets(dt);
-		this.updateAsteroids();
-		this.updateItems(dt);
 		this.updateGadgets();
+		this.updateBullets(dt);
 	}
 	updateShips(active,dt){
 		var regeneratingShips = [];
@@ -1176,7 +1217,7 @@ class Ship extends Circle{
 		if(c.playerSpawnWeapon == "Blaster"){
 			this.weapon = new Blaster(this.id);
 		}
-		if(c.playerSpawnWeapon == "PhotonCannon"){
+		if(c.playerSpawnWeapon == "PhotonCannon"){``
 			this.weapon = new PhotonCannon(this.id);
 		}
 		if(c.playerSpawnWeapon == "MassDriver"){

@@ -10,18 +10,14 @@ var roomList = {},
 
 exports.findARoom = function(clientID){
 	if(getRoomCount() == 0){
-		var sig = generateRoomSig();
-		roomList[sig] = factory.getRoom(sig,maxPlayersInRoom);
-		return sig;
+		return generateNewRoom();
 	}
 	for(var sig2 in roomList){
 		if(roomList[sig2].hasSpace()){
 			return sig2;
 		}
 	}
-	var sig3 = generateRoomSig();
-	roomList[sig3] = factory.getRoom(sig3,maxPlayersInRoom);
-	return sig3;
+	return generateNewRoom();
 }
 
 exports.joinARoom = function(sig,clientID){
@@ -91,4 +87,10 @@ function reclaimRoom(sig){
 	if(room.clientCount == 0){
 		delete roomList[sig];
 	}
+}
+
+function generateNewRoom(){
+	var sig = generateRoomSig();
+	roomList[sig] = factory.getRoom(sig,maxPlayersInRoom);
+	return sig;
 }

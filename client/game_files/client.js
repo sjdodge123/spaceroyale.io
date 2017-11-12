@@ -60,6 +60,13 @@ function clientConnect() {
 		calcPing();
 	});
 
+	server.on("showReady",function(){
+		$('#readyButton').show();
+	});
+	server.on("hideReady",function(){
+		$('#readyButton').hide();
+	});
+
 	server.on("gameState", function(gameState){
 		config = gameState.config;
 		playerList = gameState.playerList;
@@ -532,6 +539,9 @@ function stopGadget(){
 		useGadget = false;
 		server.emit("stopGadget");
 	}
+}
+function clientSendReady(){
+	server.emit('singlePlayerStart');
 }
 
 function clientSendAuth(user,pass){

@@ -127,6 +127,20 @@ canvas{
 	color:white;
 	overflow: none;
 }
+#readyButton{
+	bottom: 200;
+	width: 100%;
+	height: auto;
+	position: absolute;
+	cursor: hand;
+	pointer-events: all;
+	display: none;
+}
+#readyButton button{
+	color: black;
+	font-size: 18px;
+	font-weight: bolder;
+}
 #shipBuild{
 	top:5%;
 	left:5%;
