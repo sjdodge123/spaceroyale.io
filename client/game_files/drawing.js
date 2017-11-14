@@ -80,7 +80,7 @@ class SpriteSheet {
 		this.rows = rows;
 		this.columns = columns;
 
-		this.frameRate = 60;
+		this.frameRate = 24;
 		this.ticksPerFrame = 1 / this.frameRate;
 		this.ticks = 0;
 		this.loopAnimation = true;
@@ -127,7 +127,7 @@ var tradeShipSheet = new SpriteSheet(tradeShipSVG,0,0,200,600,1,1);
 var bulletSheet = new SpriteSheet(bulletSVG,0,0,26,62,1,5);
 var beamSheet = new SpriteSheet(beamSVG,0,0,26,62,1,5);
 var beamDotSheet = new SpriteSheet(beamDotSVG,0,0,47,47,1,5);
-var shipSheet = new SpriteSheet(shipSVG, 0, 0, 150, 150, 1, 8);
+var shipSheet = new SpriteSheet(shipSVG, 0, 0, 160, 160, 1, 16);
 
 var lastLobbyTime = null;
 
