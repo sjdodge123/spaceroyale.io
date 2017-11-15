@@ -159,9 +159,9 @@ function createShip(dataArray,isAI){
 	shipList[index].power = config.playerBasePower;
 	shipList[index].health = config.playerBaseHealth;
 	shipList[index].radius = config.playerBaseRadius;
-	shipList[index].healthAttribute = 0;
-	shipList[index].speedAttribute = 0;
-	shipList[index].weaponAttribute = 0;
+	shipList[index].healthAttribute = config.attributeHealthStart;
+	shipList[index].speedAttribute = config.attributeSpeedStart;
+	shipList[index].weaponAttribute = config.attributeWeaponStart;
 	shipList[index].id = dataArray[0];
 	shipList[index].gadget = "PulseWave";
 	shipList[index].gadgetCooldown = 0;
