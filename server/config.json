@@ -61,7 +61,7 @@
     "generatePlanets":true,
     "planetAmt":30,
     "planetMinSize":100,
-    "planetMaxSize":200,
+    "planetMaxSize":100,
 
     "generateNebulas":true,
     "nebulaAmt":40,

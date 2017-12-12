@@ -180,7 +180,7 @@ function createShip(dataArray,isAI){
 	if(isAI){
 		shipList[index].AIName = dataArray[8]
 	}
-	shipList[index].trail = new Trail({x:shipX, y:shipY}, 10, 20, shipColor, 0.35, 'circle');
+	shipList[index].trail = new Trail({x:shipX, y:shipY}, 10, 20, shipColor, 0.25, 'circle');
 }
 
 function updateShipList(packet){
@@ -470,7 +470,7 @@ function weaponFired(payload){
 			bulletList[bullet[0]].angle = bullet[3];
 			bulletList[bullet[0]].speed = bullet[4];
 			bulletList[bullet[0]].height = bullet[6];
-			bulletList[bullet[0]].trail = new Trail({x:bulletX, y:bulletY}, 10, bulletWidth, ship.color, 0.4, 'line');
+			bulletList[bullet[0]].trail = new Trail({x:bulletX, y:bulletY}, 30, 0.75*bulletWidth, ship.color, 0.2, 'circle');
 		}
 	}
 

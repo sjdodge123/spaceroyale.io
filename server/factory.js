@@ -2704,7 +2704,7 @@ class MassDriver extends Weapon{
 			return;
 		}
 		var bullets = [];
-		var bullet = new MassDriverBullet(x,y,8,20, angle, color, id);
+		var bullet = new MassDriverBullet(x,y,5,18, angle, color, id);
 		if(this.level > 1){
 			bullet.speed += bullet.speed * .35;
 		}

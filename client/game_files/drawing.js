@@ -21,8 +21,11 @@ shipSVG.src = 'sprites/ship.svg';
 var tradeShipSVG = new Image();
 tradeShipSVG.src ="sprites/trade_ship.svg";
 
+//var planetSVG = new Image();
+//planetSVG.src ="sprites/planet_sheet.svg";
+
 var planetSVG = new Image();
-planetSVG.src ="sprites/planet_sheet.svg";
+planetSVG.src ="sprites/station_sheet.svg";
 
 var asteroidSVG = new Image();
 asteroidSVG.src ="sprites/asteroid_sheet.svg";
