@@ -18,6 +18,9 @@ shipBlueSVG.src = 'sprites/ship_blue.svg';
 var shipSVG = new Image(150,1200);
 shipSVG.src = 'sprites/ship.svg';
 
+var explosionSVG = new Image(500,4000);
+explosionSVG.src = 'sprites/explosion_sheet.svg';
+
 var tradeShipSVG = new Image();
 tradeShipSVG.src ="sprites/trade_ship.svg";
 
@@ -73,7 +76,7 @@ var beamDotSVG = new Image();
 beamDotSVG.src = "sprites/beamDot_sheet.svg";
 
 class SpriteSheet {
-	constructor(image,x,y,frameWidth,frameHeight,rows,columns){
+	constructor(image,x,y,frameWidth,frameHeight,rows,columns, loopAnimation){
 		this.image = image;
 		this.x = x;
 		this.y = y;
@@ -86,7 +89,8 @@ class SpriteSheet {
 		this.frameRate = 24;
 		this.ticksPerFrame = 1 / this.frameRate;
 		this.ticks = 0;
-		this.loopAnimation = true;
+		this.loopAnimation = loopAnimation;
+		this.animationComplete = false;
 
 		for(var i=0;i<rows;i++){
 			this.frameIndex[i] = [];
@@ -109,13 +113,17 @@ class SpriteSheet {
 	update(dt){
 		this.ticks += dt/1000;
 		if (this.ticks > this.ticksPerFrame){
+			this.ticks = 0;
 			if (this.YframeIndex < this.columns - 1){
 				this.YframeIndex += 1;
+				return;
 			}
-			else if (this.loopAnimation){
+			if (this.loopAnimation){
 				this.YframeIndex = 0;
 			}
-			this.ticks = 0;
+			else{
+				this.animationComplete = true;
+			}
 		}
 	}
 	draw(width,height){
@@ -123,15 +131,14 @@ class SpriteSheet {
 	}
 }
 
-var planetSheet = new SpriteSheet(planetSVG,0,0,500,500,1,2);
-var asteroidSheet = new SpriteSheet(asteroidSVG,0,0,500,500,3,3);
-var nebulaSheet = new SpriteSheet(nebulaSVG,0,0,500,500,1,1);
-var tradeShipSheet = new SpriteSheet(tradeShipSVG,0,0,200,600,1,1);
-var bulletSheet = new SpriteSheet(bulletSVG,0,0,26,62,1,5);
-var beamSheet = new SpriteSheet(beamSVG,0,0,26,62,1,5);
-var beamDotSheet = new SpriteSheet(beamDotSVG,0,0,47,47,1,5);
-var shipSheet = new SpriteSheet(shipSVG, 0, 0, 160, 160, 1, 16);
-
+var planetSheet = new SpriteSheet(planetSVG,0,0,500,500,1,2,false);
+var asteroidSheet = new SpriteSheet(asteroidSVG,0,0,500,500,3,3,false);
+var nebulaSheet = new SpriteSheet(nebulaSVG,0,0,500,500,1,1,false);
+var tradeShipSheet = new SpriteSheet(tradeShipSVG,0,0,200,600,1,1,false);
+var bulletSheet = new SpriteSheet(bulletSVG,0,0,26,62,1,5,false);
+var beamSheet = new SpriteSheet(beamSVG,0,0,26,62,1,5,false);
+var beamDotSheet = new SpriteSheet(beamDotSVG,0,0,47,47,1,5,false);
+var shipSheet = new SpriteSheet(shipSVG, 0, 0, 160, 160, 1, 16,true);
 var lastLobbyTime = null;
 
 class FloatingText {
@@ -644,6 +651,7 @@ function drawLobbyTimer(){
 //DRAWING OBJECTS RELATIVE TO CAMERA
 function drawRelativeObjects(dt){
 	drawBullets();
+	drawExplosions(dt);
 	drawShips(dt);
 	drawAsteroids();
 	drawItems();
@@ -672,17 +680,7 @@ function drawMyShip(ship, dt){
 	//gameContext.rotate(asteroid.angle*Math.PI/180);
 	shipSheet.move(0,0);
 	shipSheet.update(dt);
-	/*
-	if(asteroid.health >= config.asteroidBaseHealth * 0.80){
-		asteroidSheet.changeFrame(0,asteroid.artType);
-	}
-	else if(asteroid.health < config.asteroidBaseHealth*.40){
-		asteroidSheet.changeFrame(2,asteroid.artType);
-	}
-	else{
-		asteroidSheet.changeFrame(1,asteroid.artType);
-	}
-	*/
+	
 	shipSheet.draw(ship.radius*2,ship.radius*2);
 	gameContext.restore();
 }
@@ -736,6 +734,22 @@ function drawShip(ship){
 	if(ship != myShip){
 		drawHealthBar(ship);
 	}
+}
+
+function drawExplosion(explosion, dt){
+	if (explosion.spriteSheet == null){
+		explosion.spriteSheet = new SpriteSheet(explosionSVG, 0, 0, 500, 500, 1, 8, false);
+	}
+	if (explosion.spriteSheet.animationComplete){
+		return terminateExplosion(explosion.sig);
+	}
+	gameContext.save();
+	gameContext.translate(explosion.x-myShip.x+camera.xOffset,explosion.y-myShip.y+camera.yOffset);
+	explosion.spriteSheet.move(0,0);
+	explosion.spriteSheet.update(dt);
+	
+	explosion.spriteSheet.draw(explosion.radius*2,explosion.radius*2);
+	gameContext.restore();
 }
 
 function drawHealthBar(ship){
@@ -1164,6 +1178,16 @@ function drawAsteroids(){
 	}
 }
 
+function drawExplosions(dt){
+	for(var sig in explosionList){
+		if(explosionList[sig] == null){
+			continue;
+		}
+		if(camera.inBounds(explosionList[sig])){
+			drawExplosion(explosionList[sig], dt);
+		}
+	}
+}
 function drawItems(){
 	for(var sig in itemList){
 		if(itemList[sig] == null){

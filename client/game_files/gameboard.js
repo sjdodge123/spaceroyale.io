@@ -9,12 +9,6 @@ function updateGameboard(){
 function updateShips(){
 	for(var id in shipList){
 		var ship = shipList[id];
-		if (ship.spriteAngle < 359){
-			ship.spriteAngle += ship.rotationRate;
-		}
-		else{
-			ship.spriteAngle = 0;
-		}
 		ship.trail.update({x:ship.x, y:ship.y});
 	}
 }
@@ -91,6 +85,12 @@ function terminateAsteroid(sig){
 	}
 }
 
+function terminateExplosion(sig){
+	if(explosionList[sig] != undefined){
+		delete explosionList[sig];
+	}
+}
+
 function terminateItem(sig){
 	if(itemList[sig] != undefined){
 		delete itemList[sig];
@@ -148,6 +148,15 @@ function spawnAIShips(payload){
 	}
 }
 
+
+function createExplosion(x,y,radius){
+	var sig = generateSig(explosionList);
+	explosionList[sig] = {};
+	explosionList[sig].sig = sig;
+	explosionList[sig].x = x;
+	explosionList[sig].y = y;
+	explosionList[sig].radius = radius;
+}
 
 function createShip(dataArray,isAI){
 	var index = dataArray[0];
