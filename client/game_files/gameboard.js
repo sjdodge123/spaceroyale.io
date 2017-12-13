@@ -149,13 +149,14 @@ function spawnAIShips(payload){
 }
 
 
-function createExplosion(x,y,radius){
+function createExplosion(x,y,radius,type){
 	var sig = generateSig(explosionList);
 	explosionList[sig] = {};
 	explosionList[sig].sig = sig;
 	explosionList[sig].x = x;
 	explosionList[sig].y = y;
 	explosionList[sig].radius = radius;
+	explosionList[sig].type = type; //0 for ship, 1 for bullet
 }
 
 function createShip(dataArray,isAI){

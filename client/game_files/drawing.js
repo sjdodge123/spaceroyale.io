@@ -21,6 +21,9 @@ shipSVG.src = 'sprites/ship.svg';
 var explosionSVG = new Image(500,4000);
 explosionSVG.src = 'sprites/explosion_sheet.svg';
 
+var popSVG = new Image(500,4000);
+popSVG.src = 'sprites/pop_sheet.svg';
+
 var tradeShipSVG = new Image();
 tradeShipSVG.src ="sprites/trade_ship.svg";
 
@@ -738,7 +741,13 @@ function drawShip(ship){
 
 function drawExplosion(explosion, dt){
 	if (explosion.spriteSheet == null){
-		explosion.spriteSheet = new SpriteSheet(explosionSVG, 0, 0, 500, 500, 1, 8, false);
+		if (!explosion.type){
+			explosion.spriteSheet = new SpriteSheet(explosionSVG, 0, 0, 500, 500, 1, 8, false);
+		}
+		else{
+			explosion.spriteSheet = new SpriteSheet(popSVG, 0, 0, 500, 500, 1, 8, false);
+		}
+		
 	}
 	if (explosion.spriteSheet.animationComplete){
 		return terminateExplosion(explosion.sig);
