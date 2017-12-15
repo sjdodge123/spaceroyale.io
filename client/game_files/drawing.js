@@ -3,20 +3,17 @@
 var background = new Image();
 background.src = 'img/background.jpg';
 
-var shipRedSVG = new Image(500,500);
+var shipRedSVG = new Image(150,1200);
 shipRedSVG.src = 'sprites/ship_red.svg';
 
-var shipGreenSVG = new Image(500,500);
+var shipGreenSVG = new Image(150,1200);
 shipGreenSVG.src = 'sprites/ship_green.svg';
 
-var shipMagentaSVG = new Image(500,500);
+var shipMagentaSVG = new Image(150,1200);
 shipMagentaSVG.src = 'sprites/ship_magenta.svg';
 
-var shipBlueSVG = new Image(500,500);
+var shipBlueSVG = new Image(150,1200);
 shipBlueSVG.src = 'sprites/ship_blue.svg';
-
-var shipSVG = new Image(150,1200);
-shipSVG.src = 'sprites/ship.svg';
 
 var explosionSVG = new Image(500,4000);
 explosionSVG.src = 'sprites/explosion_sheet.svg';
@@ -141,7 +138,10 @@ var tradeShipSheet = new SpriteSheet(tradeShipSVG,0,0,200,600,1,1,false);
 var bulletSheet = new SpriteSheet(bulletSVG,0,0,26,62,1,5,false);
 var beamSheet = new SpriteSheet(beamSVG,0,0,26,62,1,5,false);
 var beamDotSheet = new SpriteSheet(beamDotSVG,0,0,47,47,1,5,false);
-var shipSheet = new SpriteSheet(shipSVG, 0, 0, 160, 160, 1, 16,true);
+var shipBlueSheet = new SpriteSheet(shipBlueSVG, 0, 0, 160, 160, 1, 16,true);
+var shipMagentaSheet = new SpriteSheet(shipMagentaSVG, 0, 0, 160, 160, 1, 16,true);
+var shipGreenSheet = new SpriteSheet(shipGreenSVG, 0, 0, 160, 160, 1, 16,true);
+var shipRedSheet = new SpriteSheet(shipRedSVG, 0, 0, 160, 160, 1, 16,true);
 var lastLobbyTime = null;
 
 class FloatingText {
@@ -678,14 +678,38 @@ function drawMyShip(ship, dt){
 
 	drawTrail(ship.trail);
 
+	if (ship.spriteSheet == null){
+		switch (ship.color){
+			default: {
+				ship.spriteSheet = new SpriteSheet(shipRedSVG, 0, 0, 160, 160, 1, 16,true);
+				break;
+			}
+			case 'red':{
+				ship.spriteSheet = new SpriteSheet(shipRedSVG, 0, 0, 160, 160, 1, 16,true);
+				break;
+			}
+			case 'green':{
+				ship.spriteSheet = new SpriteSheet(shipGreenSVG, 0, 0, 160, 160, 1, 16,true);
+				break;
+			}
+			case '#ff00bf':{
+				ship.spriteSheet = new SpriteSheet(shipMagentaSVG, 0, 0, 160, 160, 1, 16,true);
+				break;
+			}
+			case '#66b3ff':{
+				ship.spriteSheet = new SpriteSheet(shipBlueSVG, 0, 0, 160, 160, 1, 16,true);
+				break;
+			}
+		}
+	}
 	gameContext.save();
 	gameContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
-	//gameContext.rotate(asteroid.angle*Math.PI/180);
-	shipSheet.move(0,0);
-	shipSheet.update(dt);
+	ship.spriteSheet.move(0,0);
+	ship.spriteSheet.update(dt);
 	
-	shipSheet.draw(ship.radius*2,ship.radius*2);
+	ship.spriteSheet.draw(ship.radius*2,ship.radius*2);
 	gameContext.restore();
+	drawWeapon(ship);
 }
 
 function drawShip(ship){
@@ -695,38 +719,37 @@ function drawShip(ship){
 
 	drawTrail(ship.trail);
 
-	gameContext.save();
-	gameContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
-	gameContext.rotate(ship.spriteAngle*Math.PI/180);
-	gameContext.shadowColor = ship.color;
-	gameContext.shadowOffsetX = 1;
-	gameContext.shadowOffsetY = 1;
-	gameContext.shadowBlur = 16;
-
-	var shipSVG;
-	switch (ship.color){
-		default: {
-			shipSVG = shipRedSVG;
-			break;
-		}
-		case 'red':{
-			shipSVG = shipRedSVG;
-			break;
-		}
-		case 'green':{
-			shipSVG = shipGreenSVG;
-			break;
-		}
-		case '#ff00bf':{
-			shipSVG = shipMagentaSVG;
-			break;
-		}
-		case '#66b3ff':{
-			shipSVG = shipBlueSVG;
-			break;
+	if (ship.spriteSheet == null){
+		switch (ship.color){
+			default: {
+				ship.spriteSheet = new SpriteSheet(shipRedSVG, 0, 0, 160, 160, 1, 16,true);
+				break;
+			}
+			case 'red':{
+				ship.spriteSheet = new SpriteSheet(shipRedSVG, 0, 0, 160, 160, 1, 16,true);
+				break;
+			}
+			case 'green':{
+				ship.spriteSheet = new SpriteSheet(shipGreenSVG, 0, 0, 160, 160, 1, 16,true);
+				break;
+			}
+			case '#ff00bf':{
+				ship.spriteSheet = new SpriteSheet(shipMagentaSVG, 0, 0, 160, 160, 1, 16,true);
+				break;
+			}
+			case '#66b3ff':{
+				ship.spriteSheet = new SpriteSheet(shipBlueSVG, 0, 0, 160, 160, 1, 16,true);
+				break;
+			}
 		}
 	}
-	gameContext.drawImage(shipSVG, -ship.radius, -ship.radius, 2*ship.radius, 2*ship.radius);
+
+	gameContext.save();
+	gameContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
+	ship.spriteSheet.move(0,0);
+	ship.spriteSheet.update(dt);
+	
+	ship.spriteSheet.draw(ship.radius*2,ship.radius*2);
 	gameContext.restore();
 
 	drawWeapon(ship);
@@ -776,7 +799,7 @@ function drawHealthBar(ship){
 
 function drawWeapon(ship){
 	var shipDim = ship.radius || ship.width/4;
-	var svgscale = 2 * shipDim / shipRedSVG.width;
+	var svgscale = 2 * shipDim / 500;
 	gameContext.save();
 	gameContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
 	gameContext.rotate((ship.weapon.angle + 180)*Math.PI/180);
