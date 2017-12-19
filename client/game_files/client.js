@@ -185,8 +185,8 @@ function clientConnect() {
 	server.on('terminateBullet',function(deadSigs){
 		for(var i=0;i<deadSigs.length;i++){
 			var explodedShell = bulletList[deadSigs[i]];
-			if (explodedShell.weaponName != 'ParticleBeam'){
-				createExplosion(explodedShell.x,explodedShell.y, explodedShell.height, 1);	
+			if (explodedShell.weaponName != 'ParticleBeam' && camera.inBounds(explodedShell)){
+				createExplosion(explodedShell.x,explodedShell.y, explodedShell.height, 1);
 			}
 			terminateBullet(deadSigs[i]);
 		}
