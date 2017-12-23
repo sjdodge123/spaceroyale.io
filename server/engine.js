@@ -68,10 +68,20 @@ class Engine {
 			if(item.shouldMove == false){
 				continue;
 			}
+			var newVel = utils.getMag(item.velX,item.velY);
+			if (newVel > item.maxVelocity){
+				var dirX = item.velX / newVel;
+				var dirY = item.velY / newVel;
+				item.velX = item.maxVelocity * dirX;
+				item.velY = item.maxVelocity * dirY;
+			}
+
 			item.velX -= item.dragCoeff*item.velX;
 			item.velY -= item.dragCoeff*item.velY;
 			item.newX += item.velX * this.dt;
 			item.newY += item.velY * this.dt;
+
+
 		}
 	}
 	updateGadgets(){
@@ -293,18 +303,40 @@ class Engine {
 		return result;
 	}
 
-	explodeObject(xLoc, yLoc, maxDamage,  radius){
+	explodeObject(xLoc, yLoc, maxDamage,  radius, implode){
+		var distance, ship, item, velCont;
+
 		for (var shipSig in this.shipList){
-			var ship = this.shipList[shipSig];
-			var distance = utils.getMag(xLoc - ship.x, yLoc - ship.y);
+			ship = this.shipList[shipSig];
+			distance = utils.getMag(xLoc - ship.x, yLoc - ship.y);
 			if((distance  <= (radius + ship.radius)) && (distance != 0)){
-				var velContX = (forceConstant/Math.pow(distance,2))*(ship.x - xLoc)/distance;
-				var velContY = (forceConstant/Math.pow(distance,2))*(ship.y - yLoc)/distance;
-				ship.velX += velContX;
-				ship.velY += velContY;
+				velCont = this._calcVelCont(distance,ship,xLoc,yLoc,implode)
+				ship.velX += velCont.velContX;
+				ship.velY += velCont.velContY;
 				ship.takeDamage(maxDamage * Math.abs(radius-distance)/radius);
 			}
 		}
+		for (var itemSig in this.itemList){
+			item = this.itemList[itemSig];
+			distance = utils.getMag(xLoc - item.x, yLoc - item.y);
+			if((distance  <= (radius + item.radius)) && (distance != 0)){
+				velCont = this._calcVelCont(distance,item,xLoc,yLoc,implode)
+				item.velX += velCont.velContX;
+				item.velY += velCont.velContY;
+			}
+		}
+
+	}
+	_calcVelCont(distance,object,x,y,implode){
+		var velCont = {velContX:0,velContY:0};
+		if(implode == true){
+			velCont.velContX = -forceConstant*(object.x - x)/distance;
+			velCont.velContY = -forceConstant*(object.y - y)/distance;
+		} else{
+			velCont.velContX = (forceConstant/Math.pow(distance,2))*(object.x - x)/distance;
+			velCont.velContY = (forceConstant/Math.pow(distance,2))*(object.y - y)/distance;
+		}
+		return velCont;
 	}
 	setWorldBounds(width,height){
 		this.worldWidth = width;

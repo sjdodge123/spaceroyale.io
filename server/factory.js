@@ -1810,7 +1810,7 @@ class PulseWave extends Gadget{
 	activate(x,y){
 		if(super.activate()){
 			var hitCircle = new Pulse(x,y,this.pulseRadius,"orange",this.duration);
-			this.engine.explodeObject(x, y, 0, this.pulseRadius);
+			this.engine.explodeObject(x, y, 0, this.pulseRadius,true);
 			return hitCircle;
 		}
 	}
@@ -2350,6 +2350,7 @@ class CircleItem extends Circle{
 		this.dragCoeff = c.itemDragCoeff;
 		this.velY = 0;
 		this.velX = 0;
+		this.maxVelocity = c.playerMaxSpeed;
 		this.newX = this.x;
 		this.newY = this.y;
 		this.angle = 180;

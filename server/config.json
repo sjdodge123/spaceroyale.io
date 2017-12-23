@@ -89,7 +89,7 @@
     "playerBaseAcel":500,
     "playerBaseRadius":25,
     "playerExplosionRadius":300,
-    "playerExplosionMaxDamage":50,
+    "playerExplosionMaxDamage":5,
     "playerSpawnWeapon":"Blaster",
     "playerSpawnWeaponLevel":1,
 
@@ -103,7 +103,7 @@
     "playerHealthRegenRate":0.25,
     "playerHealthRegenTime":5000,
 
-    "forceConstant": 500000,
+    "forceConstant": 5000000,
 
     "blasterCritChance":15,
     "blasterCritIncreasePercent":150,
