@@ -655,6 +655,7 @@ class GameBoard {
 			var ship = this.shipList[shipID];
 			ship.health = c.playerBaseHealth;
 			ship.power = c.playerBasePower;
+			ship.reset();
 			ship.gadget.reset();
 			messenger.messageRoomBySig(this.roomSig,"gadgetCooldownStop",{id:ship.id});
 		}
@@ -1563,6 +1564,16 @@ class Ship extends Circle{
 			this.weapon.stopFire();
 		}
 	}
+	reset(){
+		this.velX = 0;
+		this.velY = 0;
+		this.moveForward = false;
+		this.moveBackward = false;
+		this.turnLeft = false;
+		this.turnRight = false;
+		this.newX = this.x;
+		this.newY = this.y;
+	}
 	activateGadget(){
 		var objects = this.gadget.activate(this.x,this.y,this.weapon.angle);
 		if(objects == null){
@@ -1803,7 +1814,10 @@ class DirectionalShield extends Gadget{
 
 	}
 	reset(){
-		this.super.reset();
+		super.reset();
+		if (this.activeShield == null){
+			return;
+		}
 		this.activeShield.alive = false;
 	}
 }
@@ -1823,7 +1837,10 @@ class PulseWave extends Gadget{
 		}
 	}
 	reset(){
-		this.super.reset();
+		super.reset();
+		if (this.currentPulse == null){
+			return;
+		}
 		this.currentPulse.alive = false;
 	}
 }
@@ -1843,7 +1860,12 @@ class HackingDrone extends Gadget{
 		}
 	}
 	reset(){
-		this.super.reset();
+		super.reset();
+		if (this.currentDrone == null){
+			return;
+		}
+		this.currentDrone.stopHacking = true;
+		this.currentDrone.targetShip.enable();
 		this.currentDrone.alive = false;
 	}
 }
