@@ -72,10 +72,10 @@ window.onload = function() {
 function setupPage(){
     $('#nameBox').attr("placeholder","Guest"+getRandomInt(0,999999));
 
-    skinArray.push({image:'sprites/ship_magenta.svg',value:"#ff00bf"});
-    skinArray.push({image:'sprites/ship_blue.svg',value:"#66b3ff"});
-    skinArray.push({image:'sprites/ship_red.svg',value:"red"});
-    skinArray.push({image:'sprites/ship_green.svg',value:"green"});
+    skinArray.push({image:'sprites/ship_magenta_menu.svg',value:"#ff00bf"});
+    skinArray.push({image:'sprites/ship_blue_menu.svg',value:"#66b3ff"});
+    skinArray.push({image:'sprites/ship_red_menu.svg',value:"red"});
+    skinArray.push({image:'sprites/ship_green_menu.svg',value:"green"});
 
     weaponArray.push({image:'sprites/photon_cannon.svg',value:"PhotonCannon",title:"Photon Cannon"});
     weaponArray.push({image:'sprites/blaster.svg',value:"Blaster",title:"Blaster"});
