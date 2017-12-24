@@ -480,6 +480,7 @@ function weaponFired(payload){
 			bulletList[bullet[0]].angle = bullet[3];
 			bulletList[bullet[0]].speed = bullet[4];
 			bulletList[bullet[0]].height = bullet[6];
+			bulletList[bullet[0]].isCrit = bullet[7];
 			bulletList[bullet[0]].trail = new Trail({x:bulletX, y:bulletY}, 30, 0.75*bulletWidth, ship.color, 0.2, 'circle');
 		}
 	}

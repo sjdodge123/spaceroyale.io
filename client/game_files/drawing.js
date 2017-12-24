@@ -66,8 +66,12 @@ healthAttributeSVG.src = "sprites/items/health_item.svg";
 var speedAttributeSVG = new Image();
 speedAttributeSVG.src = "sprites/items/overdrive_item.svg";
 
-var bulletSVG = new Image();
-bulletSVG.src = "sprites/bullet_sheet.svg";
+var bulletSVG = new Image(260,350);
+//bulletSVG.src = "sprites/bullet_sheet.svg";
+bulletSVG.src = "sprites/bullet_anim.svg";
+
+var bulletCritSVG = new Image(260,350);
+bulletCritSVG.src = "sprites/crit_anim_wip2.svg";
 
 var beamSVG = new Image();
 beamSVG.src = "sprites/beam_sheet.svg";
@@ -135,7 +139,7 @@ var planetSheet = new SpriteSheet(planetSVG,0,0,500,500,1,2,false);
 var asteroidSheet = new SpriteSheet(asteroidSVG,0,0,500,500,3,3,false);
 var nebulaSheet = new SpriteSheet(nebulaSVG,0,0,500,500,1,1,false);
 var tradeShipSheet = new SpriteSheet(tradeShipSVG,0,0,200,600,1,1,false);
-var bulletSheet = new SpriteSheet(bulletSVG,0,0,26,62,1,5,false);
+//var bulletSheet = new SpriteSheet(bulletSVG,0,0,26,62,1,5,false);
 var beamSheet = new SpriteSheet(beamSVG,0,0,26,62,1,5,false);
 var beamDotSheet = new SpriteSheet(beamDotSVG,0,0,47,47,1,5,false);
 var shipBlueSheet = new SpriteSheet(shipBlueSVG, 0, 0, 160, 160, 1, 16,true);
@@ -706,7 +710,6 @@ function drawMyShip(ship, dt){
 	gameContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
 	ship.spriteSheet.move(0,0);
 	ship.spriteSheet.update(dt);
-	
 	ship.spriteSheet.draw(ship.radius*2,ship.radius*2);
 	gameContext.restore();
 	drawWeapon(ship);
@@ -780,7 +783,7 @@ function drawExplosion(explosion, dt){
 	explosion.spriteSheet.move(0,0);
 	explosion.spriteSheet.update(dt);
 	
-	explosion.spriteSheet.draw(explosion.radius*2,explosion.radius*2);
+	explosion.spriteSheet.draw(explosion.radius*4,explosion.radius*4);
 	gameContext.restore();
 }
 
@@ -1023,34 +1026,63 @@ function drawBullet(bullet){
 		default:{
 			drawTrail(bullet.trail);
 
-			switch(color){
-				default: {
-					bulletSheet.changeFrame(0,4);
-					break;
-				}
-				case 'red':{
-					bulletSheet.changeFrame(0,1);
-					break;
-				}
-				case 'green':{
-					bulletSheet.changeFrame(0,2);
-					break;
-				}
-				case '#ff00bf':{
-					bulletSheet.changeFrame(0,3);
-					break;
-				}
-				case '#66b3ff':{
-					bulletSheet.changeFrame(0,0);
-					break;
+			if (bullet.spriteSheet == null){
+				switch (bullet.color){
+					default: {
+						if(bullet.isCrit){
+							bullet.spriteSheet = new SpriteSheet(bulletCritSVG, 0, 0, 50, 260, 1, 7,true);
+							break;
+						}
+						bullet.spriteSheet = new SpriteSheet(bulletSVG, 0, 0, 50, 260, 1, 7,true);
+						break;
+					}
+					case 'red':{
+						bullet.spriteSheet = new SpriteSheet(bulletSVG, 0, 0, 50, 260, 1, 7,true);
+						break;
+					}
+					case 'green':{
+						bullet.spriteSheet = new SpriteSheet(bulletSVG, 0, 0, 50, 260, 1, 7,true);
+						break;
+					}
+					case '#ff00bf':{
+						bullet.spriteSheet = new SpriteSheet(bulletSVG, 0, 0, 50, 260, 1, 7,true);
+						break;
+					}
+					case '#66b3ff':{
+						bullet.spriteSheet = new SpriteSheet(bulletSVG, 0, 0, 50, 260, 1, 7,true);
+						break;
+					}
 				}
 			}
+			// switch(color){
+			// 	default: {
+			// 		bulletSheet.changeFrame(0,4);
+			// 		break;
+			// 	}
+			// 	case 'red':{
+			// 		bulletSheet.changeFrame(0,1);
+			// 		break;
+			// 	}
+			// 	case 'green':{
+			// 		bulletSheet.changeFrame(0,2);
+			// 		break;
+			// 	}
+			// 	case '#ff00bf':{
+			// 		bulletSheet.changeFrame(0,3);
+			// 		break;
+			// 	}
+			// 	case '#66b3ff':{
+			// 		bulletSheet.changeFrame(0,0);
+			// 		break;
+			// 	}
+			// }
 
 			gameContext.save();
 			gameContext.translate(bullet.x-myShip.x+camera.xOffset,bullet.y-myShip.y+camera.yOffset);
 			gameContext.rotate(bullet.angle*Math.PI/180);
-			bulletSheet.move(0,0);
-			bulletSheet.draw(2*bullet.width, 2*bullet.height);
+			bullet.spriteSheet.move(0,0);
+			bullet.spriteSheet.update(dt);
+			bullet.spriteSheet.draw(2*bullet.width*50/26,2*bullet.height*260/62);
 			/*
 			gameContext.fillStyle = color;
 			gameContext.fillRect(-bullet.width/2,-bullet.height/2,bullet.width,bullet.height);
