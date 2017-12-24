@@ -23,7 +23,13 @@ function getShipListCount(){
 	return count;
 }
 
-
+function generateSig(activeList){
+		var sig = getRandomInt(0,99999);
+		if(activeList[sig] == null || activeList[sig] == undefined){
+			return sig;
+		}
+		return generateSig(activeList);
+}	
 function getMag(x,y){
 	return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
 }

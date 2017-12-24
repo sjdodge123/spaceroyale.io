@@ -141,6 +141,7 @@ exports.weaponFired = function(id,weapon,bullets){
 			bullet.speed,
 			bullet.width,
 			bullet.height,
+			bullet.isCrit,
 		];
 		packet.push(listItem);
 	}

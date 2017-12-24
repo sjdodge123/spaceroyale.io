@@ -9,12 +9,6 @@ function updateGameboard(){
 function updateShips(){
 	for(var id in shipList){
 		var ship = shipList[id];
-		if (ship.spriteAngle < 359){
-			ship.spriteAngle += ship.rotationRate;
-		}
-		else{
-			ship.spriteAngle = 0;
-		}
 		ship.trail.update({x:ship.x, y:ship.y});
 	}
 }
@@ -91,6 +85,12 @@ function terminateAsteroid(sig){
 	}
 }
 
+function terminateExplosion(sig){
+	if(explosionList[sig] != undefined){
+		delete explosionList[sig];
+	}
+}
+
 function terminateItem(sig){
 	if(itemList[sig] != undefined){
 		delete itemList[sig];
@@ -149,6 +149,16 @@ function spawnAIShips(payload){
 }
 
 
+function createExplosion(x,y,radius,type){
+	var sig = generateSig(explosionList);
+	explosionList[sig] = {};
+	explosionList[sig].sig = sig;
+	explosionList[sig].x = x;
+	explosionList[sig].y = y;
+	explosionList[sig].radius = radius;
+	explosionList[sig].type = type; //0 for ship, 1 for bullet
+}
+
 function createShip(dataArray,isAI){
 	var index = dataArray[0];
 	shipList[index] = {};
@@ -182,7 +192,7 @@ function createShip(dataArray,isAI){
 	if(isAI){
 		shipList[index].AIName = dataArray[8]
 	}
-	shipList[index].trail = new Trail({x:shipX, y:shipY}, 10, 20, shipColor, 0.35, 'circle');
+	shipList[index].trail = new Trail({x:shipX, y:shipY}, 10, 20, shipColor, 0.25, 'circle');
 }
 
 function updateShipList(packet){
@@ -490,7 +500,8 @@ function weaponFired(payload){
 			bulletList[bullet[0]].angle = bullet[3];
 			bulletList[bullet[0]].speed = bullet[4];
 			bulletList[bullet[0]].height = bullet[6];
-			bulletList[bullet[0]].trail = new Trail({x:bulletX, y:bulletY}, 10, bulletWidth, ship.color, 0.4, 'line');
+			bulletList[bullet[0]].isCrit = bullet[7];
+			bulletList[bullet[0]].trail = new Trail({x:bulletX, y:bulletY}, 30, 0.75*bulletWidth, ship.color, 0.2, 'circle');
 		}
 	}
 

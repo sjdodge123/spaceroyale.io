@@ -2906,6 +2906,7 @@ class Bullet extends Rect{
 		this.lifetime = c.bulletLifetime;
 		this.damage = c.blasterBulletDamage;
 		this.speed = c.blasterBulletSpeed;
+		this.isCrit = false;
 		this.velX = 0;
 		this.velY = 0;
 		this.newX = this.x;

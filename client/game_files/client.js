@@ -17,7 +17,9 @@ var myID = null,
 	nebulaList = {},
 	gadgetList = {},
 	tradeShipList = {},
+	explosionList = {},
 	shipList = {};
+
 function clientConnect() {
 	var server = io();
 
@@ -244,6 +246,10 @@ function clientConnect() {
 
 	server.on('terminateBullet',function(deadSigs){
 		for(var i=0;i<deadSigs.length;i++){
+			var explodedShell = bulletList[deadSigs[i]];
+			if (explodedShell.weaponName != 'ParticleBeam' && camera.inBounds(explodedShell)){
+				createExplosion(explodedShell.x,explodedShell.y, explodedShell.height, 1);
+			}
 			terminateBullet(deadSigs[i]);
 		}
 	});
@@ -363,8 +369,10 @@ function clientConnect() {
 		var id = packet[0];
 		var killerId = packet[1];
 		var killerName = '';
-		if(camera.inBounds(shipList[id])){
+		var explodedShip = shipList[id];
+		if(camera.inBounds(explodedShip)){
 			playSound(shipDeath);
+			createExplosion(explodedShip.x,explodedShip.y, 3*explodedShip.radius, 0);
 		}
 
 		if(killerId != null && shipList[killerId] != null){
@@ -376,6 +384,7 @@ function clientConnect() {
 		if(id == myID && iAmAlive){
 			iAmAlive = false;
 			playSound(youDied);
+			createExplosion(explodedShip.x,explodedShip.y, 3*explodedShip.radius, 0);
 			cameraBouncing = true;
 			if(id != null && killerId != null && killerName != ''){
 				showGameOverScreen("You were killed by " + killerName);
