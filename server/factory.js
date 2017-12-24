@@ -658,6 +658,9 @@ class GameBoard {
 			ship.gadget.reset();
 			messenger.messageRoomBySig(this.roomSig,"gadgetCooldownStop",{id:ship.id});
 		}
+		for(var gadgetID in this.gadgetList){
+			this.gadgetList[gadgetID].alive = false;
+		}
 	}
 	generateBulletSig(){
 		var sig = utils.getRandomInt(0,99999);
@@ -1292,7 +1295,6 @@ class Ship extends Circle{
 		messenger.messageRoomBySig(this.roomSig,"changeGadget",{id:this.id,name:name});
 		messenger.messageRoomBySig(this.roomSig,"gadgetCooldownStop",{id:this.id});
 	}
-
 	applyPassive(passiveInt){
 		if(this.passives[passiveInt] == c.passivesEnum.HealthBoost){
 			this.baseHealth = c.playerBaseHealth + 15;
@@ -1607,7 +1609,7 @@ class Ship extends Circle{
 			return;
 		}
 		if(object.owner != this.id && object.alive && object.damage != null){
-			
+
 			if(this.shield != null && this.shield.alive){
 				this.shield.handleHit(object);
 				if(this.shield.alive){
@@ -1800,20 +1802,29 @@ class DirectionalShield extends Gadget{
 	deactivate(x,y){
 
 	}
+	reset(){
+		this.super.reset();
+		this.activeShield.alive = false;
+	}
 }
 
 class PulseWave extends Gadget{
 	constructor(engine, owner){
 		super(engine, owner);
 		this.pulseRadius = c.pulseRadius;
+		this.currentPulse = null;
 		this.duration = 1*1000;
 	}
 	activate(x,y){
 		if(super.activate()){
-			var hitCircle = new Pulse(x,y,this.pulseRadius,"orange",this.duration);
+			this.currentPulse = new Pulse(x,y,this.pulseRadius,"orange",this.duration);
 			this.engine.explodeObject(x, y, 0, this.pulseRadius,true);
-			return hitCircle;
+			return this.currentPulse;
 		}
+	}
+	reset(){
+		this.super.reset();
+		this.currentPulse.alive = false;
 	}
 }
 
@@ -1822,13 +1833,18 @@ class HackingDrone extends Gadget{
 		super(engine, owner);
 		this.cooldown = c.droneCooldown;
 		this.cooldownTimer = Date.now() - this.cooldown;
+		this.currentDrone = null;
 		this.duration = 200;
 	}
 	activate(x,y,angle){
 		if(super.activate()){
-			var drone = new Drone(x,y,c.droneRadius,"orange",this.duration,angle,this.owner);
-			return drone;
+			this.currentDrone = new Drone(x,y,c.droneRadius,"orange",this.duration,angle,this.owner);
+			return this.currentDrone;
 		}
+	}
+	reset(){
+		this.super.reset();
+		this.currentDrone.alive = false;
 	}
 }
 
@@ -2041,6 +2057,11 @@ class Drone extends GadgetObject{
 			if(utils.getRandomInt(0,c.droneHackStopChance) == 0){
 				this.stopHacking = true;
 			}
+		}
+	}
+	clear(){
+		if(this.hacking){
+			this.stopHacking = true;
 		}
 	}
 }
