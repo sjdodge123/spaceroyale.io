@@ -1607,9 +1607,7 @@ class Ship extends Circle{
 			return;
 		}
 		if(object.owner != this.id && object.alive && object.damage != null){
-			if(this.hacker != null && this.hacker.alive){
-				this.hacker.checkBreakDisable();
-			}
+			
 			if(this.shield != null && this.shield.alive){
 				this.shield.handleHit(object);
 				if(this.shield.alive){
@@ -1630,6 +1628,9 @@ class Ship extends Circle{
 	}
 
 	takeDamage(damage){
+		if(this.hacker != null && this.hacker.alive){
+			this.hacker.checkBreakDisable();
+		}
 		this.regenerating = false;
 		this.regenTimer = Date.now();
 		this.health -= Math.abs(damage);

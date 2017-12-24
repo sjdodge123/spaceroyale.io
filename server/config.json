@@ -23,8 +23,8 @@
     "AINameList":["Danger","Ralph","Pincer","Snowball","Tiger","Holiday","Joey","Randy","A RABID DOG","noone","Guestl337","Ceasar","Pluto","mr. bone's wild ride","chuckie","Pharoh","pockets"],
     "AIColorList":["#ff00bf","#66b3ff","red","green"],
 
-    "damageTickRate":0.5,
-    "damagePerTick":10,
+    "damageTickRate":0.125,
+    "damagePerTick":2.5,
 
     "lobbyWidth": 750,
     "lobbyHeight": 750,
@@ -44,9 +44,9 @@
       "WeaponAttribute":1
     },
 
-    "attributeSpeedStart":0,
-    "attributeWeaponStart":0,
-    "attributeHealthStart":0,
+    "attributeSpeedStart":1,
+    "attributeWeaponStart":1,
+    "attributeHealthStart":1,
 
     "attributeAmountHealth":5,
     "attributeMoveSpeedBonus":25,
@@ -85,7 +85,7 @@
     "tradeShipWeapon":"Blaster",
     "tradeShipWeaponLevel":3,
 
-    "playerMaxSpeed":600,
+    "playerMaxSpeed":300,
     "playerBaseAcel":500,
     "playerBaseRadius":25,
     "playerExplosionRadius":300,
@@ -108,9 +108,9 @@
     "blasterCritChance":15,
     "blasterCritIncreasePercent":150,
     "bulletLifetime":0.5,
-    "blasterPowerCost": 5,
-    "blasterBulletSpeed":800,
-    "blasterBulletDamage":3,
+    "blasterPowerCost": 10,
+    "blasterBulletSpeed":1200,
+    "blasterBulletDamage":4,
     "blasterSpray":5,
 
 
@@ -160,7 +160,7 @@
     "droneSearchDuration":2000,
     "droneSearchSpeed":500,
     "droneHackDuration":3000,
-    "droneHackStopChance":2,
+    "droneHackStopChance":1,
 
     "forceShieldDrawRadius":30,
     "forceShieldRadius": 25,
