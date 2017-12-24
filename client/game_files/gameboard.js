@@ -480,6 +480,9 @@ function weaponFired(payload){
 		return;
 	}
 
+	if (ship.weapon.spriteSheet != null){
+		ship.weapon.spriteSheet.changeFrame(0,0);
+	}
 	for(i=4;i<numBullets+4;i++){
 		bullet = payload[i];
 		if(bulletList[bullet[0]] == null){

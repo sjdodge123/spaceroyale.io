@@ -15,6 +15,9 @@ shipMagentaSVG.src = 'sprites/ship_magenta.svg';
 var shipBlueSVG = new Image(150,1200);
 shipBlueSVG.src = 'sprites/ship_blue.svg';
 
+var cannonSVG = new Image(300,1120);
+cannonSVG.src = 'sprites/blaster_wip.svg';
+
 var explosionSVG = new Image(500,4000);
 explosionSVG.src = 'sprites/explosion_sheet.svg';
 
@@ -790,30 +793,38 @@ function drawHealthBar(ship){
 }
 
 function drawWeapon(ship){
+	if (ship.weapon.spriteSheet == null){
+		ship.weapon.spriteSheet = new SpriteSheet(cannonSVG, 0, 0, 160, 300, 1, 7,false);
+		ship.weapon.spriteSheet.changeFrame(0,6);
+	}
+
 	var shipDim = ship.radius || ship.width/4;
-	var svgscale = 2 * shipDim / 500;
+	var svgscale = 2.2 * shipDim / 150;
+
 	gameContext.save();
 	gameContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
 	gameContext.rotate((ship.weapon.angle + 180)*Math.PI/180);
-	switch(ship.weapon.name){
-		case "Blaster":{
-			gameContext.drawImage(blasterSVG, - blasterSVG.width * svgscale / 2, -  blasterSVG.height * svgscale / 2, blasterSVG.width * svgscale, blasterSVG.height * svgscale);
-			break;
-		}
-		case "PhotonCannon":{
-			gameContext.drawImage(photonCannonSVG, - photonCannonSVG.width * svgscale / 2, -  photonCannonSVG.height * svgscale / 2, photonCannonSVG.width * svgscale, photonCannonSVG.height * svgscale);
-			break;
-		}
-		case "MassDriver":{
-			gameContext.drawImage(massDriverSVG, - massDriverSVG.width * svgscale / 2, -  massDriverSVG.height * svgscale / 2, massDriverSVG.width * svgscale, massDriverSVG.height * svgscale);
-			break;
-		}
-		case "ParticleBeam":{
-			gameContext.drawImage(particleBeamSVG, - particleBeamSVG.width * svgscale / 2, -  particleBeamSVG.height * svgscale / 2, particleBeamSVG.width * svgscale, particleBeamSVG.height * svgscale);
-			break;
-		}
-	}
-
+	ship.weapon.spriteSheet.update(dt);
+	ship.weapon.spriteSheet.draw(160 * svgscale,300 * svgscale);
+	// switch(ship.weapon.name){
+	// 	case "Blaster":{
+	// 		gameContext.drawImage(blasterSVG, - blasterSVG.width * svgscale / 2, -  blasterSVG.height * svgscale / 2, blasterSVG.width * svgscale, blasterSVG.height * svgscale);
+	// 		break;
+	// 	}
+	// 	case "PhotonCannon":{
+	// 		gameContext.drawImage(photonCannonSVG, - photonCannonSVG.width * svgscale / 2, -  photonCannonSVG.height * svgscale / 2, photonCannonSVG.width * svgscale, photonCannonSVG.height * svgscale);
+	// 		break;
+	// 	}
+	// 	case "MassDriver":{
+	// 		gameContext.drawImage(massDriverSVG, - massDriverSVG.width * svgscale / 2, -  massDriverSVG.height * svgscale / 2, massDriverSVG.width * svgscale, massDriverSVG.height * svgscale);
+	// 		break;
+	// 	}
+	// 	case "ParticleBeam":{
+	// 		gameContext.drawImage(particleBeamSVG, - particleBeamSVG.width * svgscale / 2, -  particleBeamSVG.height * svgscale / 2, particleBeamSVG.width * svgscale, particleBeamSVG.height * svgscale);
+	// 		break;
+	// 	}
+	// }
+	
 	gameContext.restore();
 
 	if(ship.weapon.chargeLevel > 0){

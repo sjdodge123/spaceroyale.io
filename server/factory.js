@@ -2532,7 +2532,7 @@ class Weapon {
 	constructor(owner){
 		this.name = "Unset";
 		this.owner = owner;
-		this.cooldown = .1;
+		this.cooldown = .2;
 		this.level = 1;
 		this.maxLevel = 3;
 		this.nextFire = 0;
