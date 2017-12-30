@@ -85,6 +85,7 @@ function checkForMail(client){
 			playerList:room.clientList,
 			shipList:shipData,
 			config:c,
+			myID:client.id,
 			world:worldData,
 			maxLobbyTime:c.lobbyWaitTime
 		};

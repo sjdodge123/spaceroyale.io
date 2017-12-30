@@ -7,18 +7,7 @@ var myID = null,
 	maxLobbyTime = null,
 	world,
 	quadTree,
-	config,
-	trailingToasts = [],
-	asteroidList = {},
-	itemList = {},
-	planetList = {},
-	playerList = {},
-	bulletList = {},
-	nebulaList = {},
-	gadgetList = {},
-	tradeShipList = {},
-	explosionList = {},
-	shipList = {};
+	config;
 
 function clientConnect() {
 	var server = io();
@@ -79,7 +68,9 @@ function clientConnect() {
 		for(var id in playerList){
 			eventLog.addEvent(playerList[id] + " has joined the battle");
 		}
-
+		if(gameState.myID != null){
+			myID = gameState.myID;
+		}
 		if(shipList[myID] != null){
 			myShip = shipList[myID];
 		}
