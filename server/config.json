@@ -15,7 +15,7 @@
     "baseShrinkingDuration": 40,
     "shrinkingDurationSpeedup":0.75,
 
-    
+
 
     "AISpawnPlayers":true,
     "AIAggroRangeMin":250,
@@ -151,7 +151,7 @@
     "shieldRestoreAmount":10,
 
     "pulseDuration":500,
-    "pulseRadius":200,
+    "pulseRadius":400,
 
     "droneRadius":10,
     "droneCooldown":10000,

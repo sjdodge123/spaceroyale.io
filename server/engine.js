@@ -304,7 +304,7 @@ class Engine {
 	}
 
 	explodeObject(xLoc, yLoc, maxDamage,  radius, implode){
-		var distance, ship, item, velCont;
+		var distance, ship, item,bullet, velCont;
 
 		for (var shipSig in this.shipList){
 			ship = this.shipList[shipSig];
@@ -320,12 +320,21 @@ class Engine {
 			item = this.itemList[itemSig];
 			distance = utils.getMag(xLoc - item.x, yLoc - item.y);
 			if((distance  <= (radius + item.radius)) && (distance != 0)){
-				velCont = this._calcVelCont(distance,item,xLoc,yLoc,implode)
+				velCont = this._calcVelCont(distance,item,xLoc,yLoc,implode);
 				item.velX += velCont.velContX;
 				item.velY += velCont.velContY;
 			}
 		}
-
+		if(implode){
+			for(var bulletSig in this.bulletList){
+				bullet = this.bulletList[bulletSig];
+				distance = utils.getMag(xLoc - bullet.x, yLoc - bullet.y);
+				if((distance  <= radius) && (distance != 0)){
+					bullet.angle = bullet.angle+180;
+					bullet.owner = '00';
+				}
+			}
+		}
 	}
 	_calcVelCont(distance,object,x,y,implode){
 		var velCont = {velContX:0,velContY:0};
