@@ -57,7 +57,8 @@ class AIController{
 		this.closestNebula == null;
 		this.closestItem = null;
 		this.closestTradeship = null;
-		this.desiredWeapon = '';
+		this.desiredWeapon = this.determineDesiredWeapon();
+		this.ship.changeWeapon(this.desiredWeapon);
 		this.ship.isAI = true;
 		this.ship.targetDirX = 0;
 		this.ship.targetDirY = 0;
@@ -68,7 +69,6 @@ class AIController{
 		this.ship.glowColor = this.ship.color;
 	}
 	update(active,shipsAlive){
-		
 		if(active && this.ship.alive){
 			this.shipsAlive = shipsAlive;
 			this.gameLoop();
@@ -77,9 +77,6 @@ class AIController{
 	}
 
 	gameLoop(){
-		if(this.desiredWeapon == ''){
-			this.desiredWeapon = this.determineDesiredWeapon();
-		}
 		if(this.closestAsteroid == null){
 			this.findClosestAsteroid();
 		}
@@ -93,7 +90,11 @@ class AIController{
 			if (fireTarget.alive){
 				var dist2 = utils.getMagSq(this.ship.x,this.ship.y,fireTarget.x,fireTarget.y);
 				if(dist2 < this.fireDistanceSqCurrent){
-					this.fireWeapon();
+					if(this.currentWeapon != "PhotonCannon" || this.ship.weapon.chargeLevel > 1){
+						this.fireWeapon();
+					}
+				} else if (this.currentWeapon == "ParticleBeam") {
+					this.ship.stopFire();
 				}
 			}
 		}
@@ -149,7 +150,8 @@ class AIController{
 		if(this.mood =="aggresive"){
 			this.fleeThresholdCurrent = this.fleeThresholdBase*.8;
 			this.aggroRangeSqCurrent = this.aggroRangeSqBase*1.5;
-			return;
+			return;this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*2;
+				this.fireDistanceSqCurrent = this.fireDistanceSqBase*2;
 		}
 		if(this.mood == "defensive"){
 			this.fleeThresholdCurrent = this.fleeThresholdBase*1.2;
@@ -157,35 +159,54 @@ class AIController{
 			return;
 		}
 		if(this.mood =="hiding"){
-			this.fleeThresholdCurrent = this.ship.health-5;
+			this.fleeThresholdCurrent = this.ship.health-5;this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*2;
+				this.fireDistanceSqCurrent = this.fireDistanceSqBase*2;
 			this.aggroRangeSqCurrent = this.aggroRangeSqBase*.2;
 			return;
 		}
 
 		if(this.mood == "looting"){
-			//Theorically the default state
-			this.fleeThresholdCurrent = this.fleeThresholdBase;
+			this.fleeThresholdCurrent = this.fleeThresholdBase;this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*2;
+				this.fireDistanceSqCurrent = this.fireDistanceSqBase*2;
 			this.aggroRangeSqCurrent = this.aggroRangeSqBase;
 			return;
 		}
 	}
 
 	updateBehaviorFromWeapon(){
-		if(this.mood =="hiding"){
+		if(this.mood == "hiding"){
 			this.maintainDistanceSqCurrent = 0;
-			return;
+			return;this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*2;
+				this.fireDistanceSqCurrent = this.fireDistanceSqBase*2;
 		}
 		if(this.currentWeapon == "Blaster"){
 			this.maintainDistanceSqCurrent = this.maintainDistanceSqBase;
 			this.fireDistanceSqCurrent = this.fireDistanceSqBase;
 		}
 		if(this.currentWeapon == "PhotonCannon"){
-			this.maintainDistanceSqCurrent = 0;
-			this.fireDistanceSqCurrent = this.fireDistanceSqBase*.2;
+			this.chargeWeapon();
+			this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*.2;
+			this.fireDistanceSqCurrent = this.fireDistanceSqBase*.2;this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*2;
+				this.fireDistanceSqCurrent = this.fireDistanceSqBase*2;
 		}
 		if(this.currentWeapon == "MassDriver"){
 			this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*2;
 			this.fireDistanceSqCurrent = this.fireDistanceSqBase*2;
+		}
+		if(this.currentWeapon == "ParticleBeam"){
+			if(this.ship.weapon.chargeLevel == 1){
+				this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*2;
+				this.fireDistanceSqCurrent = this.fireDistanceSqBase*2;
+			}
+			if(this.ship.weapon.chargeLevel == 2){
+				this.maintainDistanceSqCurrent = this.maintainDistanceSqBase;
+				this.fireDistanceSqCurrent = this.fireDistanceSqBase;
+			}
+			if(this.ship.weapon.chargeLevel == 3){
+				this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*.2;
+				this.fireDistanceSqCurrent = this.fireDistanceSqBase*.2;
+			}
+
 		}
 	}
 
@@ -249,15 +270,18 @@ class AIController{
 		}
 	}
 	determineDesiredWeapon(){
-		switch (utils.getRandomInt(0,2)){
+		switch (utils.getRandomInt(0,3)){
 			case 0:{
-				return 'BlasterItem';
+				return 'Blaster';
 			}
 			case 1:{
-				return 'PhotonCannonItem';
+				return 'PhotonCannon';
 			}
 			case 2:{
-				return 'MassDriverItem';
+				return 'MassDriver';
+			}
+			case 3:{
+				return 'ParticleBeam';
 			}
 		}
 	}
@@ -371,9 +395,17 @@ class AIController{
 		this.closestPlayerShip = playerShip;
 
 	}
+	chargeWeapon(){
+		this.ship.fire();
+	}
 	fireWeapon(){
 		if(this.ship.alive){
-			this.ship.fireWeapon = true;
+			if(this.currentWeapon == "PhotonCannon"){
+				this.ship.stopFire();
+			} else{
+				this.ship.fire();
+			}
+
 		}
 	}
 
