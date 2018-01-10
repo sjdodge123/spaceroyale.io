@@ -731,6 +731,7 @@ function recenterCamera(){
             cameraBouncingFirstPass = false;
             myID = cameraCenterSeed;
             changeGadgetHUD(shipList[myID].gadget);
+            changeWeaponHUD(shipList[myID].weapon.name);
             healthLastFrame = shipList[myID].health;
         }
         if(cameraBouncingFirstPass){

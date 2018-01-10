@@ -93,6 +93,9 @@ class Engine {
 
 			if(gadget.attached){
 				var ship = this.shipList[gadget.owner];
+				if(ship == undefined){
+					continue;
+				}
 				gadget.newX = ship.newX;
 				gadget.newY = ship.newY;
 				gadget.angle = ship.weapon.angle;
