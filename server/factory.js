@@ -263,7 +263,7 @@ class Game {
 	}
 
 	checkForWin(){
-		if(this.getPlayerShipCount() == 0){
+		if( (c.AISpectateMode == false) && (this.getPlayerShipCount() == 0) ){
 			this.gameover();
 			return true;
 		}

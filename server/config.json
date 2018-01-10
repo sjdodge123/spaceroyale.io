@@ -18,6 +18,7 @@
 
 
     "AISpawnPlayers":true,
+    "AISpectateMode":false,
     "AIAggroRangeMin":250,
     "AIAggroRangeMax":400,
     "AINameList":["Danger","Ralph","Pincer","Snowball","Tiger","Holiday","Joey","Randy","A RABID DOG","noone","Guestl337","Ceasar","Pluto","mr. bone's wild ride","chuckie","Pharoh","pockets"],

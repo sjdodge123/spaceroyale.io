@@ -40,6 +40,10 @@ class AIController{
 		this.maintainDistanceSqBase = this.maintainDistance * this.maintainDistance;
 		this.maintainDistanceSqCurrent = this.maintainDistanceSqBase;
 
+		this.gadgetDistance = utils.getRandomInt(100,300);
+		this.gadgetDistanceSqBase = this.gadgetDistance * this.gadgetDistance;
+		this.gadgetDistanceSqCurrent = this.gadgetDistanceSqBase;
+
 		this.mood = this.determineBaseMood();
 
 		//When your HP drops below this number, change to Looting
@@ -51,14 +55,20 @@ class AIController{
 
 		this.currentWeapon = null;
 		this.behaviorSet = false;
-
+		this.executeGadget = false;
 		this.closestPlayerShip = null;
 		this.closestAsteroid = null;
 		this.closestNebula == null;
 		this.closestItem = null;
 		this.closestTradeship = null;
+
+		this.fireTarget = null;
+		this.fireTargetDistance = 0;
+
 		this.desiredWeapon = this.determineDesiredWeapon();
+		this.desiredGadget = this.determineDesiredGadget();
 		this.ship.changeWeapon(this.desiredWeapon);
+		this.ship.changeGadget(this.desiredGadget);
 		this.ship.isAI = true;
 		this.ship.targetDirX = 0;
 		this.ship.targetDirY = 0;
@@ -69,7 +79,7 @@ class AIController{
 		this.ship.glowColor = this.ship.color;
 	}
 	update(active,shipsAlive){
-		if(active && this.ship.alive){
+		if(active && this.ship.alive && this.ship.enabled){
 			this.shipsAlive = shipsAlive;
 			this.gameLoop();
 			return;
@@ -84,17 +94,21 @@ class AIController{
 
 		var moveToTarget = this.determineMoveTarget();
 		this.moveToTarget(moveToTarget);
-		var fireTarget = this.determineFireTarget();
-		if(fireTarget){
-			this.faceTarget(fireTarget);
-			if (fireTarget.alive){
-				var dist2 = utils.getMagSq(this.ship.x,this.ship.y,fireTarget.x,fireTarget.y);
-				if(dist2 < this.fireDistanceSqCurrent){
+		this.fireTarget = this.determineFireTarget();
+		if(this.fireTarget){
+			this.faceTarget(this.fireTarget);
+			if (this.fireTarget.alive){
+				this.fireTargetDistance = utils.getMagSq(this.ship.x,this.ship.y,this.fireTarget.x,this.fireTarget.y);
+				if(this.fireTargetDistance < this.fireDistanceSqCurrent){
 					if(this.currentWeapon != "PhotonCannon" || this.ship.weapon.chargeLevel > 1){
 						this.fireWeapon();
 					}
 				} else if (this.currentWeapon == "ParticleBeam") {
 					this.ship.stopFire();
+				}
+
+				if(this.executeGadget == true){
+					this.useGadget();
 				}
 			}
 		}
@@ -102,6 +116,7 @@ class AIController{
 		this.updateBehaviorFromMood();
 		this.currentWeapon = this.ship.weapon.name;
 		this.updateBehaviorFromWeapon();
+		this.updateBehaviorFromGadget();
 	}
 
 	updateMood(){
@@ -150,8 +165,7 @@ class AIController{
 		if(this.mood =="aggresive"){
 			this.fleeThresholdCurrent = this.fleeThresholdBase*.8;
 			this.aggroRangeSqCurrent = this.aggroRangeSqBase*1.5;
-			return;this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*2;
-				this.fireDistanceSqCurrent = this.fireDistanceSqBase*2;
+			return;
 		}
 		if(this.mood == "defensive"){
 			this.fleeThresholdCurrent = this.fleeThresholdBase*1.2;
@@ -159,15 +173,13 @@ class AIController{
 			return;
 		}
 		if(this.mood =="hiding"){
-			this.fleeThresholdCurrent = this.ship.health-5;this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*2;
-				this.fireDistanceSqCurrent = this.fireDistanceSqBase*2;
+			this.fleeThresholdCurrent = this.ship.health-5;
 			this.aggroRangeSqCurrent = this.aggroRangeSqBase*.2;
 			return;
 		}
 
 		if(this.mood == "looting"){
-			this.fleeThresholdCurrent = this.fleeThresholdBase;this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*2;
-				this.fireDistanceSqCurrent = this.fireDistanceSqBase*2;
+			this.fleeThresholdCurrent = this.fleeThresholdBase;
 			this.aggroRangeSqCurrent = this.aggroRangeSqBase;
 			return;
 		}
@@ -176,8 +188,7 @@ class AIController{
 	updateBehaviorFromWeapon(){
 		if(this.mood == "hiding"){
 			this.maintainDistanceSqCurrent = 0;
-			return;this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*2;
-				this.fireDistanceSqCurrent = this.fireDistanceSqBase*2;
+			return;
 		}
 		if(this.currentWeapon == "Blaster"){
 			this.maintainDistanceSqCurrent = this.maintainDistanceSqBase;
@@ -186,8 +197,7 @@ class AIController{
 		if(this.currentWeapon == "PhotonCannon"){
 			this.chargeWeapon();
 			this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*.2;
-			this.fireDistanceSqCurrent = this.fireDistanceSqBase*.2;this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*2;
-				this.fireDistanceSqCurrent = this.fireDistanceSqBase*2;
+			this.fireDistanceSqCurrent = this.fireDistanceSqBase*.2;
 		}
 		if(this.currentWeapon == "MassDriver"){
 			this.maintainDistanceSqCurrent = this.maintainDistanceSqBase*2;
@@ -207,6 +217,25 @@ class AIController{
 				this.fireDistanceSqCurrent = this.fireDistanceSqBase*.2;
 			}
 
+		}
+	}
+
+	updateBehaviorFromGadget(){
+		if(this.fireTarget == null){
+			return;
+		}
+		if(this.desiredGadget == "DirectionalShield"){
+			this.executeGadget = true;
+		}
+		if(this.desiredGadget == "HackingDrone"){
+			if( (this.fireTargetDistance < this.gadgetDistanceSqCurrent) && this.fireTarget.alive && this.fireTarget.health < 70){
+				this.executeGadget = true;
+			}
+		}
+		if(this.desiredGadget == "PulseWave"){
+			if((this.fireTargetDistance < this.gadgetDistanceSqCurrent) && ( (this.fireTarget == this.closestItem) || (this.fireTarget == this.closestPlayerShip) ) ){
+				this.executeGadget = true;
+			}
 		}
 	}
 
@@ -285,6 +314,20 @@ class AIController{
 			}
 		}
 	}
+	determineDesiredGadget(){
+		switch (utils.getRandomInt(0,2)){
+			case 0:{
+				return 'DirectionalShield';
+			}
+			case 1:{
+				return 'HackingDrone';
+			}
+			case 2:{
+				return 'PulseWave';
+			}
+		}
+	}
+
 	findClosestAsteroid(){
 		var asteroid = null;
 		var lastDist2 = Infinity;
@@ -395,6 +438,11 @@ class AIController{
 		this.closestPlayerShip = playerShip;
 
 	}
+	useGadget(){
+		this.ship.activateGadget();
+		this.executeGadget = false;
+	}
+
 	chargeWeapon(){
 		this.ship.fire();
 	}
