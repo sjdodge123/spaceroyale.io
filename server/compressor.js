@@ -88,6 +88,8 @@ exports.sendShipUpdates = function(shipList){
 			ship.x,
 			ship.y,
 			ship.weapon.angle,
+			ship.velX,
+			ship.velY,
 		];
 		packet.push(listItem);
 	}

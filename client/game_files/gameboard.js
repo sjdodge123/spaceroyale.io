@@ -207,6 +207,8 @@ function updateShipList(packet){
 			shipList[ship[0]].x = ship[1];
 			shipList[ship[0]].y = ship[2];
 			shipList[ship[0]].weapon.angle = ship[3];
+			shipList[ship[0]].velX = ship[4];
+			shipList[ship[0]].velY = ship[5];
 		}
 	}
 }

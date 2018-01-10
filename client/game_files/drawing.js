@@ -373,7 +373,6 @@ function drawHUD(){
     drawTotalPlayers();
     drawPowerBar();
     drawEventLog();
-
     if(!camera.inBounds(world.whiteBound)){
 		drawBoundArrow();
 	}
@@ -711,6 +710,8 @@ function drawShip(ship){
 	if(ship.shield != null){
 		drawShield(ship);
 	}
+	//if in range..
+	drawReticle(ship);
 
 	drawTrail(ship.trail);
 
@@ -757,6 +758,47 @@ function drawShip(ship){
 	}
 }
 
+function drawReticle(ship){
+	var retLoc = trackTarget(ship);
+	gameContext.save();
+	gameContext.strokeStyle = 'red';
+	gameContext.beginPath();
+	//gameContext.arc(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset,config.shieldRadius,0,Math.PI*2,true);
+	gameContext.arc(retLoc.x - myShip.x + camera.xOffset, retLoc.y - myShip.y + camera.yOffset,12,0,Math.PI*2,true);
+	gameContext.stroke();
+	gameContext.restore();
+}
+function trackTarget(ship){
+	var loc = {x:0, y:0};
+
+	var a, b, c, dx, dy, sc, sr;
+	//hardcode blaster speed sc= 1200
+	dx = myShip.x - ship.x;
+	dy = myShip.y - ship.y;
+	sc = 1200;
+	sr = getMag(ship.velX, ship.velY); //target ship velocity
+	
+	// quadratic eq stuff
+	a = Math.pow(sc,2) - Math.pow(sr,2);
+	b = 2*(dx * ship.velX + dy * ship.velY);
+	c = -1 * Math.pow(getMag(dx,dy),2);
+
+	var rootTerm = Math.pow(b,2) - 4 * a * c;
+	if (rootTerm < 0){
+		loc.x = ship.x;
+		loc.y = ship.y;
+		return loc;
+	}
+
+	var t;
+	t = (-b + Math.sqrt(rootTerm)) / (2*a);
+	if (t < 0){
+		t = (-b + Math.sqrt(rootTerm)) / (2*a);
+	}
+	loc.x = ship.x + ship.velX * t;
+	loc.y = ship.y + ship.velY * t;
+	return loc;
+}
 function drawExplosion(explosion, dt){
 	if (explosion.spriteSheet == null){
 		if (!explosion.type){
