@@ -1,3 +1,31 @@
+var trailingToasts,
+	asteroidList,
+	itemList,
+	planetList,
+	playerList,
+	bulletList,
+	nebulaList,
+	gadgetList,
+	tradeShipList,
+	explosionList,
+	shipList;
+
+resetGameboard();
+
+function resetGameboard(){
+	trailingToasts = [];
+	asteroidList = {};
+	itemList = {};
+	planetList = {};
+	playerList = {};
+	bulletList = {};
+	nebulaList = {};
+	gadgetList = {};
+	tradeShipList = {};
+	explosionList = {};
+	shipList = {};
+}
+
 function updateGameboard(){
 	updateShips();
 	updateBullets();

@@ -1758,6 +1758,7 @@ class Ship extends Circle{
 class Gadget {
 	constructor(engine, owner){
 		this.engine = engine;
+		this.isGadget = true;
 		this.owner = owner;
 		this.coolingDown = false;
 		this.cooldownPercent = 0;
@@ -1874,6 +1875,7 @@ class GadgetObject extends Circle{
 	constructor(x,y,radius,color, owner){
 		super(x,y,radius,color);
 		this.type = "Unset";
+		this.collidesWithBullet = false;
 		this.alive = true;
 		this.angle = 0;
 		this.velX = 0;
@@ -1903,6 +1905,7 @@ class ForceShield extends GadgetObject{
 		var shieldX = x + (orbit/2) * Math.cos((angle + 90) * Math.PI/180);
 		var shieldY = y + (orbit/2) * Math.sin((angle + 90) * Math.PI/180);
 		super(shieldX,shieldY,radius,color, owner);
+		this.collidesWithBullet = true;
 		this.type = "ForceShield";
 		this.orbit = orbit;
 		this.spawnDate = Date.now();
@@ -1971,6 +1974,7 @@ class Drone extends GadgetObject{
 		this.type = "Drone";
 		this.angle = angle;
 		this.isStatic = false;
+		this.collidesWithBullet = true;
 		this.spawnDate = Date.now();
 		this.speed = c.droneFireSpeed;
 		this.hackDuration = c.droneHackDuration;
@@ -2980,6 +2984,9 @@ class Bullet extends Rect{
 			return;
 		}
 		if(object.isNebula){
+			return;
+		}
+		if(object.collidesWithBullet === false){
 			return;
 		}
 		if(object.isItem){

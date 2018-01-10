@@ -447,7 +447,6 @@ function resetGameVariables(){
     timeOutChecker = null;
     gameStarted = false;
     victory = false;
-    gameRunning = true;
     shrinkTimeLeft = 60;
     lobbyTimeLeft = 0;
     totalPlayers = null;
@@ -461,14 +460,6 @@ function resetGameVariables(){
     timeSinceLastCom = 0;
     serverTimeoutWait = 5;
     world = null;
-    asteroidList = {};
-    itemList = {};
-    planetList = {};
-    playerList = {};
-    bulletList = {};
-    nebulaList = {};
-    tradeShipList = {};
-    shipList = {};
     uiCanvas.removeEventListener("mousemove", calcMousePos, false);
     uiCanvas.removeEventListener("mousedown", handleClick, false);
     uiCanvas.addEventListener("mouseup", handleUnClick, false);
@@ -487,8 +478,10 @@ function resetGameVariables(){
     backgroundCanvas = document.getElementById('backgroundCanvas');
     backgroundImage = document.getElementById('backgroundImage');
     hud = document.getElementById('hud');
+    $('#readyButton').hide();
     $('#lobbyUI').show();
     gameContext = gameCanvas.getContext('2d');
+    resetGameboard();
 }
 
 function buildPassiveList(){
