@@ -1,4 +1,6 @@
 var trailingToasts,
+	mousex,
+	mousey,
 	asteroidList,
 	itemList,
 	planetList,
@@ -585,6 +587,46 @@ function gadgetActivated(packet){
 			gadgetList[packet[0]].radius = config.forceShieldRadius;
 		}
 	}
+}
+function setMousePos(x,y){
+	mousex = x;
+	mousey = y;
+}
+
+function trackTarget(ship){
+	
+	if (getMag(ship.x-mousex,ship.y-mousey) > config.reticleDrawDist){
+		return null;
+	}
+	var loc = {x:0, y:0};
+
+	var a, b, c, dx, dy, sc, sr;
+	//hardcode blaster speed sc= 1200
+	dx = myShip.x - ship.x;
+	dy = myShip.y - ship.y;
+	sc = 1200;
+	sr = getMag(ship.velX, ship.velY); //target ship velocity
+	
+	// quadratic eq stuff
+	a = Math.pow(sc,2) - Math.pow(sr,2);
+	b = 2*(dx * ship.velX + dy * ship.velY);
+	c = -1 * Math.pow(getMag(dx,dy),2);
+
+	var rootTerm = Math.pow(b,2) - 4 * a * c;
+	if (rootTerm < 0){
+		loc.x = ship.x;
+		loc.y = ship.y;
+		return loc;
+	}
+
+	var t;
+	t = (-b + Math.sqrt(rootTerm)) / (2*a);
+	if (t < 0){
+		t = (-b + Math.sqrt(rootTerm)) / (2*a);
+	}
+	loc.x = ship.x + ship.velX * t;
+	loc.y = ship.y + ship.velY * t;
+	return loc;
 }
 
 class Trail {

@@ -791,6 +791,7 @@ function calcMousePos(evt){
         mouseX = (((evt.pageX - rect.left)/newWidth)*gameCanvas.width)+ myShip.x - camera.xOffset;
         mouseY = (((evt.pageY - rect.top )/newHeight)*gameCanvas.height) + myShip.y - camera.yOffset;
         server.emit('mousemove',{x:mouseX,y:mouseY});
+        setMousePos(mouseX,mouseY);
     }
 }
 

@@ -104,6 +104,7 @@
     "playerHealthRegenRate":0.25,
     "playerHealthRegenTime":5000,
 
+    "reticleDrawDist": 150,
     "forceConstant": 5000000,
 
     "blasterCritChance":15,
