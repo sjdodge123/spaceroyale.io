@@ -488,21 +488,31 @@ function buildPassiveList(){
     passiveArray = [];
     firstPassiveSelected = $('#firstPassive').attr('data-selected');
     secondPassiveSelected = $('#secondPassive').attr('data-selected');
+    if(config){
+        passiveArray.push({image:'sprites/items/health_item.svg',value:"0",title:"Health Boost +"+config.passiveHealthBoost+" Base Health"});
+        passiveArray.push({image:'sprites/items/shield_item.svg',value:"1",title:"Power Boost +"+config.passivePowerBoost+" Base Power"});
+        passiveArray.push({image:'sprites/items/mass_driver_item.svg',value:"2",title:"Glass Cannon -"+config.passiveGlassCannonHealth+" BaseHealth,+"+config.passiveGlassCannonDamage * 100+"% Damage"});
+        passiveArray.push({image:'sprites/items/photon_cannon_item.svg',value:"3",title:"Running Riot +1% Damage for every killing blow"});
+    }
 
-    passiveArray.push({image:'sprites/items/health_item.svg',value:"0",title:"Health Boost +15 Base Health"});
-    passiveArray.push({image:'sprites/items/shield_item.svg',value:"1",title:"Power Boost +15 Base Power"});
-    passiveArray.push({image:'sprites/items/mass_driver_item.svg',value:"2",title:"Glass Cannon -15 BaseHealth,+15% Damage"});
-    passiveArray.push({image:'sprites/items/photon_cannon_item.svg',value:"3",title:"Running Riot +1% Damage for every killing blow"});
     var passiveList = document.getElementById("passive-list");
     var elements = $('#passive-list').children();
     $(elements).each(function(){
         $(this).remove();
     });
     for(var i=0;i<passiveArray.length;i++){
-        if(firstPassiveSelected == passiveArray[i].value ||
-           secondPassiveSelected == passiveArray[i].value){
+
+        if(firstPassiveSelected == passiveArray[i].value){
+            $('#firstPassive').attr('src',passiveArray[i].image);
+            $('#firstPassive').attr('title',passiveArray[i].title);
             continue;
         }
+        if(secondPassiveSelected == passiveArray[i].value){
+            $('#secondPassive').attr('src',passiveArray[i].image);
+            $('#secondPassive').attr('title',passiveArray[i].title);
+            continue;
+        }
+
         var div = document.createElement("DIV");
         var innnerDiv = document.createElement("DIV");
         var img = document.createElement("IMG");
@@ -514,6 +524,8 @@ function buildPassiveList(){
         $(img).attr('title',passiveArray[i].title);
         $(img).addClass('img-fluid');
         $(innnerDiv).addClass('passive');
+
+
         $(img).click(function(e){
             var newEquip = $(e.target);
             var oldPassive = clickedPassive.attr('data-selected');
@@ -531,6 +543,12 @@ function buildPassiveList(){
     }
 }
 
+function applyConfigs(){
+    buildPassiveList();
+    clientSendMessage('passiveChanged',{newPassive:$('#firstPassive').attr('data-selected'),oldPassive:null});
+    clientSendMessage('passiveChanged',{newPassive:$('#secondPassive').attr('data-selected'),oldPassive:null});
+}
+
 function enterLobby(name,color){
     $('#space-footer').hide();
     $('#gameWindow').show();
@@ -542,9 +560,6 @@ function enterLobby(name,color){
 }
 
 function init(){
-    buildPassiveList();
-    clientSendMessage('passiveChanged',{newPassive:$('#firstPassive').attr('data-selected'),oldPassive:null});
-    clientSendMessage('passiveChanged',{newPassive:$('#secondPassive').attr('data-selected'),oldPassive:null});
     timeOutChecker = setInterval(checkForTimeout,1000);
     animloop();
     uiCanvas.addEventListener("mousemove", calcMousePos, false);

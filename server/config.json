@@ -49,7 +49,7 @@
     "attributeWeaponStart":1,
     "attributeHealthStart":1,
 
-    "attributeAmountHealth":5,
+    "attributeAmountHealth":2,
     "attributeMoveSpeedBonus":25,
 
     "attributeWeaponCritBonusAmount":0.25,
@@ -181,6 +181,13 @@
         "GlassCannon":2,
         "RunningRiot":3
     },
+
+    "passiveHealthBoost": 15,
+    "passivePowerBoost":15,
+
+    "passiveGlassCannonHealth":25,
+    "passiveGlassCannonDamage":0.15,
+
 
     "sqlinfo":{
       "connectionLimit": 100,

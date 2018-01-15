@@ -74,6 +74,9 @@ function clientConnect() {
 		if(shipList[myID] != null){
 			myShip = shipList[myID];
 		}
+		if(config){
+			applyConfigs();
+		}
 		cameraBouncing = config.AISpectateMode;
 		clientSendMessage('changeWeapon',weaponArray[1].value);
 	});
