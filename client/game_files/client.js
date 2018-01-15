@@ -157,8 +157,18 @@ function clientConnect() {
 		}
 	});
 
-	server.on("runningRiot",function(){
-		playSound(runningRiot);
+	server.on("runningRiot",function(packet){
+		if(packet == null){
+			return;
+		}
+		if(shipList[packet.id] == null){
+			return;
+		}
+		var name = shipList[packet.id].name || shipList[packet.id].AIName;
+		if(myID == packet.id){
+			playSound(runningRiot);
+		}
+		eventLog.addEvent(name +" is on a Running Riot!");
 	});
 
 	server.on("weaponFired",function(payload){
