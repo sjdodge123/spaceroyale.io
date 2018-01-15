@@ -391,9 +391,6 @@ class AIController{
 		var lastDist2 = Infinity;
 		for(var i in this.gameBoard.itemList){
 			var currentItem = this.gameBoard.itemList[i];
-			if (!this.isWorthyItem(currentItem)){
-				continue;
-			}
 			if (!this.world.blueBound.inBounds(currentItem)){
 				continue;
 			}
@@ -407,15 +404,6 @@ class AIController{
 			}
 		}
 		this.closestItem = item;
-	}
-	isWorthyItem(item){
-		if (item.name == this.desiredWeapon){
-			return true;
-		}
-		if (item.name == 'HPItem' || item.name == 'ShieldItem'){
-			return true;
-		}
-		return false;
 	}
 	findClosestPlayerShip(){
 		var playerShip = null;

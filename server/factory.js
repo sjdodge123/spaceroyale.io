@@ -1664,8 +1664,15 @@ class Ship extends Circle{
 		if(killerID){
 			this.killedBy = killerID;
 		}
-		this.alive = false;
+		this.cleanupAssets();
 		this.dropAttributes();
+		this.alive = false;
+	}
+	cleanupAssets(){
+		this.stopFire();
+		if(this.gadget != null){
+			this.gadget.reset();
+		}
 	}
 	addKill(name){
 		this.killList.push(name);
@@ -1883,7 +1890,9 @@ class HackingDrone extends Gadget{
 			return;
 		}
 		this.currentDrone.stopHacking = true;
-		this.currentDrone.targetShip.enable();
+		if(this.currentDrone.targetShip){
+			this.currentDrone.targetShip.enable();
+		}
 		this.currentDrone.alive = false;
 	}
 }
