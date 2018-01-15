@@ -3,6 +3,7 @@ var playingSounds = [];
 var playerJoinSound = new Audio("./sounds/player_join.wav");
 var collision = new Audio("./sounds/collide_with_obj.wav");
 var takeDamage = new Audio("./sounds/take_damage.wav");
+var runningRiot = new Audio("./sounds/running_riot.mp3");
 
 var timerTick = new Audio("./sounds/timer_tick.wav");
 var timerEnd = new Audio("./sounds/timer_end.wav");

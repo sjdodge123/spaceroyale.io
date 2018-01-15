@@ -68,11 +68,10 @@ class Room {
 				if(ship.killedBy != null && this.shipList[ship.killedBy] != null){
 					var murderer = this.shipList[ship.killedBy];
 					var victim = ship;
-					var murdererName = this.clientList[ship.killedBy];
-					var victimName = this.clientList[shipID];
-
+					var murdererName = this.clientList[ship.killedBy] || murderer.AIName;
+					var victimName = this.clientList[shipID] || victim.AIName;
 					var messageToRoom = "";
-
+					murderer.addKill(victimName);
 					if(murderer.isAI){
 						if(!victim.isAI){
 							messageToRoom = murderer.AIName +" killed " + victimName;
@@ -81,11 +80,9 @@ class Room {
 						}
 					} else{
 						if(!victim.isAI){
-							murderer.killList.push(victimName);
 							messageToRoom = murdererName + " killed " + victimName;
 							messenger.toastPlayer(murderer.id,"You killed " + victimName);
 						} else{
-							murderer.killList.push(victimName);
 							messageToRoom = murdererName + " killed " + victim.AIName;
 							messenger.toastPlayer(murderer.id,"You killed " + victim.AIName);
 						}
@@ -1670,6 +1667,14 @@ class Ship extends Circle{
 		this.alive = false;
 		this.dropAttributes();
 	}
+	addKill(name){
+		this.killList.push(name);
+
+		if(this.killList.length > 2 && this.isPassiveEquiped(c.passivesEnum.RunningRiot)){
+			this.currentCritBonus += c.passiveRunningRiot;
+			messenger.messageUser(this.id,"runningRiot");
+		}
+	}
 	dropAttributes(){
 		var maxPossible = c.attributeMaxAmount*3;
 		var scaleFactor = maxPossible/c.attributeShipDropAmount;
@@ -1971,10 +1976,6 @@ class ForceShield extends GadgetObject{
 		}
 	}
 	takeDamage(damage){
-		/*
-		this.regenerating = false;
-		this.regenTimer = Date.now();
-		*/
 		this.health -= Math.abs(damage);
 		this.checkHP();
 	}
@@ -2306,7 +2307,7 @@ class TradeShip extends Rect{
 		}
 	}
 	fire(){
-		var bullets = this.weapon.fire(this.x, this.y, this.weapon.angle, '#808080',this.sig);
+		var bullets = this.weapon.fire(this.x, this.y, this.weapon.angle, '#808080',this.sig,0,0);
 		if(bullets == null){
 			return;
 		}

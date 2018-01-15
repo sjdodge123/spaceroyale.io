@@ -157,6 +157,10 @@ function clientConnect() {
 		}
 	});
 
+	server.on("runningRiot",function(){
+		playSound(runningRiot);
+	});
+
 	server.on("weaponFired",function(payload){
 		if(payload == null){
 			return;

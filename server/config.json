@@ -188,6 +188,8 @@
     "passiveGlassCannonHealth":25,
     "passiveGlassCannonDamage":0.15,
 
+    "passiveRunningRiot":20,
+
 
     "sqlinfo":{
       "connectionLimit": 100,
