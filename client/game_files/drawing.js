@@ -979,11 +979,11 @@ function drawGadget(gadget){
 
 	switch(gadget.type){
 		case "Pulse":{
-			gameContext.beginPath();
-			gameContext.lineWidth = 3;
-			gameContext.strokeStyle = "red";
-			gameContext.arc(gadget.x-myShip.x+camera.xOffset,gadget.y-myShip.y+camera.yOffset,gadget.radius,0,Math.PI*2,true);
-			gameContext.stroke();
+			// gameContext.beginPath();
+			// gameContext.lineWidth = 3;
+			// gameContext.strokeStyle = "red";
+			// gameContext.arc(gadget.x-myShip.x+camera.xOffset,gadget.y-myShip.y+camera.yOffset,gadget.radius,0,Math.PI*2,true);
+			// gameContext.stroke();
 			break;
 		}
 		case "Drone":{
