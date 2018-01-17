@@ -68,11 +68,10 @@ class Room {
 				if(ship.killedBy != null && this.shipList[ship.killedBy] != null){
 					var murderer = this.shipList[ship.killedBy];
 					var victim = ship;
-					var murdererName = this.clientList[ship.killedBy];
-					var victimName = this.clientList[shipID];
-
+					var murdererName = this.clientList[ship.killedBy] || murderer.AIName;
+					var victimName = this.clientList[shipID] || victim.AIName;
 					var messageToRoom = "";
-
+					murderer.addKill(victimName);
 					if(murderer.isAI){
 						if(!victim.isAI){
 							messageToRoom = murderer.AIName +" killed " + victimName;
@@ -81,11 +80,9 @@ class Room {
 						}
 					} else{
 						if(!victim.isAI){
-							murderer.killList.push(victimName);
 							messageToRoom = murdererName + " killed " + victimName;
 							messenger.toastPlayer(murderer.id,"You killed " + victimName);
 						} else{
-							murderer.killList.push(victimName);
 							messageToRoom = murdererName + " killed " + victim.AIName;
 							messenger.toastPlayer(murderer.id,"You killed " + victim.AIName);
 						}
@@ -1227,6 +1224,7 @@ class Ship extends Circle{
 		if(c.playerSpawnWeapon == "MassDriver"){
 			this.weapon = new MassDriver(this.id);
 		}
+		this.currentDmgBonus = 0;
 		this.currentCritBonus = 0;
 		this.weapon.level = c.playerSpawnWeaponLevel;
 	}
@@ -1298,26 +1296,38 @@ class Ship extends Circle{
 	}
 	applyPassive(passiveInt){
 		if(this.passives[passiveInt] == c.passivesEnum.HealthBoost){
-			this.baseHealth = c.playerBaseHealth + 15;
+			this.baseHealth += c.passiveHealthBoost;
 			this.health = this.baseHealth;
 			messenger.messageRoomBySig(this.roomSig,"shipHealth",{health:this.health,id:this.id});
 		}
 		if(this.passives[passiveInt] == c.passivesEnum.PowerBoost){
-			this.basePower = c.playerBasePower + 15;
+			this.basePower += c.passivePowerBoost;
 			this.power = this.basePower;
 			messenger.messageRoomBySig(this.roomSig,"shipPower",{power:this.power,id:this.id});
+		}
+		if(this.passives[passiveInt] == c.passivesEnum.GlassCannon){
+			this.baseHealth -= c.passiveGlassCannonHealth;
+			this.health = this.baseHealth;
+			this.currentDmgBonus += c.passiveGlassCannonDamage;
+			messenger.messageRoomBySig(this.roomSig,"shipHealth",{health:this.health,id:this.id});
 		}
 	}
 	removePassive(passiveInt){
 		if(this.passives[passiveInt] == c.passivesEnum.HealthBoost){
-			this.baseHealth = c.playerBaseHealth
+			this.baseHealth -= c.passiveHealthBoost;
 			this.health = this.baseHealth;
 			messenger.messageRoomBySig(this.roomSig,"shipHealth",{health:this.health,id:this.id});
 		}
 		if(this.passives[passiveInt] == c.passivesEnum.PowerBoost){
-			this.basePower = c.playerBasePower;
+			this.basePower -= c.passivePowerBoost;
 			this.power = this.basePower;
 			messenger.messageRoomBySig(this.roomSig,"shipPower",{power:this.power,id:this.id});
+		}
+		if(this.passives[passiveInt] == c.passivesEnum.GlassCannon){
+			this.baseHealth += c.passiveGlassCannonHealth;
+			this.health = this.baseHealth;
+			this.currentDmgBonus -= c.passiveGlassCannonDamage;
+			messenger.messageRoomBySig(this.roomSig,"shipHealth",{health:this.health,id:this.id});
 		}
 	}
 
@@ -1528,9 +1538,9 @@ class Ship extends Circle{
 
 		var _bullets;
 		if(this.weapon.name == "PhotonCannon" || this.weapon.name == "ParticleBeam"){
-			_bullets = this.weapon.fire(x,y,this.weapon.angle, this.baseColor,this.id,this.power,this.currentCritBonus);
+			_bullets = this.weapon.fire(x,y,this.weapon.angle, this.baseColor,this.id,this.power,this.currentCritBonus,this.currentDmgBonus);
 		} else{
-			_bullets = this.weapon.fire(x,y,this.weapon.angle, this.baseColor,this.id,this.currentCritBonus);
+			_bullets = this.weapon.fire(x,y,this.weapon.angle, this.baseColor,this.id,this.currentCritBonus,this.currentDmgBonus);
 		}
 		if(_bullets == null){
 			return;
@@ -1549,7 +1559,7 @@ class Ship extends Circle{
 		if(this.weapon.name == "PhotonCannon"){
 			var x = this.x + this.radius * Math.cos((this.weapon.angle + 90) * Math.PI/180);
 			var y = this.y + this.radius * Math.sin((this.weapon.angle + 90) * Math.PI/180);
-			var _bullets = this.weapon.stopFire(x,y,this.weapon.angle, this.baseColor,this.id,this.currentCritBonus);
+			var _bullets = this.weapon.stopFire(x,y,this.weapon.angle, this.baseColor,this.id,this.currentCritBonus,this.currentDmgBonus);
 			if(_bullets == null){
 				return;
 			}
@@ -1654,8 +1664,22 @@ class Ship extends Circle{
 		if(killerID){
 			this.killedBy = killerID;
 		}
-		this.alive = false;
+		this.cleanupAssets();
 		this.dropAttributes();
+		this.alive = false;
+	}
+	cleanupAssets(){
+		this.stopFire();
+		if(this.gadget != null){
+			this.gadget.reset();
+		}
+	}
+	addKill(name){
+		this.killList.push(name);
+		if(this.killList.length > 2 && this.isPassiveEquiped(c.passivesEnum.RunningRiot)){
+			this.currentCritBonus += c.passiveRunningRiot;
+			messenger.messageRoomBySig(this.roomSig,"runningRiot",{id:this.id});
+		}
 	}
 	dropAttributes(){
 		var maxPossible = c.attributeMaxAmount*3;
@@ -1866,7 +1890,9 @@ class HackingDrone extends Gadget{
 			return;
 		}
 		this.currentDrone.stopHacking = true;
-		this.currentDrone.targetShip.enable();
+		if(this.currentDrone.targetShip){
+			this.currentDrone.targetShip.enable();
+		}
 		this.currentDrone.alive = false;
 	}
 }
@@ -1958,10 +1984,6 @@ class ForceShield extends GadgetObject{
 		}
 	}
 	takeDamage(damage){
-		/*
-		this.regenerating = false;
-		this.regenTimer = Date.now();
-		*/
 		this.health -= Math.abs(damage);
 		this.checkHP();
 	}
@@ -2293,7 +2315,7 @@ class TradeShip extends Rect{
 		}
 	}
 	fire(){
-		var bullets = this.weapon.fire(this.x, this.y, this.weapon.angle, '#808080',this.sig);
+		var bullets = this.weapon.fire(this.x, this.y, this.weapon.angle, '#808080',this.sig,0,0);
 		if(bullets == null){
 			return;
 		}
@@ -2628,6 +2650,9 @@ class Weapon {
 		bullet.isCrit = true;
 		return bullet.damage*(this.critIncreasePercent/100);
 	}
+	calculateBonusDamage(bullet,dmgBonus){
+		return bullet.damage*dmgBonus;
+	}
 }
 
 class Blaster extends Weapon{
@@ -2645,15 +2670,16 @@ class Blaster extends Weapon{
 		this.critIncreasePercent = c.blasterCritIncreasePercent;
 	}
 
-	fire(x,y,angle,color,id,critBonus){
+	fire(x,y,angle,color,id,critBonus,dmgBonus){
 		if(this.onCoolDown()){
 			return;
 		}
 		var bullets = [];
 		var sprayAngle = utils.getRandomInt(-5,5);
-		var bull1 = new Bullet(x,y,this.bulletWidth,this.bulletHeight, angle + sprayAngle, color, id);
-		bull1.damage += this.calculateCritBonusDamage(bull1,critBonus);
-		bullets.push(bull1);
+		var bullet1 = new Bullet(x,y,this.bulletWidth,this.bulletHeight, angle + sprayAngle, color, id);
+		bullet1.damage += this.calculateBonusDamage(bullet1,dmgBonus);
+		bullet1.damage += this.calculateCritBonusDamage(bullet1,critBonus);
+		bullets.push(bullet1);
 		return bullets;
 	}
 	upgrade(){
@@ -2679,7 +2705,7 @@ class ParticleBeam extends Weapon{
 		this.critChance = c.particleBeamCritChance;
 		this.critChanceBonus = c.particleBeamCritIncreasePercent;
 	}
-	fire(x,y,angle,color,id,powerLevel,critBonus){
+	fire(x,y,angle,color,id,powerLevel,critBonus, dmgBonus){
 		if(this.checkForCharge(powerLevel)){
 			this.charge();
 		}
@@ -2701,6 +2727,7 @@ class ParticleBeam extends Weapon{
 
 			this.currentBeam.width = c.particleBeamWidth + ((this.chargeLevel-1)*c.particleBeamWidthGrowthPerCharge);
 			this.currentBeam.damage = c.particleBeamBaseDamage + (this.damagePerCharge * this.chargeLevel);
+			this.currentBeam.damage += this.calculateBonusDamage(this.currentBeam,dmgBonus);
 			this.currentBeam.damage += this.calculateCritBonusDamage(this.currentBeam,critBonus);
 			this.currentBeam.angle = angle;
 			this.currentBeam.vertices = this.currentBeam.getVertices();
@@ -2785,17 +2812,22 @@ class PhotonCannon extends Weapon{
 			this.charge();
 		}
 	}
-	stopFire(x,y,angle,color,id,critBonus){
+	stopFire(x,y,angle,color,id,critBonus,dmgBonus){
 		var _bullets = [], powerCost;
 		powerCost = c.photonCannonPowerCost;
 		var bullet1 = new Birdshot(x,y,4,10, angle, color, id);
+		bullet1.damage += this.calculateBonusDamage(bullet1,dmgBonus);
 		bullet1.damage += this.calculateCritBonusDamage(bullet1,critBonus);
 		_bullets.push(bullet1);
 		if(this.chargeLevel >= 2){
 			var bullet2 = new Birdshot(x,y,4,10, angle-5, color, id);
 			var bullet3 = new Birdshot(x,y,4,10, angle+5, color, id);
+			bullet2.damage += this.calculateBonusDamage(bullet2,dmgBonus);
 			bullet2.damage += this.calculateCritBonusDamage(bullet2,critBonus);
+
+			bullet3.damage += this.calculateBonusDamage(bullet3,dmgBonus);
 			bullet3.damage += this.calculateCritBonusDamage(bullet3,critBonus);
+
 			_bullets.push(bullet2);
 			_bullets.push(bullet3);
 			powerCost += this.chargeCost;
@@ -2803,8 +2835,13 @@ class PhotonCannon extends Weapon{
 		if(this.chargeLevel == 3){
 			var bullet4 = new Birdshot(x,y,4,10,angle-10, color,id);
 			var bullet5 = new Birdshot(x,y,4,10, angle+10, color,id);
+
+			bullet4.damage += this.calculateBonusDamage(bullet4,dmgBonus);
 			bullet4.damage += this.calculateCritBonusDamage(bullet4,critBonus);
+
+			bullet5.damage += this.calculateBonusDamage(bullet5,dmgBonus);
 			bullet5.damage += this.calculateCritBonusDamage(bullet5,critBonus);
+
 			_bullets.push(bullet4);
 			_bullets.push(bullet5);
 			powerCost += this.chargeCost;
@@ -2857,17 +2894,18 @@ class MassDriver extends Weapon{
 		this.critChance = c.massDriverCritChance;
 		this.critIncreasePercent = c.massDriverCritIncreasePercent;
 	}
-	fire(x,y,angle,color,id,critBonus){
+	fire(x,y,angle,color,id,critBonus,dmgBonus){
 		if(this.onCoolDown()){
 			return;
 		}
 		var bullets = [];
-		var bullet = new MassDriverBullet(x,y,8,20, angle, color, id);
+		var bullet1 = new MassDriverBullet(x,y,8,20, angle, color, id);
 		if(this.level > 1){
-			bullet.speed += bullet.speed * .35;
+			bullet1.speed += bullet1.speed * .35;
 		}
-		bullet.damage += this.calculateCritBonusDamage(bullet,critBonus);
-		bullets.push(bullet);
+		bullet1.damage += this.calculateBonusDamage(bullet1,dmgBonus);
+		bullet1.damage += this.calculateCritBonusDamage(bullet1,critBonus);
+		bullets.push(bullet1);
 		return bullets;
 	}
 	upgrade(){

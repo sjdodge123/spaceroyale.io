@@ -74,6 +74,9 @@ function clientConnect() {
 		if(shipList[myID] != null){
 			myShip = shipList[myID];
 		}
+		if(config){
+			applyConfigs();
+		}
 		cameraBouncing = config.AISpectateMode;
 		clientSendMessage('changeWeapon',weaponArray[1].value);
 	});
@@ -152,6 +155,20 @@ function clientConnect() {
 			shipList[payload.id].speedAttribute += 1;
 			return;
 		}
+	});
+
+	server.on("runningRiot",function(packet){
+		if(packet == null){
+			return;
+		}
+		if(shipList[packet.id] == null){
+			return;
+		}
+		var name = shipList[packet.id].name || shipList[packet.id].AIName;
+		if(myID == packet.id){
+			playSound(runningRiot);
+		}
+		eventLog.addEvent(name +" is on a Running Riot!");
 	});
 
 	server.on("weaponFired",function(payload){

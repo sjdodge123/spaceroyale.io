@@ -67,6 +67,8 @@ class AIController{
 
 		this.desiredWeapon = this.determineDesiredWeapon();
 		this.desiredGadget = this.determineDesiredGadget();
+		this.desiredFirstPassive = this.determinePassive();
+		this.desiredSecondPassive = this.determinePassive();
 		this.ship.changeWeapon(this.desiredWeapon);
 		this.ship.changeGadget(this.desiredGadget);
 		this.ship.isAI = true;
@@ -100,7 +102,7 @@ class AIController{
 			if (this.fireTarget.alive){
 				this.fireTargetDistance = utils.getMagSq(this.ship.x,this.ship.y,this.fireTarget.x,this.fireTarget.y);
 				if(this.fireTargetDistance < this.fireDistanceSqCurrent){
-					if(this.currentWeapon != "PhotonCannon" || this.ship.weapon.chargeLevel > 1){
+					if(this.currentWeapon != "PhotonCannon" || this.ship.weapon.chargeLevel >= utils.getRandomInt(2,3)){
 						this.fireWeapon();
 					}
 				} else if (this.currentWeapon == "ParticleBeam") {
@@ -327,6 +329,14 @@ class AIController{
 			}
 		}
 	}
+	determinePassive(){
+		var passive = utils.getRandomInt(0,Object.keys(c.passivesEnum).length -1);
+		if(this.desiredFirstPassive == passive || this.desiredSecondPassive == passive){
+			return this.determinePassive();
+		}
+		this.ship.equipPassive(passive);
+		return passive;
+	}
 
 	findClosestAsteroid(){
 		var asteroid = null;
@@ -381,9 +391,6 @@ class AIController{
 		var lastDist2 = Infinity;
 		for(var i in this.gameBoard.itemList){
 			var currentItem = this.gameBoard.itemList[i];
-			if (!this.isWorthyItem(currentItem)){
-				continue;
-			}
 			if (!this.world.blueBound.inBounds(currentItem)){
 				continue;
 			}
@@ -397,15 +404,6 @@ class AIController{
 			}
 		}
 		this.closestItem = item;
-	}
-	isWorthyItem(item){
-		if (item.name == this.desiredWeapon){
-			return true;
-		}
-		if (item.name == 'HPItem' || item.name == 'ShieldItem'){
-			return true;
-		}
-		return false;
 	}
 	findClosestPlayerShip(){
 		var playerShip = null;
