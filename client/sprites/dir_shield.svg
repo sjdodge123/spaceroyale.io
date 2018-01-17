@@ -37,9 +37,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.8"
-     inkscape:cx="1267.764"
-     inkscape:cy="74.758509"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="607.8878"
+     inkscape:cy="-211.40864"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
      showgrid="false"
@@ -47,7 +47,7 @@
      inkscape:snap-object-midpoints="true"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
-     inkscape:window-x="1912"
+     inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:snap-center="true" />
@@ -116,7 +116,8 @@
   <g
      inkscape:groupmode="layer"
      id="layer2"
-     inkscape:label="glowbg" />
+     inkscape:label="glowbg"
+     sodipodi:insensitive="true" />
   <g
      inkscape:groupmode="layer"
      id="layer6"
@@ -231,7 +232,7 @@
      inkscape:groupmode="layer"
      id="layer5"
      inkscape:label="ship"
-     style="display:inline"
+     style="display:none"
      sodipodi:insensitive="true">
     <g
        transform="matrix(0.29670897,0,0,0.29670897,476.26316,76.263263)"

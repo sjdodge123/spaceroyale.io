@@ -24,6 +24,9 @@ explosionSVG.src = 'sprites/explosion_sheet.svg';
 var pulseSVG = new Image(200, 1200);
 pulseSVG.src = 'sprites/pulse_wip3.svg';
 
+var shieldSVG = new Image(200, 1600);
+shieldSVG.src = 'sprites/dir_shield.svg';
+
 var popSVG = new Image(500,4000);
 popSVG.src = 'sprites/pop_sheet.svg';
 
@@ -995,12 +998,17 @@ function drawGadget(gadget){
 			break;
 		}
 		case "ForceShield":{
-			gameContext.beginPath();
-			gameContext.lineWidth = 5;
-			gameContext.strokeStyle = color;
-			//gameContext.arc(gadget.x-myShip.x+camera.xOffset,gadget.y-myShip.y+camera.yOffset,config.forceShieldRadius,0, Math.PI*2,true);
-			gameContext.arc(gadget.x-myShip.x+camera.xOffset,gadget.y-myShip.y+camera.yOffset,config.forceShieldDrawRadius,((gadget.angle + 90)*Math.PI/180) + Math.PI/4,((gadget.angle + 90)*Math.PI/180) - Math.PI/4,true);
-			gameContext.stroke();
+			if (gadget.spriteSheet == null){
+				gadget.spriteSheet = new SpriteSheet(shieldSVG, 0, 0, 200, 200, 1, 8,true);
+			}
+			gameContext.save();
+			gameContext.translate(gadget.x-myShip.x+camera.xOffset,gadget.y-myShip.y+camera.yOffset);
+			gameContext.rotate((gadget.angle+180)*Math.PI/180);
+			gadget.spriteSheet.move(0,0);
+			gadget.spriteSheet.update(dt);
+			
+			gadget.spriteSheet.draw(200,200);
+			gameContext.restore();
 			break;
 		}
 		default:{
