@@ -86,7 +86,7 @@
     "tradeShipWeapon":"Blaster",
     "tradeShipWeaponLevel":3,
 
-    "playerMaxSpeed":300,
+    "playerMaxSpeed":1500,
     "playerBaseAcel":500,
     "playerBaseRadius":25,
     "playerExplosionRadius":300,
@@ -153,7 +153,8 @@
     "shieldRestoreAmount":10,
 
     "pulseDuration":500,
-    "pulseRadius":400,
+    "pulseRadius":300,
+    "pulseForceMultiplier":0.0000016,
 
     "droneRadius":10,
     "droneCooldown":10000,

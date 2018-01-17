@@ -342,8 +342,8 @@ class Engine {
 	_calcVelCont(distance,object,x,y,implode){
 		var velCont = {velContX:0,velContY:0};
 		if(implode == true){
-			velCont.velContX = -forceConstant*(object.x - x)/distance;
-			velCont.velContY = -forceConstant*(object.y - y)/distance;
+			velCont.velContX = -c.pulseForceMultiplier*forceConstant*(object.x - x);///distance;
+			velCont.velContY = -c.pulseForceMultiplier*forceConstant*(object.y - y);///distance;
 		} else{
 			velCont.velContX = (forceConstant/Math.pow(distance,2))*(object.x - x)/distance;
 			velCont.velContY = (forceConstant/Math.pow(distance,2))*(object.y - y)/distance;

@@ -21,6 +21,9 @@ cannonSVG.src = 'sprites/blaster_wip.svg';
 var explosionSVG = new Image(500,4000);
 explosionSVG.src = 'sprites/explosion_sheet.svg';
 
+var pulseSVG = new Image(200, 1200);
+pulseSVG.src = 'sprites/pulse_wip3.svg';
+
 var popSVG = new Image(500,4000);
 popSVG.src = 'sprites/pop_sheet.svg';
 
@@ -650,6 +653,7 @@ function drawLobbyTimer(){
 function drawRelativeObjects(dt){
 	drawBullets();
 	drawExplosions(dt);
+	drawPulses(dt);
 	drawShips(dt);
 	drawAsteroids();
 	drawItems();
@@ -793,6 +797,23 @@ function drawExplosion(explosion, dt){
 	explosion.spriteSheet.update(dt);
 	
 	explosion.spriteSheet.draw(explosion.radius*4,explosion.radius*4);
+	gameContext.restore();
+}
+
+function drawPulse(pulse, dt){
+	if (pulse.spriteSheet == null){
+		pulse.spriteSheet = new SpriteSheet(pulseSVG, 0, 0, 200, 200, 1, 6, false);
+	}
+
+	if (pulse.spriteSheet.animationComplete){
+		return terminatePulse(pulse.sig);
+	}
+	gameContext.save();
+	gameContext.translate(pulse.x-myShip.x+camera.xOffset,pulse.y-myShip.y+camera.yOffset);
+	pulse.spriteSheet.move(0,0);
+	pulse.spriteSheet.update(dt);
+	
+	pulse.spriteSheet.draw(2*pulse.radius,2*pulse.radius);
 	gameContext.restore();
 }
 
@@ -1269,6 +1290,18 @@ function drawExplosions(dt){
 		}
 	}
 }
+
+function drawPulses(dt){
+	for(var sig in pulseList){
+		if(pulseList[sig] == null){
+			continue;
+		}
+		if(camera.inBounds(pulseList[sig])){
+			drawPulse(pulseList[sig], dt);
+		}
+	}
+}
+
 function drawItems(){
 	for(var sig in itemList){
 		if(itemList[sig] == null){

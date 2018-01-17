@@ -10,6 +10,7 @@ var trailingToasts,
 	gadgetList,
 	tradeShipList,
 	explosionList,
+	pulseList,
 	shipList;
 
 resetGameboard();
@@ -25,6 +26,7 @@ function resetGameboard(){
 	gadgetList = {};
 	tradeShipList = {};
 	explosionList = {};
+	pulseList = {};
 	shipList = {};
 }
 
@@ -121,6 +123,12 @@ function terminateExplosion(sig){
 	}
 }
 
+function terminatePulse(sig){
+	if(pulseList[sig] != undefined){
+		delete pulseList[sig];
+	}
+}
+
 function terminateItem(sig){
 	if(itemList[sig] != undefined){
 		delete itemList[sig];
@@ -178,6 +186,14 @@ function spawnAIShips(payload){
 	}
 }
 
+function createPulse(x,y,radius){
+	var sig = generateSig(pulseList);
+	pulseList[sig] = {};
+	pulseList[sig].sig = sig;
+	pulseList[sig].x = x;
+	pulseList[sig].y = y;
+	pulseList[sig].radius = radius;
+}
 
 function createExplosion(x,y,radius,type){
 	var sig = generateSig(explosionList);
@@ -579,6 +595,7 @@ function gadgetActivated(packet){
 
 		if(gadgetList[packet[0]].type == "Pulse"){
 			gadgetList[packet[0]].radius = config.pulseRadius;
+			createPulse(gadgetList[packet[0]].x,gadgetList[packet[0]].y,gadgetList[packet[0]].radius);
 		}
 		if(gadgetList[packet[0]].type == "Drone"){
 			gadgetList[packet[0]].radius = config.droneRadius;
