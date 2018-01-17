@@ -212,6 +212,7 @@ function createShip(dataArray,isAI){
 	shipList[index].spriteAngle = 0;
 	shipList[index].rotationRate = 1;
 	shipList[index].kills = 0;
+	shipList[index].bloodSeeker = false;
 	shipList[index].power = config.playerBasePower;
 	shipList[index].health = config.playerBaseHealth;
 	shipList[index].radius = config.playerBaseRadius;
@@ -611,7 +612,7 @@ function setMousePos(x,y){
 }
 
 function trackTarget(ship){
-	
+
 	if (getMag(ship.x-mousex,ship.y-mousey) > config.reticleDrawDist){
 		return null;
 	}
@@ -623,7 +624,7 @@ function trackTarget(ship){
 	dy = myShip.y - ship.y;
 	sc = 1200;
 	sr = getMag(ship.velX, ship.velY); //target ship velocity
-	
+
 	// quadratic eq stuff
 	a = Math.pow(sc,2) - Math.pow(sr,2);
 	b = 2*(dx * ship.velX + dy * ship.velY);

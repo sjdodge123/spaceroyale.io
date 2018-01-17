@@ -1151,6 +1151,7 @@ class Ship extends Circle{
 		this.passives = [];
 		this.enabled = true;
 		this.isShip = true;
+		this.lowHP = false;
 
 		this.hacker = null;
 
@@ -1167,7 +1168,7 @@ class Ship extends Circle{
 		this.useGadget = false;
 		this.stopGadget = false;
 		this.newGadgets = [];
-
+		this.bloodSeeker = false;
 		this.baseColor = color;
 		this.glowColor = color;
 		this.angle = angle;
@@ -1239,6 +1240,7 @@ class Ship extends Circle{
 		this.checkFireState();
 		this.checkBoostList();
 		this.checkKills();
+		this.checkPassives();
 		this.gadget.update();
 	}
 	changeWeapon(name){
@@ -1715,6 +1717,11 @@ class Ship extends Circle{
 		if (timeElapsed > this.regenTimeout){
 			this.regenHealth();
 		}
+		if(this.health <= c.passiveBloodseekerHP){
+			this.lowHP = true;
+		} else{
+			this.lowHP = false;
+		}
 		if(this.health < 1){
 			this.alive = false;
 		}
@@ -1749,6 +1756,21 @@ class Ship extends Circle{
 		}
 		if(this.killList.length >= 10){
 			this.color = "#ffffff";
+		}
+	}
+	checkPassives(){
+		if(this.engine.checkBloodseeker(this,c.passiveBlodseekerRange)){
+			if(this.bloodSeeker == false){
+				this.bloodSeeker = true;
+				this.acel = c.playerBaseAcel + c.passiveBloodseekerAccel;
+				messenger.messageRoomBySig(this.roomSig,"Bloodseeker",{id:this.id,on:true});
+			}
+			return;
+		}
+		if(this.bloodSeeker == true){
+			this.bloodSeeker = false;
+			this.acel = c.playerBaseAcel;
+			messenger.messageRoomBySig(this.roomSig,"Bloodseeker",{id:this.id,on:false});
 		}
 	}
 	checkBoostList(){

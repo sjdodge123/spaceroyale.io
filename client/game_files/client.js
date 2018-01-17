@@ -171,6 +171,22 @@ function clientConnect() {
 		eventLog.addEvent(name +" is on a Running Riot!");
 	});
 
+	server.on("Bloodseeker",function(packet){
+		if(packet == null){
+			return;
+		}
+		var id = packet.id;
+		if(shipList[id] == null){
+			return;
+		}
+		var on = packet.on;
+		if(on == true){
+			shipList[id].bloodSeeker = true;
+		} else{
+			shipList[id].bloodSeeker = false;
+		}
+	});
+
 	server.on("weaponFired",function(payload){
 		if(payload == null){
 			return;

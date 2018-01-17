@@ -186,7 +186,25 @@ class Engine {
 			ship.newY += ship.velY * this.dt;
 		}
 	}
-
+	checkBloodseeker(obj,dist){
+		var testLoc = {x:obj.x, y:obj.y, radius:dist};
+		for(var shipID in this.shipList){
+			var ship = this.shipList[shipID];
+			if(ship == obj){
+				continue;
+			}
+			if(ship.lowHP == false){
+				continue;
+			}
+			if(ship.isPassiveEquiped(c.passivesEnum.Bloodseeker)){
+				return true;
+			}
+			if(obj.isPassiveEquiped(c.passivesEnum.Bloodseeker) && checkDistance(testLoc,ship)){
+				return true;
+			}
+		}
+		return false;
+	}
 	broadBase(objectArray){
 
 		this.quadTree.clear();

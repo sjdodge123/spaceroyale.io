@@ -711,13 +711,21 @@ function drawMyShip(ship, dt){
 	ship.spriteSheet.draw(ship.radius*2,ship.radius*2);
 	gameContext.restore();
 	drawWeapon(ship);
+	if(myShip.bloodSeeker == true){
+		gameContext.save();
+		gameContext.strokeStyle = 'red';
+		gameContext.beginPath();
+		gameContext.arc(camera.xOffset,camera.yOffset,100,0,Math.PI*2,true);
+		gameContext.stroke();
+		gameContext.restore();
+	}
 }
 
 function drawShip(ship){
 	if(ship.shield != null){
 		drawShield(ship);
 	}
-	
+
 
 	drawTrail(ship.trail);
 
@@ -750,7 +758,7 @@ function drawShip(ship){
 	gameContext.translate(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset);
 	ship.spriteSheet.move(0,0);
 	ship.spriteSheet.update(dt);
-	
+
 	ship.spriteSheet.draw(ship.radius*2,ship.radius*2);
 	gameContext.restore();
 
@@ -762,9 +770,20 @@ function drawShip(ship){
 	if(ship != myShip){
 		drawHealthBar(ship);
 	}
-
+	if(ship.bloodSeeker == true){
+		drawBloodSeeker(ship);
+	}
 	//if in range..
 	drawReticle(ship);
+}
+
+function drawBloodSeeker(ship){
+	gameContext.save();
+	gameContext.strokeStyle = 'red';
+	gameContext.beginPath();
+	gameContext.arc(ship.x-myShip.x+camera.xOffset,ship.y-myShip.y+camera.yOffset,100,0,Math.PI*2,true);
+	gameContext.stroke();
+	gameContext.restore();
 }
 
 function drawReticle(ship){
@@ -789,7 +808,7 @@ function drawExplosion(explosion, dt){
 		else{
 			explosion.spriteSheet = new SpriteSheet(popSVG, 0, 0, 500, 500, 1, 8, false);
 		}
-		
+
 	}
 	if (explosion.spriteSheet.animationComplete){
 		return terminateExplosion(explosion.sig);
@@ -798,7 +817,7 @@ function drawExplosion(explosion, dt){
 	gameContext.translate(explosion.x-myShip.x+camera.xOffset,explosion.y-myShip.y+camera.yOffset);
 	explosion.spriteSheet.move(0,0);
 	explosion.spriteSheet.update(dt);
-	
+
 	explosion.spriteSheet.draw(explosion.radius*4,explosion.radius*4);
 	gameContext.restore();
 }
@@ -815,7 +834,7 @@ function drawPulse(pulse, dt){
 	gameContext.translate(pulse.x-myShip.x+camera.xOffset,pulse.y-myShip.y+camera.yOffset);
 	pulse.spriteSheet.move(0,0);
 	pulse.spriteSheet.update(dt);
-	
+
 	pulse.spriteSheet.draw(2*pulse.radius,2*pulse.radius);
 	gameContext.restore();
 }
@@ -865,7 +884,7 @@ function drawWeapon(ship){
 	// 		break;
 	// 	}
 	// }
-	
+
 	gameContext.restore();
 
 	if(ship.weapon.chargeLevel > 0){
@@ -1006,7 +1025,7 @@ function drawGadget(gadget){
 			gameContext.rotate((gadget.angle+180)*Math.PI/180);
 			gadget.spriteSheet.move(0,0);
 			gadget.spriteSheet.update(dt);
-			
+
 			gadget.spriteSheet.draw(200,200);
 			gameContext.restore();
 			break;

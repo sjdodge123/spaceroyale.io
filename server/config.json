@@ -180,7 +180,8 @@
         "HealthBoost":0,
         "PowerBoost":1,
         "GlassCannon":2,
-        "RunningRiot":3
+        "RunningRiot":3,
+        "Bloodseeker":4
     },
 
     "passiveHealthBoost": 15,
@@ -192,6 +193,9 @@
     "passiveRunningRiotCritBoost":10,
     "passiveRunningRiotKillsCount":3,
 
+    "passiveBlodseekerRange":600,
+    "passiveBloodseekerAccel":500,
+    "passiveBloodseekerHP":20,
 
     "sqlinfo":{
       "connectionLimit": 100,
