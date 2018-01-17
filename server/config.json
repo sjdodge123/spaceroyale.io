@@ -189,7 +189,8 @@
     "passiveGlassCannonHealth":25,
     "passiveGlassCannonDamage":0.15,
 
-    "passiveRunningRiot":20,
+    "passiveRunningRiotCritBoost":10,
+    "passiveRunningRiotKillsCount":3,
 
 
     "sqlinfo":{
