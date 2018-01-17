@@ -492,7 +492,7 @@ function buildPassiveList(){
         passiveArray.push({image:'sprites/items/health_item.svg',value:"0",title:"Health Boost +"+config.passiveHealthBoost+" Base Health"});
         passiveArray.push({image:'sprites/items/shield_item.svg',value:"1",title:"Power Boost +"+config.passivePowerBoost+" Base Power"});
         passiveArray.push({image:'sprites/items/mass_driver_item.svg',value:"2",title:"Glass Cannon -"+config.passiveGlassCannonHealth+" BaseHealth,+"+config.passiveGlassCannonDamage * 100+"% Damage"});
-        passiveArray.push({image:'sprites/items/photon_cannon_item.svg',value:"3",title:"Running Riot +"+config.passiveRunningRiot+"% critical chance for every kill past 2 kills"});
+        passiveArray.push({image:'sprites/items/photon_cannon_item.svg',value:"3",title:"Running Riot +"+config.passiveRunningRiotCritBoost+"% critical chance for every kill after "+config.passiveRunningRiotKillsCount+" kills"});
     }
 
     var passiveList = document.getElementById("passive-list");

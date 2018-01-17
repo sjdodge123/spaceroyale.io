@@ -1676,8 +1676,8 @@ class Ship extends Circle{
 	}
 	addKill(name){
 		this.killList.push(name);
-		if(this.killList.length > 2 && this.isPassiveEquiped(c.passivesEnum.RunningRiot)){
-			this.currentCritBonus += c.passiveRunningRiot;
+		if(this.killList.length >= c.passiveRunningRiotKillsCount && this.isPassiveEquiped(c.passivesEnum.RunningRiot)){
+			this.currentCritBonus += c.passiveRunningRiotCritBoost;
 			messenger.messageRoomBySig(this.roomSig,"runningRiot",{id:this.id});
 		}
 	}
