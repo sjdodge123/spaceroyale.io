@@ -1,8 +1,8 @@
 <html>
 <canvas id = "gameCanvas" width = "800" height = "600"></canvas>
 <script type= "text/javascript">
-var ship = new Image(2000,200);
-ship.src = '../client/sprites/pulse_wip2.svg';
+var ship = new Image(1600,200);
+ship.src = '../client/sprites/dir_shield.svg';
 "use strict";
 
 var width = window.innerWidth,
@@ -145,7 +145,7 @@ class MouseObject extends GameObject {
 	constructor(x, y, radius, color){
 		super(x, y, radius, color);
 		this.attached = true;
-		this.spriteSheet = new SpriteSheet(ship, this.x, this.y, 2000, 200, 10, 24);
+		this.spriteSheet = new SpriteSheet(ship, this.x, this.y, 1600, 200, 8, 24);
 	}
 	update(dt){
 		this.x = mouseX;
