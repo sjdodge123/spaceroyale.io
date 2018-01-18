@@ -137,10 +137,11 @@
     "particleBeamWidth":5,
     "particleBeamHeight":600,
     "particleBeamWidthGrowthPerCharge":2,
-    "particleBeamBaseDamage":0.1,
-    "particleBeamDamageGrowthRate":0.15,
+    "particleBeamBaseDamage":1.5,
+    "particleBeamDamageGrowthRate":0.5,
     "particleBeamCritChance":15,
     "particleBeamCritIncreasePercent":200,
+    "particleBeamCollideTimerDuration":500,
 
 
     "shieldRadius":35,

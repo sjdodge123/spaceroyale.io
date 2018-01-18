@@ -1633,20 +1633,24 @@ class Ship extends Circle{
 		}
 		if(object.owner != this.id && object.alive && object.damage != null){
 
-			if(this.shield != null && this.shield.alive){
-				this.shield.handleHit(object);
-				if(this.shield.alive){
-					return;
+			//Figure out damage
+			if(object.isBeam == true){
+				if(object.dealingDamage == true){
+					this.takeDamage(object.damage);
 				}
-				this.takeDamage(this.shield.leftOverDamage);
-				messenger.messageRoomBySig(this.roomSig,'updateShield',compressor.updateShield(this.shield));
-				this.shield = null;
 			} else{
 				this.takeDamage(object.damage);
 			}
 
+			//Alert things
 			if(this.health < 1){
 				this.iDied(object.owner);
+			}
+			if(object.isBeam == true){
+				if(object.dealingDamage == true){
+					messenger.messageUser(object.owner,"shotLanded",{id:this.id,damage:object.damage,crit:(object.isCrit == true)});
+				}
+				return;
 			}
 			messenger.messageUser(object.owner,"shotLanded",{id:this.id,damage:object.damage,crit:(object.isCrit == true)});
 		}
@@ -1789,6 +1793,7 @@ class Ship extends Circle{
 		}
 	}
 	disable(){
+		this.stopFire();
 		if(this.enabled){
 			this.enabled = false;
 		}
@@ -2178,12 +2183,21 @@ class Asteroid extends Circle{
 			return;
 		}
 		if(object.alive && object.damage != null){
-			if(object.owner != null){
-				messenger.messageUser(object.owner,"shotAsteroid",this);
+			if(object.isBeam == true){
+				if(object.dealingDamage){
+					this.health -= object.damage;
+					if(object.owner != null){
+						messenger.messageUser(object.owner,"shotAsteroid",this);
+					}
+				}
+			} else{
+				this.health -= object.damage;
+				if(object.owner != null){
+					messenger.messageUser(object.owner,"shotAsteroid",this);
+				}
 			}
-			this.health -= object.damage;
-			messenger.messageRoomBySig(this.roomSig,'asteroidHurt',{health:this.health,sig:this.sig});
 		}
+		messenger.messageRoomBySig(this.roomSig,'asteroidHurt',{health:this.health,sig:this.sig});
 		if(this.health < 1){
 			this.checkForDrop();
 			this.alive = false;
@@ -2389,11 +2403,19 @@ class TradeShip extends Rect{
 
 	handleHit(object){
 		if(object.alive && object.damage != null){
-			if(object.owner == this.sig){
-				return;
+			if(object.isBeam){
+				if(object.dealingDamage){
+					this.health -= object.damage;
+					messenger.messageUser(object.owner,"shotLanded",{id:this.sig,damage:object.damage,crit:(object.isCrit == true)});
+				}
+			} else{
+				if(object.owner == this.sig){
+					return;
+				}
+				this.health -= object.damage;
+				messenger.messageUser(object.owner,"shotLanded",{id:this.sig,damage:object.damage,crit:(object.isCrit == true)});
 			}
-			this.health -= object.damage;
-			messenger.messageUser(object.owner,"shotLanded",{id:this.sig,damage:object.damage,crit:(object.isCrit == true)});
+			
 			if(this.health < 1){
 				messenger.toastPlayer(object.owner,"You killed a TradeShip!");
 				this.alive = false;
@@ -2717,6 +2739,8 @@ class ParticleBeam extends Weapon{
 		super(owner);
 		this.name = "ParticleBeam";
 		this.equipMessage = "Equiped Particle Beam";
+		this.cooldown = c.particleBeamCollideTimerDuration;
+		this.cooldownTimer = Date.now() - this.cooldown;
 		this.powerCost = 0;
 		this.chargeCost = c.particleBeamChargeCost;
 		this.damagePerCharge = c.particleBeamDamageGrowthRate;
@@ -2728,6 +2752,9 @@ class ParticleBeam extends Weapon{
 		this.critChanceBonus = c.particleBeamCritIncreasePercent;
 	}
 	fire(x,y,angle,color,id,powerLevel,critBonus, dmgBonus){
+		if(Date.now() - this.cooldownTimer < this.cooldown){
+			return;
+		}
 		if(this.checkForCharge(powerLevel)){
 			this.charge();
 		}
@@ -2763,12 +2790,17 @@ class ParticleBeam extends Weapon{
 
 	}
 	stopFire(){
+		if(Date.now() - this.cooldownTimer > this.cooldown){
+			this.cooldownTimer = Date.now();
+		}
 		this.chargeLevel = 0;
 		messenger.messageUser(this.owner,'weaponCharge',this.chargeLevel);
 		if(this.currentBeam != null){
 			this.currentBeam.alive = false;
 			this.currentBeam = null;
 		}
+
+
 	}
 
 	checkForCharge(powerLevel){
@@ -3064,9 +3096,23 @@ class Beam extends Bullet{
 		super(x,y,width,height, angle, color, owner);
 		this.isBeam = true;
 		this.damage = c.particleBeamBaseDamage;
+		this.dealingDamage = true;
+		this.collideTimerDuration = c.particleBeamCollideTimerDuration;
+		this.collideTimer = Date.now() - this.collideTimerDuration;
 		this.isColliding = false;
 		this.collisionDistance = null;
 		this.hitList = [];
+	}
+	update(){
+		if(this.dealingDamage == false){
+			var timeElapsed = Date.now() - this.collideTimer;
+			if(timeElapsed > this.collideTimerDuration){
+				this.dealingDamage = true;
+				this.collideTimer = Date.now();
+			}
+		} else{
+			this.dealingDamage = false;
+		}
 	}
 	move(){
 
@@ -3093,7 +3139,9 @@ class Beam extends Bullet{
 		if(object.isItem){
 			return;
 		}
-		return true;
+		if(this.dealingDamage){
+			return true;
+		}
 	}
 
 }
