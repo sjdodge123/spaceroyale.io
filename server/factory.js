@@ -1297,6 +1297,10 @@ class Ship extends Circle{
 		messenger.messageRoomBySig(this.roomSig,"gadgetCooldownStop",{id:this.id});
 	}
 	applyPassive(passiveInt){
+		if(this.passives[passiveInt] == undefined){
+			console.log("Error: Could not find "+ passiveInt+ " in " +this.passives);
+			return;
+		}
 		if(this.passives[passiveInt] == c.passivesEnum.HealthBoost){
 			this.baseHealth += c.passiveHealthBoost;
 			this.health = this.baseHealth;
@@ -1342,14 +1346,18 @@ class Ship extends Circle{
 		for(var pass in c.passivesEnum){
 			if(newPassive == c.passivesEnum[pass]){
 				newEquip = newPassive;
+				break;
 			}
 		}
-		if(newEquip == null){
+		if(newEquip == null || newEquip == undefined){
 			console.log("Error: Tried to equip a passive that is not in enum");
 			return;
 		}
-		this.passives.push(newEquip);
-		this.applyPassive(newEquip);
+		if(this.isPassiveEquiped(newEquip)){
+			console.log("Error: Trying to equip a passive " + newEquip +  " that is already equiped");
+			return;
+		}
+		this.applyPassive(this.passives.push(newEquip)-1);
 
 	}
 	isPassiveEquiped(passiveInt){
@@ -2415,7 +2423,7 @@ class TradeShip extends Rect{
 				this.health -= object.damage;
 				messenger.messageUser(object.owner,"shotLanded",{id:this.sig,damage:object.damage,crit:(object.isCrit == true)});
 			}
-			
+
 			if(this.health < 1){
 				messenger.toastPlayer(object.owner,"You killed a TradeShip!");
 				this.alive = false;

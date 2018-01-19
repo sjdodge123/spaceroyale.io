@@ -79,6 +79,9 @@ function clientConnect() {
 		}
 		cameraBouncing = config.AISpectateMode;
 		clientSendMessage('changeWeapon',weaponArray[1].value);
+		clientSendMessage('changeGadget',gadgetArray[1].value);
+		clientSendMessage('passiveChanged',{newPassive:$('#firstPassive').attr('data-selected'),oldPassive:null});
+	    clientSendMessage('passiveChanged',{newPassive:$('#secondPassive').attr('data-selected'),oldPassive:null});
 	});
 
 	server.on("playerJoin", function(appendPlayerList){

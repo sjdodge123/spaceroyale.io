@@ -100,7 +100,7 @@ function setupPage(){
         var name;
         if(profile == null){
             name = $('#nameBox').val();
-            if(name == ""){
+            if(name.length == 0){
                 name = $('#nameBox').attr("placeholder");
             }
         } else{
@@ -546,8 +546,6 @@ function buildPassiveList(){
 
 function applyConfigs(){
     buildPassiveList();
-    clientSendMessage('passiveChanged',{newPassive:$('#firstPassive').attr('data-selected'),oldPassive:null});
-    clientSendMessage('passiveChanged',{newPassive:$('#secondPassive').attr('data-selected'),oldPassive:null});
 }
 
 function enterLobby(name,color){
