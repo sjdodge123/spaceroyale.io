@@ -194,9 +194,9 @@
     "passiveRunningRiotCritBoost":10,
     "passiveRunningRiotKillsCount":3,
 
-    "passiveBlodseekerRange":600,
-    "passiveBloodseekerAccel":500,
-    "passiveBloodseekerHP":20,
+    "passiveBlodseekerRange":300,
+    "passiveBloodseekerAccel":200,
+    "passiveBloodseekerHP":15,
 
     "sqlinfo":{
       "connectionLimit": 100,

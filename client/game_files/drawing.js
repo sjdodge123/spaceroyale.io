@@ -716,7 +716,7 @@ function drawMyShip(ship, dt){
 	drawWeapon(ship);
 	if(myShip.bloodSeeker == true){
 		gameContext.save();
-		gameContext.drawImage(bloodSeekerSVG, camera.xOffset - bloodSeekerSVG.width/2, camera.yOffset - bloodSeekerSVG.height/2,bloodSeekerSVG.width, bloodSeekerSVG.height);
+		gameContext.drawImage(bloodSeekerSVG, camera.xOffset - bloodSeekerSVG.width/4, camera.yOffset - bloodSeekerSVG.height/4,bloodSeekerSVG.width*.5, bloodSeekerSVG.height*.5);
 		gameContext.restore();
 	}
 }
@@ -779,7 +779,7 @@ function drawShip(ship){
 
 function drawBloodSeeker(ship){
 	gameContext.save();
-	gameContext.drawImage(bloodSeekerSVG, ship.x - myShip.x + camera.xOffset - bloodSeekerSVG.width/2, ship.y - myShip.y + camera.yOffset - bloodSeekerSVG.height/2,bloodSeekerSVG.width, bloodSeekerSVG.height);
+	gameContext.drawImage(bloodSeekerSVG, ship.x - myShip.x + camera.xOffset - bloodSeekerSVG.width/4, ship.y - myShip.y + camera.yOffset - bloodSeekerSVG.height/4,bloodSeekerSVG.width*.5, bloodSeekerSVG.height*.5);
 	gameContext.restore();
 }
 
