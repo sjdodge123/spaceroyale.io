@@ -199,7 +199,7 @@ class Engine {
 			if(ship.isPassiveEquiped(c.passivesEnum.Bloodseeker)){
 				return true;
 			}
-			if(obj.isPassiveEquiped(c.passivesEnum.Bloodseeker) && checkDistance(testLoc,ship)){
+			if(obj.isPassiveEquiped(c.passivesEnum.Bloodseeker) && utils.getMag(testLoc.x-ship.x,testLoc.y-ship.y) < dist){
 				return true;
 			}
 		}
