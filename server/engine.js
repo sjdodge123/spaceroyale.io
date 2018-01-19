@@ -186,19 +186,21 @@ class Engine {
 			ship.newY += ship.velY * this.dt;
 		}
 	}
-	checkBloodseeker(obj,dist){
+	checkBloodseeker(currentShip,dist){
+		var currentDistance = 0;
 		for(var shipID in this.shipList){
 			var ship = this.shipList[shipID];
-			if(ship == obj){
+			if(ship == currentShip){
 				continue;
 			}
 			if(ship.lowHP == false){
 				continue;
 			}
-			if(ship.isPassiveEquiped(c.passivesEnum.Bloodseeker)){
+			currentDistance = utils.getMag(currentShip.x-ship.x,currentShip.y-ship.y);
+			if(ship.isPassiveEquiped(c.passivesEnum.Bloodseeker) &&  currentDistance < dist){
 				return true;
 			}
-			if(obj.isPassiveEquiped(c.passivesEnum.Bloodseeker) && utils.getMag(obj.x-ship.x,obj.y-ship.y) < dist){
+			if(currentShip.isPassiveEquiped(c.passivesEnum.Bloodseeker) && currentDistance < dist){
 				return true;
 			}
 		}

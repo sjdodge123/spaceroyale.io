@@ -714,6 +714,17 @@ function drawMyShip(ship, dt){
 	ship.spriteSheet.draw(ship.radius*2,ship.radius*2);
 	gameContext.restore();
 	drawWeapon(ship);
+
+	//Drawing bloodseeker range for testing
+	/*
+	gameContext.save();
+	gameContext.strokeStyle = 'red';
+	gameContext.beginPath();
+	gameContext.arc(camera.xOffset,camera.yOffset,config.passiveBlodseekerRange,0,Math.PI*2,true);
+	gameContext.stroke();
+	gameContext.restore();
+	*/
+
 	if(myShip.bloodSeeker == true){
 		gameContext.save();
 		gameContext.drawImage(bloodSeekerSVG, camera.xOffset - bloodSeekerSVG.width/4, camera.yOffset - bloodSeekerSVG.height/4,bloodSeekerSVG.width*.5, bloodSeekerSVG.height*.5);
