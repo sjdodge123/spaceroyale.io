@@ -88,6 +88,9 @@ beamSVG.src = "sprites/beam_sheet.svg";
 var beamDotSVG = new Image();
 beamDotSVG.src = "sprites/beamDot_sheet.svg";
 
+var bloodSeekerSVG = new Image();
+bloodSeekerSVG.src = "sprites/bloodseeker.svg";
+
 class SpriteSheet {
 	constructor(image,x,y,frameWidth,frameHeight,rows,columns, loopAnimation){
 		this.image = image;
@@ -713,10 +716,11 @@ function drawMyShip(ship, dt){
 	drawWeapon(ship);
 	if(myShip.bloodSeeker == true){
 		gameContext.save();
-		gameContext.strokeStyle = 'red';
-		gameContext.beginPath();
-		gameContext.arc(camera.xOffset,camera.yOffset,100,0,Math.PI*2,true);
-		gameContext.stroke();
+		//gameContext.strokeStyle = 'red';
+		//gameContext.beginPath();
+		gameContext.drawImage(bloodSeekerSVG, camera.xOffset, camera.yOffset,bloodSeekerSVG.width, bloodSeekerSVG.height);
+		//gameContext.arc(camera.xOffset,camera.yOffset,100,0,Math.PI*2,true);
+		//gameContext.stroke();
 		gameContext.restore();
 	}
 }
