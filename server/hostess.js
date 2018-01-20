@@ -81,6 +81,9 @@ function generateRoomSig(){
 
 function reclaimRoom(sig){
 	var room = roomList[sig];
+	if(room == null){
+		return;
+	}
 	for(var clientID in room.clientList){
 		room.leave(clientID);
 	}
