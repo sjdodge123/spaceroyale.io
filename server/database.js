@@ -4,6 +4,7 @@ var c = utils.loadConfig();
 var messenger = require('./messenger.js');
 var bcrypt = require('bcrypt');
 var authedUsers = {};
+var activeSessions = {};
 
 exports.addAuthedUser = function(id,user_id){
 	authedUsers[id] = user_id;
@@ -15,6 +16,16 @@ exports.removeAuthedUser = function(id){
 
 exports.findAuthedUser = function(id){
 	return authedUsers[id];
+}
+
+exports.addSession = function(id){
+	return addSession(id);
+}
+exports.findSession = function(key){
+	return findSession(key);
+}
+exports.removeSession = function(key){
+	return removeSession(key);
 }
 
 exports.recordShip = function(id,ship){
@@ -75,7 +86,7 @@ exports.createUser = function(callback,params){
 				});
 			});
 		});
-		
+
 	});
 }
 
@@ -104,7 +115,8 @@ exports.lookupUser = function(callback,params){
 
 			authedUsers[params.id] = result[0].user_id;
 			params.user_id = result[0].user_id;
-			
+			params.sessionKey = addSession(params.id,params.user_id);
+
 			database.query("SELECT * FROM queenanne.player WHERE user_id LIKE ?",params.user_id,function(e,result){
 				if(e){
 					utils.logError(e);
@@ -113,6 +125,25 @@ exports.lookupUser = function(callback,params){
 				callback(result,params);
 				database.end();
 			});
+		});
+	});
+}
+
+exports.lookupUserByID = function(callback,params){
+	createConnection();
+	database.connect(function(e){
+		if(e){
+			utils.logError(e);
+			return;
+		}
+		database.query("SELECT * FROM queenanne.player WHERE user_id LIKE ?",params.user_id,function(e,result){
+				if(e){
+					utils.logError(e);
+					return;
+				}
+				authedUsers[params.id] = result[0].user_id;
+				callback(result,params);
+				database.end();
 		});
 	});
 }
@@ -150,6 +181,23 @@ function updatePlayer(callback,params){
 			});
 		});
 	});
+}
+
+function addSession(id,user_id){
+	var key = generateHash(id);
+	activeSessions[key] = user_id;
+	return key;
+}
+function findSession(key){
+	if(activeSessions[key] != null){
+		return activeSessions[key];
+	}
+	return null;
+}
+function removeSession(key){
+	if(activeSessions[key] != null){
+		delete activeSessions[key];
+	}
 }
 
 function generateHash(password){

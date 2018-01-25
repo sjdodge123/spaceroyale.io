@@ -46,7 +46,7 @@ function authCallback(result,params){
 		messenger.messageUser(params.id,'unsuccessfulAuth',{reason:"Player not found"});
 		return;
 	}
-	messenger.messageUser(params.id,'successfulAuth',result[0]);
+	messenger.messageUser(params.id,'successfulAuth',{profile:result[0],sessionKey:params.sessionKey});
 }
 
 function checkReg(creds){
@@ -101,4 +101,5 @@ function trimName(name){
     if(name.length > 10){
         return name.substring(0,10);
     }
+	return name;
 }
