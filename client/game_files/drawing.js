@@ -88,7 +88,7 @@ beamSVG.src = "sprites/beam_sheet.svg";
 var beamDotSVG = new Image();
 beamDotSVG.src = "sprites/beamDot_sheet.svg";
 
-var bloodSeekerSVG = new Image();
+var bloodSeekerSVG = new Image(1800,200);
 bloodSeekerSVG.src = "sprites/bloodseeker.svg";
 
 class SpriteSheet {
@@ -724,10 +724,15 @@ function drawMyShip(ship, dt){
 	gameContext.stroke();
 	gameContext.restore();
 	*/
-
 	if(myShip.bloodSeeker == true){
+		if (myShip.bloodseekerAnim == null){
+			myShip.bloodseekerAnim = new SpriteSheet(bloodSeekerSVG, 0, 0, 200, 200, 1, 9, true);
+		}
 		gameContext.save();
-		gameContext.drawImage(bloodSeekerSVG, camera.xOffset - bloodSeekerSVG.width/4, camera.yOffset - bloodSeekerSVG.height/4,bloodSeekerSVG.width*.5, bloodSeekerSVG.height*.5);
+		gameContext.translate(camera.xOffset, camera.yOffset);
+		ship.bloodseekerAnim.move(0,0);
+		ship.bloodseekerAnim.update(dt);
+		ship.bloodseekerAnim.draw(ship.bloodseekerAnim.frameWidth / 2, ship.bloodseekerAnim.frameHeight / 2);
 		gameContext.restore();
 	}
 }
@@ -782,7 +787,15 @@ function drawShip(ship){
 		drawHealthBar(ship);
 	}
 	if(ship.bloodSeeker == true){
-		drawBloodSeeker(ship);
+		if (ship.bloodseekerAnim == null){
+			ship.bloodseekerAnim = new SpriteSheet(bloodSeekerSVG, 0, 0, 200, 200, 1, 9, true);
+		}
+		gameContext.save();
+		gameContext.translate(ship.x - myShip.x + camera.xOffset, ship.y - myShip.y + camera.yOffset);
+		ship.bloodseekerAnim.move(0,0);
+		ship.bloodseekerAnim.update(dt);
+		ship.bloodseekerAnim.draw(ship.bloodseekerAnim.frameWidth / 2, ship.bloodseekerAnim.frameHeight / 2);
+		gameContext.restore();
 	}
 	//if in range..
 	drawReticle(ship);
