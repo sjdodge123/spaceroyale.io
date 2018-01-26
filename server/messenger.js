@@ -21,6 +21,9 @@ var cookieAPI = {
     },
 
     readCookie: function(name,cookies) {
+		if(cookies == undefined || cookies == null || cookies == ''){
+			return;
+		}
         var nameEQ = name + "=";
         var ca = cookies.split(';');
         for (var i = 0; i < ca.length; i++) {
