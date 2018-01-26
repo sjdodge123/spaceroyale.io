@@ -9,19 +9,47 @@ var myID = null,
 	quadTree,
 	config;
 
+var cookieAPI = {
+    createCookie: function(name, value, days) {
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            var expires = "; expires=" + date.toGMTString();
+        } else var expires = "";
+        document.cookie = name + "=" + value + expires + "; path=/";
+		return document.cookie;
+    },
+
+    readCookie: function(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    },
+
+    eraseCookie: function(name) {
+        this.createCookie(name, "", -1);
+    }
+
+};
+
 function clientConnect() {
 	var server = io();
-
 
 	server.on('welcome', function(id){
 		myID = id;
 	});
 
-	server.on("successfulAuth", function(player){
-		profile = player;
-		displayPlayerProfile(player);
+	server.on("successfulAuth", function(data){
+		profile = data.profile;
+		displayPlayerProfile(data.profile);
 		changeToSignout();
-		$('#signInModal').modal('toggle');
+		cookieAPI.createCookie('userAuth',data.sessionKey,7);
+		$('#signInModal').modal('hide');
 		$('#signInUser').val('');
 		$('#signInPass').val('');
 	});
@@ -42,8 +70,9 @@ function clientConnect() {
 		failedToRegister(payload.reason);
 	});
 
-	server.on("successfulSignout",function(){
+	server.on("successfulSignout",function(key){
 		changeToSignIn();
+		cookieAPI.eraseCookie(key);
     	$('#nameBox').val('').prop('disabled',false);
 	});
 

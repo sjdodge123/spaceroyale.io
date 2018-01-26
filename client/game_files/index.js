@@ -405,7 +405,7 @@ function changeToSignIn(){
 }
 
 function signOutUser(){
-    server.emit('signout');
+    server.emit('signout',cookieAPI.readCookie('userAuth'));
 }
 
 function showGameOverScreen(cause){

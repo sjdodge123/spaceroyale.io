@@ -9,6 +9,35 @@ var mailBoxList = {},
 	roomMailList = {},
 	io;
 
+var cookieAPI = {
+    createCookie: function(name, value, days) {
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            var expires = "; expires=" + date.toGMTString();
+        } else var expires = "";
+        document.cookie = name + "=" + value + expires + "; path=/";
+		return document.cookie;
+    },
+
+    readCookie: function(name,cookies) {
+        var nameEQ = name + "=";
+        var ca = cookies.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    },
+
+    eraseCookie: function(name) {
+        this.createCookie(name, "", -1);
+    }
+
+};
+
+
 exports.build = function(mainIO){
 	io = mainIO;
 }
@@ -51,6 +80,20 @@ exports.messageRoomByUserID = function(id,header,payload){
 }
 
 function checkForMail(client){
+	var key = cookieAPI.readCookie('userAuth',client.handshake.headers.cookie);
+	if(key != null){
+		var session = database.findSession(key);
+		if(session != null){
+			var params = {id:client.id,user_id:session};
+			database.lookupUserByID(function(result,params){
+				if(result == null){
+					return;
+				}
+				client.emit('successfulAuth',{profile:result[0],sessionKey:key});
+			},params);
+		}
+	}
+
 	client.emit("welcome",client.id);
 
 	client.on('register',function(creds){
@@ -114,9 +157,10 @@ function checkForMail(client){
 		hostess.kickFromRoom(client.id);
 	});
 
-  	client.on('signout',function(){
+  	client.on('signout',function(key){
   		database.removeAuthedUser(client.id);
-  		client.emit('successfulSignout');
+		database.removeSession(key);
+  		client.emit('successfulSignout',key);
   	});
 
 
