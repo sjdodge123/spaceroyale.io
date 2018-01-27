@@ -49,9 +49,11 @@ function clientConnect() {
 		displayPlayerProfile(data.profile);
 		changeToSignout();
 		cookieAPI.createCookie('userAuth',data.sessionKey,7);
-		$('#signInModal').modal('hide');
-		$('#signInUser').val('');
-		$('#signInPass').val('');
+		if($('#signInModal').hasClass('show')){
+			$('#signInModal').modal('toggle');
+			$('#signInUser').val('');
+			$('#signInPass').val('');
+		}
 	});
 
 	server.on("successfulReg",function(player){

@@ -400,7 +400,7 @@ function changeToSignIn(){
     $('#nameBox').val('');
     $('#nameBox').removeAttr("disabled");
     $('#signInButton').click(function(){
-        setTimeout(function() { $('#signInUser').focus() }, 500);
+        setTimeout(function() { $('#signInUser').focus() }, 700);
     }).attr('data-toggle','modal').attr('class','btn btn-info btn-lg').html('Sign in');
 }
 
