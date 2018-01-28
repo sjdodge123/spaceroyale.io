@@ -17,6 +17,9 @@ exports.preventMovement = function(obj,wall,dt){
 	preventMovement(obj,wall,dt);
 }
 
+exports.containsItem = function(itemList, item){
+	return containsItem(itemList, item);
+}
 exports.checkDistance = function(obj1, obj2){
 	return checkDistance(obj1, obj2);
 }
@@ -207,21 +210,28 @@ class Engine {
 		return false;
 	}
 	broadBase(objectArray){
-
+		
 		this.quadTree.clear();
 		var collidingBeams = [];
+		var beamList = [];
 		for (var i = 0; i < objectArray.length; i++) {
+			if (objectArray[i].isBeam){
+				beamList.push(objectArray[i]);
+				objectArray.splice(i,1);
+				continue;
+			}
 			this.quadTree.insert(objectArray[i]);
   		}
   		for(var j=0; j<objectArray.length;j++){
   			var obj1 = objectArray[j];
   			var collisionList = [];
   			collisionList = this.quadTree.retrieve(collisionList,obj1);
+  			collisionList = collisionList.concat(beamList);
   			this.narrowBase(obj1,collisionList, collidingBeams);
   		}
-
-  		for (var i = 0; i < collidingBeams.length; i++){
-			var beam = collidingBeams[i];
+  		/*
+  		for (var i = 0; i < beamList.length; i++){
+			var beam = beamList[i];
 			var offset = {x: beam.height/2 * Math.cos((beam.angle + 90) * Math.PI/180),y: beam.height/2 * Math.sin((beam.angle + 90) * Math.PI/180)};
 			var beamSource = {x:beam.x - offset.x, y: beam.y - offset.y};
 			var beamDest = {x:beam.x + offset.x, y: beam.y + offset.y};
@@ -241,6 +251,7 @@ class Engine {
 			beam.collisionDistance = Math.sqrt(minDistanceSq) + 5;
 			beam.hitList = [];
   		}
+  		*/
 
 	}
 
@@ -253,6 +264,7 @@ class Engine {
 			}
     		if(obj1.inBounds(obj2)){
   				if(obj1.handleHit(obj2)){
+  					/*
   					if(obj1.isBeam){
   						if (!this.containsItem(obj1.hitList,obj2)){
   							obj1.hitList.push(obj2);
@@ -263,10 +275,12 @@ class Engine {
 
   					}
   					else{
+  						*/
   						dyingBulletList.push(obj1);
-  					}
+  					//}
 				}
   				if(obj2.handleHit(obj1)){
+  					/*
   					if(obj2.isBeam){
   						if (!this.containsItem(obj2.hitList, obj1)){
   							obj2.hitList.push(obj1);
@@ -275,9 +289,9 @@ class Engine {
 							collidingBeams.push(obj2);
 						}
   					}
-  					else{
+  					else{*/
   						dyingBulletList.push(obj2);
-  					}
+  					//}
 
 				}
     		}
@@ -288,14 +302,7 @@ class Engine {
 		}
 	}
 
-	containsItem(itemList, item){
-		for (var i = 0; i < itemList.length; i++){
-			if (item == itemList[i]){
-				return true;
-			}
-		}
-		return false;
-	}
+	
 
 	checkCollideAll(loc,obj){
 		var result = false;
@@ -489,6 +496,14 @@ function checkDistance(obj1,obj2){
 	return false;
 }
 
+function containsItem(itemList, item){
+	for (var i = 0; i < itemList.length; i++){
+		if (item == itemList[i]){
+			return true;
+		}
+	}
+	return false;
+}
 function preventMovement(obj,wall,dt){
 	var bx = wall.x - obj.x;
 	var by = wall.y - obj.y;
