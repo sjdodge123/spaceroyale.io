@@ -296,7 +296,7 @@ class Game {
 					this.readyButtonVisible = true;
 					messenger.messageRoomBySig(this.roomSig,"showReady");
 				}
-				this.cancelGameStart();
+				this.resetGameStart();
 				return;
 			}
 			this.start();
@@ -340,6 +340,14 @@ class Game {
 		}
 	}
 	cancelGameStart(){
+		if(this.lobbyTimer != null){
+			this.singlePlayer = false;
+			this.readyButtonVisible = false;
+			this.lobbyTimer = null;
+			this.lobbyTimeLeft = this.lobbyWaitTime;
+		}
+	}
+	resetGameStart(){
 		if(this.lobbyTimer != null){
 			this.lobbyTimer = null;
 			this.lobbyTimeLeft = this.lobbyWaitTime;
