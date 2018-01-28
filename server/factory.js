@@ -2777,20 +2777,18 @@ class ParticleBeam extends Weapon{
 		this.powerCost = c.particleBeamBasePowerCost;
 		if(this.chargeLevel > 0){
 			if(this.currentBeam == null){
-				this.currentBeam = new Beam(x,y,c.particleBeamWidth,c.particleBeamHeight,angle,color,id);
+				this.currentBeam = new Beam(x,y,c.particleBeamWidth,1,angle,color,id);
 				this.powerCost += c.particleBeamChargeCost * this.chargeLevel;
 			} else{
 				this.powerCost = c.particleBeamChargeCost * this.chargeLevel;
 			}
-
+			this.currentBeam.determineHeight();
 			this.currentBeam.width = c.particleBeamWidth + ((this.chargeLevel-1)*c.particleBeamWidthGrowthPerCharge);
 			this.currentBeam.damage = c.particleBeamBaseDamage + (this.damagePerCharge * this.chargeLevel);
 			this.currentBeam.damage += this.calculateBonusDamage(this.currentBeam,dmgBonus);
 			this.currentBeam.damage += this.calculateCritBonusDamage(this.currentBeam,critBonus);
 			this.currentBeam.angle = angle;
-			this.currentBeam.x = x + (this.currentBeam.height/2) * Math.cos((this.angle+90) * Math.PI/180);
-			this.currentBeam.y = y + (this.currentBeam.height/2) * Math.sin((this.angle+90) * Math.PI/180);
-
+			this.currentBeam.move(x,y);
 			return [this.currentBeam];
 		}
 
@@ -3109,7 +3107,6 @@ class Beam extends Bullet{
 		this.hitList = [];
 	}
 	update(){
-		this.determineHeight();
 		if(this.dealingDamage == false){
 			var timeElapsed = Date.now() - this.collideTimer;
 			if(timeElapsed > this.collideTimerDuration){
@@ -3120,17 +3117,21 @@ class Beam extends Bullet{
 			this.dealingDamage = false;
 		}
 	}
-	move(){
-
+	move(x,y){
+		this.x = x + (this.height/2) * Math.cos((this.angle+90) * Math.PI/180);
+		this.y = y + (this.height/2) * Math.sin((this.angle+90) * Math.PI/180);
+		this.vertices = this.getVertices();
 	}
 	determineHeight(){
 		if (this.hitList.length == 0){
 			this.height = c.particleBeamHeight;
+			this.vertices = this.getVertices();
 			return;
 		}
 		var offset = {x: this.height/2 * Math.cos((this.angle + 90) * Math.PI/180),y: this.height/2 * Math.sin((this.angle + 90) * Math.PI/180)};
 		var beamSource = {x:this.x - offset.x, y: this.y - offset.y};
-		
+
+
 		var minDistanceSq = Infinity;
 		var closestObj = null;
 		for (var j = 0; j < this.hitList.length; j++){
@@ -3145,10 +3146,9 @@ class Beam extends Bullet{
 		//this.x = beamSource.x + (closestObj.x - beamSource.x)/2;
 		//this.y = beamSource.y + (closestObj.y - beamSource.y)/2;
 		//this.isColliding = true;
+		//this.x = beamSource.x + offset.x;
+		//this.y = beamSource.y + offset.y;
 		this.height = Math.sqrt(minDistanceSq);
-		this.x = beamSource.x + (this.height/2) * Math.cos((this.angle+90) * Math.PI/180);
-		this.y = beamSource.y + (this.height/2) * Math.sin((this.angle+90) * Math.PI/180);
-		this.vertices = this.getVertices();
 		this.hitList = [];
 	}
 	handleHit(object){
@@ -3181,7 +3181,7 @@ class Beam extends Bullet{
 		if(!_engine.containsItem(this.hitList, object)){
 			this.hitList.push(object);
 		}
-		
+
 		//return true;
 	}
 

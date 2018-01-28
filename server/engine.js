@@ -210,7 +210,7 @@ class Engine {
 		return false;
 	}
 	broadBase(objectArray){
-		
+
 		this.quadTree.clear();
 		var collidingBeams = [];
 		var beamList = [];
@@ -229,30 +229,6 @@ class Engine {
   			collisionList = collisionList.concat(beamList);
   			this.narrowBase(obj1,collisionList, collidingBeams);
   		}
-  		/*
-  		for (var i = 0; i < beamList.length; i++){
-			var beam = beamList[i];
-			var offset = {x: beam.height/2 * Math.cos((beam.angle + 90) * Math.PI/180),y: beam.height/2 * Math.sin((beam.angle + 90) * Math.PI/180)};
-			var beamSource = {x:beam.x - offset.x, y: beam.y - offset.y};
-			var beamDest = {x:beam.x + offset.x, y: beam.y + offset.y};
-  			var minDistanceSq = Infinity;
-  			var closestObj = null;
-  			for (var j = 0; j < beam.hitList.length; j++){
-				var currentObj = beam.hitList[j];
-				var distSq = utils.getMagSq(beamSource.x, beamSource.y, currentObj.x, currentObj.y);
-				if (distSq < minDistanceSq){
-					minDistanceSq = distSq;
-					closestObj = currentObj;
-				}
-			}
-			//beam.x = beamSource.x + (closestObj.x - beamSource.x)/2;
-			//beam.y = beamSource.y + (closestObj.y - beamSource.y)/2;
-			beam.isColliding = true;
-			beam.collisionDistance = Math.sqrt(minDistanceSq) + 5;
-			beam.hitList = [];
-  		}
-  		*/
-
 	}
 
 	narrowBase(obj1,collisionList, collidingBeams){
@@ -264,35 +240,10 @@ class Engine {
 			}
     		if(obj1.inBounds(obj2)){
   				if(obj1.handleHit(obj2)){
-  					/*
-  					if(obj1.isBeam){
-  						if (!this.containsItem(obj1.hitList,obj2)){
-  							obj1.hitList.push(obj2);
-  						}
-						if (!this.containsItem(collidingBeams,obj1)){
-							collidingBeams.push(obj1);
-						}
-
-  					}
-  					else{
-  						*/
-  						dyingBulletList.push(obj1);
-  					//}
+  					dyingBulletList.push(obj1);
 				}
   				if(obj2.handleHit(obj1)){
-  					/*
-  					if(obj2.isBeam){
-  						if (!this.containsItem(obj2.hitList, obj1)){
-  							obj2.hitList.push(obj1);
-  						}
-						if (!this.containsItem(collidingBeams, obj2)){
-							collidingBeams.push(obj2);
-						}
-  					}
-  					else{*/
-  						dyingBulletList.push(obj2);
-  					//}
-
+  					dyingBulletList.push(obj2);
 				}
     		}
 		}
@@ -302,7 +253,7 @@ class Engine {
 		}
 	}
 
-	
+
 
 	checkCollideAll(loc,obj){
 		var result = false;
