@@ -1178,6 +1178,9 @@ function drawBullet(bullet){
 			}
 
 		case "ParticleBeam":{
+			if (Date.now() - bullet.spawnDate < 50){
+				break;
+			}
 			switch(color){
 				default: {
 					beamSheet.changeFrame(0,4);

@@ -2777,12 +2777,12 @@ class ParticleBeam extends Weapon{
 		this.powerCost = c.particleBeamBasePowerCost;
 		if(this.chargeLevel > 0){
 			if(this.currentBeam == null){
-				this.currentBeam = new Beam(x,y,c.particleBeamWidth,1,angle,color,id);
+				this.currentBeam = new Beam(x,y,c.particleBeamWidth,c.particleBeamHeight,angle,color,id);
 				this.powerCost += c.particleBeamChargeCost * this.chargeLevel;
 			} else{
 				this.powerCost = c.particleBeamChargeCost * this.chargeLevel;
+				this.currentBeam.determineHeight();
 			}
-			this.currentBeam.determineHeight();
 			this.currentBeam.width = c.particleBeamWidth + ((this.chargeLevel-1)*c.particleBeamWidthGrowthPerCharge);
 			this.currentBeam.damage = c.particleBeamBaseDamage + (this.damagePerCharge * this.chargeLevel);
 			this.currentBeam.damage += this.calculateBonusDamage(this.currentBeam,dmgBonus);
