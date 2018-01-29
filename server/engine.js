@@ -255,9 +255,9 @@ class Engine {
 
 
 
-	checkCollideAll(loc,obj){
+	checkCollideAll(loc){
 		var result = false;
-		var testLoc = {x:loc.x, y:loc.y, radius:(obj.width || obj.radius)};
+		var testLoc = {x:loc.x, y:loc.y, radius:loc.width};
 		var objectArray = [];
 		for(var shipSig in this.shipList){
 			objectArray.push(this.shipList[shipSig]);

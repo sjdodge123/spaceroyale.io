@@ -721,36 +721,57 @@ class GameBoard {
 	populateWorld(){
 		if(c.generateAsteroids){
 			for(var i = 0; i<c.asteroidAmt;i++){
-				var sig = this.generateAsteroidSig();
-				var asteroid = new Asteroid(0,0,utils.getRandomInt(c.asteroidMinSize,c.asteroidMaxSize),sig,this.roomSig);
-				var loc = this.world.findFreeLoc(asteroid);
-				asteroid.x = loc.x;
-				asteroid.y = loc.y;
-				this.asteroidList[sig] = asteroid;
+				try{
+					var sig = this.generateAsteroidSig();
+					var asteroid = new Asteroid(0,0,utils.getRandomInt(c.asteroidMinSize,c.asteroidMaxSize),sig,this.roomSig);
+					var loc = this.world.findFreeLoc(asteroid);
+					asteroid.x = loc.x;
+					asteroid.y = loc.y;
+					this.asteroidList[sig] = asteroid;
+				}
+				catch(e){
+					console.log("Maximum call stack reached during asteroid spawning! Spawned " + i + " successfully.");
+					break;
+				}
+				
 			}
 			var data = compressor.spawnAsteroids(this.asteroidList);
 			messenger.messageRoomBySig(this.roomSig,"spawnAsteroids",data);
 		}
 		if(c.generatePlanets){
 			for(var i = 0; i<c.planetAmt;i++){
-				var sig = this.generatePlanetSig();
-				var planet = new Planet(0,0,utils.getRandomInt(c.planetMinSize,c.planetMaxSize),sig);
-				var loc = this.world.findFreeLoc(planet);
-				planet.x = loc.x;
-				planet.y = loc.y;
-				this.planetList[sig] = planet;
+				try{
+					var sig = this.generatePlanetSig();
+					var planet = new Planet(0,0,utils.getRandomInt(c.planetMinSize,c.planetMaxSize),sig);
+					var loc = this.world.findFreeLoc(planet);
+					planet.x = loc.x;
+					planet.y = loc.y;
+					this.planetList[sig] = planet;
+				}
+				catch(e){
+					console.log("Maximum call stack reached during planet spawning! Spawned " + i + " successfully.");
+					break;
+				}
+				
 			}
 			var data = compressor.spawnPlanets(this.planetList);
 			messenger.messageRoomBySig(this.roomSig,"spawnPlanets",data);
 		}
 		if(c.generateNebulas){
 			for(var i = 0; i<c.nebulaAmt;i++){
-				var sig = this.generateNebulaSig();
-				var nebula = new Nebula(0,0,utils.getRandomInt(c.nebulaMinSize,c.nebulaMaxSize),sig);
-				var loc = this.world.findFreeLoc(nebula);
-				nebula.x = loc.x;
-				nebula.y = loc.y;
-				this.nebulaList[sig] = nebula;
+				try{
+					var sig = this.generateNebulaSig();
+					var nebula = new Nebula(0,0,utils.getRandomInt(c.nebulaMinSize,c.nebulaMaxSize),sig);
+					var loc = this.world.getSafeLoc(nebula.radius);
+					nebula.x = loc.x;
+					nebula.y = loc.y;
+					this.nebulaList[sig] = nebula;
+				}
+				catch(e){
+					console.log("Maximum call stack reached during nebula spawning! Spawned " + i + " successfully.");
+					break;
+				}
+				
 			}
 			var data = compressor.spawnNebula(this.nebulaList);
 			messenger.messageRoomBySig(this.roomSig,"spawnNebula",data);
@@ -996,15 +1017,15 @@ class World extends Rect{
 	}
 	findFreeLoc(obj){
 		var loc = this.getSafeLoc(obj.width || obj.radius);
-		if(this.engine.checkCollideAll(loc, obj)){
+		if(this.engine.checkCollideAll(loc)){
 			return this.findFreeLoc(obj);
 		}
 		return loc;
 	}
 	getSafeLoc(size){
-		var objW = size + c.playerBaseRadius*3;
-		var objH = size + c.playerBaseRadius*3;
-		return {x:Math.floor(Math.random()*(this.width - 2*objW - this.x)) + this.x + objW, y:Math.floor(Math.random()*(this.height - 2*objH - this.y)) + this.y + objH};
+		var objW = size + 5 + c.playerBaseRadius * 2;
+		var objH = size + 5 + c.playerBaseRadius * 2;
+		return {x:Math.floor(Math.random()*(this.width - 2*objW - this.x)) + this.x + objW, y:Math.floor(Math.random()*(this.height - 2*objH - this.y)) + this.y + objH, width: objW};
 	}
 	getRandEdgeLoc(pad){
 		var loc = {x: null,y: null};
