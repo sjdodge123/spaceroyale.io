@@ -736,7 +736,9 @@ function gameLoop(dt){
     drawBackground();
     drawRelativeObjects(dt);
     drawHUD();
-    checkForDamage()
+    if(gameStarted){
+        checkForDamage();
+    }
 }
 
 function recenterCamera(){
