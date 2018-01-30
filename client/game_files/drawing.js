@@ -385,12 +385,13 @@ function drawHUD(){
     if(!camera.inBounds(world.whiteBound)){
 		drawBoundArrow();
 	}
-	if(myGraph == null){
-		myGraph = new AttributeGraph(eventLog.x-350,eventLog.y-25);
-	} else {
-		myGraph.update();
-	}
+
     if(gameStarted){
+		if(myGraph == null){
+			myGraph = new AttributeGraph(eventLog.x-350,eventLog.y-25);
+		} else {
+			myGraph.update();
+		}
     	drawShrinkTimer();
     } else{
     	drawLobbyTimer();
