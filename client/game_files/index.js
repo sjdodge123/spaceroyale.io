@@ -497,11 +497,11 @@ function buildPassiveList(){
     firstPassiveSelected = $('#firstPassive').attr('data-selected');
     secondPassiveSelected = $('#secondPassive').attr('data-selected');
     if(config){
-        passiveArray.push({image:'sprites/items/health_item.svg',value:"0",title:"Health Boost +"+config.passiveHealthBoost+" Base Health"});
-        passiveArray.push({image:'sprites/items/shield_item.svg',value:"1",title:"Power Boost +"+config.passivePowerBoost+" Base Power"});
+        passiveArray.push({image:'sprites/items/passive_health.svg',value:"0",title:"Health Boost +"+config.passiveHealthBoost+" Base Health"});
+        passiveArray.push({image:'sprites/items/passive_power.svg',value:"1",title:"Power Boost +"+config.passivePowerBoost+" Base Power"});
         passiveArray.push({image:'sprites/items/mass_driver_item.svg',value:"2",title:"Glass Cannon -"+config.passiveGlassCannonHealth+" BaseHealth,+"+config.passiveGlassCannonDamage * 100+"% Damage"});
         passiveArray.push({image:'sprites/items/photon_cannon_item.svg',value:"3",title:"Running Riot +"+config.passiveRunningRiotCritBoost+"% critical chance for every kill after "+config.passiveRunningRiotKillsCount+" kills"});
-        passiveArray.push({image:'sprites/items/shield_item.svg',value:"4",title:"Bloodseeker +"+config.passiveBloodseekerAccel+" acceleration when nearby enemies are below " + config.passiveBloodseekerHP + "; Enemies get this buff when you are low too!"});
+        passiveArray.push({image:'sprites/items/passive_bloodletter.svg',value:"4",title:"Bloodseeker +"+config.passiveBloodseekerAccel+" acceleration when nearby enemies are below " + config.passiveBloodseekerHP + "; Enemies get this buff when you are low too!"});
     }
 
     var passiveList = document.getElementById("passive-list");
