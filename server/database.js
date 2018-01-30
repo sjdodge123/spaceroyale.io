@@ -84,6 +84,7 @@ exports.createUser = function(callback,params){
 					params.player = player;
 					authedUsers[params.id] = player.user_id;
 					result.insertId = player.user_id;
+					params.sessionKey = addSession(params.id,params.player.user_id);
 					callback(result,params);
 					database.end();
 				});

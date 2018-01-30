@@ -56,10 +56,11 @@ function clientConnect() {
 		}
 	});
 
-	server.on("successfulReg",function(player){
-		profile = player;
-		displayPlayerProfile(player);
+	server.on("successfulReg",function(data){
+		profile = data.profile;
+		displayPlayerProfile(data.profile);
 		changeToSignout();
+		cookieAPI.createCookie('userAuth',data.sessionKey,7);
 		$('#signUpModal').modal('toggle');
 	});
 

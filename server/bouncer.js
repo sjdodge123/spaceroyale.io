@@ -94,7 +94,7 @@ function regCallback(result,params){
 		return;
 	}
 	database.addAuthedUser(params.id,result.insertId);
-	messenger.messageUser(params.id,'successfulReg',params.player);
+	messenger.messageUser(params.id,'successfulReg',{profile:params.player,sessionKey:params.sessionKey});
 }
 
 function trimName(name){
