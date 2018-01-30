@@ -77,14 +77,14 @@ function setupPage(){
     skinArray.push({image:'sprites/ship_red_menu.svg',value:"red"});
     skinArray.push({image:'sprites/ship_green_menu.svg',value:"green"});
 
-    weaponArray.push({image:'sprites/photon_cannon.svg',value:"PhotonCannon",title:"Photon Cannon"});
-    weaponArray.push({image:'sprites/blaster.svg',value:"Blaster",title:"Blaster"});
-    weaponArray.push({image:'sprites/mass_driver.svg',value:"MassDriver",title:"Mass Driver"});
-    weaponArray.push({image:'sprites/particle_beam.svg',value:"ParticleBeam",title:"Particle Beam"});
+    weaponArray.push({image:'sprites/photon_cannon.svg',value:"PhotonCannon",title:"Photon Cannon",description:"Fires charged photon particles that melt enemy ships. Creates 1-5 medium damage particles (This weapon is charge based and builds charge points as you hold the trigger)"});
+    weaponArray.push({image:'sprites/blaster.svg',value:"Blaster",title:"Blaster",description:"Semi-Automatic ion cannon capable of dealing moderate damage for a low power cost"});
+    weaponArray.push({image:'sprites/mass_driver.svg',value:"MassDriver",title:"Mass Driver",description:"High powered matter acceleration weapon. High power cost, high damage"});
+    weaponArray.push({image:'sprites/particle_beam.svg',value:"ParticleBeam",title:"Particle Beam",description:"Creates a susatained gamma ray slowly melting emeny ships. Starts low power cost grows as the beam gets larger (This weapon is charge based and builds charge points as you hold the trigger)"});
 
-    gadgetArray.push({image:"sprites/items/blaster_item.svg",value:"DirectionalShield",title:"Directional Shield"});
-    gadgetArray.push({image:"sprites/items/overdrive_item.svg",value:"PulseWave",title:"Pulse Wave"});
-    gadgetArray.push({image:"sprites/items/health_item.svg",value:"HackingDrone",title:"Hacking Drone"});
+    gadgetArray.push({image:"sprites/items/gadget_shield.svg",value:"DirectionalShield",title:"Directional Shield",description:"Activate to create an energy shield to absorb incoming damage in the direction you aim"});
+    gadgetArray.push({image:"sprites/items/gadget_pulse.svg",value:"PulseWave",title:"Pulse Wave",description:"Activate to create a large wave of energy to pull enemies inward"});
+    gadgetArray.push({image:"sprites/items/gadget_drone.svg",value:"HackingDrone",title:"Hacking Drone",description:"Activate to send a drone to hack and take control of an enemy ship"});
 
 
 
@@ -184,6 +184,8 @@ function setupPage(){
         weaponArray.unshift(lastElement);
         //$("#firstWeapon").attr('src',weaponArray[0].image).attr('data-selected',weaponArray[0].value).attr('title',weaponArray[0].title);
         $("#secondWeapon").attr('src',weaponArray[1].image).attr('data-selected',weaponArray[1].value).attr('title',weaponArray[1].title);
+        $("#weaponTitle").text(weaponArray[1].title);
+        $("#weaponInfo").html("<p>" + weaponArray[1].description + "</p>");
         //$("#thirdWeapon").attr('src',weaponArray[2].image).attr('data-selected',weaponArray[2].value).attr('title',weaponArray[2].title);
         clientSendMessage('changeWeapon',weaponArray[1].value);
     });
@@ -193,6 +195,8 @@ function setupPage(){
         weaponArray.push(firstElement);
         //$("#firstWeapon").attr('src',weaponArray[0].image).attr('data-selected',weaponArray[0].value).attr('title',weaponArray[0].title);
         $("#secondWeapon").attr('src',weaponArray[1].image).attr('data-selected',weaponArray[1].value).attr('title',weaponArray[1].title);
+        $("#weaponTitle").text(weaponArray[1].title);
+        $("#weaponInfo").html("<p>" + weaponArray[1].description + "</p>");
         //$("#thirdWeapon").attr('src',weaponArray[2].image).attr('data-selected',weaponArray[2].value).attr('title',weaponArray[2].title);
         clientSendMessage('changeWeapon',weaponArray[1].value);
     });
@@ -208,6 +212,8 @@ function setupPage(){
         gadgetArray.unshift(lastElement);
         //$("#firstGadget").attr('src',gadgetArray[0].image).attr('data-selected',gadgetArray[0].value).attr('title',gadgetArray[0].title);
         $("#secondGadget").attr('src',gadgetArray[1].image).attr('data-selected',gadgetArray[1].value).attr('title',gadgetArray[1].title);
+        $("#gadgetTitle").text(gadgetArray[1].title);
+        $("#gadgetInfo").html("<p>" + gadgetArray[1].description + "</p>");
         //$("#thirdGadget").attr('src',gadgetArray[2].image).attr('data-selected',gadgetArray[2].value).attr('title',gadgetArray[2].title);
         clientSendMessage('changeGadget',gadgetArray[1].value);
     });
@@ -217,6 +223,8 @@ function setupPage(){
         gadgetArray.push(firstElement);
         //$("#firstGadget").attr('src',gadgetArray[0].image).attr('data-selected',gadgetArray[0].value).attr('title',gadgetArray[0].title);
         $("#secondGadget").attr('src',gadgetArray[1].image).attr('data-selected',gadgetArray[1].value).attr('title',gadgetArray[1].title);
+        $("#gadgetTitle").text(gadgetArray[1].title);
+        $("#gadgetInfo").html("<p>" + gadgetArray[1].description + "</p>");
         //$("#thirdGadget").attr('src',gadgetArray[2].image).attr('data-selected',gadgetArray[2].value).attr('title',gadgetArray[2].title);
         clientSendMessage('changeGadget',gadgetArray[1].value);
     });

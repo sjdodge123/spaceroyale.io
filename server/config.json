@@ -132,15 +132,15 @@
     "massDriverCritIncreasePercent":50,
 
     "particleBeamBasePowerCost":15,
-    "particleBeamChargeCost":0.5,
-    "particleBeamChargeTime":500,
+    "particleBeamChargeCost":0.35,
+    "particleBeamChargeTime":750,
     "particleBeamWidth":5,
     "particleBeamHeight":600,
     "particleBeamWidthGrowthPerCharge":2,
-    "particleBeamBaseDamage":1.5,
-    "particleBeamDamageGrowthRate":0.5,
-    "particleBeamCritChance":15,
-    "particleBeamCritIncreasePercent":200,
+    "particleBeamBaseDamage":2.25,
+    "particleBeamDamageGrowthRate":1.3,
+    "particleBeamCritChance":10,
+    "particleBeamCritIncreasePercent":0,
     "particleBeamCollideTimerDuration":500,
 
 

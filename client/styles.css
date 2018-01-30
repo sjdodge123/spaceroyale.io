@@ -223,9 +223,15 @@ canvas{
     border-bottom-right-radius: 5px;
     border-top-left-radius:5px;
     border-top-right-radius: 5px;
-	height: 3vw;
+	height: 6vw;
+	margin-top: -60px;
 	margin-bottom: 1vw;
 	width: 90%;
+}
+#weaponInfo p{
+	margin-left: 10px;
+	margin-right: 10px;
+	font-size: .9vw;
 }
 #gadgetTitle p{
 	font-weight: bold;
@@ -233,6 +239,7 @@ canvas{
 	margin-bottom: 0 !important;
 }
 #gadgetInfo{
+	background-color: rgba(0, 0, 0, 0.7);
 	margin: auto;
 	border: 1px solid #333333;
 	border-bottom-left-radius: 5px;
@@ -243,7 +250,9 @@ canvas{
 	width: 90%;
 }
 #gadgetInfo p{
-	font-size: 1vw;
+	margin-left: 10px;
+	margin-right: 10px;
+	font-size: .9vw;
 }
 #passiveSelection{
 	margin-bottom: 1vw;
