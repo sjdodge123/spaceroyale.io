@@ -733,7 +733,7 @@ class GameBoard {
 					console.log("Maximum call stack reached during asteroid spawning! Spawned " + i + " successfully.");
 					break;
 				}
-				
+
 			}
 			var data = compressor.spawnAsteroids(this.asteroidList);
 			messenger.messageRoomBySig(this.roomSig,"spawnAsteroids",data);
@@ -752,7 +752,7 @@ class GameBoard {
 					console.log("Maximum call stack reached during planet spawning! Spawned " + i + " successfully.");
 					break;
 				}
-				
+
 			}
 			var data = compressor.spawnPlanets(this.planetList);
 			messenger.messageRoomBySig(this.roomSig,"spawnPlanets",data);
@@ -771,7 +771,7 @@ class GameBoard {
 					console.log("Maximum call stack reached during nebula spawning! Spawned " + i + " successfully.");
 					break;
 				}
-				
+
 			}
 			var data = compressor.spawnNebula(this.nebulaList);
 			messenger.messageRoomBySig(this.roomSig,"spawnNebula",data);
@@ -2402,8 +2402,21 @@ class TradeShip extends Rect{
 		ts.readyToMove = true;
 	}
 	dropItems(){
-		var item = new this.item(this.x+this.width/2,this.y+this.height/2,1);
-		return [item];
+		var droppedItems = [];
+		var health = Math.ceil(c.attributeTradeShipDropAmount /3);
+		var speed =  Math.ceil(c.attributeTradeShipDropAmount /3);
+		var weapon = Math.ceil(c.attributeTradeShipDropAmount /3);
+
+		for(var i=0;i<health;i++){
+			droppedItems.push(new HealthAttribute(this.x,this.y, utils.getRandomInt(0, 359), utils.getRandomInt(0, 10),utils.getRandomInt(0, 10), utils.getRandomInt(c.itemMinSpeed,c.itemMaxSpeed)));
+		}
+		for(var i=0;i<speed;i++){
+			droppedItems.push(new SpeedAttribute(this.x,this.y, utils.getRandomInt(0, 359), utils.getRandomInt(0, 10), utils.getRandomInt(0, 10), utils.getRandomInt(c.itemMinSpeed,c.itemMaxSpeed)));
+		}
+		for(var i=0;i<weapon;i++){
+			droppedItems.push(new WeaponAttribute(this.x,this.y, utils.getRandomInt(0, 359), utils.getRandomInt(0, 10), utils.getRandomInt(0, 10), utils.getRandomInt(c.itemMinSpeed,c.itemMaxSpeed)));
+		}
+		return droppedItems;
 	}
 	move(){
 		this.x += this.speed * Math.cos(this.angle * (Math.PI/180));
