@@ -36,6 +36,7 @@ var server = null,
     toastDuration = 4500,
     totalPlayers = null,
     myShip = null,
+    myName = '',
     healthLastFrame = 0,
     newWidth = 0,
     newHeight = 0,
@@ -106,6 +107,7 @@ function setupPage(){
         } else{
             name = profile.game_name;
         }
+        myName = name;
         enterLobby(name,$('#secondSkin').attr('data-selected'));
         return false;
     });
@@ -422,7 +424,7 @@ function showGameOverScreen(cause){
         $('#gameOverCause').html(cause);
         $('#gameOverMenu').show();
         $('#gameOverReturn').click(function(){
-            resetGameVariables();
+            Variables();
             server.emit('playerLeaveRoom');
             $('#gameOverMenu').hide();
             $('#gameCanvas').css('opacity', '1');
@@ -431,6 +433,8 @@ function showGameOverScreen(cause){
             $('#space-footer').show();
         });
     });
+    $('#spectateTitle').show();
+    $('#spectateName').show();
 }
 
 function goFullScreen(){
@@ -459,6 +463,7 @@ function resetGameVariables(){
     lobbyTimeLeft = 0;
     totalPlayers = null;
     myShip = null;
+    myName = '';
     myGraph = null;
     healthLastFrame = 100;
     moveForward = false;
@@ -488,6 +493,8 @@ function resetGameVariables(){
     hud = document.getElementById('hud');
     $('#readyButton').hide();
     $('#lobbyUI').show();
+    $('#spectateTitle').hide();
+    $('#spectateName').hide();
     gameContext = gameCanvas.getContext('2d');
     resetGameboard();
 }
@@ -754,6 +761,7 @@ function recenterCamera(){
             cameraCenterSeed = findAlivePlayerIndex();
             cameraBouncingFirstPass = false;
             myID = cameraCenterSeed;
+            $('#spectateName').html("<p>"+myName+"</p>");
             changeGadgetHUD(shipList[myID].gadget);
             changeWeaponHUD(shipList[myID].weapon.name);
             healthLastFrame = shipList[myID].health;
@@ -765,6 +773,7 @@ function recenterCamera(){
     }
     if(myID != null && shipList != null && shipList[myID] != null){
         myShip = shipList[myID];
+        myName = myShip.AIName || playerList[myID];
         camera.centerOnObject(myShip);
         camera.draw();
     }
