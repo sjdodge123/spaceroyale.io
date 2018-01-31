@@ -73,7 +73,7 @@ var healthAttributeSVG = new Image();
 healthAttributeSVG.src = "sprites/items/health_item.svg";
 
 var speedAttributeSVG = new Image();
-speedAttributeSVG.src = "sprites/items/shield_item.svg";
+speedAttributeSVG.src = "sprites/items/speed_item.svg";
 
 var bulletSVG = new Image(260,350);
 //bulletSVG.src = "sprites/bullet_sheet.svg";
