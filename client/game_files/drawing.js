@@ -67,13 +67,13 @@ var massDriverItemSVG = new Image();
 massDriverItemSVG.src = "sprites/items/mass_driver_item.svg";
 
 var weaponAttributeSVG = new Image();
-weaponAttributeSVG.src = "sprites/items/weapon_item.svg";
+weaponAttributeSVG.src = "sprites/items/weapon_attr.svg";
 
 var healthAttributeSVG = new Image();
 healthAttributeSVG.src = "sprites/items/health_item.svg";
 
 var speedAttributeSVG = new Image();
-speedAttributeSVG.src = "sprites/items/shield_item.svg";
+speedAttributeSVG.src = "sprites/items/speed_item.svg";
 
 var bulletSVG = new Image(260,350);
 //bulletSVG.src = "sprites/bullet_sheet.svg";
