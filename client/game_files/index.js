@@ -424,7 +424,7 @@ function showGameOverScreen(cause){
         $('#gameOverCause').html(cause);
         $('#gameOverMenu').show();
         $('#gameOverReturn').click(function(){
-            Variables();
+            resetGameVariables();
             server.emit('playerLeaveRoom');
             $('#gameOverMenu').hide();
             $('#gameCanvas').css('opacity', '1');
