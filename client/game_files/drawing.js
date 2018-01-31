@@ -67,7 +67,7 @@ var massDriverItemSVG = new Image();
 massDriverItemSVG.src = "sprites/items/mass_driver_item.svg";
 
 var weaponAttributeSVG = new Image();
-weaponAttributeSVG.src = "sprites/items/weapon_item.svg";
+weaponAttributeSVG.src = "sprites/items/weapon_attr.svg";
 
 var healthAttributeSVG = new Image();
 healthAttributeSVG.src = "sprites/items/health_item.svg";
