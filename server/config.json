@@ -168,10 +168,12 @@
     "droneHackStopChance":1,
 
     "forceShieldDrawRadius":30,
-    "forceShieldRadius": 25,
+    "forceShieldRadius": 35,
     "forceShieldHeight": 5,
     "forceShieldOrbitR": 55,
-    "forceShieldHealth": 40,
+    "forceShieldHealth": 30,
+    "forceShieldCooldown":5,
+    "forceShieldDuration": 3,
     "forceShieldRegenRate": 3,
 
     "quadTreeMaxCount": 70,

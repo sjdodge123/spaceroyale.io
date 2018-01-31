@@ -562,6 +562,9 @@ class GameBoard {
 		//In game running
 		if(active){
 			var objectArray = [];
+			for(var gadgetSig in this.gadgetList){
+				objectArray.push(this.gadgetList[gadgetSig]);
+			}
 			for(var ship in this.shipList){
 				_engine.preventEscape(this.shipList[ship],this.world);
 				objectArray.push(this.shipList[ship]);
@@ -580,9 +583,6 @@ class GameBoard {
 			}
 			for(var nebulaSig in this.nebulaList){
 				objectArray.push(this.nebulaList[nebulaSig]);
-			}
-			for(var gadgetSig in this.gadgetList){
-				objectArray.push(this.gadgetList[gadgetSig]);
 			}
 			for(var bulletSig in this.bulletList){
 				objectArray.push(this.bulletList[bulletSig]);
@@ -1890,8 +1890,8 @@ class DirectionalShield extends Gadget{
 		this.shieldRadius  = c.forceShieldRadius;
 
 		this.activeShield = null;
-		this.cooldown = 5*1000;
-		this.duration = 3*1000;
+		this.cooldown = c.forceShieldCooldown*1000;
+		this.duration = c.forceShieldDuration*1000;
 	}
 	activate(x,y,angle){
 		if(super.activate()){
