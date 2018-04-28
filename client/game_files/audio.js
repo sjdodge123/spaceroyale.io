@@ -1,4 +1,4 @@
-var gameMuted = true;
+var gameMuted = false;
 var playingSounds = [];
 var playerJoinSound = new Audio("./sounds/player_join.wav");
 var collision = new Audio("./sounds/collide_with_obj.wav");
