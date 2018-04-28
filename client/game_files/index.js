@@ -433,8 +433,6 @@ function showGameOverScreen(cause){
             $('#space-footer').show();
         });
     });
-    $('#spectateTitle').show();
-    $('#spectateName').show();
 }
 
 function goFullScreen(){
@@ -761,7 +759,6 @@ function recenterCamera(){
             cameraCenterSeed = findAlivePlayerIndex();
             cameraBouncingFirstPass = false;
             myID = cameraCenterSeed;
-            $('#spectateName').html("<p>"+myName+"</p>");
             changeGadgetHUD(shipList[myID].gadget);
             changeWeaponHUD(shipList[myID].weapon.name);
             healthLastFrame = shipList[myID].health;
@@ -769,11 +766,14 @@ function recenterCamera(){
         if(cameraBouncingFirstPass){
             return;
         }
+        $('#spectateTitle').show();
+        $('#spectateName').show();
 
     }
     if(myID != null && shipList != null && shipList[myID] != null){
         myShip = shipList[myID];
         myName = myShip.AIName || playerList[myID];
+        $('#spectateName').html("<p>"+myName+"</p>");
         camera.centerOnObject(myShip);
         camera.draw();
     }

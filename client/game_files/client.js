@@ -109,7 +109,7 @@ function clientConnect() {
 		if(config){
 			applyConfigs();
 		}
-		cameraBouncing = config.AISpectateMode;
+		cameraBouncing = config.SpectateOnStart;
 		clientSendMessage('changeWeapon',weaponArray[1].value);
 		clientSendMessage('changeGadget',gadgetArray[1].value);
 		clientSendMessage('passiveChanged',{newPassive:$('#firstPassive').attr('data-selected'),oldPassive:null});
