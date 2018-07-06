@@ -10,6 +10,7 @@ var roomList = {},
 
 exports.findARoom = function(clientID){
 	if(getRoomCount() == 0){
+		console.log("No rooms existing starting a new room");
 		return generateNewRoom();
 	}
 	for(var sig2 in roomList){
@@ -72,7 +73,7 @@ function searchForRoom(id){
 }
 
 function generateRoomSig(){
-	var sig = utils.getRandomInt(0,10);
+	var sig = utils.getRandomInt(0,99);
 	if(roomList[sig] == null || roomList[sig] == undefined){
 		return sig;
 	}
@@ -88,7 +89,9 @@ function reclaimRoom(sig){
 		room.leave(clientID);
 	}
 	if(room.clientCount == 0){
+		console.log("Reclaming old room " + sig);
 		delete roomList[sig];
+		roomList[sig] = undefined;
 	}
 }
 

@@ -222,7 +222,7 @@ class Game {
 	gameover(){
 		this.active = false;
 		var winnerName = '';
-		console.log("Room" + this.roomSig +"'s game has ended.");
+		console.log("Room " + this.roomSig +"'s game has ended.");
 		for(var shipID in this.shipList){
 			if(!this.shipList[shipID].isAI){
 				winnerName = this.clientList[shipID];
