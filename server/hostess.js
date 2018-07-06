@@ -44,12 +44,16 @@ exports.getRoomCount = function(){
 exports.updateRooms = function(dt){
 	for(var sig in roomList){
 		var room = roomList[sig];
+		if(room == null){
+			delete roomList[sig];
+			continue;
+		}
 		if(!room.game.gameEnded){
 			room.update(dt);
 		} else if(room.alive){
 			room.alive = false;
 			messenger.messageRoomBySig(room.sig,"gameOver",room.game.winner);
-			setTimeout(reclaimRoom,roomKickTimeout*1000,room.sig);
+			reclaimRoom(room.sig); //setTimeout(reclaimRoom,roomKickTimeout*1000,room.sig);
 		}
 	}
 }
@@ -90,8 +94,7 @@ function reclaimRoom(sig){
 	}
 	if(room.clientCount == 0){
 		console.log("Reclaming old room " + sig);
-		delete roomList[sig];
-		roomList[sig] = undefined;
+		roomList[sig] = null;
 	}
 }
 
