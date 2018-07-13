@@ -6,8 +6,8 @@
     "minPlayers":1,
     "maxPlayersInRoom":50,
     "randomizePlayersLocations":true,
-    "roomKickTimeout":90,
-    "lobbyWaitTime":30,
+    "roomKickTimeout":5,
+    "lobbyWaitTime":60,
 
 
     "baseTimeUntilShrink":10,

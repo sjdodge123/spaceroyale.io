@@ -18,6 +18,7 @@ var bouncer = require('./server/bouncer.js');
 
 //Base Server Settings
 var serverSleeping = true,
+    pendingReboot = false,
 	clientCount = 0,
 	serverTickSpeed = c.serverTickSpeed,
 	serverUpdates = null,
@@ -57,14 +58,27 @@ io.on('connection', function(client){
 
 //Gamestate updates
 function update(){
-	if(!serverSleeping){
-    	var dt = utils.getDT();
-		hostess.updateRooms(dt);
-	}
+    if(serverSleeping){
+        return;
+    }
+	var dt = utils.getDT();
+	hostess.updateRooms(dt);
+    if(pendingReboot == false){
+        //25000000
+        var heapUsed = process.memoryUsage().heapUsed;
+        if(heapUsed > 35000000){
+            console.log("Performing Emergency reboot Memory Critical " + heapUsed);
+            reboot();
+        } else if(heapUsed > 25000000){
+            console.log("Pending reboot.. Memory currently at " + heapUsed);
+            pendingReboot = true;
+        }
+    }
 }
 
 function checkForWake(){
 	if(serverSleeping){
+        console.log("Server wake");
     	utils.getDT();
 		serverSleeping = false;
 		utils.logToFile('logs/connections.txt',"Server wakeup");
@@ -72,9 +86,18 @@ function checkForWake(){
 	}
 }
 
-function checkForSleep(){
+function reboot(){
+    console.log("Server rebooting.....");
+    utils.logToFile('logs/connections.txt',"Server force reboot. Ran for " + process.uptime() / 60 / 60 + " hours");
+    process.exit(1);
+}
 
+function checkForSleep(){
 	if(clientCount == 0){
+        if(pendingReboot){
+            reboot();
+        }
+        console.log("Server sleep ZZZ..");
 		serverSleeping = true;
 		clearInterval(serverUpdates);
 		utils.logToFile('logs/connections.txt',"Server sleep");

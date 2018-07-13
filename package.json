@@ -5,13 +5,15 @@
   "main": "runServer.js",
   "dependencies": {
     "bcrypt": "^1.0.3",
+    "express": "^4.10.2",
+    "forever": "^0.15.3",
+    "google-auth-library": "^0.10.0",
+    "jQuery": "^1.7.4",
     "mysql": "^2.13.0",
+    "node-command-line": "^1.0.2",
     "nodemon": "^1.11.0",
-    "express":"^4.10.2",
-    "google-auth-library":"^0.10.0",
-    "jQuery":"^1.7.4",
-    "percircle":"^1.0.25",
-    "socket.io":"^1.4.4"
+    "percircle": "^1.0.25",
+    "socket.io": "^1.4.4"
   },
   "engine": "node 5.4.1",
   "devDependencies": {},
