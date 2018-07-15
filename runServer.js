@@ -66,10 +66,10 @@ function update(){
     if(pendingReboot == false){
         //25000000
         var heapUsed = process.memoryUsage().heapUsed;
-        if(heapUsed > 35000000){
+        if(heapUsed > 40000000){
             console.log("Performing Emergency reboot Memory Critical " + heapUsed);
             reboot();
-        } else if(heapUsed > 25000000){
+        } else if(heapUsed > 32500000){
             console.log("Pending reboot.. Memory currently at " + heapUsed);
             pendingReboot = true;
         }
