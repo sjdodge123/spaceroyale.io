@@ -1,7 +1,7 @@
 "use strict";
 
 var background = new Image();
-background.src = 'img/background.jpg';
+background.src = 'img/bg_working.png';
 
 var shipRedSVG = new Image(150,1200);
 shipRedSVG.src = 'sprites/ship_red.svg';
