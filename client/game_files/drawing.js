@@ -27,6 +27,9 @@ pulseSVG.src = 'sprites/pulse_wip3.svg';
 var shieldSVG = new Image(200, 1600);
 shieldSVG.src = 'sprites/dir_shield.svg';
 
+var droneSVG = new Image(200, 1600);
+droneSVG.src = 'sprites/items/gadget_drone.svg';
+
 var popSVG = new Image(500,4000);
 popSVG.src = 'sprites/pop_sheet.svg';
 
@@ -1031,11 +1034,21 @@ function drawGadget(gadget){
 			break;
 		}
 		case "Drone":{
+			if (gadget.spriteSheet == null){
+				gadget.spriteSheet = new SpriteSheet(droneSVG, 0, 0, 200, 200, 1, 1,false);
+			}
+			gameContext.save();
+			gadget.spriteSheet.move(gadget.x-myShip.x+camera.xOffset,gadget.y-myShip.y+camera.yOffset);
+			gadget.spriteSheet.update(dt);
+			gadget.spriteSheet.draw(65,65);
+			gameContext.restore();
+			/*
 			gameContext.beginPath();
 			gameContext.lineWidth = 1;
 			gameContext.fillStyle = "orange";
 			gameContext.arc(gadget.x-myShip.x+camera.xOffset,gadget.y-myShip.y+camera.yOffset,gadget.radius,0,Math.PI*2,true);
 			gameContext.fill();
+			*/
 			break;
 		}
 		case "ForceShield":{
