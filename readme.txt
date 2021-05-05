@@ -9,3 +9,8 @@
 - once install completes run server ->  screen -d -m -S webserver node runServer.js
 - open a web browser and navigate to localhost:3000 if all went correctly you should now see the website loaded 
 
+2021 Update: Now with auto deployment to Heroku!
+
+For local install : install node 6.10.3 here https://nodejs.org/dist/v6.10.3/
+Once installed set the SRIO environment varibles on your machine
+run NPM Install, then NPM Start open a browser and check localhost:3000
