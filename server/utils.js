@@ -14,6 +14,7 @@ if(process.env.SRIO_ENV == "DEV"){
         }
     }
 }
+c.port =  process.env.PORT || c.port;
 loadDBInfo();
 
 
