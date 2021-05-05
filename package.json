@@ -18,7 +18,7 @@
   "engines": {
     "node": "5.4.1",
     "nvm" : "0.38"
-  }
+  },
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
