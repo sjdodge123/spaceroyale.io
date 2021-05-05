@@ -1,5 +1,5 @@
-logs/
-serverlogs/
+marketing/
+marketing/*
 node_modules/
 node_modules/*
 
