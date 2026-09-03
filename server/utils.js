@@ -25,11 +25,11 @@ exports.getRandomInt = function(min,max){
 };
 
 exports.logToFile = function(fileLoc,content){
-	fs.appendFile(__dirname + fileLoc,new Date() + " : " + content + "\r\n");
+	console.log(new Date() + " : " + content);
 }
 
 exports.logError = function(content){
-    fs.appendFile(__dirname+ "logs/errors.txt",new Date() + " : " + content + "\r\n");
+    console.error(new Date() + " : " + content);
 }
 
 exports.getTimer = function(callback,delay){
